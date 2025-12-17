@@ -86,8 +86,8 @@ final class AppViewModel {
         do {
             let supabaseUser = try await supabase.fetchUser(id: userId)
 
-            // Check if user needs onboarding
-            if supabaseUser.fullName == nil || supabaseUser.fullName?.isEmpty == true {
+            // Check if user needs onboarding (check if goals are set, meaning they completed onboarding)
+            if supabaseUser.dailyTaskGoal == nil || supabaseUser.dailyTaskGoal == 0 {
                 appState = .onboarding
                 return
             }
