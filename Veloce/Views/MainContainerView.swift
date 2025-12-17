@@ -1424,6 +1424,9 @@ struct CalendarDayCell: View {
     let hasEvents: Bool
     let action: () -> Void
 
+    @State private var todayPulse: Bool = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private var isToday: Bool {
         Calendar.current.isDateInToday(date)
     }
@@ -1438,29 +1441,74 @@ struct CalendarDayCell: View {
                     .font(Theme.Typography.caption2)
                     .foregroundStyle(Theme.Colors.textTertiary)
 
-                Text(date, format: .dateTime.day())
-                    .font(isToday ? Theme.Typography.bodyBold : Theme.Typography.body)
-                    .foregroundStyle(isSelected ? .white : (isToday ? Theme.Colors.accent : Theme.Colors.textPrimary))
-                    .frame(width: 36, height: 36)
-                    .background(isSelected ? Theme.Colors.accent : Color.clear)
-                    .clipShape(Circle())
-                    .overlay(
+                ZStack {
+                    // Glow for today
+                    if isToday && !isSelected {
                         Circle()
-                            .stroke(isToday && !isSelected ? Theme.Colors.accent : Color.clear, lineWidth: 2)
-                    )
+                            .fill(Theme.Colors.accent.opacity(0.2))
+                            .frame(width: 40, height: 40)
+                            .blur(radius: 4)
+                            .scaleEffect(todayPulse ? 1.1 : 1.0)
+                    }
 
+                    // Background
+                    Circle()
+                        .fill(
+                            isSelected ?
+                            LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.accentSecondary], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                                LinearGradient(colors: [Color.clear], startPoint: .top, endPoint: .bottom)
+                        )
+                        .frame(width: 36, height: 36)
+
+                    // Glass effect for selected
+                    if isSelected {
+                        Circle()
+                            .fill(.ultraThinMaterial.opacity(0.3))
+                            .frame(width: 36, height: 36)
+                    }
+
+                    // Today ring
+                    if isToday && !isSelected {
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [Theme.Colors.accent, Theme.Colors.accentSecondary],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2
+                            )
+                            .frame(width: 36, height: 36)
+                    }
+
+                    // Day number
+                    Text(date, format: .dateTime.day())
+                        .font(isToday || isSelected ? Theme.Typography.bodyBold : Theme.Typography.body)
+                        .foregroundStyle(isSelected ? .white : (isToday ? Theme.Colors.accent : Theme.Colors.textPrimary))
+                }
+                .shadow(color: isSelected ? Theme.Colors.accent.opacity(0.3) : .clear, radius: 6, x: 0, y: 2)
+
+                // Event indicator
                 if hasEvents {
-                    Circle()
-                        .fill(isSelected ? .white : Theme.Colors.accent)
-                        .frame(width: 6, height: 6)
+                    HStack(spacing: 2) {
+                        Circle()
+                            .fill(isSelected ? .white : Theme.Colors.accent)
+                            .frame(width: 5, height: 5)
+                    }
+                    .transition(.scale.combined(with: .opacity))
                 } else {
-                    Circle()
-                        .fill(Color.clear)
-                        .frame(width: 6, height: 6)
+                    Color.clear
+                        .frame(width: 5, height: 5)
                 }
             }
         }
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(CalendarCellButtonStyle())
+        .onAppear {
+            guard isToday, !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                todayPulse = true
+            }
+        }
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint(isSelected ? "Currently selected" : "Double tap to view this day")
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : [.isButton])
@@ -1483,16 +1531,28 @@ struct CalendarDayCell: View {
     }
 }
 
+struct CalendarCellButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
 struct ScheduledTaskRow: View {
     let task: TaskItem
 
     var body: some View {
-        HStack {
+        HStack(spacing: Theme.Spacing.md) {
+            // Time pill
             if let time = task.scheduledTime {
                 Text(time, format: .dateTime.hour().minute())
-                    .font(Theme.Typography.caption1)
-                    .foregroundStyle(Theme.Colors.textTertiary)
-                    .frame(width: 60)
+                    .font(Theme.Typography.caption1Medium)
+                    .foregroundStyle(Theme.Colors.accent)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Theme.Colors.accent.opacity(0.1))
+                    .clipShape(Capsule())
             }
 
             Text(task.title)
@@ -1501,10 +1561,21 @@ struct ScheduledTaskRow: View {
                 .lineLimit(1)
 
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(Theme.Colors.textTertiary.opacity(0.5))
         }
-        .padding(Theme.Spacing.sm)
-        .background(Theme.Colors.glassBackground)
-        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.small))
+        .padding(Theme.Spacing.md)
+        .background {
+            RoundedRectangle(cornerRadius: Theme.Radius.card)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.Radius.card)
+                        .stroke(Theme.Colors.glassBorder, lineWidth: 0.5)
+                )
+        }
+        .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
     }
 }
 
@@ -1595,18 +1666,67 @@ struct GoalsPageView: View {
 struct GoalRow: View {
     let goal: Goal
 
+    @State private var animatedProgress: Double = 0
+    @State private var isAppearing = false
+    @State private var completedScale: CGFloat = 1.0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var progressColor: LinearGradient {
+        if goal.isCompleted {
+            return LinearGradient(colors: [Theme.Colors.success, Theme.Colors.aiCyan], startPoint: .leading, endPoint: .trailing)
+        } else if goal.progress >= 0.7 {
+            return LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.success], startPoint: .leading, endPoint: .trailing)
+        } else {
+            return LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.accentSecondary], startPoint: .leading, endPoint: .trailing)
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Text(goal.title)
                     .font(Theme.Typography.headline)
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .foregroundStyle(goal.isCompleted ? Theme.Colors.textTertiary : Theme.Colors.textPrimary)
+                    .strikethrough(goal.isCompleted, color: Theme.Colors.textTertiary)
 
                 Spacer()
 
                 if goal.isCompleted {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Theme.Colors.success)
+                    ZStack {
+                        // Glow
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundStyle(Theme.Colors.success.opacity(0.3))
+                            .blur(radius: 4)
+
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Theme.Colors.success, Theme.Colors.aiCyan],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+                    .scaleEffect(completedScale)
+                } else {
+                    // Progress ring
+                    ZStack {
+                        Circle()
+                            .stroke(Theme.Colors.textTertiary.opacity(0.2), lineWidth: 2)
+                            .frame(width: 24, height: 24)
+
+                        Circle()
+                            .trim(from: 0, to: animatedProgress)
+                            .stroke(progressColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                            .frame(width: 24, height: 24)
+                            .rotationEffect(.degrees(-90))
+
+                        Text("\(Int(animatedProgress * 100))")
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundStyle(Theme.Colors.textTertiary)
+                    }
                 }
             }
 
@@ -1617,27 +1737,88 @@ struct GoalRow: View {
                     .lineLimit(2)
             }
 
-            // Progress bar
+            // Animated progress bar
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Theme.Colors.glassBorder)
-                        .frame(height: 4)
+                    // Track
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Theme.Colors.textTertiary.opacity(0.15))
+                        .frame(height: 6)
 
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Theme.Colors.accent)
-                        .frame(width: geo.size.width * goal.progress, height: 4)
+                    // Progress fill with gradient
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(progressColor)
+                        .frame(width: geo.size.width * animatedProgress, height: 6)
+                        .shadow(color: Theme.Colors.accent.opacity(0.3), radius: 4, x: 0, y: 0)
                 }
             }
-            .frame(height: 4)
+            .frame(height: 6)
 
-            Text("\(Int(goal.progress * 100))% complete")
-                .font(Theme.Typography.caption2)
-                .foregroundStyle(Theme.Colors.textTertiary)
+            HStack {
+                Text("\(Int(animatedProgress * 100))% complete")
+                    .font(Theme.Typography.caption2)
+                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .contentTransition(.numericText())
+
+                Spacer()
+
+                if let targetDate = goal.targetDate {
+                    HStack(spacing: 4) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 10))
+                        Text(targetDate, format: .dateTime.month().day())
+                            .font(Theme.Typography.caption2)
+                    }
+                    .foregroundStyle(goal.isOverdue ? Theme.Colors.error : Theme.Colors.textTertiary)
+                }
+            }
         }
         .padding(Theme.Spacing.md)
-        .background(Theme.Colors.glassBackground)
-        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.card))
+        .background {
+            RoundedRectangle(cornerRadius: Theme.Radius.card)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.Radius.card)
+                        .stroke(
+                            goal.isCompleted ?
+                            LinearGradient(colors: [Theme.Colors.success.opacity(0.3), Theme.Colors.success.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                                LinearGradient(colors: [.white.opacity(0.2), .white.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                            lineWidth: 0.5
+                        )
+                )
+        }
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .opacity(isAppearing ? 1 : 0)
+        .offset(y: isAppearing ? 0 : 10)
+        .onAppear {
+            if reduceMotion {
+                animatedProgress = goal.progress
+                isAppearing = true
+                return
+            }
+
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                isAppearing = true
+            }
+
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.2)) {
+                animatedProgress = goal.progress
+            }
+
+            if goal.isCompleted {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.5).delay(0.5)) {
+                    completedScale = 1.15
+                }
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7).delay(0.7)) {
+                    completedScale = 1.0
+                }
+            }
+        }
+        .onChange(of: goal.progress) { _, newValue in
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                animatedProgress = newValue
+            }
+        }
     }
 }
 
