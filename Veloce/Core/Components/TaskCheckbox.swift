@@ -14,6 +14,7 @@ struct TaskCheckbox: View {
     var size: CGFloat = Theme.Size.checkboxSize
     var onToggle: (() -> Void)?
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isAnimating = false
     @State private var showParticles = false
 
@@ -41,11 +42,11 @@ struct TaskCheckbox: View {
                     Image(systemName: "checkmark")
                         .font(.system(size: size * 0.5, weight: .bold))
                         .foregroundStyle(.white)
-                        .transition(.scale.combined(with: .opacity))
+                        .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
                 }
 
-                // Particle burst on completion
-                if showParticles {
+                // Particle burst on completion (skip for reduce motion)
+                if showParticles && !reduceMotion {
                     ParticleBurst(
                         particleCount: 8,
                         colors: [Theme.Colors.success, Theme.Colors.iridescentMint],
@@ -56,33 +57,44 @@ struct TaskCheckbox: View {
         }
         .buttonStyle(.plain)
         .contentShape(Circle())
-        .scaleEffect(isAnimating ? 1.2 : 1.0)
-        .animation(Theme.Animation.bouncySpring, value: isChecked)
-        .animation(Theme.Animation.quickSpring, value: isAnimating)
+        .scaleEffect(isAnimating && !reduceMotion ? 1.2 : 1.0)
+        .animation(reduceMotion ? .none : Theme.Animation.bouncySpring, value: isChecked)
+        .animation(reduceMotion ? .none : Theme.Animation.quickSpring, value: isAnimating)
+        .accessibilityLabel(isChecked ? "Completed" : "Not completed")
+        .accessibilityHint("Double tap to toggle")
+        .accessibilityAddTraits(.isButton)
     }
 
     private func toggleCheckbox() {
-        withAnimation(Theme.Animation.bouncySpring) {
+        if reduceMotion {
             isChecked.toggle()
+        } else {
+            withAnimation(Theme.Animation.bouncySpring) {
+                isChecked.toggle()
+            }
         }
 
-        // Haptic feedback
+        // Haptic feedback (always provide - not affected by reduce motion)
         if isChecked {
             HapticsService.shared.taskComplete()
 
-            // Show celebration particles
-            showParticles = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                showParticles = false
+            // Show celebration particles (skip for reduce motion)
+            if !reduceMotion {
+                showParticles = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    showParticles = false
+                }
             }
         } else {
             HapticsService.shared.selectionFeedback()
         }
 
-        // Bounce animation
-        isAnimating = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            isAnimating = false
+        // Bounce animation (skip for reduce motion)
+        if !reduceMotion {
+            isAnimating = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isAnimating = false
+            }
         }
 
         onToggle?()

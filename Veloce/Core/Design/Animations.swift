@@ -4,12 +4,25 @@
 //
 //  Animation Utilities and Effects
 //  Custom animations and transition effects
+//  Respects accessibility reduceMotion setting
 //
 
 import SwiftUI
 
+// MARK: - Reduce Motion Aware Animation
+/// Returns an animation that respects the reduce motion setting
+struct ReduceMotionAnimation {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    static func animation(_ animation: Animation, reduced: Animation = .linear(duration: 0.01)) -> Animation {
+        // Note: This is a static helper - callers should check reduceMotion in their view
+        animation
+    }
+}
+
 // MARK: - Bounce Animation Modifier
 struct BounceModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isBouncing = false
 
     let trigger: Bool
@@ -21,6 +34,9 @@ struct BounceModifier: ViewModifier {
             .scaleEffect(isBouncing ? scale : 1.0)
             .onChange(of: trigger) { _, newValue in
                 if newValue {
+                    // Skip animation if reduce motion is enabled
+                    guard !reduceMotion else { return }
+
                     withAnimation(.spring(response: duration, dampingFraction: 0.5)) {
                         isBouncing = true
                     }
@@ -36,6 +52,7 @@ struct BounceModifier: ViewModifier {
 
 // MARK: - Shake Animation Modifier
 struct ShakeModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shakeOffset: CGFloat = 0
 
     let trigger: Bool
@@ -46,6 +63,9 @@ struct ShakeModifier: ViewModifier {
             .offset(x: shakeOffset)
             .onChange(of: trigger) { _, newValue in
                 if newValue {
+                    // Skip animation if reduce motion is enabled
+                    guard !reduceMotion else { return }
+
                     withAnimation(.linear(duration: 0.05).repeatCount(6, autoreverses: true)) {
                         shakeOffset = intensity
                     }
@@ -61,15 +81,16 @@ struct ShakeModifier: ViewModifier {
 
 // MARK: - Wiggle Animation Modifier
 struct WiggleModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isWiggling = false
 
     let active: Bool
 
     func body(content: Content) -> some View {
         content
-            .rotationEffect(.degrees(isWiggling ? 2 : -2))
+            .rotationEffect(.degrees((isWiggling && !reduceMotion) ? 2 : (isWiggling && !reduceMotion) ? -2 : 0))
             .animation(
-                active ?
+                (active && !reduceMotion) ?
                     .linear(duration: 0.1).repeatForever(autoreverses: true) :
                     .default,
                 value: isWiggling
@@ -82,6 +103,7 @@ struct WiggleModifier: ViewModifier {
 
 // MARK: - Fade In Animation Modifier
 struct FadeInModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var opacity: Double = 0
 
     let delay: Double
@@ -91,7 +113,9 @@ struct FadeInModifier: ViewModifier {
         content
             .opacity(opacity)
             .onAppear {
-                withAnimation(.easeIn(duration: duration).delay(delay)) {
+                // Fade is gentle enough for reduce motion, but make it instant
+                let animationDuration = reduceMotion ? 0.01 : duration
+                withAnimation(.easeIn(duration: animationDuration).delay(reduceMotion ? 0 : delay)) {
                     opacity = 1
                 }
             }
@@ -100,6 +124,7 @@ struct FadeInModifier: ViewModifier {
 
 // MARK: - Slide In Animation Modifier
 struct SlideInModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var offset: CGFloat = 50
     @State private var opacity: Double = 0
 
@@ -109,14 +134,20 @@ struct SlideInModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .offset(
-                x: edge == .leading ? -offset : (edge == .trailing ? offset : 0),
-                y: edge == .top ? -offset : (edge == .bottom ? offset : 0)
+                x: reduceMotion ? 0 : (edge == .leading ? -offset : (edge == .trailing ? offset : 0)),
+                y: reduceMotion ? 0 : (edge == .top ? -offset : (edge == .bottom ? offset : 0))
             )
             .opacity(opacity)
             .onAppear {
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(delay)) {
+                if reduceMotion {
+                    // Instant appearance for reduce motion
                     offset = 0
                     opacity = 1
+                } else {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(delay)) {
+                        offset = 0
+                        opacity = 1
+                    }
                 }
             }
     }
@@ -124,6 +155,7 @@ struct SlideInModifier: ViewModifier {
 
 // MARK: - Scale In Animation Modifier
 struct ScaleInModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var scale: CGFloat = 0.8
     @State private var opacity: Double = 0
 
@@ -131,12 +163,18 @@ struct ScaleInModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .scaleEffect(scale)
+            .scaleEffect(reduceMotion ? 1 : scale)
             .opacity(opacity)
             .onAppear {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.7).delay(delay)) {
+                if reduceMotion {
+                    // Instant appearance for reduce motion
                     scale = 1
                     opacity = 1
+                } else {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7).delay(delay)) {
+                        scale = 1
+                        opacity = 1
+                    }
                 }
             }
     }
@@ -168,8 +206,9 @@ struct StaggeredAnimationContainer<Content: View>: View {
     }
 }
 
-// MARK: - Floating Animation Modifier
-struct FloatingModifier: ViewModifier {
+// MARK: - Floating Animation Modifier (respects reduce motion)
+struct SimpleFloatingModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var offset: CGFloat = 0
 
     let amplitude: CGFloat
@@ -179,6 +218,9 @@ struct FloatingModifier: ViewModifier {
         content
             .offset(y: offset)
             .onAppear {
+                // Skip continuous animation for reduce motion
+                guard !reduceMotion else { return }
+
                 withAnimation(
                     .easeInOut(duration: duration)
                         .repeatForever(autoreverses: true)
@@ -186,11 +228,16 @@ struct FloatingModifier: ViewModifier {
                     offset = amplitude
                 }
             }
+            .transaction { transaction in
+                // Make animation interruptible
+                transaction.animation = transaction.animation?.speed(1.0)
+            }
     }
 }
 
 // MARK: - Rotation Animation Modifier
 struct ContinuousRotationModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var rotation: Double = 0
 
     let duration: Double
@@ -200,12 +247,19 @@ struct ContinuousRotationModifier: ViewModifier {
         content
             .rotationEffect(.degrees(rotation))
             .onAppear {
+                // Skip continuous rotation for reduce motion
+                guard !reduceMotion else { return }
+
                 withAnimation(
                     .linear(duration: duration)
                         .repeatForever(autoreverses: false)
                 ) {
                     rotation = clockwise ? 360 : -360
                 }
+            }
+            .transaction { transaction in
+                // Make animation interruptible
+                transaction.animation = transaction.animation?.speed(1.0)
             }
     }
 }
@@ -242,9 +296,9 @@ extension View {
         modifier(ScaleInModifier(delay: delay))
     }
 
-    /// Floating animation
+    /// Floating animation (respects reduce motion)
     func floating(amplitude: CGFloat = 5, duration: Double = 2) -> some View {
-        modifier(FloatingModifier(amplitude: amplitude, duration: duration))
+        modifier(SimpleFloatingModifier(amplitude: amplitude, duration: duration))
     }
 
     /// Continuous rotation

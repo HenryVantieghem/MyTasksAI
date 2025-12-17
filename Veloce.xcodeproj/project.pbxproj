@@ -13,7 +13,6 @@
 		820501BC2EEA321D004A19A3 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 820501BB2EEA321D004A19A3 /* Realtime */; };
 		820501BE2EEA321D004A19A3 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 820501BD2EEA321D004A19A3 /* Storage */; };
 		820501C02EEA321D004A19A3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 820501BF2EEA321D004A19A3 /* Supabase */; };
-		820502C72EEA378D004A19A3 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 820502C62EEA378D004A19A3 /* Secrets.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +33,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		820502C62EEA378D004A19A3 /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 		8233E5842EE2514E00E8DB19 /* Veloce.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Veloce.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8233E5912EE2515400E8DB19 /* VeloceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VeloceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8233E59B2EE2515400E8DB19 /* VeloceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VeloceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,7 +90,6 @@
 		8233E57B2EE2514E00E8DB19 = {
 			isa = PBXGroup;
 			children = (
-				820502C62EEA378D004A19A3 /* Secrets.plist */,
 				8233E5862EE2514E00E8DB19 /* Veloce */,
 				8233E5942EE2515400E8DB19 /* VeloceTests */,
 				8233E59E2EE2515400E8DB19 /* VeloceUITests */,
@@ -239,7 +236,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				820502C72EEA378D004A19A3 /* Secrets.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

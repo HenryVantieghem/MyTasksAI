@@ -257,15 +257,16 @@ struct StreakCelebration: View {
             // Content card
             if showContent {
                 VStack(spacing: 24) {
-                    // Emoji
+                    // Emoji (decorative - fixed size is OK for emoji)
                     Text(streakEmoji)
                         .font(.system(size: 72))
                         .scaleEffect(numberScale)
+                        .accessibilityHidden(true)
 
                     // Streak number with fire
                     HStack(spacing: 8) {
                         Image(systemName: "flame.fill")
-                            .font(.system(size: 32))
+                            .font(.largeTitle)
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [Theme.Colors.fire, Theme.Colors.aiOrange],
@@ -273,16 +274,19 @@ struct StreakCelebration: View {
                                     endPoint: .top
                                 )
                             )
+                            .accessibilityHidden(true)
 
                         Text("\(streakDays)")
-                            .font(.system(size: 48, weight: .black, design: .rounded))
+                            .font(.system(.largeTitle, design: .rounded, weight: .black))
                             .foregroundStyle(Theme.Colors.fire)
+                            .accessibilityLabel("\(streakDays) day streak")
                     }
 
                     // Title
                     Text(streakTitle)
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(.title2, design: .rounded, weight: .bold))
                         .foregroundStyle(Theme.Colors.textPrimary)
+                        .accessibilityAddTraits(.isHeader)
 
                     // Subtitle
                     Text("You're on fire! Keep up the momentum.")
@@ -295,7 +299,7 @@ struct StreakCelebration: View {
                         dismiss()
                     } label: {
                         Text("Awesome!")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(Theme.Typography.headline)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
@@ -309,6 +313,7 @@ struct StreakCelebration: View {
                             .clipShape(Capsule())
                     }
                     .padding(.top, 8)
+                    .accessibilityLabel("Dismiss celebration")
                 }
                 .padding(32)
                 .frame(maxWidth: 320)
@@ -318,6 +323,8 @@ struct StreakCelebration: View {
                         .shadow(color: Theme.Colors.aiOrange.opacity(0.3), radius: 30, y: 10)
                 )
                 .transition(.scale.combined(with: .opacity))
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Streak celebration! \(streakDays) day streak. \(streakTitle). You're on fire! Keep up the momentum.")
             }
         }
         .onAppear {
@@ -402,6 +409,7 @@ struct LevelUpCelebration: View {
                             .frame(width: 120, height: 120)
                             .rotationEffect(.degrees(ringRotation))
                             .scaleEffect(ringScale)
+                            .accessibilityHidden(true)
 
                         // Inner circle
                         Circle()
@@ -414,17 +422,19 @@ struct LevelUpCelebration: View {
                             )
                             .frame(width: 100, height: 100)
                             .scaleEffect(ringScale)
+                            .accessibilityHidden(true)
 
                         // Level number
                         Text("\(newLevel)")
-                            .font(.system(size: 48, weight: .black, design: .rounded))
+                            .font(.system(.largeTitle, design: .rounded, weight: .black))
                             .foregroundStyle(.white)
                             .scaleEffect(ringScale)
+                            .accessibilityLabel("Level \(newLevel)")
                     }
 
                     // Title
                     Text("Level Up!")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .font(.system(.title, design: .rounded, weight: .bold))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
@@ -432,6 +442,7 @@ struct LevelUpCelebration: View {
                                 endPoint: .trailing
                             )
                         )
+                        .accessibilityAddTraits(.isHeader)
 
                     // Subtitle
                     Text("You've reached Level \(newLevel)!")
@@ -458,7 +469,7 @@ struct LevelUpCelebration: View {
                         dismiss()
                     } label: {
                         Text("Continue")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(Theme.Typography.headline)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
@@ -472,9 +483,12 @@ struct LevelUpCelebration: View {
                             .clipShape(Capsule())
                     }
                     .padding(.top, 8)
+                    .accessibilityLabel("Dismiss celebration")
                 }
                 .padding(32)
                 .frame(maxWidth: 320)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Level up celebration! You've reached level \(newLevel). \(newLevel % 5 == 0 ? "New rewards unlocked!" : "")")
                 .background(
                     RoundedRectangle(cornerRadius: 28)
                         .fill(.ultraThinMaterial)

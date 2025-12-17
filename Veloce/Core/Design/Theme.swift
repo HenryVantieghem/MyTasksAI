@@ -69,6 +69,20 @@ enum Theme {
         static let glassBorder = Color.white.opacity(0.2)
         static let divider = Color(uiColor: .separator)
 
+        // MARK: Dark Mode Aware Colors (use with DarkModeAware modifier)
+        /// Returns different colors based on color scheme
+        static func adaptiveGlass(light: Double = 0.1, dark: Double = 0.15) -> (light: Color, dark: Color) {
+            (Color.white.opacity(light), Color.white.opacity(dark))
+        }
+
+        static func adaptiveBorder(light: Double = 0.2, dark: Double = 0.25) -> (light: Color, dark: Color) {
+            (Color.white.opacity(light), Color.white.opacity(dark))
+        }
+
+        static func adaptiveShadow(light: Double = 0.1, dark: Double = 0.3) -> (light: Color, dark: Color) {
+            (Color.black.opacity(light), Color.black.opacity(dark))
+        }
+
         // MARK: Gradient Presets
         static var accentGradient: LinearGradient {
             LinearGradient(
@@ -216,11 +230,19 @@ enum Theme {
 
     // MARK: - Shadow
     enum Shadow {
+        // Light mode shadows
         static let sm = ShadowStyle(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         static let md = ShadowStyle(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         static let lg = ShadowStyle(color: .black.opacity(0.15), radius: 16, x: 0, y: 8)
         static let glow = ShadowStyle(color: Colors.accent.opacity(0.4), radius: 20, x: 0, y: 0)
         static let aiGlow = ShadowStyle(color: Colors.aiPurple.opacity(0.5), radius: 24, x: 0, y: 0)
+
+        // Dark mode enhanced shadows (use with adaptiveShadow modifier)
+        static let smDark = ShadowStyle(color: .black.opacity(0.2), radius: 6, x: 0, y: 3)
+        static let mdDark = ShadowStyle(color: .black.opacity(0.3), radius: 12, x: 0, y: 6)
+        static let lgDark = ShadowStyle(color: .black.opacity(0.4), radius: 20, x: 0, y: 10)
+        static let glowDark = ShadowStyle(color: Colors.accent.opacity(0.5), radius: 24, x: 0, y: 0)
+        static let aiGlowDark = ShadowStyle(color: Colors.aiPurple.opacity(0.6), radius: 28, x: 0, y: 0)
     }
 
     // MARK: - Animation
@@ -260,30 +282,111 @@ extension View {
         self.shadow(color: style.color, radius: style.radius, x: style.x, y: style.y)
     }
 
-    /// Apply card style
-    func cardStyle() -> some View {
-        self
-            .padding(Theme.Spacing.cardPadding)
-            .background(Theme.Colors.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
-            .themeShadow(Theme.Shadow.sm)
+    /// Apply adaptive theme shadow (different in light/dark mode)
+    func themeShadow(_ light: ShadowStyle, dark: ShadowStyle) -> some View {
+        modifier(AdaptiveThemeShadowModifier(lightShadow: light, darkShadow: dark))
     }
 
-    /// Apply glass card style
+    /// Apply standard adaptive shadow (auto-selects light/dark variant)
+    func adaptiveThemeShadow(_ size: AdaptiveShadowSize) -> some View {
+        switch size {
+        case .sm:
+            return AnyView(themeShadow(Theme.Shadow.sm, dark: Theme.Shadow.smDark))
+        case .md:
+            return AnyView(themeShadow(Theme.Shadow.md, dark: Theme.Shadow.mdDark))
+        case .lg:
+            return AnyView(themeShadow(Theme.Shadow.lg, dark: Theme.Shadow.lgDark))
+        case .glow:
+            return AnyView(themeShadow(Theme.Shadow.glow, dark: Theme.Shadow.glowDark))
+        case .aiGlow:
+            return AnyView(themeShadow(Theme.Shadow.aiGlow, dark: Theme.Shadow.aiGlowDark))
+        }
+    }
+}
+
+/// Adaptive shadow sizes for convenience
+enum AdaptiveShadowSize {
+    case sm, md, lg, glow, aiGlow
+}
+
+/// Modifier for adaptive shadows based on color scheme
+struct AdaptiveThemeShadowModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let lightShadow: ShadowStyle
+    let darkShadow: ShadowStyle
+
+    func body(content: Content) -> some View {
+        let shadow = colorScheme == .dark ? darkShadow : lightShadow
+        content.shadow(color: shadow.color, radius: shadow.radius, x: shadow.x, y: shadow.y)
+    }
+}
+
+// MARK: - Card Style Extensions
+extension View {
+    /// Apply card style with adaptive shadows
+    func cardStyle() -> some View {
+        modifier(CardStyleModifier())
+    }
+
+    /// Apply glass card style with adaptive dark mode
     func glassCardStyle() -> some View {
-        self
-            .padding(Theme.Spacing.cardPadding)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.card)
-                    .stroke(Theme.Colors.glassBorder, lineWidth: 0.5)
-            )
+        modifier(GlassCardStyleModifier())
     }
 
     /// Apply screen padding
     func screenPadding() -> some View {
         self.padding(.horizontal, Theme.Spacing.screenPadding)
+    }
+}
+
+/// Card style modifier with adaptive shadows
+struct CardStyleModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    func body(content: Content) -> some View {
+        content
+            .padding(Theme.Spacing.cardPadding)
+            .background(Theme.Colors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+            .shadow(
+                color: .black.opacity(colorScheme == .dark ? 0.2 : 0.05),
+                radius: colorScheme == .dark ? 6 : 4,
+                x: 0,
+                y: colorScheme == .dark ? 3 : 2
+            )
+    }
+}
+
+/// Glass card style modifier with adaptive dark mode
+struct GlassCardStyleModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    func body(content: Content) -> some View {
+        content
+            .padding(Theme.Spacing.cardPadding)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.CornerRadius.card)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(colorScheme == .dark ? 0.15 : 0.25),
+                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(
+                color: .black.opacity(colorScheme == .dark ? 0.25 : 0.08),
+                radius: colorScheme == .dark ? 8 : 4,
+                x: 0,
+                y: colorScheme == .dark ? 4 : 2
+            )
     }
 }
 

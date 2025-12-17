@@ -8,8 +8,91 @@
 
 import SwiftUI
 
+// MARK: - Dark Mode Aware Modifier
+/// Applies different values based on color scheme for polished dark mode
+struct DarkModeAwareModifier<Light: View, Dark: View>: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let lightView: () -> Light
+    let darkView: () -> Dark
+
+    func body(content: Content) -> some View {
+        if colorScheme == .dark {
+            darkView()
+        } else {
+            lightView()
+        }
+    }
+}
+
+extension View {
+    /// Apply different views based on color scheme
+    func darkModeAware<Light: View, Dark: View>(
+        light: @escaping () -> Light,
+        dark: @escaping () -> Dark
+    ) -> some View {
+        modifier(DarkModeAwareModifier(lightView: light, darkView: dark))
+    }
+
+    /// Apply different opacity based on color scheme
+    func adaptiveOpacity(light: Double, dark: Double) -> some View {
+        modifier(AdaptiveOpacityModifier(lightOpacity: light, darkOpacity: dark))
+    }
+
+    /// Apply different shadow based on color scheme
+    func adaptiveShadow(
+        lightColor: Color = .black.opacity(0.1),
+        darkColor: Color = .black.opacity(0.3),
+        radius: CGFloat = 8,
+        x: CGFloat = 0,
+        y: CGFloat = 4
+    ) -> some View {
+        modifier(AdaptiveShadowModifier(
+            lightColor: lightColor,
+            darkColor: darkColor,
+            radius: radius,
+            x: x,
+            y: y
+        ))
+    }
+}
+
+// MARK: - Adaptive Opacity Modifier
+struct AdaptiveOpacityModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let lightOpacity: Double
+    let darkOpacity: Double
+
+    func body(content: Content) -> some View {
+        content.opacity(colorScheme == .dark ? darkOpacity : lightOpacity)
+    }
+}
+
+// MARK: - Adaptive Shadow Modifier
+struct AdaptiveShadowModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let lightColor: Color
+    let darkColor: Color
+    let radius: CGFloat
+    let x: CGFloat
+    let y: CGFloat
+
+    func body(content: Content) -> some View {
+        content.shadow(
+            color: colorScheme == .dark ? darkColor : lightColor,
+            radius: colorScheme == .dark ? radius * 1.5 : radius,  // Larger blur in dark mode
+            x: x,
+            y: y
+        )
+    }
+}
+
 // MARK: - Glass Effect Modifier
 struct GlassEffectModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
     let cornerRadius: CGFloat
     let opacity: Double
     let borderWidth: CGFloat
@@ -23,8 +106,8 @@ struct GlassEffectModifier: ViewModifier {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(0.3),
-                                .white.opacity(0.1)
+                                .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
+                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -81,11 +164,24 @@ struct GlassButtonModifier: ViewModifier {
                     .overlay(
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(
-                                Theme.Colors.glassBorder,
+                                LinearGradient(
+                                    colors: [
+                                        .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
+                                        .white.opacity(colorScheme == .dark ? 0.05 : 0.15)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
                                 lineWidth: 0.5
                             )
                     )
             }
+            .shadow(
+                color: .black.opacity(colorScheme == .dark ? 0.3 : 0.1),
+                radius: colorScheme == .dark ? 6 : 4,
+                x: 0,
+                y: 2
+            )
             .scaleEffect(isPressed ? DesignTokens.Scale.pressed : 1)
             .opacity(isPressed ? DesignTokens.Opacity.pressed : 1)
     }
@@ -102,13 +198,30 @@ struct GlassTextFieldStyle: TextFieldStyle {
             .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.textField))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.textField)
-                    .stroke(Theme.Colors.glassBorder, lineWidth: 0.5)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(colorScheme == .dark ? 0.15 : 0.25),
+                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(
+                color: .black.opacity(colorScheme == .dark ? 0.2 : 0.05),
+                radius: colorScheme == .dark ? 3 : 2,
+                x: 0,
+                y: 1
             )
     }
 }
 
 // MARK: - Floating Glass Modifier
 struct FloatingGlassModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var isHovering = false
 
     let elevation: CGFloat
@@ -119,13 +232,23 @@ struct FloatingGlassModifier: ViewModifier {
             .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.card)
-                    .stroke(Theme.Colors.glassBorder, lineWidth: 0.5)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(colorScheme == .dark ? 0.15 : 0.25),
+                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
             )
             .shadow(
-                color: .black.opacity(0.15),
-                radius: elevation,
+                color: .black.opacity(colorScheme == .dark ? 0.4 : 0.15),
+                radius: colorScheme == .dark ? elevation * 1.5 : elevation,
                 x: 0,
-                y: elevation / 2
+                y: colorScheme == .dark ? elevation * 0.75 : elevation / 2
             )
     }
 }
@@ -175,6 +298,8 @@ extension View {
 
 // MARK: - Glass Pill Button Style
 struct GlassPillButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) private var colorScheme
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(Theme.Typography.subheadline)
@@ -184,7 +309,23 @@ struct GlassPillButtonStyle: ButtonStyle {
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .stroke(Theme.Colors.glassBorder, lineWidth: 0.5)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
+                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(
+                color: .black.opacity(colorScheme == .dark ? 0.25 : 0.08),
+                radius: colorScheme == .dark ? 4 : 2,
+                x: 0,
+                y: 1
             )
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
             .animation(Theme.Animation.fast, value: configuration.isPressed)

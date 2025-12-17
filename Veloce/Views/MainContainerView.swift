@@ -195,48 +195,244 @@ struct TasksPageView: View {
         VStack(spacing: Theme.Spacing.lg) {
             Spacer()
 
-            Image(systemName: "checkmark.circle")
-                .font(.system(size: 60, weight: .light))
-                .foregroundStyle(Theme.Colors.textTertiary)
-
-            Text(emptyStateMessage)
-                .font(Theme.Typography.body)
-                .foregroundStyle(Theme.Colors.textSecondary)
-                .multilineTextAlignment(.center)
-
-            Spacer()
-        }
-        .padding(Theme.Spacing.xl)
-    }
-
-    private var emptyStateMessage: String {
-        switch viewModel.currentFilter {
-        case .all: return "No tasks yet.\nTap + to add your first task!"
-        case .today: return "No tasks for today.\nEnjoy your day!"
-        case .scheduled: return "No scheduled tasks.\nSchedule tasks for better planning."
-        case .completed: return "No completed tasks yet.\nStart checking off your tasks!"
-        }
-    }
-
-    private var addButton: some View {
-        Button {
-            showAddTask = true
-            HapticsService.shared.impact()
-        } label: {
-            Image(systemName: "plus")
-                .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 56, height: 56)
-                .background(
+            // Animated empty state icon
+            Image(systemName: emptyStateIcon)
+                .font(.system(size: 64, weight: .light))
+                .foregroundStyle(
                     LinearGradient(
-                        colors: [Theme.Colors.accent, Theme.Colors.accentSecondary],
+                        colors: [Theme.Colors.accent.opacity(0.6), Theme.Colors.accentSecondary.opacity(0.4)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .clipShape(Circle())
-                .shadow(color: Theme.Colors.accent.opacity(0.3), radius: 10, x: 0, y: 5)
+                .symbolEffect(.pulse.byLayer, options: .repeating)
+                .accessibilityHidden(true)
+
+            VStack(spacing: Theme.Spacing.sm) {
+                Text(emptyStateTitle)
+                    .font(Theme.Typography.title3)
+                    .foregroundStyle(Theme.Colors.textPrimary)
+
+                Text(emptyStateSubtitle)
+                    .font(Theme.Typography.body)
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            // CTA Button for empty states
+            if showEmptyStateCTA {
+                Button {
+                    showAddTask = true
+                    HapticsService.shared.impact(.medium)
+                } label: {
+                    HStack(spacing: Theme.Spacing.sm) {
+                        Image(systemName: "plus.circle.fill")
+                        Text(emptyStateCTAText)
+                    }
+                    .font(Theme.Typography.headline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, Theme.Spacing.xl)
+                    .padding(.vertical, Theme.Spacing.md)
+                    .background(Theme.Colors.accentGradient)
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(ScaleButtonStyle())
+                .padding(.top, Theme.Spacing.md)
+            }
+
+            Spacer()
         }
+        .padding(Theme.Spacing.xl)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(emptyStateTitle). \(emptyStateSubtitle)")
+    }
+
+    private var emptyStateIcon: String {
+        switch viewModel.currentFilter {
+        case .all: return "tray"
+        case .today: return "sun.max"
+        case .scheduled: return "calendar.badge.clock"
+        case .completed: return "checkmark.circle"
+        }
+    }
+
+    private var emptyStateTitle: String {
+        switch viewModel.currentFilter {
+        case .all: return "No tasks yet"
+        case .today: return "All clear for today!"
+        case .scheduled: return "Nothing scheduled"
+        case .completed: return "Nothing completed yet"
+        }
+    }
+
+    private var emptyStateSubtitle: String {
+        switch viewModel.currentFilter {
+        case .all: return "Add your first task to get started"
+        case .today: return "Enjoy your free time or add some tasks"
+        case .scheduled: return "Schedule tasks to plan your day better"
+        case .completed: return "Complete tasks to see them here"
+        }
+    }
+
+    private var showEmptyStateCTA: Bool {
+        viewModel.currentFilter == .all || viewModel.currentFilter == .today
+    }
+
+    private var emptyStateCTAText: String {
+        "Add Task"
+    }
+
+    private var addButton: some View {
+        PremiumFAB(
+            isEmpty: viewModel.filteredTasks.isEmpty,
+            action: {
+                showAddTask = true
+                HapticsService.shared.impact(.medium)
+            }
+        )
+    }
+}
+
+// MARK: - Premium Floating Action Button
+
+struct PremiumFAB: View {
+    let isEmpty: Bool
+    let action: () -> Void
+
+    @State private var isPressed = false
+    @State private var floatPhase: CGFloat = 0
+    @State private var glowPhase: CGFloat = 0
+    @State private var rotationAngle: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                // Outer glow ring (intensifies when empty)
+                Circle()
+                    .stroke(
+                        AngularGradient(
+                            colors: [
+                                Theme.Colors.accent.opacity(isEmpty ? 0.6 : 0.3),
+                                Theme.Colors.accentSecondary.opacity(isEmpty ? 0.4 : 0.2),
+                                Theme.Colors.aiCyan.opacity(isEmpty ? 0.3 : 0.1),
+                                Theme.Colors.accent.opacity(isEmpty ? 0.6 : 0.3)
+                            ],
+                            center: .center,
+                            angle: .degrees(rotationAngle)
+                        ),
+                        lineWidth: isEmpty ? 3 : 2
+                    )
+                    .frame(width: 68, height: 68)
+                    .blur(radius: isEmpty ? 6 : 4)
+                    .scaleEffect(1 + glowPhase * (isEmpty ? 0.15 : 0.08))
+
+                // Glass background
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .frame(width: 60, height: 60)
+                    .overlay(
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        .white.opacity(0.4),
+                                        .white.opacity(0.1)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+
+                // Gradient fill
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Theme.Colors.accent.opacity(0.9),
+                                Theme.Colors.accentSecondary.opacity(0.7)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 56, height: 56)
+
+                // Plus icon
+                Image(systemName: "plus")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .rotationEffect(.degrees(isPressed ? 90 : 0))
+            }
+            .frame(width: 68, height: 68)
+            .shadow(color: Theme.Colors.accent.opacity(0.4), radius: 12, x: 0, y: 6)
+            .scaleEffect(isPressed ? 1.1 : 1.0)
+            .offset(y: reduceMotion ? 0 : -floatPhase * 3)
+        }
+        .buttonStyle(.plain)
+        .pressEvents(onPress: {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                isPressed = true
+            }
+        }, onRelease: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                isPressed = false
+            }
+        })
+        .onAppear {
+            guard !reduceMotion else { return }
+
+            // Floating animation
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                floatPhase = 1
+            }
+
+            // Glow pulse
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                glowPhase = 1
+            }
+
+            // Ring rotation
+            withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
+                rotationAngle = 360
+            }
+        }
+        .accessibilityLabel("Add new task")
+        .accessibilityHint("Double tap to create a new task")
+    }
+}
+
+// MARK: - Press Events Modifier
+
+struct PressEventsModifier: ViewModifier {
+    var onPress: () -> Void
+    var onRelease: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in onPress() }
+                    .onEnded { _ in onRelease() }
+            )
+    }
+}
+
+extension View {
+    func pressEvents(onPress: @escaping () -> Void, onRelease: @escaping () -> Void) -> some View {
+        modifier(PressEventsModifier(onPress: onPress, onRelease: onRelease))
+    }
+}
+
+// MARK: - Scale Button Style (for tap feedback)
+
+struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.94 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 
@@ -246,69 +442,254 @@ struct TaskRow: View {
     let task: TaskItem
     @Bindable var viewModel: TasksViewModel
     @State private var showDetail = false
+    @State private var checkScale: CGFloat = 1.0
+    @State private var checkOpacity: Double = 1.0
+    @State private var strikethroughProgress: CGFloat = 0
+    @State private var sparkleRotation: Double = 0
+    @State private var isAppearing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var priorityColor: Color {
+        switch task.priorityEnum {
+        case .urgent: return Theme.Colors.error
+        case .high: return Theme.Colors.streakOrange
+        case .medium: return Theme.Colors.warning
+        case .low: return Theme.Colors.accent
+        case .none: return Theme.Colors.textTertiary.opacity(0.5)
+        }
+    }
 
     var body: some View {
         Button {
             showDetail = true
+            HapticsService.shared.selectionFeedback()
         } label: {
-            HStack(spacing: Theme.Spacing.md) {
-                // Checkbox
-                Button {
-                    viewModel.toggleCompletion(task)
-                } label: {
-                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 24))
-                        .foregroundStyle(task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary)
-                }
-                .buttonStyle(.plain)
+            HStack(spacing: 0) {
+                // Priority accent border
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(priorityColor)
+                    .frame(width: 4)
+                    .padding(.vertical, 8)
 
-                // Content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(task.title)
-                        .font(Theme.Typography.body)
-                        .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : Theme.Colors.textPrimary)
-                        .strikethrough(task.isCompleted)
-                        .lineLimit(2)
+                HStack(spacing: Theme.Spacing.md) {
+                    // Animated Checkbox
+                    Button {
+                        toggleWithAnimation()
+                    } label: {
+                        ZStack {
+                            // Background circle
+                            Circle()
+                                .stroke(task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary.opacity(0.4), lineWidth: 2)
+                                .frame(width: 26, height: 26)
 
-                    HStack(spacing: Theme.Spacing.sm) {
-                        // Star rating
-                        if task.starRating > 0 {
-                            Text(String(repeating: "*", count: task.starRating))
-                                .font(Theme.Typography.caption1)
-                                .foregroundStyle(Theme.Colors.warning)
+                            // Filled background when complete
+                            Circle()
+                                .fill(task.isCompleted ? Theme.Colors.success : Color.clear)
+                                .frame(width: 22, height: 22)
+                                .scaleEffect(task.isCompleted ? 1 : 0)
+
+                            // Checkmark
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundStyle(.white)
+                                .scaleEffect(task.isCompleted ? 1 : 0)
+                                .opacity(task.isCompleted ? 1 : 0)
                         }
+                        .scaleEffect(checkScale)
+                        .opacity(checkOpacity)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(task.isCompleted ? "Mark incomplete" : "Mark complete")
+                    .accessibilityHint("Double tap to toggle task completion")
 
-                        // Time estimate
-                        if let minutes = task.estimatedMinutes {
-                            Label("\(minutes)m", systemImage: "clock")
-                                .font(Theme.Typography.caption1)
+                    // Content
+                    VStack(alignment: .leading, spacing: 4) {
+                        // Title with animated strikethrough
+                        Text(task.title)
+                            .font(Theme.Typography.body)
+                            .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : Theme.Colors.textPrimary)
+                            .strikethrough(task.isCompleted, color: Theme.Colors.textTertiary)
+                            .lineLimit(2)
+
+                        // Metadata row
+                        HStack(spacing: Theme.Spacing.sm) {
+                            // Star rating with gold shimmer
+                            if task.starRating > 0 {
+                                HStack(spacing: 2) {
+                                    ForEach(0..<task.starRating, id: \.self) { _ in
+                                        Image(systemName: "star.fill")
+                                            .font(.system(size: 10))
+                                    }
+                                }
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Theme.Colors.gold, Theme.Colors.warning],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .accessibilityLabel("\(task.starRating) star priority")
+                            }
+
+                            // Time estimate pill
+                            if let minutes = task.estimatedMinutes {
+                                HStack(spacing: 3) {
+                                    Image(systemName: "clock")
+                                        .font(.system(size: 9))
+                                    Text("\(minutes)m")
+                                        .font(Theme.Typography.caption2)
+                                }
                                 .foregroundStyle(Theme.Colors.textTertiary)
-                        }
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Theme.Colors.glassBackground)
+                                .clipShape(Capsule())
+                                .accessibilityLabel("Estimated \(minutes) minutes")
+                            }
 
-                        // AI processed indicator
-                        if task.aiProcessedAt != nil {
-                            Image(systemName: "sparkles")
-                                .font(Theme.Typography.caption1)
-                                .foregroundStyle(Theme.Colors.aiPurple)
+                            // AI sparkle indicator with subtle rotation
+                            if task.aiProcessedAt != nil {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .rotationEffect(.degrees(sparkleRotation))
+                                    .accessibilityLabel("AI enhanced")
+                            }
                         }
                     }
+
+                    Spacer()
+
+                    // Chevron indicator
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Theme.Colors.textTertiary.opacity(0.5))
                 }
-
-                Spacer()
-
-                // Priority indicator
-                Circle()
-                    .fill(task.priorityEnum.color)
-                    .frame(width: 8, height: 8)
+                .padding(.leading, Theme.Spacing.md)
+                .padding(.trailing, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.md)
             }
-            .padding(Theme.Spacing.md)
-            .background(Theme.Colors.glassBackground)
+            .background {
+                RoundedRectangle(cornerRadius: Theme.Radius.card)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Theme.Radius.card)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        .white.opacity(0.2),
+                                        .white.opacity(0.05)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.5
+                            )
+                    )
+            }
             .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.card))
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(TaskRowButtonStyle())
+        .contentShape(Rectangle())
+        .opacity(isAppearing ? 1 : 0)
+        .offset(y: isAppearing ? 0 : 10)
+        .onAppear {
+            // Stagger entrance
+            guard !reduceMotion else {
+                isAppearing = true
+                return
+            }
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                isAppearing = true
+            }
+            // Sparkle rotation
+            if task.aiProcessedAt != nil {
+                withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                    sparkleRotation = 15
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(taskAccessibilityLabel)
+        .accessibilityHint("Double tap to view details")
+        .accessibilityAddTraits(task.isCompleted ? [.isButton] : [.isButton])
         .sheet(isPresented: $showDetail) {
             TaskDetailSheet(task: task, viewModel: viewModel)
         }
+    }
+
+    private func toggleWithAnimation() {
+        let wasCompleted = task.isCompleted
+
+        if reduceMotion {
+            viewModel.toggleCompletion(task)
+            return
+        }
+
+        // Bounce animation
+        withAnimation(.spring(response: 0.2, dampingFraction: 0.5)) {
+            checkScale = 1.3
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            viewModel.toggleCompletion(task)
+
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                checkScale = 1.0
+            }
+        }
+
+        // Haptic feedback
+        if !wasCompleted {
+            HapticsService.shared.impact(.medium)
+        } else {
+            HapticsService.shared.selectionFeedback()
+        }
+
+        let message = wasCompleted ? "Task marked incomplete" : "Task completed"
+        AccessibilityAnnouncement.announce(message)
+    }
+
+    private var taskAccessibilityLabel: String {
+        var parts: [String] = []
+
+        if task.isCompleted {
+            parts.append("Completed:")
+        }
+
+        parts.append(task.title)
+
+        if task.starRating > 0 {
+            parts.append("\(task.starRating) star priority")
+        }
+
+        if let minutes = task.estimatedMinutes {
+            parts.append("estimated \(minutes) minutes")
+        }
+
+        if task.aiProcessedAt != nil {
+            parts.append("AI enhanced")
+        }
+
+        return parts.joined(separator: ", ")
+    }
+}
+
+// MARK: - Task Row Button Style
+
+struct TaskRowButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
 
@@ -333,7 +714,20 @@ struct FilterPill: View {
             .background(isSelected ? Theme.Colors.accent : Theme.Colors.glassBackground)
             .foregroundStyle(isSelected ? .white : Theme.Colors.textPrimary)
             .clipShape(Capsule())
+            .scaleEffect(1.0) // Provides tap feedback base
         }
+        .buttonStyle(FilterPillButtonStyle())
+        .accessibilityLabel("\(title) filter")
+        .accessibilityHint(isSelected ? "Currently selected" : "Double tap to filter by \(title.lowercased())")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : [.isButton])
+    }
+}
+
+struct FilterPillButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
 
@@ -345,38 +739,310 @@ struct MainStatsBar: View {
     let streak: Int
     let points: Int
 
+    @State private var animatedCompleted: Int = 0
+    @State private var animatedStreak: Int = 0
+    @State private var animatedPoints: Int = 0
+    @State private var hasAnimated = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var progress: Double {
+        total > 0 ? Double(completed) / Double(total) : 0
+    }
+
+    private var isGoalComplete: Bool {
+        completed >= total && total > 0
+    }
+
     var body: some View {
-        HStack(spacing: Theme.Spacing.lg) {
-            MainStatItem(icon: "checkmark.circle", value: "\(completed)/\(total)", label: "Today")
-            MainStatItem(icon: "flame", value: "\(streak)", label: "Streak")
-            MainStatItem(icon: "star", value: "\(points)", label: "Points")
+        HStack(spacing: Theme.Spacing.sm) {
+            // Today's Progress with Ring
+            TodayProgressStat(
+                completed: animatedCompleted,
+                total: total,
+                progress: progress,
+                isComplete: isGoalComplete
+            )
+
+            // Divider
+            Rectangle()
+                .fill(Theme.Colors.glassBorder)
+                .frame(width: 1, height: 40)
+
+            // Streak with Flame
+            StreakStat(streak: animatedStreak)
+
+            // Divider
+            Rectangle()
+                .fill(Theme.Colors.glassBorder)
+                .frame(width: 1, height: 40)
+
+            // Points
+            PointsStat(points: animatedPoints)
         }
         .padding(Theme.Spacing.md)
-        .background(Theme.Colors.glassBackground)
-        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.card))
+        .background {
+            RoundedRectangle(cornerRadius: Theme.Radius.card)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.Radius.card)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    .white.opacity(0.25),
+                                    .white.opacity(0.08)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.5
+                        )
+                )
+        }
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
+        .onAppear {
+            guard !hasAnimated else { return }
+            hasAnimated = true
+
+            if reduceMotion {
+                animatedCompleted = completed
+                animatedStreak = streak
+                animatedPoints = points
+            } else {
+                // Animate counts
+                animateCount(to: completed, updating: $animatedCompleted, duration: 0.6)
+                animateCount(to: streak, updating: $animatedStreak, duration: 0.8)
+                animateCount(to: points, updating: $animatedPoints, duration: 1.0)
+            }
+        }
+        .onChange(of: completed) { _, newValue in
+            if reduceMotion {
+                animatedCompleted = newValue
+            } else {
+                animateCount(to: newValue, updating: $animatedCompleted, duration: 0.3)
+            }
+        }
+        .onChange(of: streak) { _, newValue in
+            if reduceMotion {
+                animatedStreak = newValue
+            } else {
+                animateCount(to: newValue, updating: $animatedStreak, duration: 0.3)
+            }
+        }
+        .onChange(of: points) { _, newValue in
+            if reduceMotion {
+                animatedPoints = newValue
+            } else {
+                animateCount(to: newValue, updating: $animatedPoints, duration: 0.5)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Daily progress: \(completed) of \(total) tasks, \(streak) day streak, \(points) points")
+    }
+
+    private func animateCount(to target: Int, updating binding: Binding<Int>, duration: Double) {
+        let steps = 20
+        let interval = duration / Double(steps)
+        let increment = Double(target - binding.wrappedValue) / Double(steps)
+        var current = Double(binding.wrappedValue)
+
+        for i in 0..<steps {
+            DispatchQueue.main.asyncAfter(deadline: .now() + interval * Double(i)) {
+                current += increment
+                binding.wrappedValue = Int(current.rounded())
+            }
+        }
+        // Ensure final value
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+            binding.wrappedValue = target
+        }
     }
 }
 
-struct MainStatItem: View {
-    let icon: String
-    let value: String
-    let label: String
+// MARK: - Today Progress Stat
+
+struct TodayProgressStat: View {
+    let completed: Int
+    let total: Int
+    let progress: Double
+    let isComplete: Bool
+
+    @State private var ringProgress: Double = 0
+    @State private var celebratePulse: Bool = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(spacing: 4) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundStyle(Theme.Colors.accent)
-                Text(value)
+        HStack(spacing: Theme.Spacing.sm) {
+            // Progress Ring
+            ZStack {
+                // Track
+                Circle()
+                    .stroke(Theme.Colors.textTertiary.opacity(0.2), lineWidth: 3)
+                    .frame(width: 36, height: 36)
+
+                // Progress
+                Circle()
+                    .trim(from: 0, to: ringProgress)
+                    .stroke(
+                        isComplete ?
+                        LinearGradient(colors: [Theme.Colors.success, Theme.Colors.aiCyan], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                            LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.accentSecondary], startPoint: .topLeading, endPoint: .bottomTrailing),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                    )
+                    .frame(width: 36, height: 36)
+                    .rotationEffect(.degrees(-90))
+
+                // Checkmark when complete
+                if isComplete {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.Colors.success)
+                        .scaleEffect(celebratePulse ? 1.2 : 1.0)
+                } else {
+                    Image(systemName: "checkmark.circle")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Theme.Colors.accent)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(completed)/\(total)")
                     .font(Theme.Typography.headline)
                     .foregroundStyle(Theme.Colors.textPrimary)
+                    .contentTransition(.numericText())
+                Text("Today")
+                    .font(Theme.Typography.caption2)
+                    .foregroundStyle(Theme.Colors.textTertiary)
             }
-            Text(label)
-                .font(Theme.Typography.caption2)
-                .foregroundStyle(Theme.Colors.textTertiary)
         }
         .frame(maxWidth: .infinity)
+        .onAppear {
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.2)) {
+                ringProgress = progress
+            }
+        }
+        .onChange(of: progress) { _, newValue in
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                ringProgress = newValue
+            }
+        }
+        .onChange(of: isComplete) { _, newValue in
+            guard newValue, !reduceMotion else { return }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+                celebratePulse = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    celebratePulse = false
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Streak Stat
+
+struct StreakStat: View {
+    let streak: Int
+
+    @State private var flameWiggle: Double = 0
+    @State private var glowIntensity: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var isOnFire: Bool { streak >= 3 }
+
+    var body: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            ZStack {
+                // Glow effect for active streaks
+                if isOnFire {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(Theme.Colors.fire.opacity(0.4))
+                        .blur(radius: 6)
+                        .scaleEffect(1.0 + glowIntensity * 0.3)
+                }
+
+                Image(systemName: isOnFire ? "flame.fill" : "flame")
+                    .font(.system(size: 20))
+                    .foregroundStyle(
+                        isOnFire ?
+                        LinearGradient(colors: [Theme.Colors.fire, Theme.Colors.streakOrange, Theme.Colors.warning], startPoint: .bottom, endPoint: .top) :
+                            LinearGradient(colors: [Theme.Colors.textTertiary], startPoint: .bottom, endPoint: .top)
+                    )
+                    .rotationEffect(.degrees(flameWiggle))
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(streak)")
+                    .font(Theme.Typography.headline)
+                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .contentTransition(.numericText())
+                Text(streak == 1 ? "Day" : "Days")
+                    .font(Theme.Typography.caption2)
+                    .foregroundStyle(Theme.Colors.textTertiary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .onAppear {
+            guard isOnFire, !reduceMotion else { return }
+            // Flame wiggle
+            withAnimation(.easeInOut(duration: 0.3).repeatForever(autoreverses: true)) {
+                flameWiggle = 5
+            }
+            // Glow pulse
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                glowIntensity = 1
+            }
+        }
+    }
+}
+
+// MARK: - Points Stat
+
+struct PointsStat: View {
+    let points: Int
+
+    @State private var starRotation: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            ZStack {
+                // Background glow
+                Image(systemName: "star.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(Theme.Colors.xp.opacity(0.3))
+                    .blur(radius: 4)
+
+                Image(systemName: "star.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Theme.Colors.gold, Theme.Colors.xp],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .rotationEffect(.degrees(starRotation))
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(points)")
+                    .font(Theme.Typography.headline)
+                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .contentTransition(.numericText())
+                Text("XP")
+                    .font(Theme.Typography.caption2)
+                    .foregroundStyle(Theme.Colors.textTertiary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                starRotation = 10
+            }
+        }
     }
 }
 
@@ -484,22 +1150,37 @@ struct CalendarPageView: View {
                 HStack {
                     Button {
                         viewModel.goToPrevious()
+                        HapticsService.shared.selectionFeedback()
                     } label: {
                         Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(Theme.Colors.accent)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
+                    .buttonStyle(ScaleButtonStyle())
+                    .accessibilityLabel("Previous month")
 
                     Spacer()
 
                     Text(viewModel.selectedDate, format: .dateTime.month().year())
                         .font(Theme.Typography.headline)
+                        .accessibilityAddTraits(.isHeader)
 
                     Spacer()
 
                     Button {
                         viewModel.goToNext()
+                        HapticsService.shared.selectionFeedback()
                     } label: {
                         Image(systemName: "chevron.right")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(Theme.Colors.accent)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
+                    .buttonStyle(ScaleButtonStyle())
+                    .accessibilityLabel("Next month")
                 }
                 .padding(.horizontal, Theme.Spacing.md)
 
@@ -546,23 +1227,34 @@ struct CalendarDayCell: View {
     let hasEvents: Bool
     let action: () -> Void
 
+    private var isToday: Bool {
+        Calendar.current.isDateInToday(date)
+    }
+
     var body: some View {
-        Button(action: action) {
+        Button {
+            action()
+            HapticsService.shared.selectionFeedback()
+        } label: {
             VStack(spacing: 4) {
                 Text(date, format: .dateTime.weekday(.short))
                     .font(Theme.Typography.caption2)
                     .foregroundStyle(Theme.Colors.textTertiary)
 
                 Text(date, format: .dateTime.day())
-                    .font(Theme.Typography.body)
-                    .foregroundStyle(isSelected ? .white : Theme.Colors.textPrimary)
+                    .font(isToday ? Theme.Typography.bodyBold : Theme.Typography.body)
+                    .foregroundStyle(isSelected ? .white : (isToday ? Theme.Colors.accent : Theme.Colors.textPrimary))
                     .frame(width: 36, height: 36)
                     .background(isSelected ? Theme.Colors.accent : Color.clear)
                     .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(isToday && !isSelected ? Theme.Colors.accent : Color.clear, lineWidth: 2)
+                    )
 
                 if hasEvents {
                     Circle()
-                        .fill(Theme.Colors.accent)
+                        .fill(isSelected ? .white : Theme.Colors.accent)
                         .frame(width: 6, height: 6)
                 } else {
                     Circle()
@@ -571,7 +1263,26 @@ struct CalendarDayCell: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle())
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint(isSelected ? "Currently selected" : "Double tap to view this day")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : [.isButton])
+    }
+
+    private var accessibilityLabel: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        var label = formatter.string(from: date)
+
+        if isToday {
+            label = "Today, \(label)"
+        }
+
+        if hasEvents {
+            label += ", has tasks"
+        }
+
+        return label
     }
 }
 
@@ -625,19 +1336,50 @@ struct GoalsPageView: View {
     private var emptyState: some View {
         VStack(spacing: Theme.Spacing.lg) {
             Image(systemName: "target")
-                .font(.system(size: 60))
-                .foregroundStyle(Theme.Colors.textTertiary)
+                .font(.system(size: 64, weight: .light))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Theme.Colors.accent.opacity(0.6), Theme.Colors.accentSecondary.opacity(0.4)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .symbolEffect(.pulse.byLayer, options: .repeating)
+                .accessibilityHidden(true)
 
-            Text("No goals yet")
+            VStack(spacing: Theme.Spacing.sm) {
+                Text("No goals yet")
+                    .font(Theme.Typography.title3)
+                    .foregroundStyle(Theme.Colors.textPrimary)
+
+                Text("Set SMART goals to stay focused on what matters.")
+                    .font(Theme.Typography.body)
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            // CTA Button
+            Button {
+                // TODO: Show add goal sheet
+                HapticsService.shared.impact(.medium)
+            } label: {
+                HStack(spacing: Theme.Spacing.sm) {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Create Goal")
+                }
                 .font(Theme.Typography.headline)
-                .foregroundStyle(Theme.Colors.textPrimary)
-
-            Text("Set SMART goals to stay focused on what matters.")
-                .font(Theme.Typography.body)
-                .foregroundStyle(Theme.Colors.textSecondary)
-                .multilineTextAlignment(.center)
+                .foregroundStyle(.white)
+                .padding(.horizontal, Theme.Spacing.xl)
+                .padding(.vertical, Theme.Spacing.md)
+                .background(Theme.Colors.accentGradient)
+                .clipShape(Capsule())
+            }
+            .buttonStyle(ScaleButtonStyle())
+            .padding(.top, Theme.Spacing.md)
         }
         .padding(Theme.Spacing.xl)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("No goals yet. Set SMART goals to stay focused on what matters.")
     }
 
     private var goalsList: some View {
