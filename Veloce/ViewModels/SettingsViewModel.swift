@@ -192,17 +192,25 @@ final class SettingsViewModel {
     // MARK: - Account Actions
 
     func signOut() async {
+        guard supabase.isConfigured else { return }
+
         do {
-            try await supabase.supabase.auth.signOut()
+            let client = try supabase.getClient()
+            try await client.auth.signOut()
         } catch {
             self.error = error.localizedDescription
         }
     }
 
     func deleteAccount() async throws {
+        guard supabase.isConfigured else {
+            throw SettingsError.notConfigured
+        }
+
         // This would need a server-side function to delete user data
         // For now, just sign out
-        try await supabase.supabase.auth.signOut()
+        let client = try supabase.getClient()
+        try await client.auth.signOut()
     }
 
     // MARK: - Data Management
@@ -310,6 +318,7 @@ enum SettingsError: Error, LocalizedError {
     case noContext
     case saveFailed
     case exportFailed
+    case notConfigured
 
     var errorDescription: String? {
         switch self {
@@ -319,6 +328,8 @@ enum SettingsError: Error, LocalizedError {
             return "Failed to save settings"
         case .exportFailed:
             return "Failed to export data"
+        case .notConfigured:
+            return "Supabase is not configured"
         }
     }
 }

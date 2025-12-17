@@ -163,8 +163,15 @@ final class AppViewModel {
 
     /// Sign out
     func signOut() async {
+        guard supabase.isConfigured else {
+            currentUser = nil
+            appState = .unauthenticated
+            return
+        }
+
         do {
-            try await supabase.supabase.auth.signOut()
+            let client = try supabase.getClient()
+            try await client.auth.signOut()
             currentUser = nil
             appState = .unauthenticated
         } catch {

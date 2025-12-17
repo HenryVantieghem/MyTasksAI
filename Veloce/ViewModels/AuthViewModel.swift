@@ -230,13 +230,20 @@ final class AuthViewModel {
             return
         }
 
+        guard supabase.isConfigured else {
+            authState = .error(supabase.lastError ?? "Supabase is not configured. Please check your Secrets.plist file.")
+            haptics.error()
+            return
+        }
+
         authState = .signingIn
         isLoading = true
 
         defer { isLoading = false }
 
         do {
-            try await supabase.supabase.auth.signIn(
+            let client = try supabase.getClient()
+            try await client.auth.signIn(
                 email: email,
                 password: password
             )
@@ -269,13 +276,20 @@ final class AuthViewModel {
             return
         }
 
+        guard supabase.isConfigured else {
+            authState = .error(supabase.lastError ?? "Supabase is not configured. Please check your Secrets.plist file.")
+            haptics.error()
+            return
+        }
+
         authState = .signingUp
         isLoading = true
 
         defer { isLoading = false }
 
         do {
-            try await supabase.supabase.auth.signUp(
+            let client = try supabase.getClient()
+            try await client.auth.signUp(
                 email: email,
                 password: password,
                 data: fullName.isEmpty ? nil : ["full_name": .string(fullName)]
@@ -299,11 +313,18 @@ final class AuthViewModel {
             return
         }
 
+        guard supabase.isConfigured else {
+            authState = .error(supabase.lastError ?? "Supabase is not configured. Please check your Secrets.plist file.")
+            haptics.error()
+            return
+        }
+
         isLoading = true
         defer { isLoading = false }
 
         do {
-            try await supabase.supabase.auth.resetPasswordForEmail(email)
+            let client = try supabase.getClient()
+            try await client.auth.resetPasswordForEmail(email)
 
             // Show success message
             authState = .error("Password reset email sent. Check your inbox.")
@@ -318,8 +339,15 @@ final class AuthViewModel {
 
     /// Sign out
     func signOut() async {
+        guard supabase.isConfigured else {
+            authState = .idle
+            clearForm()
+            return
+        }
+
         do {
-            try await supabase.supabase.auth.signOut()
+            let client = try supabase.getClient()
+            try await client.auth.signOut()
             authState = .idle
             clearForm()
         } catch {

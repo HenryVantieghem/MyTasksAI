@@ -82,9 +82,21 @@ final class SupabaseService {
         isConfigured = true
     }
 
-    /// Get the Supabase client
+    /// Get the Supabase client (throws if not configured)
+    func getClient() throws -> SupabaseClient {
+        guard isConfigured, let client else {
+            throw SupabaseError.notConfigured
+        }
+        return client
+    }
+
+    /// Get the Supabase client (for backwards compatibility - prefer getClient())
     var supabase: SupabaseClient {
         guard let client else {
+            // Check if configuration failed with a specific error
+            if let error = lastError {
+                fatalError("SupabaseService not configured: \(error)")
+            }
             fatalError("SupabaseService not configured. Call configure() first.")
         }
         return client
