@@ -629,16 +629,13 @@ extension SupabaseService {
 
         let channel = supabase.channel("tasks-changes")
 
+        // Subscribe to Postgres changes for the tasks table and filter by user_id at the server level.
         let changes = channel.postgresChange(
             AnyAction.self,
             schema: "public",
-            table: "tasks"
-        ).filter { action in
-            // Attempt to extract the row payload and compare user_id
-            guard let row = action.row as? [String: Any],
-                  let value = row["user_id"] as? String else { return false }
-            return value == userId.uuidString
-        }
+            table: "tasks",
+            filter: "user_id=eq.\(userId.uuidString)"
+        )
 
         try await channel.subscribeWithError()
 
