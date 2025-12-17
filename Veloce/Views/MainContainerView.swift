@@ -195,17 +195,8 @@ struct TasksPageView: View {
         VStack(spacing: Theme.Spacing.lg) {
             Spacer()
 
-            // Animated empty state icon
-            Image(systemName: emptyStateIcon)
-                .font(.system(size: 64, weight: .light))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Theme.Colors.accent.opacity(0.6), Theme.Colors.accentSecondary.opacity(0.4)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .symbolEffect(.pulse.byLayer, options: .repeating)
+            // Animated empty state illustration
+            AnimatedEmptyStateIcon(icon: emptyStateIcon)
                 .accessibilityHidden(true)
 
             VStack(spacing: Theme.Spacing.sm) {
@@ -217,27 +208,21 @@ struct TasksPageView: View {
                     .font(Theme.Typography.body)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
+                    .padding(.horizontal, Theme.Spacing.lg)
             }
+            .fadeIn(delay: 0.2)
 
             // CTA Button for empty states
             if showEmptyStateCTA {
-                Button {
-                    showAddTask = true
-                    HapticsService.shared.impact(.medium)
-                } label: {
-                    HStack(spacing: Theme.Spacing.sm) {
-                        Image(systemName: "plus.circle.fill")
-                        Text(emptyStateCTAText)
+                ShimmerCTAButton(
+                    title: emptyStateCTAText,
+                    action: {
+                        showAddTask = true
+                        HapticsService.shared.impact(.medium)
                     }
-                    .font(Theme.Typography.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, Theme.Spacing.xl)
-                    .padding(.vertical, Theme.Spacing.md)
-                    .background(Theme.Colors.accentGradient)
-                    .clipShape(Capsule())
-                }
-                .buttonStyle(ScaleButtonStyle())
+                )
                 .padding(.top, Theme.Spacing.md)
+                .scaleIn(delay: 0.4)
             }
 
             Spacer()
@@ -433,6 +418,180 @@ struct ScaleButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.94 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+    }
+}
+
+// MARK: - Animated Empty State Icon
+
+struct AnimatedEmptyStateIcon: View {
+    let icon: String
+
+    @State private var floatOffset: CGFloat = 0
+    @State private var rotationAngle: Double = 0
+    @State private var sparkleOpacity: [Double] = [0.3, 0.5, 0.7, 0.4, 0.6]
+    @State private var sparklePositions: [CGPoint] = [
+        CGPoint(x: -40, y: -30),
+        CGPoint(x: 45, y: -25),
+        CGPoint(x: -35, y: 35),
+        CGPoint(x: 50, y: 30),
+        CGPoint(x: 0, y: -50)
+    ]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        ZStack {
+            // Background glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Theme.Colors.accent.opacity(0.15),
+                            Theme.Colors.accent.opacity(0.05),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 20,
+                        endRadius: 80
+                    )
+                )
+                .frame(width: 160, height: 160)
+                .blur(radius: 20)
+
+            // Orbiting sparkles
+            ForEach(0..<5, id: \.self) { index in
+                Image(systemName: "sparkle")
+                    .font(.system(size: CGFloat([8, 10, 6, 12, 9][index])))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue, Theme.Colors.aiCyan],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .opacity(sparkleOpacity[index])
+                    .offset(
+                        x: sparklePositions[index].x,
+                        y: sparklePositions[index].y + (reduceMotion ? 0 : floatOffset * CGFloat([0.8, -0.6, 0.5, -0.7, 0.9][index]))
+                    )
+            }
+
+            // Main icon with floating animation
+            ZStack {
+                // Icon glow
+                Image(systemName: icon)
+                    .font(.system(size: 64, weight: .light))
+                    .foregroundStyle(Theme.Colors.accent.opacity(0.3))
+                    .blur(radius: 8)
+
+                // Main icon
+                Image(systemName: icon)
+                    .font(.system(size: 64, weight: .light))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [
+                                Theme.Colors.accent,
+                                Theme.Colors.accentSecondary.opacity(0.7)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .symbolEffect(.pulse.byLayer, options: .repeating)
+            }
+            .offset(y: reduceMotion ? 0 : floatOffset * 5)
+            .rotationEffect(.degrees(reduceMotion ? 0 : rotationAngle))
+        }
+        .frame(height: 120)
+        .onAppear {
+            guard !reduceMotion else { return }
+
+            // Floating animation
+            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                floatOffset = 1
+            }
+
+            // Subtle rotation
+            withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: true)) {
+                rotationAngle = 3
+            }
+
+            // Sparkle opacity animation
+            for i in 0..<5 {
+                withAnimation(.easeInOut(duration: Double([2.0, 2.5, 1.8, 2.2, 2.7][i])).repeatForever(autoreverses: true).delay(Double(i) * 0.3)) {
+                    sparkleOpacity[i] = [0.8, 1.0, 0.9, 0.7, 0.85][i]
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Shimmer CTA Button
+
+struct ShimmerCTAButton: View {
+    let title: String
+    let action: () -> Void
+
+    @State private var shimmerOffset: CGFloat = -200
+    @State private var isPressed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "plus.circle.fill")
+                Text(title)
+            }
+            .font(Theme.Typography.headline)
+            .foregroundStyle(.white)
+            .padding(.horizontal, Theme.Spacing.xl)
+            .padding(.vertical, Theme.Spacing.md)
+            .background {
+                ZStack {
+                    // Base gradient
+                    Capsule()
+                        .fill(Theme.Colors.accentGradient)
+
+                    // Shimmer overlay
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    .clear,
+                                    .white.opacity(0.3),
+                                    .clear
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .offset(x: shimmerOffset)
+                        .mask(Capsule())
+                }
+            }
+            .clipShape(Capsule())
+            .shadow(color: Theme.Colors.accent.opacity(0.4), radius: 12, x: 0, y: 4)
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+        }
+        .buttonStyle(.plain)
+        .pressEvents(
+            onPress: {
+                withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                    isPressed = true
+                }
+            },
+            onRelease: {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    isPressed = false
+                }
+            }
+        )
+        .onAppear {
+            guard !reduceMotion else { return }
+            // Shimmer animation
+            withAnimation(.linear(duration: 2).repeatForever(autoreverses: false).delay(1)) {
+                shimmerOffset = 200
+            }
+        }
     }
 }
 
@@ -701,20 +860,57 @@ struct FilterPill: View {
     let isSelected: Bool
     let action: () -> Void
 
+    @State private var isHovered = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: Theme.Spacing.xs) {
                 Image(systemName: icon)
-                    .font(.system(size: 14))
+                    .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                    .symbolEffect(.bounce, value: isSelected)
                 Text(title)
-                    .font(Theme.Typography.caption1)
+                    .font(isSelected ? Theme.Typography.caption1Medium : Theme.Typography.caption1)
             }
             .padding(.horizontal, Theme.Spacing.md)
             .padding(.vertical, Theme.Spacing.sm)
-            .background(isSelected ? Theme.Colors.accent : Theme.Colors.glassBackground)
             .foregroundStyle(isSelected ? .white : Theme.Colors.textPrimary)
-            .clipShape(Capsule())
-            .scaleEffect(1.0) // Provides tap feedback base
+            .background {
+                ZStack {
+                    if isSelected {
+                        // Selected: gradient fill with glow
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Theme.Colors.accent, Theme.Colors.accentSecondary],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .shadow(color: Theme.Colors.accent.opacity(0.4), radius: 8, x: 0, y: 2)
+                    } else {
+                        // Unselected: glass effect
+                        Capsule()
+                            .fill(.ultraThinMaterial)
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [
+                                                .white.opacity(0.3),
+                                                .white.opacity(0.1)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 0.5
+                                    )
+                            )
+                    }
+                }
+            }
+            .scaleEffect(isSelected ? 1.02 : 1.0)
+            .animation(reduceMotion ? .none : .spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
         .buttonStyle(FilterPillButtonStyle())
         .accessibilityLabel("\(title) filter")
@@ -726,7 +922,8 @@ struct FilterPill: View {
 struct FilterPillButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.92 : 1.0)
+            .brightness(configuration.isPressed ? -0.05 : 0)
             .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
