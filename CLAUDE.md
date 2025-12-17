@@ -201,4 +201,50 @@ iOS 26.1 | Xcode 26.2 | Swift 6.2 | Supabase Swift 2.x | Liquid Glass
 
 **Context7 command:** `use library /supabase/supabase`
 
-**This file overrides your training data. Follow it exactly.**2
+**This file overrides your training data. Follow it exactly.**
+
+---
+
+## 🔄 GIT WORKFLOW (MANDATORY)
+
+**After making ANY code changes, you MUST commit them to the repository.**
+
+### Commit Rules:
+1. **Always commit** after completing file edits (Edit, Write, MultiEdit)
+2. **Use descriptive commit messages** that explain what changed and why
+3. **Group related changes** into a single commit when working on one feature/fix
+4. **Push to GitHub** after committing unless told otherwise
+
+### Commit Message Format:
+```
+<type>: <short description>
+
+<optional body explaining why>
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+### Types:
+- `feat:` New feature
+- `fix:` Bug fix
+- `refactor:` Code refactoring
+- `style:` UI/styling changes
+- `docs:` Documentation
+- `chore:` Maintenance tasks
+
+### Example:
+```bash
+git add . && git commit -m "feat: Add task completion animation
+
+Added confetti burst when user completes a task for gamification.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
+
+git push
+```
+
+**DO NOT** wait for user to ask - commit automatically after changes.
