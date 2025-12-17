@@ -11,6 +11,7 @@ import SwiftUI
 // MARK: - Onboarding Container View
 struct OnboardingContainerView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(AppViewModel.self) private var appViewModel
     @Bindable var viewModel: OnboardingViewModel
 
     /// Adaptive padding based on device size
@@ -67,6 +68,14 @@ struct OnboardingContainerView: View {
                         .padding(.horizontal, horizontalPadding)
                         .padding(.vertical, Theme.Spacing.lg)
                         .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .task {
+            // Connect onboarding completion to app state
+            viewModel.onComplete = {
+                Task {
+                    await appViewModel.checkAuthenticationState()
                 }
             }
         }

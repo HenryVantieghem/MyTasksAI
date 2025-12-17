@@ -13,6 +13,7 @@ import AuthenticationServices
 
 struct AuthView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppViewModel.self) private var appViewModel
     @State private var viewModel = AuthViewModel()
     @State private var showEmailSignIn = false
     @State private var showError = false
@@ -53,6 +54,14 @@ struct AuthView: View {
         }
         .sheet(isPresented: $showEmailSignIn) {
             EmailSignInSheet(viewModel: viewModel)
+        }
+        .task {
+            // Connect auth success to app state refresh
+            viewModel.onAuthSuccess = {
+                Task {
+                    await appViewModel.checkAuthenticationState()
+                }
+            }
         }
     }
 
@@ -333,7 +342,7 @@ struct EmailSignInSheet: View {
 
     private var isValid: Bool {
         let emailValid = email.contains("@") && email.contains(".")
-        let passwordValid = password.count >= 6
+        let passwordValid = password.count >= 8  // Match AuthViewModel validation
 
         if isSignUp {
             return emailValid && passwordValid && password == confirmPassword
