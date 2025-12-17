@@ -610,11 +610,9 @@ struct TaskRow: View {
 
     private var priorityColor: Color {
         switch task.priorityEnum {
-        case .urgent: return Theme.Colors.error
-        case .high: return Theme.Colors.streakOrange
+        case .high: return Theme.Colors.error
         case .medium: return Theme.Colors.warning
-        case .low: return Theme.Colors.accent
-        case .none: return Theme.Colors.textTertiary.opacity(0.5)
+        case .low: return Theme.Colors.textTertiary.opacity(0.5)
         }
     }
 

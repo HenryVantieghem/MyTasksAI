@@ -166,8 +166,8 @@ struct PulsingGlowModifier: ViewModifier {
     }
 }
 
-// MARK: - Shimmer Effect
-struct ShimmerModifier: ViewModifier {
+// MARK: - Glow Shimmer Effect
+struct GlowShimmerModifier: ViewModifier {
     @State private var phase: CGFloat = 0
 
     let gradient: Gradient
@@ -235,9 +235,9 @@ extension View {
         modifier(PulsingGlowModifier(color: color, radius: radius))
     }
 
-    /// Apply shimmer effect
-    func shimmer() -> some View {
-        modifier(ShimmerModifier(
+    /// Apply shimmer glow effect
+    func shimmerGlow() -> some View {
+        modifier(GlowShimmerModifier(
             gradient: Gradient(colors: [
                 .clear,
                 .white.opacity(0.5),
