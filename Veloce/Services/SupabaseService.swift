@@ -646,7 +646,7 @@ extension SupabaseService {
             AnyAction.self,
             schema: "public",
             table: "tasks",
-            filter: "user_id=eq.\(userId.uuidString)"
+            filter: .eq("user_id", value: userId.uuidString)
         )
 
         try await channel.subscribeWithError()

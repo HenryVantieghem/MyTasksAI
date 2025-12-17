@@ -156,9 +156,7 @@ struct OnboardingContainerView: View {
         case .welcome: return "Get Started"
         case .goals: return "Continue"
         case .focusAreas: return "Continue"
-        case .name: return "Continue"
         case .notifications: return "Continue"
-        case .calendar: return "Continue"
         case .complete: return "Done"
         }
     }
@@ -166,7 +164,6 @@ struct OnboardingContainerView: View {
     private var canProceed: Bool {
         switch viewModel.currentStep {
         case .focusAreas: return !viewModel.selectedFocusAreas.isEmpty
-        case .name: return !viewModel.fullName.trimmingCharacters(in: .whitespaces).isEmpty
         default: return true
         }
     }

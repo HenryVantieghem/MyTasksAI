@@ -14,21 +14,17 @@ import UserNotifications
 
 enum OnboardingStep: Int, CaseIterable {
     case welcome = 0
-    case name = 1
-    case goals = 2
-    case focusAreas = 3
-    case notifications = 4
-    case calendar = 5
-    case complete = 6
+    case goals = 1
+    case focusAreas = 2
+    case notifications = 3
+    case complete = 4
 
     var title: String {
         switch self {
         case .welcome: return "Welcome to Veloce"
-        case .name: return "What's your name?"
         case .goals: return "Set your goals"
         case .focusAreas: return "What do you focus on?"
         case .notifications: return "Stay on track"
-        case .calendar: return "Connect your calendar"
         case .complete: return "You're all set!"
         }
     }
@@ -36,11 +32,9 @@ enum OnboardingStep: Int, CaseIterable {
     var subtitle: String {
         switch self {
         case .welcome: return "Your AI-powered productivity companion"
-        case .name: return "Let's personalize your experience"
         case .goals: return "How many tasks do you want to complete?"
         case .focusAreas: return "We'll tailor AI suggestions for you"
         case .notifications: return "Get reminders for your tasks"
-        case .calendar: return "Sync your schedule for smart suggestions"
         case .complete: return "Start being productive!"
         }
     }
@@ -48,11 +42,9 @@ enum OnboardingStep: Int, CaseIterable {
     var icon: String {
         switch self {
         case .welcome: return "sparkles"
-        case .name: return "person.circle"
         case .goals: return "target"
         case .focusAreas: return "square.grid.2x2"
         case .notifications: return "bell.badge"
-        case .calendar: return "calendar"
         case .complete: return "checkmark.circle.fill"
         }
     }
@@ -141,14 +133,12 @@ final class OnboardingViewModel {
         switch currentStep {
         case .welcome:
             return true
-        case .name:
-            return !fullName.trimmingCharacters(in: .whitespaces).isEmpty
         case .goals:
             return dailyTaskGoal > 0 && weeklyTaskGoal > 0
         case .focusAreas:
             return !selectedFocusAreas.isEmpty
-        case .notifications, .calendar:
-            return true  // Optional steps
+        case .notifications:
+            return true  // Optional step
         case .complete:
             return true
         }
