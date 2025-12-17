@@ -1,0 +1,126 @@
+//
+//  SubTask.swift
+//  Veloce
+//
+//  Claude Code-style task breakdown model
+//
+
+import Foundation
+
+/// Represents a sub-task within a larger task breakdown
+/// Similar to Claude Code's todo tracking system
+struct SubTask: Codable, Identifiable, Sendable, Hashable {
+    let id: UUID
+    var title: String
+    var estimatedMinutes: Int?
+    var status: SubTaskStatus
+    var orderIndex: Int
+    var aiReasoning: String?  // Why AI created this sub-task
+    var completedAt: Date?
+    let createdAt: Date
+
+    // Parent task reference (for Supabase)
+    var taskId: UUID?
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        estimatedMinutes: Int? = nil,
+        status: SubTaskStatus = .pending,
+        orderIndex: Int,
+        aiReasoning: String? = nil,
+        completedAt: Date? = nil,
+        createdAt: Date = Date(),
+        taskId: UUID? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.estimatedMinutes = estimatedMinutes
+        self.status = status
+        self.orderIndex = orderIndex
+        self.aiReasoning = aiReasoning
+        self.completedAt = completedAt
+        self.createdAt = createdAt
+        self.taskId = taskId
+    }
+}
+
+// MARK: - Sub-Task Status
+
+enum SubTaskStatus: String, Codable, Sendable, CaseIterable {
+    case pending = "pending"
+    case inProgress = "in_progress"
+    case completed = "completed"
+
+    var icon: String {
+        switch self {
+        case .pending: return "circle"
+        case .inProgress: return "circle.dotted"
+        case .completed: return "checkmark.circle.fill"
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .pending: return "Pending"
+        case .inProgress: return "In Progress"
+        case .completed: return "Completed"
+        }
+    }
+}
+
+// MARK: - Sub-Task Collection Extensions
+
+extension Array where Element == SubTask {
+    /// Calculate completion progress (0.0 - 1.0)
+    var progress: Double {
+        guard !isEmpty else { return 0 }
+        let completed = filter { $0.status == .completed }.count
+        return Double(completed) / Double(count)
+    }
+
+    /// Get completion string like "2/5"
+    var progressString: String {
+        let completed = filter { $0.status == .completed }.count
+        return "\(completed)/\(count)"
+    }
+
+    /// Total estimated time in minutes
+    var totalEstimatedMinutes: Int {
+        compactMap(\.estimatedMinutes).reduce(0, +)
+    }
+
+    /// Remaining time (incomplete tasks only)
+    var remainingMinutes: Int {
+        filter { $0.status != .completed }
+            .compactMap(\.estimatedMinutes)
+            .reduce(0, +)
+    }
+
+    /// Get current in-progress task
+    var currentTask: SubTask? {
+        first { $0.status == .inProgress }
+    }
+
+    /// Get next pending task
+    var nextPendingTask: SubTask? {
+        sorted { $0.orderIndex < $1.orderIndex }
+            .first { $0.status == .pending }
+    }
+}
+
+// MARK: - Supabase Coding Keys
+
+extension SubTask {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case estimatedMinutes = "estimated_minutes"
+        case status
+        case orderIndex = "order_index"
+        case aiReasoning = "ai_reasoning"
+        case completedAt = "completed_at"
+        case createdAt = "created_at"
+        case taskId = "task_id"
+    }
+}

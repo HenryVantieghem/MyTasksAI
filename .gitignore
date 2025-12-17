@@ -1,0 +1,99 @@
+# ====================
+# Xcode Build Artifacts
+# ====================
+DerivedData/
+build/
+*.xcodeproj/project.xcworkspace/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.app
+*.framework
+*.dylib
+*.a
+
+# ====================
+# Swift Package Manager
+# ====================
+.build/
+.swiftpm/
+Package.resolved
+
+# ====================
+# CocoaPods
+# ====================
+Pods/
+Podfile.lock
+
+# ====================
+# Carthage
+# ====================
+Carthage/Build/
+Carthage/Checkouts/
+
+# ====================
+# Secrets & Environment
+# ====================
+Secrets.plist
+*.xcconfig
+!**/Base.xcconfig
+.env
+.env.*
+*.pem
+*.p12
+*.p8
+*.mobileprovision
+*.provisionprofile
+
+# ====================
+# IDE & System Files
+# ====================
+.DS_Store
+.idea/
+*.swp
+*.swo
+*~
+
+# ====================
+# Claude Code
+# ====================
+.claude/settings.local.json
+
+# ====================
+# Cursor
+# ====================
+.cursor/
+
+# ====================
+# MCP Config
+# ====================
+.mcp.json
+
+# ====================
+# Temporary Files
+# ====================
+*.log
+*.tmp
+*.temp
+
+# ====================
+# Supabase Local
+# ====================
+supabase/.branches/
+supabase/.temp/
+
+# ====================
+# Fastlane
+# ====================
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
