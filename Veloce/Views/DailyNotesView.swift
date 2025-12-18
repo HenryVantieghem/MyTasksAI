@@ -19,8 +19,7 @@ struct DailyNotesView: View {
     @State private var selectedDate: Date = Date()
     @State private var notesLines: [NotesLine] = []
     @State private var newLineText: String = ""
-    @State private var selectedLineForDetail: NotesLine?
-    @State private var linkedTaskForDetail: TaskItem?
+    @State private var selectedTaskForDetail: TaskItem?
     @State private var focusedLineId: UUID?
     @State private var isNewLineFocused: Bool = false
 
@@ -95,10 +94,8 @@ struct DailyNotesView: View {
         .task {
             loadLinesForDate(selectedDate)
         }
-        .sheet(item: $selectedLineForDetail) { line in
-            if let task = linkedTaskForDetail {
-                taskDetailSheet(for: task, line: line)
-            }
+        .sheet(item: $selectedTaskForDetail) { task in
+            taskDetailSheet(for: task)
         }
     }
 
@@ -150,13 +147,18 @@ struct DailyNotesView: View {
     // MARK: - Task Detail Sheet
 
     @ViewBuilder
-    private func taskDetailSheet(for task: TaskItem, line: NotesLine) -> some View {
+    private func taskDetailSheet(for task: TaskItem) -> some View {
+        // Find the corresponding line for this task
+        let line = notesLines.first(where: { $0.linkedTaskId == task.id })
+
         TaskDetailContentView(
             task: task,
             onToggleComplete: {
                 viewModel.toggleCompletion(task)
-                line.isChecked = task.isCompleted
-                saveLines()
+                if let line = line {
+                    line.isChecked = task.isCompleted
+                    saveLines()
+                }
             },
             onReprocessAI: {
                 viewModel.reprocessAI(for: task)
@@ -174,12 +176,14 @@ struct DailyNotesView: View {
             onDelete: {
                 // Delete task and unlink from line
                 viewModel.deleteTask(task)
-                line.linkedTaskId = nil
-                saveLines()
-                selectedLineForDetail = nil
+                if let line = line {
+                    line.linkedTaskId = nil
+                    saveLines()
+                }
+                selectedTaskForDetail = nil
             },
             onDismiss: {
-                selectedLineForDetail = nil
+                selectedTaskForDetail = nil
             }
         )
         .presentationDetents([.medium, .large])
@@ -266,16 +270,18 @@ struct DailyNotesView: View {
         guard line.hasContent else { return }
 
         // Get or create linked task
+        let task: TaskItem
         if let taskId = line.linkedTaskId,
-           let task = viewModel.tasks.first(where: { $0.id == taskId }) {
-            linkedTaskForDetail = task
+           let existingTask = viewModel.tasks.first(where: { $0.id == taskId }) {
+            task = existingTask
         } else {
             // Create new task from line
-            let task = createTaskFromLine(line)
-            linkedTaskForDetail = task
+            task = createTaskFromLine(line)
         }
 
-        selectedLineForDetail = line
+        // Show task detail sheet
+        selectedTaskForDetail = task
+        HapticsService.shared.lightImpact()
     }
 
     private func createTaskFromLine(_ line: NotesLine) -> TaskItem {
