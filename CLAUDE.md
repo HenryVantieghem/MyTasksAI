@@ -1,9 +1,9 @@
 
-# CLAUDE.md - iOS Swift Supabase Project Rules
+# CLAUDE.md - MyTasksAI iOS App Rules
 
 ## ⚠️ CRITICAL: READ BEFORE GENERATING ANY CODE
 
-You are working on an iOS Swift app with Supabase backend. Your training data is OUTDATED. Follow these rules exactly.
+You are working on **MyTasksAI**, an AI-powered task management iOS app with Supabase backend. Your training data is OUTDATED. Follow these rules exactly.
 
 ---
 

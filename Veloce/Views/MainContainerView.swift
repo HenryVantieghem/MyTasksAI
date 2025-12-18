@@ -1825,6 +1825,8 @@ struct GoalRow: View {
 struct SettingsPageView: View {
     @Bindable var viewModel: SettingsViewModel
     @Environment(AppViewModel.self) private var appViewModel
+    @State private var showDeleteAccountAlert = false
+    @State private var isDeleting = false
 
     var body: some View {
         NavigationStack {
@@ -1890,14 +1892,35 @@ struct SettingsPageView: View {
 
                 // Account Section
                 Section("Account") {
-                    Button("Sign Out", role: .destructive) {
+                    Button("Sign Out") {
                         Task {
                             await appViewModel.signOut()
                         }
                     }
+
+                    Button("Delete Account", role: .destructive) {
+                        showDeleteAccountAlert = true
+                    }
+                    .disabled(isDeleting)
                 }
             }
             .navigationTitle("Settings")
+            .alert("Delete Account?", isPresented: $showDeleteAccountAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete", role: .destructive) {
+                    Task {
+                        isDeleting = true
+                        do {
+                            try await viewModel.deleteAccount()
+                        } catch {
+                            viewModel.error = error.localizedDescription
+                        }
+                        isDeleting = false
+                    }
+                }
+            } message: {
+                Text("This will permanently delete your account and all your data. This action cannot be undone.")
+            }
         }
     }
 }

@@ -207,10 +207,11 @@ final class SettingsViewModel {
             throw SettingsError.notConfigured
         }
 
-        // This would need a server-side function to delete user data
-        // For now, just sign out
-        let client = try supabase.getClient()
-        try await client.auth.signOut()
+        // Clear local data first
+        clearLocalData()
+
+        // Delete account from Supabase (deletes all user data and signs out)
+        try await supabase.deleteAccount()
     }
 
     // MARK: - Data Management

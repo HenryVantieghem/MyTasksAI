@@ -112,7 +112,7 @@ struct LoadingView: View {
                         )
                 }
 
-                Text("Veloce")
+                Text("MyTasksAI")
                     .font(Theme.Typography.largeTitle)
                     .foregroundStyle(Theme.Colors.textPrimary)
 

@@ -121,6 +121,46 @@ final class SupabaseService {
         currentUserId != nil
     }
 
+    // MARK: - Account Management
+
+    /// Delete current user account and all associated data
+    func deleteAccount() async throws {
+        guard let userId = currentUserId else {
+            throw SupabaseError.notAuthenticated
+        }
+
+        // Delete user data from all tables (order matters due to foreign keys)
+        // Delete sub-tasks first
+        try await supabase
+            .from("sub_tasks")
+            .delete()
+            .eq("task_id", value: "")
+            .or("task_id.in.(select id from tasks where user_id.eq.\(userId.uuidString))")
+            .execute()
+
+        // Delete task-related data
+        try await supabase.from("task_youtube_resources").delete().eq("user_id", value: userId.uuidString).execute()
+        try await supabase.from("task_reflections").delete().eq("user_id", value: userId.uuidString).execute()
+        try await supabase.from("tasks").delete().eq("user_id", value: userId.uuidString).execute()
+
+        // Delete goals and achievements
+        try await supabase.from("goals").delete().eq("user_id", value: userId.uuidString).execute()
+        try await supabase.from("achievements").delete().eq("user_id", value: userId.uuidString).execute()
+
+        // Delete streaks and patterns
+        try await supabase.from("streaks").delete().eq("user_id", value: userId.uuidString).execute()
+        try await supabase.from("user_productivity_patterns").delete().eq("user_id", value: userId.uuidString).execute()
+
+        // Delete user profile
+        try await supabase.from("users").delete().eq("id", value: userId.uuidString).execute()
+
+        // Sign out the user (this invalidates the session)
+        try await supabase.auth.signOut()
+
+        // Clear local state
+        currentUserId = nil
+    }
+
     // MARK: - User Operations
 
     /// Fetch user profile
