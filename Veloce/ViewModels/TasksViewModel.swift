@@ -66,7 +66,7 @@ final class TasksViewModel {
 
     // MARK: Services
     private let ai = AIService.shared
-    private let gamification = GamificationService.shared
+    let gamification = GamificationService.shared
     private let sync = SyncService.shared
     private let haptics = HapticsService.shared
     private let widget = WidgetSyncService.shared

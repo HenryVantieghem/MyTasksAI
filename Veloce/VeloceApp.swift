@@ -28,7 +28,8 @@ struct VeloceApp: App {
                 User.self,
                 Goal.self,
                 Achievement.self,
-                TaskTemplate.self
+                TaskTemplate.self,
+                NotesLine.self
             ])
 
             let config = ModelConfiguration(

@@ -49,12 +49,16 @@ struct MainContainerView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            // Tasks Tab
-            TasksPageView(viewModel: tasksViewModel)
-                .tabItem {
-                    Label(MainTab.tasks.rawValue, systemImage: selectedTab == .tasks ? MainTab.tasks.selectedIcon : MainTab.tasks.icon)
-                }
-                .tag(MainTab.tasks)
+            // Tasks Tab - Apple Notes-style daily pages
+            NavigationStack {
+                DailyNotesView(viewModel: tasksViewModel)
+                    .navigationTitle("Tasks")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+            .tabItem {
+                Label(MainTab.tasks.rawValue, systemImage: selectedTab == .tasks ? MainTab.tasks.selectedIcon : MainTab.tasks.icon)
+            }
+            .tag(MainTab.tasks)
 
             // Calendar Tab
             CalendarPageView(viewModel: calendarViewModel)

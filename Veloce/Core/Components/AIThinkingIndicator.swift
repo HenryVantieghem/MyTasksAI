@@ -291,6 +291,81 @@ struct ClaudeCodeOrb: View {
     }
 }
 
+// MARK: - Notes Line AI Indicator
+/// Subtle thinking dots for notes line - appears when typing, auto-hides after duration
+struct NotesLineAIIndicator: View {
+    let isTyping: Bool
+    var duration: Double = 2.0
+
+    @State private var showIndicator: Bool = false
+    @State private var dotOpacities: [Double] = [0.3, 0.3, 0.3]
+    @State private var currentDot: Int = 0
+    @State private var hideTimer: Timer?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private let dotSize: CGFloat = 4
+    private let dotSpacing: CGFloat = 3
+
+    var body: some View {
+        HStack(spacing: dotSpacing) {
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .fill(Theme.Colors.aiPurple)
+                    .frame(width: dotSize, height: dotSize)
+                    .opacity(dotOpacities[index])
+            }
+        }
+        .opacity(showIndicator ? 1 : 0)
+        .animation(.easeOut(duration: 0.15), value: showIndicator)
+        .onChange(of: isTyping) { _, newValue in
+            if newValue {
+                startThinking()
+            }
+        }
+    }
+
+    private func startThinking() {
+        // Cancel any existing timer
+        hideTimer?.invalidate()
+
+        // Show indicator
+        withAnimation(.easeOut(duration: 0.15)) {
+            showIndicator = true
+        }
+
+        // Start dot animation
+        if !reduceMotion {
+            animateDots()
+        }
+
+        // Schedule auto-hide
+        hideTimer = Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { _ in
+            withAnimation(.easeOut(duration: 0.2)) {
+                showIndicator = false
+            }
+            dotOpacities = [0.3, 0.3, 0.3]
+        }
+    }
+
+    private func animateDots() {
+        guard showIndicator else { return }
+
+        var newOpacities = [0.3, 0.3, 0.3]
+        newOpacities[currentDot] = 1.0
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            dotOpacities = newOpacities
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            currentDot = (currentDot + 1) % 3
+            if showIndicator {
+                animateDots()
+            }
+        }
+    }
+}
+
 // MARK: - Inline AI Typing Indicator
 /// Shows when AI is generating inline content (like Claude Code)
 struct InlineAITypingIndicator: View {

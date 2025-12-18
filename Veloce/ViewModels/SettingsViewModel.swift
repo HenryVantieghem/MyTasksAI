@@ -18,7 +18,7 @@ import Auth
 final class SettingsViewModel {
     // MARK: State
     private(set) var isLoading: Bool = false
-    private(set) var error: String?
+    var error: String?
 
     // MARK: User Settings
     var fullName: String = ""
