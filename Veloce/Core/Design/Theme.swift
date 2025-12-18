@@ -132,6 +132,40 @@ enum Theme {
                 angle: angle
             )
         }
+
+        // MARK: - Claude/Anthropic Inspired Colors
+        /// Warm, friendly palette inspired by Anthropic's Claude design system
+        enum Claude {
+            /// Primary warm orange (Crail #C15F3C)
+            static let primary = Color(red: 0.757, green: 0.373, blue: 0.235)
+
+            /// Soft gray (Cloudy #B1ADA1)
+            static let secondary = Color(red: 0.694, green: 0.678, blue: 0.631)
+
+            /// Off-white background (Pampas #F4F3EE)
+            static let background = Color(red: 0.957, green: 0.953, blue: 0.933)
+
+            /// Pure white for cards
+            static let cardBackground = Color.white
+
+            /// Warm charcoal text
+            static let textPrimary = Color(red: 0.15, green: 0.15, blue: 0.15)
+
+            /// Warm gray secondary text
+            static let textSecondary = Color(red: 0.45, green: 0.43, blue: 0.40)
+
+            /// Lighter tertiary text
+            static let textTertiary = Color(red: 0.65, green: 0.63, blue: 0.60)
+
+            /// Gradient for primary actions
+            static var primaryGradient: LinearGradient {
+                LinearGradient(
+                    colors: [primary, primary.opacity(0.85)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        }
     }
 
     // MARK: - Layout Constants

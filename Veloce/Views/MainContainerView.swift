@@ -49,12 +49,36 @@ struct MainContainerView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            // Tasks Tab
-            TasksPageView(viewModel: tasksViewModel)
-                .tabItem {
-                    Label(MainTab.tasks.rawValue, systemImage: selectedTab == .tasks ? MainTab.tasks.selectedIcon : MainTab.tasks.icon)
-                }
-                .tag(MainTab.tasks)
+            // Tasks Tab - Apple Notes-style open sheet
+            NavigationStack {
+                NotesStyleTasksView(viewModel: tasksViewModel)
+                    .navigationTitle("Tasks")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Menu {
+                                Button {
+                                    // Filter options
+                                } label: {
+                                    Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+                                }
+
+                                Button {
+                                    // Brain dump
+                                } label: {
+                                    Label("Brain Dump", systemImage: "brain.head.profile")
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis.circle")
+                                    .foregroundStyle(NotesTheme.Colors.primary)
+                            }
+                        }
+                    }
+            }
+            .tabItem {
+                Label(MainTab.tasks.rawValue, systemImage: selectedTab == .tasks ? MainTab.tasks.selectedIcon : MainTab.tasks.icon)
+            }
+            .tag(MainTab.tasks)
 
             // Calendar Tab
             CalendarPageView(viewModel: calendarViewModel)
@@ -77,7 +101,7 @@ struct MainContainerView: View {
                 }
                 .tag(MainTab.settings)
         }
-        .tint(Theme.Colors.accent)
+        .tint(Color(red: 0.757, green: 0.373, blue: 0.235)) // Claude warm orange
         .onAppear {
             setupViewModels()
         }
