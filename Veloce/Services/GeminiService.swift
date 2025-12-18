@@ -433,9 +433,15 @@ enum GeminiError: Error, LocalizedError {
 // MARK: - Configuration Extension
 
 extension GeminiService {
-    /// Load API key from environment or configuration
+    /// Load API key from Secrets.plist or fallback sources
     func loadConfiguration() {
-        // Try environment variable first
+        // Try Secrets.plist first (primary source)
+        if let apiKey = loadFromSecretsPlist("GEMINI_API_KEY") {
+            configure(apiKey: apiKey)
+            return
+        }
+
+        // Try environment variable
         if let envKey = ProcessInfo.processInfo.environment["GEMINI_API_KEY"] {
             configure(apiKey: envKey)
             return
@@ -450,6 +456,29 @@ extension GeminiService {
 
         // Not configured - will need to be set via configure()
         isConfigured = false
+    }
+
+    /// Load a value from Secrets.plist
+    private func loadFromSecretsPlist(_ key: String) -> String? {
+        // Try bundle path first
+        if let path = Bundle.main.path(forResource: "Secrets", ofType: "plist"),
+           let plist = NSDictionary(contentsOfFile: path),
+           let value = plist[key] as? String,
+           !value.isEmpty,
+           !value.contains("YOUR_") {
+            return value
+        }
+
+        // Try URL resource approach
+        if let url = Bundle.main.url(forResource: "Secrets", withExtension: "plist"),
+           let plist = NSDictionary(contentsOf: url),
+           let value = plist[key] as? String,
+           !value.isEmpty,
+           !value.contains("YOUR_") {
+            return value
+        }
+
+        return nil
     }
 
     /// Store API key (for development/testing)
