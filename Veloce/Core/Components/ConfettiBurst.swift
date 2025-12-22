@@ -277,14 +277,14 @@ struct StreakCelebration: View {
                             .accessibilityHidden(true)
 
                         Text("\(streakDays)")
-                            .font(.system(.largeTitle, design: .rounded, weight: .black))
+                            .font(.system(.largeTitle, design: .default, weight: .black))
                             .foregroundStyle(Theme.Colors.fire)
                             .accessibilityLabel("\(streakDays) day streak")
                     }
 
                     // Title
                     Text(streakTitle)
-                        .font(.system(.title2, design: .rounded, weight: .bold))
+                        .font(.system(.title2, design: .default, weight: .bold))
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .accessibilityAddTraits(.isHeader)
 
@@ -426,7 +426,7 @@ struct LevelUpCelebration: View {
 
                         // Level number
                         Text("\(newLevel)")
-                            .font(.system(.largeTitle, design: .rounded, weight: .black))
+                            .font(.system(.largeTitle, design: .default, weight: .black))
                             .foregroundStyle(.white)
                             .scaleEffect(ringScale)
                             .accessibilityLabel("Level \(newLevel)")
@@ -434,7 +434,7 @@ struct LevelUpCelebration: View {
 
                     // Title
                     Text("Level Up!")
-                        .font(.system(.title, design: .rounded, weight: .bold))
+                        .font(.system(.title, design: .default, weight: .bold))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],

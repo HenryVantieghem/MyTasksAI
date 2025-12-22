@@ -4,6 +4,7 @@
 //
 //  Pomodoro Timer Section for Task Detail Sheet
 //  Focus timer with presets and AI estimate integration
+//  NOW WIRED to PomodoroTimerService.shared for global state
 //
 
 import SwiftUI
@@ -11,12 +12,51 @@ import SwiftUI
 // MARK: - Pomodoro Timer Section
 struct PomodoroTimerSection: View {
     let task: TaskItem
-    @State private var timerMinutes: Int = 25
-    @State private var isTimerRunning: Bool = false
-    @State private var remainingSeconds: Int = 0
-    @State private var timer: Timer?
+    let onStartFocus: () -> Void  // Callback to launch FocusMode full-screen
+
+    // Global service binding - no more local timer state!
+    @State private var pomodoroService = PomodoroTimerService.shared
+    @State private var selectedDuration: Int = 25  // For preset selection only
 
     private let presets = [5, 15, 25] // Minutes
+
+    // MARK: - Computed Properties (from service)
+
+    /// Is the timer currently running for THIS task?
+    private var isTimerActiveForThisTask: Bool {
+        pomodoroService.currentSession?.taskId == task.id
+    }
+
+    /// Is timer running (for this task or any task)?
+    private var isTimerRunning: Bool {
+        pomodoroService.isRunning
+    }
+
+    /// Is timer paused for this task?
+    private var isTimerPaused: Bool {
+        guard let session = pomodoroService.currentSession else { return false }
+        return session.taskId == task.id && session.state == .paused
+    }
+
+    /// Remaining seconds from service (or selected duration)
+    private var remainingSeconds: Int {
+        if isTimerActiveForThisTask {
+            return pomodoroService.currentSession?.remainingSeconds ?? (selectedDuration * 60)
+        }
+        return selectedDuration * 60
+    }
+
+    /// Button state: Start, Pause, or Resume
+    private var buttonState: TimerButtonState {
+        if isTimerActiveForThisTask {
+            if pomodoroService.isRunning {
+                return .pause
+            } else if isTimerPaused {
+                return .resume
+            }
+        }
+        return .start
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
@@ -28,16 +68,33 @@ struct PomodoroTimerSection: View {
                 Text("Focus Timer")
                     .font(Theme.Typography.headline)
                     .foregroundStyle(Theme.Colors.textPrimary)
+
+                Spacer()
+
+                // Session counter (if active)
+                if let session = pomodoroService.currentSession, session.taskId == task.id {
+                    sessionCounter(sessionsCompleted: session.sessionsCompleted)
+                }
             }
 
-            // Timer display
-            Text(formattedTime)
-                .font(.system(size: 48, weight: .light, design: .monospaced))
-                .foregroundStyle(isTimerRunning ? Theme.Colors.accent : Theme.Colors.textPrimary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Theme.Spacing.md)
+            // Timer display with glow when running
+            ZStack {
+                // Glow effect when running
+                if isTimerActiveForThisTask && isTimerRunning {
+                    Circle()
+                        .fill(Theme.Colors.accent.opacity(0.2))
+                        .blur(radius: 30)
+                        .frame(width: 120, height: 120)
+                }
 
-            // Preset buttons
+                Text(formattedTime)
+                    .font(.system(size: 48, weight: .light, design: .monospaced))
+                    .foregroundStyle(isTimerActiveForThisTask && isTimerRunning ? Theme.Colors.accent : Theme.Colors.textPrimary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Theme.Spacing.md)
+
+            // Preset buttons (disabled if any timer is running)
             HStack(spacing: Theme.Spacing.sm) {
                 ForEach(presets, id: \.self) { minutes in
                     presetButton(minutes: minutes)
@@ -49,15 +106,14 @@ struct PomodoroTimerSection: View {
                 }
             }
 
-            // Start/Pause button
+            // Start/Pause/Resume button
             Button {
-                toggleTimer()
-                HapticsService.shared.impact()
+                handleButtonTap()
             } label: {
                 HStack(spacing: 8) {
-                    Image(systemName: isTimerRunning ? "pause.fill" : "play.fill")
+                    Image(systemName: buttonState.icon)
                         .font(.system(size: 16))
-                    Text(isTimerRunning ? "Pause" : "Start")
+                    Text(buttonState.title)
                         .font(.system(size: 15, weight: .semibold))
                 }
                 .foregroundStyle(.white)
@@ -67,23 +123,41 @@ struct PomodoroTimerSection: View {
                     RoundedRectangle(cornerRadius: Theme.Radius.button)
                         .fill(
                             LinearGradient(
-                                colors: [Theme.Colors.accent, Theme.Colors.accentSecondary],
+                                colors: buttonState.gradientColors,
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
                         )
                 )
             }
+
+            // Stop button (only when timer is active for this task)
+            if isTimerActiveForThisTask {
+                Button {
+                    pomodoroService.stopSession()
+                    HapticsService.shared.selectionFeedback()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "stop.fill")
+                            .font(.system(size: 12))
+                        Text("Stop Timer")
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: Theme.Radius.button)
+                            .fill(Color.white.opacity(0.05))
+                    )
+                }
+            }
         }
         .padding(Theme.Spacing.lg)
         .liquidGlass(cornerRadius: Theme.Radius.card)
         .onAppear {
-            // Initialize with AI estimate if available, otherwise default to 25
-            timerMinutes = task.estimatedMinutes ?? 25
-            remainingSeconds = timerMinutes * 60
-        }
-        .onDisappear {
-            timer?.invalidate()
+            // Initialize selected duration with AI estimate if available
+            selectedDuration = task.estimatedMinutes ?? 25
         }
     }
 
@@ -94,9 +168,22 @@ struct PomodoroTimerSection: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    // MARK: - Session Counter
+    private func sessionCounter(sessionsCompleted: Int) -> some View {
+        HStack(spacing: 4) {
+            ForEach(0..<4, id: \.self) { index in
+                Circle()
+                    .fill(index < sessionsCompleted ? Theme.Colors.aiCyan : Color.white.opacity(0.2))
+                    .frame(width: 8, height: 8)
+            }
+        }
+    }
+
     // MARK: - Preset Button
     private func presetButton(minutes: Int, isAI: Bool = false) -> some View {
-        Button {
+        let isSelected = selectedDuration == minutes && !isTimerActiveForThisTask
+
+        return Button {
             selectPreset(minutes: minutes)
             HapticsService.shared.selectionFeedback()
         } label: {
@@ -106,13 +193,13 @@ struct PomodoroTimerSection: View {
                         .font(.system(size: 10))
                 }
                 Text("\(minutes)m")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .font(.system(size: 13, weight: .medium, design: .default))
             }
-            .foregroundStyle(timerMinutes == minutes ? .white : Theme.Colors.textSecondary)
+            .foregroundStyle(isSelected ? .white : Theme.Colors.textSecondary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(
-                timerMinutes == minutes
+                isSelected
                     ? AnyShapeStyle(Theme.Colors.accent)
                     : AnyShapeStyle(Theme.Colors.glassBackground)
             )
@@ -126,40 +213,59 @@ struct PomodoroTimerSection: View {
     // MARK: - Actions
     private func selectPreset(minutes: Int) {
         guard !isTimerRunning else { return }
-        timerMinutes = minutes
-        remainingSeconds = minutes * 60
+        selectedDuration = minutes
     }
 
-    private func toggleTimer() {
-        if isTimerRunning {
-            pauseTimer()
-        } else {
-            startTimer()
+    private func handleButtonTap() {
+        switch buttonState {
+        case .start:
+            // Start new session and launch FocusMode
+            pomodoroService.startSession(
+                taskId: task.id,
+                taskTitle: task.title,
+                duration: selectedDuration * 60
+            )
+            onStartFocus()  // Launch full-screen FocusMode
+
+        case .pause:
+            pomodoroService.pauseSession()
+
+        case .resume:
+            pomodoroService.resumeSession()
+            onStartFocus()  // Re-launch FocusMode on resume
+        }
+    }
+}
+
+// MARK: - Timer Button State
+private enum TimerButtonState {
+    case start
+    case pause
+    case resume
+
+    var icon: String {
+        switch self {
+        case .start: return "play.fill"
+        case .pause: return "pause.fill"
+        case .resume: return "play.fill"
         }
     }
 
-    private func startTimer() {
-        isTimerRunning = true
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if remainingSeconds > 0 {
-                remainingSeconds -= 1
-            } else {
-                completeTimer()
-            }
+    var title: String {
+        switch self {
+        case .start: return "Start Focus"
+        case .pause: return "Pause"
+        case .resume: return "Resume"
         }
     }
 
-    private func pauseTimer() {
-        isTimerRunning = false
-        timer?.invalidate()
-        timer = nil
-    }
-
-    private func completeTimer() {
-        pauseTimer()
-        HapticsService.shared.celebration()
-        // Reset for next session
-        remainingSeconds = timerMinutes * 60
+    var gradientColors: [Color] {
+        switch self {
+        case .start, .resume:
+            return [Theme.Colors.accent, Theme.Colors.accentSecondary]
+        case .pause:
+            return [Theme.Colors.warning, Theme.Colors.warning.opacity(0.8)]
+        }
     }
 }
 
@@ -167,11 +273,16 @@ struct PomodoroTimerSection: View {
 #Preview {
     ZStack {
         IridescentBackground()
-        PomodoroTimerSection(task: {
-            let task = TaskItem(title: "Test task")
-            task.estimatedMinutes = 30
-            return task
-        }())
+        PomodoroTimerSection(
+            task: {
+                let task = TaskItem(title: "Test task")
+                task.estimatedMinutes = 30
+                return task
+            }(),
+            onStartFocus: {
+                print("Launch FocusMode!")
+            }
+        )
         .padding()
     }
 }

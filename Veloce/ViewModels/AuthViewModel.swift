@@ -3,14 +3,13 @@
 //  Veloce
 //
 //  Auth View Model - Authentication State Management
-//  Handles sign in, sign up, and authentication flows
+//  Handles email sign in, sign up, and authentication flows
 //
 
 import Foundation
+import SwiftUI
 import Supabase
 import Auth
-import AuthenticationServices
-import CryptoKit
 
 // MARK: - Auth State
 
@@ -22,26 +21,43 @@ enum AuthState: Equatable {
     case error(String)
 }
 
-// MARK: - Auth Method
+// MARK: - Validation State
 
-enum AuthMethod: String, CaseIterable {
-    case apple = "apple"
-    case google = "google"
-    case email = "email"
+enum ValidationState: Equatable {
+    case idle
+    case validating
+    case valid
+    case invalid(String)
 
-    var displayName: String {
+    var isValid: Bool {
+        if case .valid = self { return true }
+        return false
+    }
+}
+
+// MARK: - Password Strength
+
+enum PasswordStrength: Int, CaseIterable {
+    case weak = 1
+    case fair = 2
+    case good = 3
+    case strong = 4
+
+    var label: String {
         switch self {
-        case .apple: return "Sign in with Apple"
-        case .google: return "Sign in with Google"
-        case .email: return "Sign in with Email"
+        case .weak: return "Weak"
+        case .fair: return "Fair"
+        case .good: return "Good"
+        case .strong: return "Strong"
         }
     }
 
-    var icon: String {
+    var color: Color {
         switch self {
-        case .apple: return "apple.logo"
-        case .google: return "g.circle.fill"
-        case .email: return "envelope.fill"
+        case .weak: return Theme.CelestialColors.errorNebula
+        case .fair: return Theme.CelestialColors.warningNebula
+        case .good: return Theme.CelestialColors.nebulaGlow
+        case .strong: return Theme.CelestialColors.successNebula
         }
     }
 }
@@ -59,17 +75,21 @@ final class AuthViewModel {
     var error: String?
 
     // MARK: Form State
-    var email: String = ""
-    var password: String = ""
+    var email: String = "" {
+        didSet { validateEmailRealTime() }
+    }
+    var password: String = "" {
+        didSet { calculatePasswordStrength() }
+    }
     var confirmPassword: String = ""
     var fullName: String = ""
+    var showPassword: Bool = false
 
-    // MARK: Apple Sign In
-    private var currentNonce: String?
+    // MARK: Validation State
+    private(set) var emailValidation: ValidationState = .idle
+    private(set) var passwordStrength: PasswordStrength = .weak
 
     // MARK: Services
-    private let appleSignIn = AppleSignInService.shared
-    private let googleSignIn = GoogleSignInService.shared
     private let supabase = SupabaseService.shared
     private let haptics = HapticsService.shared
 
@@ -79,154 +99,65 @@ final class AuthViewModel {
     // MARK: Initialization
     init() {}
 
-    // MARK: - Apple Sign In (Native Button Support)
+    // MARK: - Email Validation
 
-    /// Configure Apple Sign In request
-    func configureAppleSignIn(_ request: ASAuthorizationAppleIDRequest) {
-        let nonce = generateNonce()
-        currentNonce = nonce
-        request.requestedScopes = [.email, .fullName]
-        request.nonce = sha256(nonce)
-    }
+    /// Validate email format in real-time
+    func validateEmailRealTime() {
+        guard !email.isEmpty else {
+            emailValidation = .idle
+            return
+        }
 
-    /// Handle Apple Sign In completion
-    func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) async {
-        switch result {
-        case .success(let authorization):
-            guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
-                  let identityToken = appleIDCredential.identityToken,
-                  let idTokenString = String(data: identityToken, encoding: .utf8),
-                  let nonce = currentNonce else {
-                error = "Failed to get Apple credentials"
-                return
-            }
+        emailValidation = .validating
 
-            authState = .signingIn
-            isLoading = true
-            defer { isLoading = false }
-
-            do {
-                try await appleSignIn.signInWithSupabase(idToken: idTokenString, nonce: nonce)
-                authState = .success
-                haptics.taskComplete()
-                onAuthSuccess?()
-            } catch {
-                self.error = error.localizedDescription
-                authState = .error(error.localizedDescription)
-                haptics.error()
-            }
-
-        case .failure(let authError):
-            if (authError as NSError).code == ASAuthorizationError.canceled.rawValue {
-                authState = .idle
-            } else {
-                error = authError.localizedDescription
-                authState = .error(authError.localizedDescription)
-                haptics.error()
-            }
+        // Simple debounce - validate immediately for now
+        let emailRegex = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+        if email.range(of: emailRegex, options: .regularExpression) != nil {
+            emailValidation = .valid
+        } else {
+            emailValidation = .invalid("Please enter a valid email")
         }
     }
 
-    // MARK: - Nonce Generation
+    // MARK: - Password Strength
 
-    private func generateNonce(length: Int = 32) -> String {
-        precondition(length > 0)
-        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-        var result = ""
-        var remainingLength = length
-
-        while remainingLength > 0 {
-            let randoms: [UInt8] = (0..<16).map { _ in
-                var random: UInt8 = 0
-                _ = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-                return random
-            }
-
-            randoms.forEach { random in
-                if remainingLength == 0 { return }
-                if random < charset.count {
-                    result.append(charset[Int(random)])
-                    remainingLength -= 1
-                }
-            }
+    /// Calculate password strength based on criteria
+    func calculatePasswordStrength() {
+        guard !password.isEmpty else {
+            passwordStrength = .weak
+            return
         }
-        return result
-    }
 
-    private func sha256(_ input: String) -> String {
-        let inputData = Data(input.utf8)
-        let hashedData = SHA256.hash(data: inputData)
-        return hashedData.compactMap { String(format: "%02x", $0) }.joined()
-    }
+        var score = 0
 
-    // MARK: - Apple Sign In (Existing)
+        // Length check
+        if password.count >= 8 { score += 1 }
 
-    /// Sign in with Apple
-    func signInWithApple() async {
-        authState = .signingIn
-        isLoading = true
+        // Uppercase check
+        if password.range(of: "[A-Z]", options: .regularExpression) != nil { score += 1 }
 
-        defer { isLoading = false }
+        // Number check
+        if password.range(of: "[0-9]", options: .regularExpression) != nil { score += 1 }
 
-        do {
-            let result = try await appleSignIn.signIn()
+        // Special character check
+        if password.range(of: "[^A-Za-z0-9]", options: .regularExpression) != nil { score += 1 }
 
-            // Sign in with Supabase using Apple credential
-            if let nonce = result.nonce {
-                try await appleSignIn.signInWithSupabase(
-                    idToken: result.identityToken,
-                    nonce: nonce
-                )
-            }
-
-            authState = .success
-            haptics.taskComplete()
-            onAuthSuccess?()
-        } catch let error as AppleSignInError {
-            if case .cancelled = error {
-                authState = .idle
-            } else {
-                authState = .error(error.localizedDescription)
-                haptics.error()
-            }
-        } catch {
-            authState = .error(error.localizedDescription)
-            haptics.error()
-        }
-    }
-
-    // MARK: - Google Sign In
-
-    /// Sign in with Google
-    func signInWithGoogle() async {
-        authState = .signingIn
-        isLoading = true
-
-        defer { isLoading = false }
-
-        do {
-            try await googleSignIn.signIn()
-
-            authState = .success
-            haptics.taskComplete()
-            onAuthSuccess?()
-        } catch {
-            authState = .error(error.localizedDescription)
-            haptics.error()
-        }
+        passwordStrength = PasswordStrength(rawValue: max(1, score)) ?? .weak
     }
 
     // MARK: - Email Sign In
 
     /// Sign in with email and password
     func signInWithEmail() async {
-        guard validateEmail() else {
+        guard emailValidation.isValid else {
             authState = .error("Please enter a valid email address")
+            haptics.error()
             return
         }
 
         guard !password.isEmpty else {
             authState = .error("Please enter your password")
+            haptics.error()
             return
         }
 
@@ -261,18 +192,21 @@ final class AuthViewModel {
 
     /// Sign up with email and password
     func signUpWithEmail() async {
-        guard validateEmail() else {
+        guard emailValidation.isValid else {
             authState = .error("Please enter a valid email address")
+            haptics.error()
             return
         }
 
         guard password.count >= 8 else {
             authState = .error("Password must be at least 8 characters")
+            haptics.error()
             return
         }
 
         guard password == confirmPassword else {
             authState = .error("Passwords don't match")
+            haptics.error()
             return
         }
 
@@ -308,8 +242,9 @@ final class AuthViewModel {
 
     /// Send password reset email
     func sendPasswordReset() async {
-        guard validateEmail() else {
+        guard emailValidation.isValid else {
             authState = .error("Please enter a valid email address")
+            haptics.error()
             return
         }
 
@@ -357,20 +292,24 @@ final class AuthViewModel {
 
     // MARK: - Validation
 
-    /// Validate email format
-    private func validateEmail() -> Bool {
-        let emailRegex = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
-        return email.range(of: emailRegex, options: .regularExpression) != nil
-    }
-
     /// Check if form is valid for sign in
     var canSignIn: Bool {
-        !email.isEmpty && !password.isEmpty
+        emailValidation.isValid && !password.isEmpty
     }
 
     /// Check if form is valid for sign up
     var canSignUp: Bool {
-        !email.isEmpty && password.count >= 8 && password == confirmPassword
+        emailValidation.isValid && password.count >= 8 && password == confirmPassword
+    }
+
+    /// Check if password meets minimum requirements
+    var passwordMeetsRequirements: Bool {
+        password.count >= 8
+    }
+
+    /// Check if passwords match
+    var passwordsMatch: Bool {
+        !confirmPassword.isEmpty && password == confirmPassword
     }
 
     // MARK: - Helpers
@@ -381,6 +320,8 @@ final class AuthViewModel {
         password = ""
         confirmPassword = ""
         fullName = ""
+        emailValidation = .idle
+        passwordStrength = .weak
     }
 
     /// Clear error
@@ -388,6 +329,7 @@ final class AuthViewModel {
         if case .error = authState {
             authState = .idle
         }
+        error = nil
     }
 
     /// Reset state

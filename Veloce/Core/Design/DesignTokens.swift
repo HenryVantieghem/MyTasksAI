@@ -153,6 +153,10 @@ enum DesignTokens {
         static let pointsGoalMet: Int = 50
         static let pointsAchievement: Int = 100
 
+        // Convenience aliases
+        static let taskComplete: Int = pointsTaskComplete
+        static let onTimeBonus: Int = pointsOnTimeBonus
+
         // Streak thresholds
         static let streakBronze: Int = 3
         static let streakSilver: Int = 7
@@ -183,6 +187,100 @@ enum DesignTokens {
             let progress = Double(points - currentLevelPoints) / Double(nextLevelPoints - currentLevelPoints)
             return min(max(progress, 0), 1)
         }
+    }
+
+    // MARK: - Energy Core Configuration
+    enum EnergyCore {
+        // MARK: Sizing
+        /// Standard orb size for task cards
+        static let size: CGFloat = 28
+        /// Large orb for detail view
+        static let sizeLarge: CGFloat = 36
+        /// Small orb for compact lists
+        static let sizeSmall: CGFloat = 22
+
+        // MARK: Rings
+        /// Inner ring width
+        static let ringInnerWidth: CGFloat = 1.5
+        /// Outer ring width (priority indicator)
+        static let ringOuterWidth: CGFloat = 2
+        /// Ring padding from orb
+        static let ringPadding: CGFloat = 3
+
+        // MARK: Animation
+        /// Breathing animation duration (medium energy)
+        static let breatheDuration: Double = 2.0
+        /// Pulse animation duration (high energy)
+        static let pulseDuration: Double = 1.0
+        /// Particle orbit duration (max energy)
+        static let orbitDuration: Double = 3.0
+        /// Fill change animation duration
+        static let fillDuration: Double = 0.5
+        /// Completion implosion duration
+        static let implosionDuration: Double = 0.3
+
+        // MARK: Particles
+        /// Number of orbiting particles for max energy
+        static let particleCount: Int = 6
+        /// Particle size
+        static let particleSize: CGFloat = 4
+        /// Orbit radius multiplier (from center)
+        static let orbitRadius: CGFloat = 1.4
+
+        // MARK: Energy Thresholds (points)
+        /// Low energy threshold (10-25 points)
+        static let lowThreshold: Int = 25
+        /// Medium energy threshold (26-50 points)
+        static let mediumThreshold: Int = 50
+        /// High energy threshold (51-75 points)
+        static let highThreshold: Int = 75
+        /// Max energy is 76+ points
+
+        // MARK: Glow
+        /// Base glow radius
+        static let glowRadius: CGFloat = 8
+        /// Max glow radius (high energy)
+        static let glowRadiusMax: CGFloat = 16
+        /// Glow pulse intensity range
+        static let glowPulseMin: Double = 0.6
+        static let glowPulseMax: Double = 1.0
+    }
+
+    // MARK: - Input Bar Configuration
+    enum InputBar {
+        // MARK: Sizing
+        /// Container corner radius
+        static let cornerRadius: CGFloat = 24
+        /// Container horizontal padding
+        static let horizontalPadding: CGFloat = 16
+        /// Container vertical padding
+        static let verticalPadding: CGFloat = 12
+        /// Button size (plus, mic, send)
+        static let buttonSize: CGFloat = 36
+        /// Button icon size
+        static let buttonIconSize: CGFloat = 18
+        /// Minimum text field height
+        static let minHeight: CGFloat = 44
+        /// Maximum expanded height
+        static let maxHeight: CGFloat = 120
+
+        // MARK: Spacing
+        /// Space between greeting and input
+        static let greetingSpacing: CGFloat = 8
+        /// Space between elements in input
+        static let elementSpacing: CGFloat = 12
+        /// Bottom margin from safe area
+        static let bottomMargin: CGFloat = 8
+
+        // MARK: Animation
+        /// Send button appearance duration
+        static let sendAppearDuration: Double = 0.25
+        /// Greeting fade duration
+        static let greetingFadeDuration: Double = 0.4
+        /// Plus button rotation duration
+        static let plusRotationDuration: Double = 0.3
+        /// Glow animation duration
+        static let glowDuration: Double = 2.0
     }
 
     // MARK: - AI Configuration

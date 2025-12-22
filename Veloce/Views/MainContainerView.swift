@@ -14,24 +14,27 @@ import SwiftData
 enum MainTab: String, CaseIterable {
     case tasks = "Tasks"
     case calendar = "Calendar"
-    case goals = "Goals"
-    case settings = "Settings"
+    case momentum = "Momentum"
+    case journal = "Journal"
+    case dump = "Dump"
 
     var icon: String {
         switch self {
-        case .tasks: return "checkmark.circle"
+        case .tasks: return "plus.bubble"
         case .calendar: return "calendar"
-        case .goals: return "target"
-        case .settings: return "gearshape"
+        case .momentum: return "flame"
+        case .journal: return "book.pages"
+        case .dump: return "brain.head.profile"
         }
     }
 
     var selectedIcon: String {
         switch self {
-        case .tasks: return "checkmark.circle.fill"
+        case .tasks: return "plus.bubble.fill"
         case .calendar: return "calendar"
-        case .goals: return "target"
-        case .settings: return "gearshape.fill"
+        case .momentum: return "flame.fill"
+        case .journal: return "book.pages.fill"
+        case .dump: return "brain.head.profile.fill"
         }
     }
 }
@@ -42,48 +45,159 @@ struct MainContainerView: View {
     @Environment(AppViewModel.self) private var appViewModel
     @Environment(\.modelContext) private var modelContext
 
+    // Tab state
     @State private var selectedTab: MainTab = .tasks
+
+    // ViewModels
     @State private var tasksViewModel = TasksViewModel()
     @State private var calendarViewModel = CalendarViewModel()
     @State private var settingsViewModel = SettingsViewModel()
+    @State private var chatTasksViewModel = ChatTasksViewModel()
+
+    // Sheet state
+    @State private var showStatsSheet = false
+    @State private var showSettingsSheet = false
+
+    // Input bar state (managed at container level for proper z-ordering)
+    @State private var taskInputText = ""
+    @FocusState private var isTaskInputFocused: Bool
+    @State private var showSchedulePicker = false
+    @State private var showPriorityPicker = false
+
+    // Computed property for greeting context
+    private var completedTasksToday: Int {
+        let calendar = Calendar.current
+        return chatTasksViewModel.tasks.filter { task in
+            task.isCompleted &&
+            task.completedAt != nil &&
+            calendar.isDateInToday(task.completedAt!)
+        }.count
+    }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // Tasks Tab - Apple Notes-style daily pages
-            NavigationStack {
+        ZStack {
+            // Tab content
+            TabView(selection: $selectedTab) {
+                // Tasks Tab - with embedded input bar
+                NavigationStack {
+                    ChatTasksView(viewModel: chatTasksViewModel)
+                        .safeAreaInset(edge: .bottom, spacing: 0) {
+                            // Input bar positioned above tab bar area
+                            VStack(spacing: 0) {
+                                FloatingInputBar(
+                                    text: $taskInputText,
+                                    isFocused: $isTaskInputFocused,
+                                    completedTasksToday: completedTasksToday,
+                                    currentStreak: GamificationService.shared.currentStreak,
+                                    isFirstTaskOfDay: chatTasksViewModel.tasks.filter { !$0.isCompleted }.isEmpty,
+                                    onSubmit: {
+                                        createTask()
+                                    },
+                                    onSchedule: {
+                                        showSchedulePicker = true
+                                    },
+                                    onPriority: {
+                                        showPriorityPicker = true
+                                    },
+                                    onAI: {
+                                        HapticsService.shared.selectionFeedback()
+                                    }
+                                )
+                                // Spacer for tab bar height
+                                Spacer()
+                                    .frame(height: 90)
+                            }
+                        }
+                }
+                .tag(MainTab.tasks)
+
+                // Calendar Tab - Enhanced with Visual Timeline
+                EnhancedCalendarView(viewModel: calendarViewModel)
+                    .tag(MainTab.calendar)
+
+                // Momentum Tab - Gamification Dashboard
+                MomentumTabView()
+                    .tag(MainTab.momentum)
+
+                // Journal Tab - Apple Notes-style daily pages
                 DailyNotesView(viewModel: tasksViewModel)
-                    .navigationTitle("Tasks")
-                    .navigationBarTitleDisplayMode(.inline)
+                    .tag(MainTab.journal)
+
+                // Brain Dump Tab - AI-powered thought processing
+                BrainDumpView()
+                    .tag(MainTab.dump)
             }
-            .tabItem {
-                Label(MainTab.tasks.rawValue, systemImage: selectedTab == .tasks ? MainTab.tasks.selectedIcon : MainTab.tasks.icon)
+            .toolbar(.hidden, for: .tabBar)
+
+            // Custom Celestial Tab Bar - floats at bottom independently
+            VStack {
+                Spacer()
+                CelestialTabBar(selectedTab: $selectedTab)
+                    .padding(.bottom, 8)
             }
-            .tag(MainTab.tasks)
-
-            // Calendar Tab
-            CalendarPageView(viewModel: calendarViewModel)
-                .tabItem {
-                    Label(MainTab.calendar.rawValue, systemImage: MainTab.calendar.icon)
-                }
-                .tag(MainTab.calendar)
-
-            // Goals Tab
-            GoalsPageView()
-                .tabItem {
-                    Label(MainTab.goals.rawValue, systemImage: MainTab.goals.icon)
-                }
-                .tag(MainTab.goals)
-
-            // Settings Tab
-            SettingsPageView(viewModel: settingsViewModel)
-                .tabItem {
-                    Label(MainTab.settings.rawValue, systemImage: selectedTab == .settings ? MainTab.settings.selectedIcon : MainTab.settings.icon)
-                }
-                .tag(MainTab.settings)
         }
-        .tint(Theme.Colors.accent)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .safeAreaInset(edge: .top) {
+            UniversalHeaderView(
+                title: selectedTab.rawValue,
+                showStatsSheet: $showStatsSheet,
+                showSettingsSheet: $showSettingsSheet,
+                userName: appViewModel.currentUser?.fullName,
+                avatarUrl: nil
+            )
+        }
+        .sheet(isPresented: $showStatsSheet) {
+            StatsBottomSheet()
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+                .voidPresentationBackground()
+        }
+        .sheet(isPresented: $showSettingsSheet) {
+            SettingsBottomSheet(viewModel: settingsViewModel)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+                .voidPresentationBackground()
+        }
+        .sheet(isPresented: $showSchedulePicker) {
+            ChatSchedulePickerSheet { date in
+                createTask(scheduledTime: date)
+            }
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showPriorityPicker) {
+            PriorityPickerSheet { priority in
+                createTask(priority: priority)
+            }
+            .presentationDetents([.height(280)])
+            .presentationDragIndicator(.visible)
+        }
+        .animation(Theme.Animation.spring, value: selectedTab)
         .onAppear {
             setupViewModels()
+        }
+    }
+
+    // MARK: - Task Creation
+
+    private func createTask(priority: Int = 2, scheduledTime: Date? = nil) {
+        let text = taskInputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+
+        // Clear input immediately
+        withAnimation {
+            taskInputText = ""
+        }
+
+        Task {
+            await chatTasksViewModel.createTask(title: text, priority: priority)
+
+            // If scheduled time provided, update the task
+            if let scheduledTime = scheduledTime, let lastTask = chatTasksViewModel.tasks.last {
+                chatTasksViewModel.updateTask(lastTask, scheduledTime: scheduledTime)
+            }
         }
     }
 
@@ -91,6 +205,7 @@ struct MainContainerView: View {
         tasksViewModel.setup(context: modelContext)
         calendarViewModel.setup(context: modelContext)
         settingsViewModel.setup(context: modelContext, user: appViewModel.currentUser)
+        chatTasksViewModel.setup(context: modelContext)
     }
 }
 
@@ -105,9 +220,8 @@ struct TasksPageView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background
-                IridescentBackground(intensity: 0.3)
-                    .ignoresSafeArea()
+                // Background - Void design system
+                VoidBackground.tasks
 
                 VStack(spacing: 0) {
                     // Stats bar
@@ -196,42 +310,40 @@ struct TasksPageView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: Theme.Spacing.lg) {
+        VStack(spacing: 24) {
             Spacer()
 
-            // Animated empty state illustration
-            AnimatedEmptyStateIcon(icon: emptyStateIcon)
+            // Clean thin icon
+            Image(systemName: emptyStateIcon)
+                .font(.system(size: 64, weight: .thin))
+                .foregroundStyle(AppColors.textTertiary)
                 .accessibilityHidden(true)
 
-            VStack(spacing: Theme.Spacing.sm) {
+            VStack(spacing: 8) {
                 Text(emptyStateTitle)
-                    .font(Theme.Typography.title3)
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .font(AppTypography.title2)
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text(emptyStateSubtitle)
-                    .font(Theme.Typography.body)
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .font(AppTypography.subheadline)
+                    .foregroundStyle(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, Theme.Spacing.lg)
             }
             .fadeIn(delay: 0.2)
 
             // CTA Button for empty states
             if showEmptyStateCTA {
-                ShimmerCTAButton(
-                    title: emptyStateCTAText,
-                    action: {
-                        showAddTask = true
-                        HapticsService.shared.impact(.medium)
-                    }
-                )
-                .padding(.top, Theme.Spacing.md)
+                Button(emptyStateCTAText) {
+                    showAddTask = true
+                    HapticsService.shared.impact(.medium)
+                }
+                .buttonStyle(.glassProminent)
                 .scaleIn(delay: 0.4)
             }
 
             Spacer()
         }
-        .padding(Theme.Spacing.xl)
+        .padding(40)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(emptyStateTitle). \(emptyStateSubtitle)")
     }
@@ -625,137 +737,65 @@ struct TaskRow: View {
             showDetail = true
             HapticsService.shared.selectionFeedback()
         } label: {
-            HStack(spacing: 0) {
-                // Priority accent border
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(priorityColor)
-                    .frame(width: 4)
-                    .padding(.vertical, 8)
-
-                HStack(spacing: Theme.Spacing.md) {
-                    // Animated Checkbox
-                    Button {
-                        toggleWithAnimation()
-                    } label: {
-                        ZStack {
-                            // Background circle
+            HStack(spacing: 16) {
+                // Checkbox - Clean minimal style
+                Button {
+                    toggleWithAnimation()
+                } label: {
+                    Circle()
+                        .strokeBorder(
+                            task.isCompleted ? AppColors.accentSuccess : AppColors.textTertiary,
+                            lineWidth: 1.5
+                        )
+                        .background(
                             Circle()
-                                .stroke(task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary.opacity(0.4), lineWidth: 2)
-                                .frame(width: 26, height: 26)
-
-                            // Filled background when complete
-                            Circle()
-                                .fill(task.isCompleted ? Theme.Colors.success : Color.clear)
-                                .frame(width: 22, height: 22)
-                                .scaleEffect(task.isCompleted ? 1 : 0)
-
-                            // Checkmark
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(.white)
-                                .scaleEffect(task.isCompleted ? 1 : 0)
-                                .opacity(task.isCompleted ? 1 : 0)
+                                .fill(task.isCompleted ? AppColors.accentSuccess : Color.clear)
+                        )
+                        .overlay {
+                            if task.isCompleted {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundStyle(.white)
+                            }
                         }
+                        .frame(width: 24, height: 24)
                         .scaleEffect(checkScale)
                         .opacity(checkOpacity)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(task.isCompleted ? "Mark incomplete" : "Mark complete")
-                    .accessibilityHint("Double tap to toggle task completion")
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(task.isCompleted ? "Mark incomplete" : "Mark complete")
+                .accessibilityHint("Double tap to toggle task completion")
 
-                    // Content
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Title with animated strikethrough
-                        Text(task.title)
-                            .font(Theme.Typography.body)
-                            .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : Theme.Colors.textPrimary)
-                            .strikethrough(task.isCompleted, color: Theme.Colors.textTertiary)
-                            .lineLimit(2)
+                // Content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(task.title)
+                        .font(AppTypography.body)
+                        .foregroundStyle(task.isCompleted ? AppColors.textTertiary : AppColors.textPrimary)
+                        .strikethrough(task.isCompleted, color: AppColors.textTertiary)
+                        .lineLimit(2)
 
-                        // Metadata row
-                        HStack(spacing: Theme.Spacing.sm) {
-                            // Star rating with gold shimmer
-                            if task.starRating > 0 {
-                                HStack(spacing: 2) {
-                                    ForEach(0..<task.starRating, id: \.self) { _ in
-                                        Image(systemName: "star.fill")
-                                            .font(.system(size: 10))
-                                    }
-                                }
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [Theme.Colors.gold, Theme.Colors.warning],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .accessibilityLabel("\(task.starRating) star priority")
-                            }
-
-                            // Time estimate pill
-                            if let minutes = task.estimatedMinutes {
-                                HStack(spacing: 3) {
-                                    Image(systemName: "clock")
-                                        .font(.system(size: 9))
-                                    Text("\(minutes)m")
-                                        .font(Theme.Typography.caption2)
-                                }
-                                .foregroundStyle(Theme.Colors.textTertiary)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Theme.Colors.glassBackground)
-                                .clipShape(Capsule())
-                                .accessibilityLabel("Estimated \(minutes) minutes")
-                            }
-
-                            // AI sparkle indicator with subtle rotation
-                            if task.aiProcessedAt != nil {
-                                Image(systemName: "sparkles")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(
-                                        LinearGradient(
-                                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .rotationEffect(.degrees(sparkleRotation))
-                                    .accessibilityLabel("AI enhanced")
+                    // Priority stars
+                    if task.starRating > 0 {
+                        HStack(spacing: 2) {
+                            ForEach(0..<task.starRating, id: \.self) { _ in
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(AppColors.accentSecondary)
                             }
                         }
+                        .accessibilityLabel("\(task.starRating) star priority")
                     }
-
-                    Spacer()
-
-                    // Chevron indicator
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Theme.Colors.textTertiary.opacity(0.5))
                 }
-                .padding(.leading, Theme.Spacing.md)
-                .padding(.trailing, Theme.Spacing.md)
-                .padding(.vertical, Theme.Spacing.md)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AppColors.textTertiary)
             }
-            .background {
-                RoundedRectangle(cornerRadius: Theme.Radius.card)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Theme.Radius.card)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        .white.opacity(0.2),
-                                        .white.opacity(0.05)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 0.5
-                            )
-                    )
-            }
-            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.card))
-            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+            .padding(16)
+            .background(AppColors.backgroundSurface)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(TaskRowButtonStyle())
         .contentShape(Rectangle())
@@ -1302,8 +1342,8 @@ struct CalendarPageView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                IridescentBackground(intensity: 0.3)
-                    .ignoresSafeArea()
+                // Background - Void design system
+                VoidBackground.calendar
 
                 VStack {
                     if !viewModel.isAuthorized {
@@ -1318,28 +1358,30 @@ struct CalendarPageView: View {
     }
 
     private var calendarPermissionView: some View {
-        VStack(spacing: Theme.Spacing.lg) {
+        VStack(spacing: 24) {
             Image(systemName: "calendar.badge.exclamationmark")
-                .font(.system(size: 60))
-                .foregroundStyle(Theme.Colors.textTertiary)
+                .font(.system(size: 64, weight: .thin))
+                .foregroundStyle(AppColors.textTertiary)
 
-            Text("Calendar Access Required")
-                .font(Theme.Typography.headline)
-                .foregroundStyle(Theme.Colors.textPrimary)
+            VStack(spacing: 8) {
+                Text("Calendar Access Required")
+                    .font(AppTypography.title2)
+                    .foregroundStyle(AppColors.textPrimary)
 
-            Text("Enable calendar access to sync your tasks with your schedule.")
-                .font(Theme.Typography.body)
-                .foregroundStyle(Theme.Colors.textSecondary)
-                .multilineTextAlignment(.center)
+                Text("Enable calendar access to sync your tasks with your schedule.")
+                    .font(AppTypography.subheadline)
+                    .foregroundStyle(AppColors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
 
             Button("Enable Calendar Access") {
                 Task {
                     await viewModel.requestAccess()
                 }
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.glassProminent)
         }
-        .padding(Theme.Spacing.xl)
+        .padding(40)
     }
 
     private var calendarContent: some View {
@@ -1590,8 +1632,8 @@ struct GoalsPageView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                IridescentBackground(intensity: 0.3)
-                    .ignoresSafeArea()
+                // Background - Void design system
+                VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiGold, starCount: VoidDesign.Stars.countSparse)
 
                 if goals.isEmpty {
                     emptyState
@@ -1604,27 +1646,20 @@ struct GoalsPageView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: Theme.Spacing.lg) {
+        VStack(spacing: 24) {
             Image(systemName: "target")
-                .font(.system(size: 64, weight: .light))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Theme.Colors.accent.opacity(0.6), Theme.Colors.accentSecondary.opacity(0.4)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .symbolEffect(.pulse.byLayer, options: .repeating)
+                .font(.system(size: 64, weight: .thin))
+                .foregroundStyle(AppColors.textTertiary)
                 .accessibilityHidden(true)
 
-            VStack(spacing: Theme.Spacing.sm) {
+            VStack(spacing: 8) {
                 Text("No goals yet")
-                    .font(Theme.Typography.title3)
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .font(AppTypography.title2)
+                    .foregroundStyle(AppColors.textPrimary)
 
                 Text("Set SMART goals to stay focused on what matters.")
-                    .font(Theme.Typography.body)
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .font(AppTypography.subheadline)
+                    .foregroundStyle(AppColors.textSecondary)
                     .multilineTextAlignment(.center)
             }
 
@@ -1633,21 +1668,15 @@ struct GoalsPageView: View {
                 // TODO: Show add goal sheet
                 HapticsService.shared.impact(.medium)
             } label: {
-                HStack(spacing: Theme.Spacing.sm) {
+                HStack(spacing: 8) {
                     Image(systemName: "plus.circle.fill")
                     Text("Create Goal")
                 }
-                .font(Theme.Typography.headline)
-                .foregroundStyle(.white)
-                .padding(.horizontal, Theme.Spacing.xl)
-                .padding(.vertical, Theme.Spacing.md)
-                .background(Theme.Colors.accentGradient)
-                .clipShape(Capsule())
+                .font(AppTypography.headline)
             }
-            .buttonStyle(ScaleButtonStyle())
-            .padding(.top, Theme.Spacing.md)
+            .buttonStyle(.glassProminent)
         }
-        .padding(Theme.Spacing.xl)
+        .padding(40)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("No goals yet. Set SMART goals to stay focused on what matters.")
     }
@@ -1726,7 +1755,7 @@ struct GoalRow: View {
                             .rotationEffect(.degrees(-90))
 
                         Text("\(Int(animatedProgress * 100))")
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(.system(size: 8, weight: .bold, design: .default))
                             .foregroundStyle(Theme.Colors.textTertiary)
                     }
                 }

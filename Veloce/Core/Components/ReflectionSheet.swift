@@ -172,7 +172,7 @@ struct ReflectionSheet: View {
                         .foregroundStyle(Theme.Colors.secondaryText)
 
                     Text(estimated.formattedDuration)
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .font(.system(size: 48, weight: .bold, design: .default))
                         .foregroundStyle(Theme.Colors.accent)
                 }
 

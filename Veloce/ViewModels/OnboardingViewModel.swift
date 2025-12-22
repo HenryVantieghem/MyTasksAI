@@ -21,7 +21,7 @@ enum OnboardingStep: Int, CaseIterable {
 
     var title: String {
         switch self {
-        case .welcome: return "Welcome to Veloce"
+        case .welcome: return "Welcome to MyTasksAI"
         case .goals: return "Set your goals"
         case .focusAreas: return "What do you focus on?"
         case .notifications: return "Stay on track"
@@ -113,8 +113,8 @@ final class OnboardingViewModel {
     var selectedFocusAreas: Set<FocusArea> = []
 
     // MARK: Permissions
-    private(set) var notificationsGranted: Bool = false
-    private(set) var calendarGranted: Bool = false
+    var notificationsGranted: Bool = false
+    var calendarGranted: Bool = false
 
     // MARK: Services
     private let supabase = SupabaseService.shared

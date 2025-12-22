@@ -16,6 +16,7 @@ struct GamificationPill: View {
     let level: Int
     var showLevel: Bool = true
     var compact: Bool = false
+    var transparent: Bool = false  // When true, skip glass effect (for unified header)
     var onTap: (() -> Void)? = nil
 
     @State private var isAnimating: Bool = false
@@ -25,31 +26,41 @@ struct GamificationPill: View {
             HapticsService.shared.selectionFeedback()
             onTap?()
         } label: {
-            HStack(spacing: compact ? Theme.Spacing.xs : Theme.Spacing.sm) {
-                // Streak badge
-                StreakBadge(streak: streak, compact: compact)
-
-                if !compact {
-                    Divider()
-                        .frame(height: 20)
-                }
-
-                // Points display
-                PointsDisplay(points: points, compact: compact)
-
-                // Level badge (optional)
-                if showLevel && !compact {
-                    Divider()
-                        .frame(height: 20)
-
-                    LevelBadge(level: level)
-                }
-            }
-            .padding(.horizontal, compact ? Theme.Spacing.sm : Theme.Spacing.md)
-            .padding(.vertical, compact ? Theme.Spacing.xs : Theme.Spacing.sm)
-            .liquidGlass(cornerRadius: Theme.Radius.pill)
+            pillContent
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var pillContent: some View {
+        let content = HStack(spacing: compact ? Theme.Spacing.xs : Theme.Spacing.sm) {
+            // Streak badge
+            StreakBadge(streak: streak, compact: compact)
+
+            if !compact {
+                Divider()
+                    .frame(height: 20)
+            }
+
+            // Points display
+            PointsDisplay(points: points, compact: compact)
+
+            // Level badge (optional)
+            if showLevel && !compact {
+                Divider()
+                    .frame(height: 20)
+
+                LevelBadge(level: level)
+            }
+        }
+        .padding(.horizontal, compact ? Theme.Spacing.sm : Theme.Spacing.md)
+        .padding(.vertical, compact ? Theme.Spacing.xs : Theme.Spacing.sm)
+
+        if transparent {
+            content
+        } else {
+            content.liquidGlass(cornerRadius: Theme.Radius.pill)
+        }
     }
 }
 
@@ -185,7 +196,7 @@ struct LevelBadge: View {
 
             // Level number
             Text("\(level)")
-                .font(.system(size: size * 0.45, weight: .bold, design: .rounded))
+                .font(.system(size: size * 0.45, weight: .bold, design: .default))
                 .foregroundStyle(.white)
         }
     }

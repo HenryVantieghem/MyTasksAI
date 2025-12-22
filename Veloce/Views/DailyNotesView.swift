@@ -27,67 +27,97 @@ struct DailyNotesView: View {
     @State private var keyboardObserver = KeyboardObserver()
     @State private var currentEditingLine: NotesLine?
 
+    // MARK: Genius Sheet & Animation
+    @State private var showGeniusSheet = false
+    @State private var selectedTaskForGenius: TaskItem?
+    @State private var showAICreationAnimation = false
+
     // MARK: Configuration
     private let maxLinesPerPage = 50
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with date pill and stats
-            headerSection
+        ZStack {
+            VStack(spacing: 0) {
+                // Header with date pill and stats
+                headerSection
 
-            // Notes content
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        // Existing lines
-                        ForEach(notesLines) { line in
-                            NotesLineView(
-                                line: line,
-                                onTap: {
-                                    handleLineTap(line)
-                                },
-                                onTextChange: { _ in
-                                    saveLines()
-                                },
-                                onCheckToggle: {
-                                    toggleLineCheckbox(line)
-                                },
-                                isFocused: Binding(
-                                    get: { focusedLineId == line.id },
-                                    set: { if $0 { focusedLineId = line.id; currentEditingLine = line } }
+                // Notes content
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            // Existing lines
+                            ForEach(notesLines) { line in
+                                NotesLineView(
+                                    line: line,
+                                    onTap: {
+                                        handleLineTap(line)
+                                    },
+                                    onTextChange: { _ in
+                                        saveLines()
+                                    },
+                                    onCheckToggle: {
+                                        toggleLineCheckbox(line)
+                                    },
+                                    isFocused: Binding(
+                                        get: { focusedLineId == line.id },
+                                        set: { if $0 { focusedLineId = line.id; currentEditingLine = line } }
+                                    )
                                 )
-                            )
-                            .id(line.id)
-                        }
-
-                        // New line input
-                        EmptyNotesLineView(
-                            placeholder: notesLines.isEmpty ? "Start typing..." : "New line...",
-                            text: $newLineText,
-                            isFocused: $isNewLineFocused,
-                            onSubmit: {
-                                createNewLine()
+                                .id(line.id)
                             }
-                        )
-                        .id("newLine")
+
+                            // New line input
+                            EmptyNotesLineView(
+                                placeholder: notesLines.isEmpty ? "Start typing..." : "New line...",
+                                text: $newLineText,
+                                isFocused: $isNewLineFocused,
+                                onSubmit: {
+                                    createNewLine()
+                                }
+                            )
+                            .id("newLine")
+                        }
+                        .padding(.bottom, keyboardObserver.isVisible ? 60 : 100)
                     }
-                    .padding(.bottom, keyboardObserver.isVisible ? 60 : 100)
-                }
-                .scrollDismissesKeyboard(.interactively)
-                .onChange(of: notesLines.count) { _, _ in
-                    // Scroll to bottom when new line added
-                    withAnimation(Theme.Animation.fast) {
-                        proxy.scrollTo("newLine", anchor: .bottom)
+                    .scrollDismissesKeyboard(.interactively)
+                    .onChange(of: notesLines.count) { _, _ in
+                        // Scroll to bottom when new line added
+                        withAnimation(Theme.Animation.fast) {
+                            proxy.scrollTo("newLine", anchor: .bottom)
+                        }
                     }
                 }
             }
-        }
-        .safeAreaInset(edge: .bottom) {
-            if keyboardObserver.isVisible {
-                keyboardToolbar
+            .safeAreaInset(edge: .bottom) {
+                if keyboardObserver.isVisible {
+                    keyboardToolbar
+                }
+            }
+
+            // Genius Task Sheet overlay
+            if showGeniusSheet, let task = selectedTaskForGenius {
+                GeniusTaskSheet(
+                    task: task,
+                    isPresented: $showGeniusSheet,
+                    onEditTapped: {
+                        showGeniusSheet = false
+                        selectedTaskForDetail = task
+                    }
+                )
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(1)
+            }
+
+            // AI Creation Animation overlay
+            if showAICreationAnimation {
+                AITaskCreationAnimation {
+                    showAICreationAnimation = false
+                }
+                .zIndex(2)
             }
         }
-        .background(Theme.Colors.background)
+        .background(AppColors.backgroundPrimary.ignoresSafeArea())
+        .preferredColorScheme(.dark)
         .onChange(of: selectedDate) { _, newDate in
             loadLinesForDate(newDate)
         }
@@ -103,19 +133,12 @@ struct DailyNotesView: View {
 
     private var headerSection: some View {
         VStack(spacing: Theme.Spacing.xs) {
-            // Date pill
+            // Date pill only - stats now shown in universal header
             DatePillView(selectedDate: $selectedDate)
-
-            // Stats bar
-            CompactStatsBar(
-                completedCount: completedCount,
-                totalCount: notesLines.filter { $0.hasCheckbox }.count,
-                streakDays: viewModel.gamification.currentStreak,
-                points: viewModel.gamification.totalPoints
-            )
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
-        .padding(.vertical, Theme.Spacing.sm)
+        .padding(.top, Theme.Spacing.universalHeaderHeight)
+        .padding(.bottom, Theme.Spacing.sm)
     }
 
     // MARK: - Keyboard Toolbar
@@ -270,21 +293,27 @@ struct DailyNotesView: View {
         guard line.hasContent else { return }
 
         // Get or create linked task
-        let task: TaskItem
         if let taskId = line.linkedTaskId,
            let existingTask = viewModel.tasks.first(where: { $0.id == taskId }) {
-            task = existingTask
+            // Show Genius Sheet for existing task
+            selectedTaskForGenius = existingTask
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showGeniusSheet = true
+            }
         } else {
-            // Create new task from line
-            task = createTaskFromLine(line)
+            // Create new task from line with AI animation
+            createTaskFromLine(line)
         }
 
-        // Show task detail sheet
-        selectedTaskForDetail = task
         HapticsService.shared.lightImpact()
     }
 
-    private func createTaskFromLine(_ line: NotesLine) -> TaskItem {
+    private func createTaskFromLine(_ line: NotesLine) {
+        // Show AI creation animation
+        withAnimation {
+            showAICreationAnimation = true
+        }
+
         let task = TaskItem(
             title: line.text,
             userId: SupabaseService.shared.currentUserId ?? UUID()
@@ -305,11 +334,17 @@ struct DailyNotesView: View {
         // Process with AI
         Task {
             await viewModel.processTaskWithAI(task)
+
+            // After AI processing, show Genius Sheet
+            await MainActor.run {
+                selectedTaskForGenius = task
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    showGeniusSheet = true
+                }
+            }
         }
 
         saveLines()
-
-        return task
     }
 
     private func saveLines() {

@@ -132,6 +132,12 @@ final class GamificationService {
         pointsForLevel(currentLevel + 1) - totalPoints
     }
 
+    /// Daily task completion rate (0.0 - 1.0)
+    var completionRate: Double {
+        guard dailyGoal > 0 else { return 0 }
+        return min(1.0, Double(tasksCompletedToday) / Double(dailyGoal))
+    }
+
     // MARK: - Streak System
 
     /// Update streak on task completion
@@ -338,6 +344,12 @@ extension AchievementType {
         case .reflectionGuru: return 250
         case .goalSetter: return 100
         case .goalAchiever: return 300
+        // Focus achievements
+        case .focusFirst: return 50
+        case .focusHour: return 100
+        case .deepFocusMaster: return 500
+        case .distractionFree: return 1000
+        case .focusStreak: return 250
         }
     }
 }

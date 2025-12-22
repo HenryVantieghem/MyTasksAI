@@ -15,8 +15,10 @@ import Auth
 
 enum AppState: Equatable {
     case loading
+    case freeTrialWelcome  // First screen for new users
     case unauthenticated
     case onboarding
+    case paywall  // Show after trial expires
     case authenticated
 }
 
@@ -30,6 +32,18 @@ final class AppViewModel {
     private(set) var currentUser: User?
     private(set) var isInitialized: Bool = false
     private(set) var error: String?
+
+    /// Track if user prefers Sign Up or Sign In (set by FreeTrialWelcomeView)
+    var preferSignUp: Bool = true
+
+    // MARK: UserDefaults Keys
+    private let hasSeenWelcomeKey = "mytasksai_has_seen_welcome"
+
+    /// Whether user has seen the welcome screen
+    var hasSeenWelcome: Bool {
+        get { UserDefaults.standard.bool(forKey: hasSeenWelcomeKey) }
+        set { UserDefaults.standard.set(newValue, forKey: hasSeenWelcomeKey) }
+    }
 
     // MARK: Services
     private let supabase = SupabaseService.shared
@@ -75,19 +89,49 @@ final class AppViewModel {
 
     /// Check current authentication state
     func checkAuthenticationState() async {
+        #if DEBUG
+        print("🔵 [AppViewModel] checkAuthenticationState() called")
+        #endif
+
         appState = .loading
 
         guard let userId = await supabase.getCurrentUserId() else {
-            appState = .unauthenticated
+            #if DEBUG
+            print("🔵 [AppViewModel] No user ID found")
+            #endif
+
+            // Check if user has seen the welcome screen
+            if !hasSeenWelcome {
+                #if DEBUG
+                print("🔵 [AppViewModel] First time user → .freeTrialWelcome")
+                #endif
+                appState = .freeTrialWelcome
+            } else {
+                #if DEBUG
+                print("🔵 [AppViewModel] Returning user → .unauthenticated")
+                #endif
+                appState = .unauthenticated
+            }
             return
         }
+
+        #if DEBUG
+        print("🔵 [AppViewModel] User ID: \(userId)")
+        #endif
 
         // Fetch user profile
         do {
             let supabaseUser = try await supabase.fetchUser(id: userId)
 
+            #if DEBUG
+            print("🔵 [AppViewModel] Fetched user - dailyTaskGoal: \(supabaseUser.dailyTaskGoal ?? 0)")
+            #endif
+
             // Check if user needs onboarding (check if goals are set, meaning they completed onboarding)
             if supabaseUser.dailyTaskGoal == nil || supabaseUser.dailyTaskGoal == 0 {
+                #if DEBUG
+                print("🔵 [AppViewModel] No daily goal set → .onboarding")
+                #endif
                 appState = .onboarding
                 return
             }
@@ -95,6 +139,26 @@ final class AppViewModel {
             // Load or create local user
             await loadOrCreateLocalUser(from: supabaseUser)
 
+            // Check subscription status
+            let subscription = SubscriptionService.shared
+            await subscription.checkSubscriptionStatus()
+
+            #if DEBUG
+            print("🔵 [AppViewModel] Subscription check complete - shouldShowPaywall: \(subscription.shouldShowPaywall)")
+            #endif
+
+            // If trial expired and not subscribed, show paywall
+            if subscription.shouldShowPaywall {
+                #if DEBUG
+                print("🔵 [AppViewModel] Showing paywall → .paywall")
+                #endif
+                appState = .paywall
+                return
+            }
+
+            #if DEBUG
+            print("🔵 [AppViewModel] User has access → .authenticated")
+            #endif
             appState = .authenticated
 
             // Start background sync
@@ -104,9 +168,32 @@ final class AppViewModel {
                 }
             }
         } catch {
+            #if DEBUG
+            print("🔵 [AppViewModel] Error fetching profile: \(error) → .onboarding")
+            #endif
             // User authenticated but no profile - needs onboarding
             appState = .onboarding
         }
+    }
+
+    /// Handle subscription completed - transition to authenticated
+    func handleSubscriptionCompleted() {
+        #if DEBUG
+        print("🔵 [AppViewModel] handleSubscriptionCompleted() → .authenticated")
+        #endif
+        appState = .authenticated
+    }
+
+    /// Handle user continuing from Free Trial welcome screen
+    /// - Parameter toSignUp: If true, user tapped "Start Free Trial" (go to Sign Up). If false, user tapped "Sign In"
+    func handleWelcomeContinue(toSignUp: Bool) {
+        #if DEBUG
+        print("🔵 [AppViewModel] handleWelcomeContinue(toSignUp: \(toSignUp))")
+        #endif
+
+        hasSeenWelcome = true
+        preferSignUp = toSignUp
+        appState = .unauthenticated
     }
 
     /// Load or create local user from Supabase user

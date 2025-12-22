@@ -67,7 +67,15 @@ final class SupabaseService {
             return
         }
 
-        client = SupabaseClient(supabaseURL: url, supabaseKey: key)
+        client = SupabaseClient(
+            supabaseURL: url,
+            supabaseKey: key,
+            options: SupabaseClientOptions(
+                auth: SupabaseClientOptions.AuthOptions(
+                    emitLocalSessionAsInitialSession: true
+                )
+            )
+        )
         isConfigured = true
     }
 
@@ -78,7 +86,15 @@ final class SupabaseService {
             return
         }
 
-        client = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: key)
+        client = SupabaseClient(
+            supabaseURL: supabaseURL,
+            supabaseKey: key,
+            options: SupabaseClientOptions(
+                auth: SupabaseClientOptions.AuthOptions(
+                    emitLocalSessionAsInitialSession: true
+                )
+            )
+        )
         isConfigured = true
     }
 

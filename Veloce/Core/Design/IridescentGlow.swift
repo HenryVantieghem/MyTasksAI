@@ -350,3 +350,367 @@ struct GlowingProgressRing: View {
         .animation(Theme.Animation.spring, value: progress)
     }
 }
+
+// MARK: - Micro-Interaction Modifiers
+
+/// Press feedback with scale and haptics
+struct PressEffectModifier: ViewModifier {
+    @State private var isPressed = false
+    let scale: CGFloat
+    let hapticStyle: HapticStyle
+
+    enum HapticStyle {
+        case none
+        case light
+        case medium
+        case selection
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(isPressed ? scale : 1.0)
+            .animation(Theme.Animation.quickSpring, value: isPressed)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        if !isPressed {
+                            isPressed = true
+                            triggerHaptic()
+                        }
+                    }
+                    .onEnded { _ in
+                        isPressed = false
+                    }
+            )
+    }
+
+    private func triggerHaptic() {
+        switch hapticStyle {
+        case .none: break
+        case .light: HapticsService.shared.lightImpact()
+        case .medium: HapticsService.shared.impact()
+        case .selection: HapticsService.shared.selectionFeedback()
+        }
+    }
+}
+
+extension View {
+    /// Add press feedback with scale animation
+    func pressEffect(
+        scale: CGFloat = 0.96,
+        haptic: PressEffectModifier.HapticStyle = .selection
+    ) -> some View {
+        modifier(PressEffectModifier(scale: scale, hapticStyle: haptic))
+    }
+}
+
+/// Bounce entrance animation
+struct BounceEntranceModifier: ViewModifier {
+    @State private var appeared = false
+    let delay: Double
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(appeared ? 1 : 0.5)
+            .opacity(appeared ? 1 : 0)
+            .onAppear {
+                withAnimation(
+                    .spring(response: 0.5, dampingFraction: 0.6)
+                    .delay(delay)
+                ) {
+                    appeared = true
+                }
+            }
+    }
+}
+
+extension View {
+    /// Add bounce entrance animation
+    func bounceEntrance(delay: Double = 0) -> some View {
+        modifier(BounceEntranceModifier(delay: delay))
+    }
+}
+
+/// Slide up entrance animation
+struct SlideUpEntranceModifier: ViewModifier {
+    @State private var appeared = false
+    let offset: CGFloat
+    let delay: Double
+
+    func body(content: Content) -> some View {
+        content
+            .offset(y: appeared ? 0 : offset)
+            .opacity(appeared ? 1 : 0)
+            .onAppear {
+                withAnimation(
+                    .spring(response: 0.6, dampingFraction: 0.75)
+                    .delay(delay)
+                ) {
+                    appeared = true
+                }
+            }
+    }
+}
+
+extension View {
+    /// Add slide up entrance animation
+    func slideUpEntrance(offset: CGFloat = 30, delay: Double = 0) -> some View {
+        modifier(SlideUpEntranceModifier(offset: offset, delay: delay))
+    }
+}
+
+/// Fade and scale entrance for staggered lists
+struct StaggeredEntranceModifier: ViewModifier {
+    @State private var appeared = false
+    let index: Int
+    let baseDelay: Double
+    let staggerDelay: Double
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(appeared ? 1 : 0.85)
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 20)
+            .onAppear {
+                let totalDelay = baseDelay + (Double(index) * staggerDelay)
+                withAnimation(
+                    .spring(response: 0.5, dampingFraction: 0.7)
+                    .delay(totalDelay)
+                ) {
+                    appeared = true
+                }
+            }
+    }
+}
+
+extension View {
+    /// Add staggered entrance animation for list items
+    func staggeredEntrance(
+        index: Int,
+        baseDelay: Double = 0.1,
+        staggerDelay: Double = 0.05
+    ) -> some View {
+        modifier(StaggeredEntranceModifier(
+            index: index,
+            baseDelay: baseDelay,
+            staggerDelay: staggerDelay
+        ))
+    }
+}
+
+/// Gentle float animation for background elements
+struct FloatAnimationModifier: ViewModifier {
+    @State private var offset: CGFloat = 0
+    let amplitude: CGFloat
+    let duration: Double
+
+    func body(content: Content) -> some View {
+        content
+            .offset(y: offset)
+            .onAppear {
+                withAnimation(
+                    .easeInOut(duration: duration)
+                    .repeatForever(autoreverses: true)
+                ) {
+                    offset = amplitude
+                }
+            }
+    }
+}
+
+extension View {
+    /// Add gentle floating animation
+    func floatAnimation(amplitude: CGFloat = 8, duration: Double = 3) -> some View {
+        modifier(FloatAnimationModifier(amplitude: amplitude, duration: duration))
+    }
+}
+
+/// Shake animation for errors or attention
+struct ShakeAnimationModifier: ViewModifier {
+    @Binding var trigger: Bool
+    let intensity: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .modifier(ShakeEffect(shakeNumber: trigger ? 3 : 0, intensity: intensity))
+            .animation(.spring(response: 0.2, dampingFraction: 0.3), value: trigger)
+            .onChange(of: trigger) { _, newValue in
+                if newValue {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        trigger = false
+                    }
+                }
+            }
+    }
+}
+
+struct ShakeEffect: GeometryEffect {
+    var shakeNumber: CGFloat
+    let intensity: CGFloat
+
+    var animatableData: CGFloat {
+        get { shakeNumber }
+        set { shakeNumber = newValue }
+    }
+
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        ProjectionTransform(CGAffineTransform(translationX:
+            intensity * sin(shakeNumber * .pi * 2),
+            y: 0
+        ))
+    }
+}
+
+extension View {
+    /// Add shake animation triggered by binding
+    func shakeAnimation(trigger: Binding<Bool>, intensity: CGFloat = 10) -> some View {
+        modifier(ShakeAnimationModifier(trigger: trigger, intensity: intensity))
+    }
+}
+
+/// Success check animation
+struct SuccessCheckModifier: ViewModifier {
+    @Binding var isShowing: Bool
+    @State private var checkScale: CGFloat = 0
+    @State private var ringScale: CGFloat = 0.8
+    @State private var ringOpacity: Double = 1
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                if isShowing {
+                    ZStack {
+                        // Expanding ring
+                        Circle()
+                            .stroke(Theme.Colors.success, lineWidth: 2)
+                            .scaleEffect(ringScale)
+                            .opacity(ringOpacity)
+
+                        // Check icon
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 44))
+                            .foregroundStyle(Theme.Colors.success)
+                            .scaleEffect(checkScale)
+                    }
+                    .onAppear {
+                        HapticsService.shared.celebration()
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+                            checkScale = 1
+                        }
+                        withAnimation(.easeOut(duration: 0.6)) {
+                            ringScale = 1.5
+                            ringOpacity = 0
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            withAnimation(.easeOut(duration: 0.3)) {
+                                checkScale = 0
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                isShowing = false
+                            }
+                        }
+                    }
+                }
+            }
+    }
+}
+
+extension View {
+    /// Add success check animation overlay
+    func successCheck(isShowing: Binding<Bool>) -> some View {
+        modifier(SuccessCheckModifier(isShowing: isShowing))
+    }
+}
+
+/// Ripple effect on tap
+struct RippleEffectModifier: ViewModifier {
+    @State private var ripples: [RippleState] = []
+    let color: Color
+
+    struct RippleState: Identifiable {
+        let id = UUID()
+        let position: CGPoint
+        var scale: CGFloat = 0
+        var opacity: Double = 0.5
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                GeometryReader { geometry in
+                    ForEach(ripples) { ripple in
+                        Circle()
+                            .fill(color.opacity(ripple.opacity))
+                            .frame(width: 40, height: 40)
+                            .scaleEffect(ripple.scale)
+                            .position(ripple.position)
+                    }
+                }
+                .allowsHitTesting(false)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture { location in
+                addRipple(at: location)
+            }
+    }
+
+    private func addRipple(at position: CGPoint) {
+        let ripple = RippleState(position: position)
+        ripples.append(ripple)
+
+        withAnimation(.easeOut(duration: 0.5)) {
+            if let index = ripples.firstIndex(where: { $0.id == ripple.id }) {
+                ripples[index].scale = 4
+                ripples[index].opacity = 0
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            ripples.removeAll { $0.id == ripple.id }
+        }
+    }
+}
+
+extension View {
+    /// Add ripple effect on tap
+    func rippleEffect(color: Color = Theme.Colors.accent.opacity(0.3)) -> some View {
+        modifier(RippleEffectModifier(color: color))
+    }
+}
+
+/// Breathing animation for AI elements
+struct BreathingGlowModifier: ViewModifier {
+    @State private var intensity: Double = 0.3
+    let color: Color
+    let minIntensity: Double
+    let maxIntensity: Double
+
+    func body(content: Content) -> some View {
+        content
+            .shadow(color: color.opacity(intensity), radius: 15)
+            .shadow(color: color.opacity(intensity * 0.5), radius: 25)
+            .onAppear {
+                withAnimation(
+                    .easeInOut(duration: 2)
+                    .repeatForever(autoreverses: true)
+                ) {
+                    intensity = maxIntensity
+                }
+            }
+    }
+}
+
+extension View {
+    /// Add breathing glow animation for AI elements
+    func breathingGlow(
+        color: Color = Theme.Colors.aiPurple,
+        min: Double = 0.2,
+        max: Double = 0.6
+    ) -> some View {
+        modifier(BreathingGlowModifier(
+            color: color,
+            minIntensity: min,
+            maxIntensity: max
+        ))
+    }
+}

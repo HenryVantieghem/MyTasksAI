@@ -23,8 +23,8 @@ final class GeminiService {
 
     // MARK: Configuration
     private var apiKey: String?
-    private let baseURL = "https://generativelanguage.googleapis.com/v1beta"
-    private let modelName = "gemini-1.5-flash"
+    private let baseURL = "https://generativelanguage.googleapis.com/v1"
+    private let modelName = "gemini-2.0-flash"
 
     // MARK: Rate Limiting
     private var lastRequestTime: Date?
@@ -430,6 +430,188 @@ enum GeminiError: Error, LocalizedError {
     }
 }
 
+// MARK: - Genius Task Analysis
+
+extension GeminiService {
+    /// Generate comprehensive genius-level analysis for a task
+    func generateGeniusAnalysis(
+        title: String,
+        notes: String? = nil,
+        context: String? = nil,
+        userPatterns: UserPatterns? = nil
+    ) async throws -> GeniusTaskAnalysis {
+        let notesSection = notes.map { "Notes: \($0)" } ?? ""
+        let contextSection = context.map { "Context: \($0)" } ?? ""
+        let patternsSection = userPatterns.map { """
+            User Patterns:
+            - Learning style: \($0.preferredLearningStyle ?? "not specified")
+            - Peak hours: \($0.peakProductivityHours ?? "not specified")
+            """ } ?? ""
+
+        let prompt = """
+        You are a world-class productivity mentor and task execution expert. Analyze this task and provide genius-level guidance.
+
+        TASK: "\(title)"
+        \(notesSection)
+        \(contextSection)
+        \(patternsSection)
+
+        Respond in this exact JSON format:
+        {
+            "task_type": "CREATE|COMMUNICATE|CONSUME|COORDINATE",
+            "estimated_minutes": <number>,
+            "mentor_advice": {
+                "main_advice": "<2-3 sentence personalized strategy for crushing this task>",
+                "thought_process": "<your reasoning for this advice>",
+                "potential_blocker": "<one thing that might get in the way, or null>",
+                "quick_tip": "<one-liner tip for the collapsed card view>"
+            },
+            "execution_steps": [
+                {"description": "<step>", "estimated_minutes": <number>, "order_index": <number>, "is_completed": false}
+            ],
+            "resources": [
+                {
+                    "title": "<resource title>",
+                    "url": "<actual working URL>",
+                    "source": "<YouTube/Article/Docs/Tool>",
+                    "type": "youtube|article|documentation|tool",
+                    "duration": "<duration if video, e.g. '8 min'>",
+                    "reasoning": "<why this helps>"
+                }
+            ]
+        }
+
+        TASK TYPE RULES:
+        - CREATE: High cognitive work (writing, coding, designing, building) - needs deep focus
+        - COMMUNICATE: Interpersonal tasks (emails, calls, meetings) - needs social energy
+        - CONSUME: Learning tasks (reading, courses, research) - can be fragmented
+        - COORDINATE: Admin tasks (scheduling, organizing, quick todos) - interstitial work
+
+        IMPORTANT:
+        - Make the FIRST execution step the "START HERE" moment - smallest possible action to build momentum
+        - Resources should be REAL, WORKING URLs to actual YouTube videos, articles, or tools
+        - For YouTube, search for actual tutorials relevant to the task
+        - Be specific and actionable, not generic
+        - Keep execution steps to 3-5 maximum
+        - Keep resources to 2-4 maximum
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.5)
+
+        guard let data = jsonResponse.data(using: .utf8) else {
+            throw GeminiError.parsingFailed
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        return try decoder.decode(GeniusTaskAnalysis.self, from: data)
+    }
+
+    /// Generate smart schedule suggestions based on calendar
+    func generateScheduleSuggestions(
+        task: TaskItem,
+        calendar: [CalendarEventInfo],
+        userPatterns: UserPatterns?
+    ) async throws -> [GeniusScheduleSuggestion] {
+        let calendarText = calendar.prefix(20).map { event in
+            let formatter = DateFormatter()
+            formatter.dateFormat = "EEE MMM d, h:mm a"
+            return "- \(event.title): \(formatter.string(from: event.start)) to \(formatter.string(from: event.end))"
+        }.joined(separator: "\n")
+
+        let prompt = """
+        You are a scheduling genius. Find the 3 best times to do this task.
+
+        TASK: "\(task.title)"
+        TASK TYPE: \(task.taskType.rawValue.uppercased())
+        ESTIMATED DURATION: \(task.estimatedMinutes ?? 30) minutes
+
+        CALENDAR (next 7 days):
+        \(calendarText.isEmpty ? "No events scheduled" : calendarText)
+
+        SCHEDULING RULES:
+        - CREATE tasks: Morning (8-11am), 90+ min blocks, no meetings before
+        - COMMUNICATE tasks: After lunch (1-4pm), can batch with other meetings
+        - CONSUME tasks: Flexible, can use 30-min gaps
+        - COORDINATE tasks: Interstitial, quick 15-min slots between meetings
+
+        TODAY IS: \(Date().formatted(date: .complete, time: .omitted))
+
+        Respond in this exact JSON format:
+        {
+            "suggestions": [
+                {
+                    "rank": "best|good|okay",
+                    "date": "<ISO 8601 date string>",
+                    "reason": "<why this slot is good, 10 words max>"
+                }
+            ]
+        }
+
+        IMPORTANT:
+        - Suggest times in the NEXT 7 days only
+        - Best slot should be clearly superior
+        - Avoid conflicts with existing calendar events
+        - Consider task type when suggesting time of day
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.4)
+
+        guard let data = jsonResponse.data(using: .utf8) else {
+            throw GeminiError.parsingFailed
+        }
+
+        // Parse the response
+        let response = try JSONDecoder().decode(ScheduleResponseWrapper.self, from: data)
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
+
+        return response.suggestions.compactMap { suggestion in
+            guard let date = formatter.date(from: suggestion.date) ?? parseFlexibleDate(suggestion.date) else {
+                return nil
+            }
+            return GeniusScheduleSuggestion(
+                rank: ScheduleRank(rawValue: suggestion.rank) ?? .okay,
+                date: date,
+                reason: suggestion.reason
+            )
+        }
+    }
+
+    /// Parse various date formats from AI response
+    private func parseFlexibleDate(_ dateString: String) -> Date? {
+        let formatters = [
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd'T'HH:mm",
+            "MMM d, yyyy h:mm a"
+        ]
+
+        for format in formatters {
+            let formatter = DateFormatter()
+            formatter.dateFormat = format
+            if let date = formatter.date(from: dateString) {
+                return date
+            }
+        }
+        return nil
+    }
+}
+
+// MARK: - Schedule Response Wrapper
+
+private struct ScheduleResponseWrapper: Decodable {
+    let suggestions: [ScheduleSuggestionDTO]
+}
+
+private struct ScheduleSuggestionDTO: Decodable {
+    let rank: String
+    let date: String
+    let reason: String
+}
+
 // MARK: - Configuration Extension
 
 extension GeminiService {
@@ -485,5 +667,249 @@ extension GeminiService {
     func storeAPIKey(_ key: String) {
         UserDefaults.standard.set(key, forKey: "gemini_api_key")
         configure(apiKey: key)
+    }
+}
+
+// MARK: - Goal Genius AI Methods
+
+extension GeminiService {
+
+    /// Transform a vague goal into a SMART goal
+    /// - Parameters:
+    ///   - title: The original goal title
+    ///   - description: Optional description
+    ///   - category: Goal category
+    ///   - timeframe: Goal timeframe (sprint/milestone/horizon)
+    /// - Returns: GoalRefinement with SMART analysis
+    func refineGoalToSMART(
+        title: String,
+        description: String?,
+        category: GoalCategory?,
+        timeframe: GoalTimeframe
+    ) async throws -> GoalRefinement {
+        let descSection = description.map { "Description: \($0)" } ?? ""
+        let categorySection = category.map { "Category: \($0.displayName)" } ?? ""
+
+        let prompt = """
+        You are a world-class productivity coach and goal-setting expert. Transform this vague goal into a crystal-clear SMART goal.
+
+        GOAL: "\(title)"
+        \(descSection)
+        \(categorySection)
+        TIMEFRAME: \(timeframe.displayName) (\(timeframe.subtitle))
+
+        Make it:
+        - Specific: Clear and well-defined, no ambiguity
+        - Measurable: Quantifiable success metrics (numbers, percentages, deliverables)
+        - Achievable: Realistic given the \(timeframe.subtitle) timeframe
+        - Relevant: Connected to broader life/career goals
+        - Time-bound: With clear deadline and milestone checkpoints
+
+        Respond in this exact JSON format:
+        {
+            "refined_title": "Specific, action-oriented title (max 60 chars)",
+            "refined_description": "Detailed description with context and motivation (2-3 sentences)",
+            "success_metrics": ["Metric 1 with number", "Metric 2 with number", "Metric 3"],
+            "potential_obstacles": ["Specific obstacle 1", "Specific obstacle 2"],
+            "motivational_quote": "An inspiring quote relevant to this specific goal journey",
+            "smart_analysis": {
+                "specific": "Why it's specific and clear",
+                "measurable": "How to measure success",
+                "achievable": "Why it's realistic for this timeframe",
+                "relevant": "Why it matters to the person",
+                "time_bound": "Timeline breakdown with checkpoints"
+            }
+        }
+
+        IMPORTANT:
+        - Be specific and personalized, not generic
+        - Include actual numbers and metrics
+        - The quote should feel hand-picked for this goal
+        - Success metrics should be trackable weekly
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.6)
+
+        guard let data = jsonResponse.data(using: .utf8) else {
+            throw GeminiError.parsingFailed
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        return try decoder.decode(GoalRefinement.self, from: data)
+    }
+
+    /// Generate a comprehensive roadmap with milestones for achieving a goal
+    /// - Parameters:
+    ///   - goal: The goal to create roadmap for
+    ///   - userPatterns: Optional user productivity patterns
+    /// - Returns: GoalRoadmap with phases, milestones, habits, and tasks
+    func generateGoalRoadmap(
+        goal: Goal,
+        userPatterns: UserPatterns?
+    ) async throws -> GoalRoadmap {
+        let timeframe = goal.timeframeEnum ?? .milestone
+        let patternsSection = userPatterns.map { """
+            User Patterns:
+            - Learning style: \($0.preferredLearningStyle ?? "not specified")
+            - Peak hours: \($0.peakProductivityHours ?? "not specified")
+            - Best days: \($0.bestDays?.joined(separator: ", ") ?? "not specified")
+            """ } ?? ""
+
+        let daysUntilDeadline = goal.daysRemaining ?? timeframe.defaultDurationDays
+
+        let prompt = """
+        You are a strategic planning genius and productivity architect. Create a detailed roadmap to achieve this goal.
+
+        GOAL: "\(goal.displayTitle)"
+        DESCRIPTION: \(goal.displayDescription ?? "No description")
+        CATEGORY: \(goal.categoryEnum?.displayName ?? "General")
+        TIMEFRAME: \(timeframe.displayName) (\(timeframe.subtitle))
+        DAYS UNTIL DEADLINE: \(daysUntilDeadline)
+        TARGET DATE: \(goal.targetDate?.formatted(date: .abbreviated, time: .omitted) ?? "Not set")
+        \(patternsSection)
+
+        Create a phased roadmap appropriate for this timeframe:
+        - Sprint (1-2 weeks): 1 phase with focused daily execution
+        - Milestone (1-3 months): 2-3 phases with bi-weekly checkpoints
+        - Horizon (3-12 months): 4-6 phases with monthly milestones
+
+        Respond in this exact JSON format:
+        {
+            "phases": [
+                {
+                    "name": "Phase 1: Foundation",
+                    "start_week": 1,
+                    "end_week": 2,
+                    "milestones": [
+                        {
+                            "title": "Clear milestone title",
+                            "description": "What this achieves",
+                            "target_days_from_start": 7,
+                            "success_indicator": "How to know it's done",
+                            "points_value": 50
+                        }
+                    ],
+                    "daily_habits": [
+                        {
+                            "title": "Daily habit title (verb + action)",
+                            "frequency": "daily|weekdays|weekly",
+                            "duration_minutes": 15,
+                            "best_time": "morning|afternoon|evening",
+                            "reasoning": "Why this habit supports the goal"
+                        }
+                    ],
+                    "one_time_tasks": [
+                        {
+                            "title": "Task title (verb + specific action)",
+                            "estimated_minutes": 30,
+                            "priority": "high|medium|low",
+                            "reasoning": "Why this task matters"
+                        }
+                    ],
+                    "phase_obstacles": ["Potential blocker for this phase"]
+                }
+            ],
+            "total_estimated_hours": 40,
+            "success_probability": 0.85,
+            "coaching_notes": "Personalized advice for this journey (2-3 sentences)"
+        }
+
+        RULES:
+        - Each phase should have 1-3 milestones
+        - Include 1-3 daily habits per phase
+        - Include 3-5 one-time tasks per phase
+        - Tasks should be specific and actionable
+        - Habits should be small (5-30 min) and sustainable
+        - Points should reflect effort (25-100 per milestone)
+        - success_probability should be realistic (0.6-0.95)
+        - Phases should build on each other logically
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.5)
+
+        guard let data = jsonResponse.data(using: .utf8) else {
+            throw GeminiError.parsingFailed
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        return try decoder.decode(GoalRoadmap.self, from: data)
+    }
+
+    /// Generate weekly check-in coaching for a goal
+    /// - Parameters:
+    ///   - goal: The goal being tracked
+    ///   - recentProgress: Current progress (0.0-1.0)
+    ///   - completedMilestones: Number of completed milestones
+    ///   - totalMilestones: Total number of milestones
+    ///   - blockers: User-reported blockers (optional)
+    /// - Returns: WeeklyCheckIn with coaching response
+    func generateWeeklyCheckIn(
+        goal: Goal,
+        recentProgress: Double,
+        completedMilestones: Int,
+        totalMilestones: Int,
+        blockers: [String]?
+    ) async throws -> WeeklyCheckIn {
+        let timeframe = goal.timeframeEnum ?? .milestone
+        let blockersSection = blockers.map { "BLOCKERS REPORTED: \($0.joined(separator: ", "))" } ?? ""
+
+        let prompt = """
+        You are an empathetic productivity coach conducting a weekly check-in with someone working on their goal.
+
+        GOAL: "\(goal.displayTitle)"
+        TIMEFRAME: \(timeframe.displayName)
+        PROGRESS: \(Int(recentProgress * 100))%
+        MILESTONES: \(completedMilestones)/\(totalMilestones) completed
+        DAYS REMAINING: \(goal.daysRemaining ?? 0)
+        CHECK-IN STREAK: \(goal.checkInStreak) weeks
+        \(blockersSection)
+
+        Provide a coaching response that:
+        1. Acknowledges their emotional state and effort
+        2. Assesses progress honestly but kindly
+        3. Gives specific, actionable advice for next week
+        4. Suggests a small habit adjustment if helpful
+        5. Provides genuine motivation
+        6. Predicts potential obstacles
+
+        Respond in this exact JSON format:
+        {
+            "emotional_response": "Warm acknowledgment of their effort and state (1-2 sentences)",
+            "progress_assessment": "on_track|ahead|behind|at_risk",
+            "week_focus": "This week, focus on... (specific actionable advice)",
+            "habit_tweak": {
+                "current": "What they might be doing",
+                "suggested": "Small adjustment suggestion",
+                "reasoning": "Why this helps"
+            },
+            "motivation": "Encouraging message personalized to their progress (1-2 sentences)",
+            "next_week_obstacles": ["Specific predicted blocker 1", "Specific predicted blocker 2"],
+            "celebration_worthy": true/false,
+            "action_items": ["Specific action 1", "Specific action 2", "Specific action 3"]
+        }
+
+        TONE GUIDELINES:
+        - If ahead: Celebrate but warn against complacency
+        - If on_track: Encourage steady progress
+        - If behind: Acknowledge difficulty, offer specific recovery path
+        - If at_risk: Honest but hopeful, suggest scope adjustment if needed
+
+        Be warm, specific, and avoid generic advice. Reference their actual goal and progress.
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.7)
+
+        guard let data = jsonResponse.data(using: .utf8) else {
+            throw GeminiError.parsingFailed
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        return try decoder.decode(WeeklyCheckIn.self, from: data)
     }
 }

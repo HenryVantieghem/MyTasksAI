@@ -139,6 +139,10 @@ struct TaskDetailSheetEnhanced: View {
                     onSubTaskStatusChanged: { updatedSubTask in
                         updateSubTaskStatus(updatedSubTask)
                     },
+                    onSubTaskAdded: { _ in },
+                    onSubTaskDeleted: { _ in },
+                    onSubTaskUpdated: { _ in },
+                    onSubTasksReordered: { _ in },
                     onRefresh: {
                         loadSubTasks()
                     }

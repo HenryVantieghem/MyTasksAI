@@ -158,6 +158,16 @@ final class HapticsService {
         impact(.rigid)
     }
 
+    /// Impact feedback with style (alias)
+    func impactFeedback(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        impact(style)
+    }
+
+    /// Success feedback (alias for notification success)
+    func successFeedback() {
+        notification(.success)
+    }
+
     /// Toggle switch
     func toggle() {
         guard hapticsEnabled else { return }

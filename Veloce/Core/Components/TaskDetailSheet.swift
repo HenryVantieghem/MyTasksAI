@@ -35,6 +35,14 @@ struct TaskDetailContentView: View {
     @State private var aiThoughtProcessText: String = ""
     @State private var showingReflectionSheet: Bool = false
 
+    // MARK: - Editing States
+    @State private var editableTitle: String = ""
+    @State private var recurringType: RecurringTypeExtended = .once
+    @State private var recurringCustomDays: Set<Int> = []
+    @State private var recurringEndDate: Date?
+    @State private var showDeleteConfirmation: Bool = false
+    @State private var showCalendarScheduling: Bool = false
+
     // Get priority from task (default to medium)
     private var taskPriority: TaskPriority {
         TaskPriority(rawValue: task.starRating) ?? .medium
@@ -85,6 +93,18 @@ struct TaskDetailContentView: View {
                     onSubTaskStatusChanged: { updatedSubTask in
                         updateSubTaskStatus(updatedSubTask)
                     },
+                    onSubTaskAdded: { title in
+                        addSubTask(title: title)
+                    },
+                    onSubTaskDeleted: { subtask in
+                        deleteSubTask(subtask)
+                    },
+                    onSubTaskUpdated: { subtask in
+                        updateSubTask(subtask)
+                    },
+                    onSubTasksReordered: { reordered in
+                        subTasks = reordered
+                    },
                     onRefresh: {
                         loadSubTasks()
                     }
@@ -92,6 +112,12 @@ struct TaskDetailContentView: View {
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 20)
                 .animation(.spring(response: 0.4, dampingFraction: 0.8).delay(0.2), value: appeared)
+
+                // MARK: - Recurring Section
+                recurringCard
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 20)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.8).delay(0.22), value: appeared)
 
                 // MARK: - AI Thought Process Card (NEW) - Collapsible
                 if !aiThoughtProcessText.isEmpty || !subTasks.isEmpty {
@@ -197,44 +223,99 @@ struct TaskDetailContentView: View {
     // MARK: - Title Card
 
     private var titleCard: some View {
-        HStack(spacing: 14) {
-            // Checkbox
-            Button(action: {
-                HapticsService.shared.impact()
-                onToggleComplete()
-            }) {
-                ZStack {
-                    Circle()
-                        .strokeBorder(
-                            task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary,
-                            lineWidth: 2
-                        )
-                        .frame(width: 28, height: 28)
-
-                    if task.isCompleted {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack(spacing: 14) {
+                // Checkbox
+                Button(action: {
+                    HapticsService.shared.impact()
+                    onToggleComplete()
+                }) {
+                    ZStack {
                         Circle()
-                            .fill(Theme.Colors.success)
+                            .strokeBorder(
+                                task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary,
+                                lineWidth: 2
+                            )
                             .frame(width: 28, height: 28)
 
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.white)
+                        if task.isCompleted {
+                            Circle()
+                                .fill(Theme.Colors.success)
+                                .frame(width: 28, height: 28)
+
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
+                .buttonStyle(.plain)
+
+                // Editable Title
+                EditableTaskTitle(
+                    title: $editableTitle,
+                    onCommit: { newTitle in
+                        task.title = newTitle
+                        task.updatedAt = Date()
+                    },
+                    isCompleted: task.isCompleted
+                )
+
+                Spacer()
             }
-            .buttonStyle(.plain)
 
-            // Title
-            Text(task.title)
-                .font(Theme.Typography.headline)
-                .foregroundStyle(Theme.Colors.textPrimary)
-                .strikethrough(task.isCompleted)
-                .opacity(task.isCompleted ? 0.6 : 1)
+            // Recurring badge if recurring
+            if task.isRecurring {
+                RecurringBadge(type: task.recurringExtended)
+            }
 
-            Spacer()
+            // Priority picker
+            priorityPicker
         }
         .padding(16)
         .glassCard()
+    }
+
+    // MARK: - Priority Picker
+
+    private var priorityPicker: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            Text("Priority:")
+                .font(Theme.Typography.caption1)
+                .foregroundStyle(Theme.Colors.textSecondary)
+
+            ForEach([1, 2, 3], id: \.self) { stars in
+                Button {
+                    task.starRating = stars
+                    task.updatedAt = Date()
+                    HapticsService.shared.selectionFeedback()
+                } label: {
+                    Text(String(repeating: "★", count: stars))
+                        .font(.system(size: 16))
+                        .foregroundStyle(task.starRating == stars ? Theme.Colors.warning : Theme.Colors.textTertiary)
+                }
+                .buttonStyle(.plain)
+            }
+
+            Spacer()
+        }
+    }
+
+    // MARK: - Recurring Section Card
+
+    private var recurringCard: some View {
+        RecurringSection(
+            selectedType: $recurringType,
+            customDays: $recurringCustomDays,
+            endDate: $recurringEndDate,
+            onChanged: {
+                task.setRecurringExtended(
+                    type: recurringType,
+                    customDays: recurringCustomDays.isEmpty ? nil : recurringCustomDays,
+                    endDate: recurringEndDate
+                )
+            }
+        )
     }
 
     // MARK: - AI Insight Card
@@ -495,6 +576,15 @@ struct TaskDetailContentView: View {
     // MARK: - Cognitive Productivity Methods
 
     private func loadInitialData() {
+        // Initialize editing states from task
+        editableTitle = task.title
+        recurringType = task.recurringExtended
+        if let days = task.recurringDays {
+            recurringCustomDays = Set(days)
+        }
+        recurringEndDate = task.recurringEndDate
+        contextNotes = task.contextNotes ?? ""
+
         Task {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask { await loadSubTasks() }
@@ -578,6 +668,34 @@ struct TaskDetailContentView: View {
     private func updateSubTaskStatus(_ updatedSubTask: SubTask) {
         if let index = subTasks.firstIndex(where: { $0.id == updatedSubTask.id }) {
             subTasks[index] = updatedSubTask
+            // TODO: Save to Supabase
+        }
+    }
+
+    private func addSubTask(title: String) {
+        let newSubTask = SubTask(
+            title: title,
+            estimatedMinutes: nil,
+            status: .pending,
+            orderIndex: subTasks.count + 1,
+            aiReasoning: nil
+        )
+        subTasks.append(newSubTask)
+        // TODO: Save to Supabase
+    }
+
+    private func deleteSubTask(_ subtask: SubTask) {
+        subTasks.removeAll { $0.id == subtask.id }
+        // Reorder remaining tasks
+        for (index, _) in subTasks.enumerated() {
+            subTasks[index].orderIndex = index + 1
+        }
+        // TODO: Save to Supabase
+    }
+
+    private func updateSubTask(_ subtask: SubTask) {
+        if let index = subTasks.firstIndex(where: { $0.id == subtask.id }) {
+            subTasks[index] = subtask
             // TODO: Save to Supabase
         }
     }

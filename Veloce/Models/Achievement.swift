@@ -150,6 +150,13 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
     case brainDumpMaster = "brain_dump_master"
     case reflectionGuru = "reflection_guru"
 
+    // Focus Mode Achievements
+    case focusFirst = "focus_first"             // Complete first focus session with blocking
+    case focusHour = "focus_hour"               // Complete a 1-hour focus session
+    case deepFocusMaster = "deep_focus_master"  // Complete 10 Deep Focus sessions
+    case distractionFree = "distraction_free"   // Complete 50 focus sessions with blocking
+    case focusStreak = "focus_streak"           // Use focus mode 7 days in a row
+
     var title: String {
         switch self {
         case .firstTask: return "Getting Started"
@@ -175,6 +182,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .aiCollaborator: return "AI Collaborator"
         case .brainDumpMaster: return "Brain Dump Master"
         case .reflectionGuru: return "Reflection Guru"
+        case .focusFirst: return "Focus Starter"
+        case .focusHour: return "Deep Concentration"
+        case .deepFocusMaster: return "Deep Focus Master"
+        case .distractionFree: return "Distraction Free"
+        case .focusStreak: return "Focus Streak"
         }
     }
 
@@ -203,6 +215,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .aiCollaborator: return "Use AI assistance for 25 tasks"
         case .brainDumpMaster: return "Add 20 tasks in a single session"
         case .reflectionGuru: return "Review your daily reflection 10 times"
+        case .focusFirst: return "Complete your first focus session with app blocking"
+        case .focusHour: return "Complete a 1-hour focus session with app blocking"
+        case .deepFocusMaster: return "Complete 10 Deep Focus sessions (unbreakable)"
+        case .distractionFree: return "Complete 50 focus sessions with app blocking"
+        case .focusStreak: return "Use focus mode 7 days in a row"
         }
     }
 
@@ -227,6 +244,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .aiCollaborator: return "cpu"
         case .brainDumpMaster: return "brain"
         case .reflectionGuru: return "text.book.closed.fill"
+        case .focusFirst: return "shield.lefthalf.filled"
+        case .focusHour: return "hourglass"
+        case .deepFocusMaster: return "lock.shield.fill"
+        case .distractionFree: return "shield.checkered"
+        case .focusStreak: return "flame.circle.fill"
         }
     }
 
@@ -264,6 +286,16 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
             return Theme.Colors.aiPink
         case .reflectionGuru:
             return Theme.Colors.aiBlue
+        case .focusFirst:
+            return Theme.Colors.aiPurple
+        case .focusHour:
+            return Theme.Colors.aiCyan
+        case .deepFocusMaster:
+            return Color(red: 0.98, green: 0.35, blue: 0.40)  // Error nebula red
+        case .distractionFree:
+            return Theme.Colors.aiGold
+        case .focusStreak:
+            return Theme.Colors.aiOrange
         }
     }
 
@@ -301,6 +333,16 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
             return 100
         case .reflectionGuru:
             return 125
+        case .focusFirst:
+            return 50
+        case .focusHour:
+            return 100
+        case .deepFocusMaster:
+            return 500
+        case .distractionFree:
+            return 1000
+        case .focusStreak:
+            return 250
         }
     }
 
@@ -318,6 +360,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .streakGold: return 30
         case .streakDiamond: return 100
         case .aiExplorer: return 10
+        case .focusFirst: return 1
+        case .focusHour: return 1
+        case .deepFocusMaster: return 10
+        case .distractionFree: return 50
+        case .focusStreak: return 7
         default: return 1
         }
     }

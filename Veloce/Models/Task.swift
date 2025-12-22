@@ -44,6 +44,10 @@ final class TaskItem {
     var contextNotes: String?
     var category: String?
 
+    // MARK: Task Type (AI-detected)
+    var taskTypeRaw: String?  // TaskType.rawValue
+    var aiQuickTip: String?   // One-liner for collapsed card
+
     // MARK: Gamification
     var pointsEarned: Int
     var completedOnTime: Bool?
@@ -54,9 +58,15 @@ final class TaskItem {
 
     // MARK: Tracking
     var actualMinutes: Int?
+    var timesRescheduled: Int?
+    var emotionalBlocker: String?
 
     // MARK: Recurring
     var recurringType: String?  // RecurringType.rawValue
+    var recurringDays: [Int]?  // 0-6 for Sun-Sat (for custom recurring)
+    var recurringEndDate: Date?  // Optional end date for recurring tasks
+    var recurringParentId: UUID?  // Links recurring instances to parent task
+    var lastRecurrenceDate: Date?  // When the last recurring instance was created
 
     // MARK: Initialization
     init(
@@ -81,12 +91,18 @@ final class TaskItem {
         scheduleSuggestion: Data? = nil,
         contextNotes: String? = nil,
         category: String? = nil,
+        taskTypeRaw: String? = nil,
+        aiQuickTip: String? = nil,
         pointsEarned: Int = 0,
         completedOnTime: Bool? = nil,
         sortOrder: Int = 0,
         starRating: Int = 2,
         actualMinutes: Int? = nil,
-        recurringType: String? = nil
+        recurringType: String? = nil,
+        recurringDays: [Int]? = nil,
+        recurringEndDate: Date? = nil,
+        recurringParentId: UUID? = nil,
+        lastRecurrenceDate: Date? = nil
     ) {
         self.id = id
         self.title = title
@@ -109,12 +125,18 @@ final class TaskItem {
         self.scheduleSuggestion = scheduleSuggestion
         self.contextNotes = contextNotes
         self.category = category
+        self.taskTypeRaw = taskTypeRaw
+        self.aiQuickTip = aiQuickTip
         self.pointsEarned = pointsEarned
         self.completedOnTime = completedOnTime
         self.sortOrder = sortOrder
         self.starRating = starRating
         self.actualMinutes = actualMinutes
         self.recurringType = recurringType
+        self.recurringDays = recurringDays
+        self.recurringEndDate = recurringEndDate
+        self.recurringParentId = recurringParentId
+        self.lastRecurrenceDate = lastRecurrenceDate
     }
 }
 
@@ -123,6 +145,17 @@ extension TaskItem {
     /// Priority as enum
     var priority: TaskPriority {
         TaskPriority(rawValue: starRating) ?? .medium
+    }
+
+    /// Task type as enum
+    var taskType: TaskType {
+        get {
+            guard let raw = taskTypeRaw else { return .coordinate }
+            return TaskType(rawValue: raw) ?? .coordinate
+        }
+        set {
+            taskTypeRaw = newValue.rawValue
+        }
     }
 
     /// AI Priority as TaskPriority enum
@@ -195,6 +228,65 @@ extension TaskItem {
         String(repeating: "★", count: starRating)
     }
 
+    /// Energy level for power meter visualization (0.0 - 1.0)
+    /// Calculated from potential points before completion
+    var energyLevel: Double {
+        let potentialPoints = calculatePotentialPoints()
+        // Map points (10-100) to energy level (0.0-1.0)
+        let normalizedPoints = Double(potentialPoints - 10) / 90.0
+        return min(max(normalizedPoints, 0.0), 1.0)
+    }
+
+    /// Potential points for this task (used by Energy Core)
+    var potentialPoints: Int {
+        calculatePotentialPoints()
+    }
+
+    /// Energy state for visual rendering
+    var energyState: EnergyState {
+        let points = calculatePotentialPoints()
+        if points <= DesignTokens.EnergyCore.lowThreshold {
+            return .low
+        } else if points <= DesignTokens.EnergyCore.mediumThreshold {
+            return .medium
+        } else if points <= DesignTokens.EnergyCore.highThreshold {
+            return .high
+        } else {
+            return .max
+        }
+    }
+
+    /// Calculate potential points from task properties
+    private func calculatePotentialPoints() -> Int {
+        var points = DesignTokens.Gamification.pointsTaskComplete // Base 10
+
+        // Priority bonus
+        switch starRating {
+        case 3: points += 15  // High priority
+        case 2: points += 5   // Medium priority
+        default: break        // Low priority, no bonus
+        }
+
+        // Star rating bonus (5 per star)
+        points += starRating * 5
+
+        // AI processing bonus
+        if hasAIProcessing { points += 5 }
+
+        // Scheduled bonus
+        if isScheduled { points += 5 }
+
+        // Time estimate bonus (longer tasks = more points)
+        if let minutes = estimatedMinutes {
+            points += min(minutes / 10, 20) // Cap at +20
+        }
+
+        // Overdue penalty (reduce visual appeal)
+        if isOverdue { points = max(points - 10, 10) }
+
+        return min(points, 100) // Cap at 100
+    }
+
     /// Alias for contextNotes (for compatibility)
     var notes: String? {
         get { contextNotes }
@@ -210,6 +302,37 @@ extension TaskItem {
     var recurring: RecurringType {
         guard let recurringType else { return .once }
         return RecurringType(rawValue: recurringType) ?? .once
+    }
+
+    /// Extended recurring type for UI
+    var recurringExtended: RecurringTypeExtended {
+        guard let recurringType else { return .once }
+        return RecurringTypeExtended(rawValue: recurringType) ?? .once
+    }
+
+    /// Whether this is a recurring task
+    var isRecurring: Bool {
+        recurringType != nil && recurringType != "once"
+    }
+
+    /// Whether this task can create the next recurring instance
+    var canCreateNextRecurrence: Bool {
+        guard isRecurring else { return false }
+        guard isCompleted else { return false }
+
+        // Check end date
+        if let endDate = recurringEndDate, Date() > endDate {
+            return false
+        }
+
+        return true
+    }
+
+    /// Formatted recurring days string
+    var recurringDaysFormatted: String? {
+        guard let days = recurringDays, !days.isEmpty else { return nil }
+        let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        return days.sorted().compactMap { $0 >= 0 && $0 <= 6 ? dayNames[$0] : nil }.joined(separator: ", ")
     }
 
     /// Formatted scheduled date string
@@ -237,6 +360,102 @@ extension TaskItem {
     func setRecurring(_ type: RecurringType) {
         recurringType = type.rawValue
         updatedAt = .now
+    }
+
+    /// Set extended recurring type with options
+    func setRecurringExtended(
+        type: RecurringTypeExtended,
+        customDays: Set<Int>? = nil,
+        endDate: Date? = nil
+    ) {
+        recurringType = type.rawValue
+        recurringDays = customDays != nil ? Array(customDays!).sorted() : nil
+        recurringEndDate = endDate
+        updatedAt = .now
+    }
+
+    /// Calculate next occurrence date based on recurring settings
+    func calculateNextOccurrenceDate() -> Date? {
+        guard isRecurring else { return nil }
+
+        let calendar = Calendar.current
+        let baseDate = completedAt ?? Date()
+
+        switch recurringExtended {
+        case .once:
+            return nil
+
+        case .daily:
+            return calendar.date(byAdding: .day, value: 1, to: baseDate)
+
+        case .weekdays:
+            var nextDate = calendar.date(byAdding: .day, value: 1, to: baseDate) ?? baseDate
+            let weekday = calendar.component(.weekday, from: nextDate)
+            // Skip to Monday if on weekend
+            if weekday == 1 { // Sunday
+                nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate) ?? nextDate
+            } else if weekday == 7 { // Saturday
+                nextDate = calendar.date(byAdding: .day, value: 2, to: nextDate) ?? nextDate
+            }
+            return nextDate
+
+        case .weekly:
+            return calendar.date(byAdding: .weekOfYear, value: 1, to: baseDate)
+
+        case .biweekly:
+            return calendar.date(byAdding: .weekOfYear, value: 2, to: baseDate)
+
+        case .monthly:
+            return calendar.date(byAdding: .month, value: 1, to: baseDate)
+
+        case .custom:
+            guard let days = recurringDays, !days.isEmpty else { return nil }
+            // Find next matching day
+            var searchDate = calendar.date(byAdding: .day, value: 1, to: baseDate) ?? baseDate
+            for _ in 0..<7 {
+                let weekday = calendar.component(.weekday, from: searchDate) - 1 // Convert to 0-6
+                if days.contains(weekday) {
+                    return searchDate
+                }
+                searchDate = calendar.date(byAdding: .day, value: 1, to: searchDate) ?? searchDate
+            }
+            return nil
+        }
+    }
+
+    /// Create a new task instance for the next recurrence
+    func createRecurringInstance() -> TaskItem? {
+        guard canCreateNextRecurrence else { return nil }
+        guard let nextDate = calculateNextOccurrenceDate() else { return nil }
+
+        // Check if past end date
+        if let endDate = recurringEndDate, nextDate > endDate {
+            return nil
+        }
+
+        let newTask = TaskItem(
+            title: title,
+            isCompleted: false,
+            userId: userId,
+            estimatedMinutes: estimatedMinutes,
+            scheduledTime: nextDate,
+            duration: duration,
+            reminderEnabled: reminderEnabled,
+            contextNotes: contextNotes,
+            category: category,
+            taskTypeRaw: taskTypeRaw,
+            starRating: starRating,
+            recurringType: recurringType,
+            recurringDays: recurringDays,
+            recurringEndDate: recurringEndDate,
+            recurringParentId: recurringParentId ?? id // Link to parent
+        )
+
+        // Update this task's last recurrence date
+        lastRecurrenceDate = Date()
+        updatedAt = .now
+
+        return newTask
     }
 
     /// Mark task as completed
@@ -442,3 +661,47 @@ struct SupabaseTask: Codable, Sendable {
 
 // MARK: - Schedule Suggestion
 // Note: ScheduleSuggestion is defined in TaskReflection.swift to avoid duplication
+
+// MARK: - Energy State
+/// Visual state for the Energy Core power meter
+enum EnergyState: String, CaseIterable {
+    case low      // 10-25 points - dim, dormant
+    case medium   // 26-50 points - breathing glow
+    case high     // 51-75 points - pulsing, bright
+    case max      // 76-100 points - overflow, particles
+
+    /// Fill percentage for the energy orb
+    var fillPercentage: CGFloat {
+        switch self {
+        case .low: return 0.25
+        case .medium: return 0.50
+        case .high: return 0.75
+        case .max: return 1.0
+        }
+    }
+
+    /// Should show breathing animation
+    var isBreathing: Bool {
+        self == .medium
+    }
+
+    /// Should show pulse animation
+    var isPulsing: Bool {
+        self == .high || self == .max
+    }
+
+    /// Should show orbiting particles
+    var hasParticles: Bool {
+        self == .max
+    }
+
+    /// Glow intensity multiplier
+    var glowIntensity: Double {
+        switch self {
+        case .low: return 0.2
+        case .medium: return 0.4
+        case .high: return 0.6
+        case .max: return 1.0
+        }
+    }
+}

@@ -215,7 +215,7 @@ struct WorkflowStepRow: View {
                         .frame(width: 24, height: 24)
 
                     Text("\(step.number)")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .font(.system(size: 11, weight: .bold, design: .default))
                         .foregroundStyle(Theme.Colors.aiCyan)
                 }
 

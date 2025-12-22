@@ -4,6 +4,7 @@
 //
 //  Claude Code-style task breakdown with progress tracking
 //  AI generates actionable sub-tasks for systematic completion
+//  Manual add/edit/delete/reorder support
 //
 
 import SwiftUI
@@ -12,11 +13,21 @@ struct SubTaskBreakdownCard: View {
     @Binding var subTasks: [SubTask]
     let taskTitle: String
     let onSubTaskStatusChanged: (SubTask) -> Void
+    let onSubTaskAdded: (String) -> Void
+    let onSubTaskDeleted: (SubTask) -> Void
+    let onSubTaskUpdated: (SubTask) -> Void
+    let onSubTasksReordered: ([SubTask]) -> Void
     let onRefresh: () -> Void
 
     @State private var isLoading: Bool = false
     @State private var appeared: Bool = false
     @State private var expandedSubTaskId: UUID?
+    @State private var isAddingSubTask: Bool = false
+    @State private var newSubTaskTitle: String = ""
+    @State private var editingSubTaskId: UUID?
+    @State private var editingSubTaskTitle: String = ""
+    @FocusState private var isNewSubTaskFocused: Bool
+    @FocusState private var isEditingFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
@@ -36,10 +47,17 @@ struct SubTaskBreakdownCard: View {
             // Sub-task list
             if isLoading {
                 loadingView
-            } else if subTasks.isEmpty {
+            } else if subTasks.isEmpty && !isAddingSubTask {
                 emptyStateView
             } else {
                 subTaskListView
+            }
+
+            // Add subtask section
+            if isAddingSubTask {
+                addSubTaskInputView
+            } else {
+                addSubTaskButton
             }
         }
         .padding(Theme.Spacing.md)
@@ -217,6 +235,9 @@ struct SubTaskBreakdownCard: View {
                 SubTaskRow(
                     subTask: subTask,
                     isExpanded: expandedSubTaskId == subTask.id,
+                    isEditing: editingSubTaskId == subTask.id,
+                    editingTitle: editingSubTaskId == subTask.id ? $editingSubTaskTitle : .constant(""),
+                    isEditingFocused: $isEditingFocused,
                     onToggleStatus: { updatedSubTask in
                         onSubTaskStatusChanged(updatedSubTask)
                     },
@@ -228,10 +249,183 @@ struct SubTaskBreakdownCard: View {
                                 expandedSubTaskId = subTask.id
                             }
                         }
-                    }
+                    },
+                    onStartEdit: {
+                        startEditing(subTask)
+                    },
+                    onCommitEdit: {
+                        commitEdit(for: subTask)
+                    },
+                    onCancelEdit: {
+                        cancelEdit()
+                    },
+                    onDelete: {
+                        deleteSubTask(subTask)
+                    },
+                    onMoveUp: subTask.orderIndex > 1 ? {
+                        moveSubTask(subTask, direction: .up)
+                    } : nil,
+                    onMoveDown: subTask.orderIndex < subTasks.count ? {
+                        moveSubTask(subTask, direction: .down)
+                    } : nil
                 )
             }
         }
+    }
+
+    // MARK: - Add SubTask Button
+
+    private var addSubTaskButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                isAddingSubTask = true
+                isNewSubTaskFocused = true
+            }
+            HapticsService.shared.selectionFeedback()
+        } label: {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Theme.Colors.accent)
+
+                Text("Add subtask")
+                    .font(Theme.Typography.subheadline)
+                    .foregroundStyle(Theme.Colors.secondaryText)
+
+                Spacer()
+            }
+            .padding(Theme.Spacing.sm)
+            .background {
+                RoundedRectangle(cornerRadius: Theme.Radius.sm)
+                    .fill(Theme.Colors.glassBackground.opacity(0.2))
+                    .strokeBorder(Theme.Colors.glassBorder.opacity(0.15), style: StrokeStyle(lineWidth: 1, dash: [5]))
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Add SubTask Input
+
+    private var addSubTaskInputView: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            Image(systemName: "circle")
+                .font(.system(size: 16))
+                .foregroundStyle(Theme.Colors.tertiaryText)
+
+            TextField("What's the step?", text: $newSubTaskTitle)
+                .font(Theme.Typography.subheadline)
+                .foregroundStyle(Theme.Colors.primaryText)
+                .focused($isNewSubTaskFocused)
+                .onSubmit {
+                    addNewSubTask()
+                }
+                .submitLabel(.done)
+
+            // Save button
+            Button {
+                addNewSubTask()
+            } label: {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(newSubTaskTitle.isEmpty ? Theme.Colors.tertiaryText : Theme.Colors.success)
+            }
+            .disabled(newSubTaskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+
+            // Cancel button
+            Button {
+                cancelAddSubTask()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Theme.Colors.tertiaryText)
+            }
+        }
+        .padding(Theme.Spacing.sm)
+        .background {
+            RoundedRectangle(cornerRadius: Theme.Radius.sm)
+                .fill(Theme.Colors.accent.opacity(0.08))
+                .strokeBorder(Theme.Colors.accent.opacity(0.3), lineWidth: 1)
+        }
+    }
+
+    // MARK: - Add/Edit Actions
+
+    private func addNewSubTask() {
+        let title = newSubTaskTitle.trimmingCharacters(in: .whitespaces)
+        guard !title.isEmpty else { return }
+
+        onSubTaskAdded(title)
+        HapticsService.shared.softImpact()
+
+        // Reset
+        newSubTaskTitle = ""
+        isNewSubTaskFocused = true
+    }
+
+    private func cancelAddSubTask() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            isAddingSubTask = false
+            newSubTaskTitle = ""
+            isNewSubTaskFocused = false
+        }
+    }
+
+    private func startEditing(_ subTask: SubTask) {
+        editingSubTaskId = subTask.id
+        editingSubTaskTitle = subTask.title
+        isEditingFocused = true
+        HapticsService.shared.selectionFeedback()
+    }
+
+    private func commitEdit(for subTask: SubTask) {
+        let trimmed = editingSubTaskTitle.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, trimmed != subTask.title else {
+            cancelEdit()
+            return
+        }
+
+        var updated = subTask
+        updated.title = trimmed
+        onSubTaskUpdated(updated)
+        HapticsService.shared.softImpact()
+        cancelEdit()
+    }
+
+    private func cancelEdit() {
+        editingSubTaskId = nil
+        editingSubTaskTitle = ""
+        isEditingFocused = false
+    }
+
+    private func deleteSubTask(_ subTask: SubTask) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            onSubTaskDeleted(subTask)
+        }
+        HapticsService.shared.softImpact()
+    }
+
+    private enum MoveDirection { case up, down }
+
+    private func moveSubTask(_ subTask: SubTask, direction: MoveDirection) {
+        var sorted = subTasks.sorted { $0.orderIndex < $1.orderIndex }
+        guard let currentIndex = sorted.firstIndex(where: { $0.id == subTask.id }) else { return }
+
+        let targetIndex = direction == .up ? currentIndex - 1 : currentIndex + 1
+        guard targetIndex >= 0, targetIndex < sorted.count else { return }
+
+        // Swap
+        sorted.swapAt(currentIndex, targetIndex)
+
+        // Update order indices
+        for (index, var task) in sorted.enumerated() {
+            task.orderIndex = index + 1
+            sorted[index] = task
+        }
+
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            onSubTasksReordered(sorted)
+        }
+        HapticsService.shared.selectionFeedback()
     }
 
     // MARK: - Actions
@@ -257,8 +451,19 @@ struct SubTaskBreakdownCard: View {
 struct SubTaskRow: View {
     let subTask: SubTask
     let isExpanded: Bool
+    let isEditing: Bool
+    @Binding var editingTitle: String
+    var isEditingFocused: FocusState<Bool>.Binding
     let onToggleStatus: (SubTask) -> Void
     let onToggleExpand: () -> Void
+    let onStartEdit: () -> Void
+    let onCommitEdit: () -> Void
+    let onCancelEdit: () -> Void
+    let onDelete: () -> Void
+    let onMoveUp: (() -> Void)?
+    let onMoveDown: (() -> Void)?
+
+    @State private var showDeleteConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -272,41 +477,18 @@ struct SubTaskRow: View {
                 }
                 .buttonStyle(.plain)
 
-                // Order number and title
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: Theme.Spacing.xs) {
-                        Text("\(subTask.orderIndex).")
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(Theme.Colors.tertiaryText)
-
-                        Text(subTask.title)
-                            .font(Theme.Typography.subheadline)
-                            .foregroundStyle(subTask.status == .completed
-                                             ? Theme.Colors.tertiaryText
-                                             : Theme.Colors.primaryText)
-                            .strikethrough(subTask.status == .completed)
-                    }
-
-                    // Time estimate
-                    if let minutes = subTask.estimatedMinutes {
-                        Text(minutes.formattedDuration)
-                            .font(.system(size: 10))
-                            .foregroundStyle(Theme.Colors.tertiaryText)
-                    }
+                // Order number and title (or editing field)
+                if isEditing {
+                    editingView
+                } else {
+                    titleView
                 }
 
                 Spacer()
 
-                // Expand indicator (if has reasoning)
-                if subTask.aiReasoning != nil {
-                    Button {
-                        onToggleExpand()
-                    } label: {
-                        Image(systemName: isExpanded ? "chevron.up" : "info.circle")
-                            .font(.caption)
-                            .foregroundStyle(Theme.Colors.aiPurple.opacity(0.7))
-                    }
-                    .buttonStyle(.plain)
+                // Actions
+                if !isEditing {
+                    rowActions
                 }
             }
             .padding(.vertical, Theme.Spacing.sm)
@@ -325,6 +507,142 @@ struct SubTaskRow: View {
         .overlay {
             RoundedRectangle(cornerRadius: Theme.Radius.sm)
                 .strokeBorder(borderForStatus, lineWidth: subTask.status == .inProgress ? 1.5 : 0.5)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+                onDelete()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+        .contextMenu {
+            Button { onStartEdit() } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+
+            if let moveUp = onMoveUp {
+                Button { moveUp() } label: {
+                    Label("Move Up", systemImage: "arrow.up")
+                }
+            }
+
+            if let moveDown = onMoveDown {
+                Button { moveDown() } label: {
+                    Label("Move Down", systemImage: "arrow.down")
+                }
+            }
+
+            Divider()
+
+            Button(role: .destructive) { onDelete() } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+
+    // MARK: - Title View
+
+    private var titleView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: Theme.Spacing.xs) {
+                Text("\(subTask.orderIndex).")
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(Theme.Colors.tertiaryText)
+
+                Text(subTask.title)
+                    .font(Theme.Typography.subheadline)
+                    .foregroundStyle(subTask.status == .completed
+                                     ? Theme.Colors.tertiaryText
+                                     : Theme.Colors.primaryText)
+                    .strikethrough(subTask.status == .completed)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onStartEdit()
+            }
+
+            // Time estimate
+            if let minutes = subTask.estimatedMinutes {
+                Text(minutes.formattedDuration)
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.Colors.tertiaryText)
+            }
+        }
+    }
+
+    // MARK: - Editing View
+
+    private var editingView: some View {
+        HStack(spacing: Theme.Spacing.xs) {
+            Text("\(subTask.orderIndex).")
+                .font(.system(.caption, design: .monospaced))
+                .foregroundStyle(Theme.Colors.tertiaryText)
+
+            TextField("Subtask title", text: $editingTitle)
+                .font(Theme.Typography.subheadline)
+                .foregroundStyle(Theme.Colors.primaryText)
+                .focused(isEditingFocused)
+                .onSubmit { onCommitEdit() }
+                .submitLabel(.done)
+
+            Button { onCommitEdit() } label: {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Theme.Colors.success)
+            }
+
+            Button { onCancelEdit() } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Theme.Colors.tertiaryText)
+            }
+        }
+    }
+
+    // MARK: - Row Actions
+
+    private var rowActions: some View {
+        HStack(spacing: Theme.Spacing.xs) {
+            // Reorder buttons
+            if onMoveUp != nil || onMoveDown != nil {
+                HStack(spacing: 2) {
+                    if let moveUp = onMoveUp {
+                        Button { moveUp() } label: {
+                            Image(systemName: "chevron.up")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(Theme.Colors.tertiaryText)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    if let moveDown = onMoveDown {
+                        Button { moveDown() } label: {
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(Theme.Colors.tertiaryText)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Theme.Colors.glassBackground.opacity(0.3))
+                )
+            }
+
+            // Expand indicator (if has reasoning)
+            if subTask.aiReasoning != nil {
+                Button {
+                    onToggleExpand()
+                } label: {
+                    Image(systemName: isExpanded ? "chevron.up" : "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(Theme.Colors.aiPurple.opacity(0.7))
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 
@@ -434,6 +752,10 @@ struct SubTaskRow: View {
             ]),
             taskTitle: "Finish quarterly report",
             onSubTaskStatusChanged: { _ in },
+            onSubTaskAdded: { print("Added: \($0)") },
+            onSubTaskDeleted: { print("Deleted: \($0.title)") },
+            onSubTaskUpdated: { print("Updated: \($0.title)") },
+            onSubTasksReordered: { print("Reordered: \($0.map { $0.title })") },
             onRefresh: { }
         )
         .padding()

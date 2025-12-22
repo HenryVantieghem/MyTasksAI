@@ -22,25 +22,52 @@ struct VeloceApp: App {
     // MARK: Initialization
     init() {
         // Configure SwiftData model container
+        let schema = Schema([
+            TaskItem.self,
+            User.self,
+            Goal.self,
+            Achievement.self,
+            TaskTemplate.self,
+            NotesLine.self,
+            // Focus/App Blocking models
+            FocusSessionRecord.self,
+            FocusBlockList.self,
+            ScheduledFocusSession.self
+        ])
+
+        let config = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .none
+        )
+
         do {
-            let schema = Schema([
-                TaskItem.self,
-                User.self,
-                Goal.self,
-                Achievement.self,
-                TaskTemplate.self,
-                NotesLine.self
-            ])
-
-            let config = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                cloudKitDatabase: .none
-            )
-
             modelContainer = try ModelContainer(for: schema, configurations: config)
         } catch {
-            fatalError("Failed to create model container: \(error)")
+            // If schema migration fails, try deleting the old database and creating fresh
+            print("⚠️ ModelContainer creation failed: \(error)")
+            print("⚠️ Attempting to reset database...")
+
+            // Delete existing SwiftData files
+            if let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+                let storeURL = url.appendingPathComponent("default.store")
+                let shmURL = url.appendingPathComponent("default.store-shm")
+                let walURL = url.appendingPathComponent("default.store-wal")
+
+                try? FileManager.default.removeItem(at: storeURL)
+                try? FileManager.default.removeItem(at: shmURL)
+                try? FileManager.default.removeItem(at: walURL)
+
+                print("✅ Old database files removed, creating fresh container...")
+            }
+
+            // Try again with fresh database
+            do {
+                modelContainer = try ModelContainer(for: schema, configurations: config)
+                print("✅ Fresh ModelContainer created successfully")
+            } catch {
+                fatalError("Failed to create model container even after reset: \(error)")
+            }
         }
     }
 
@@ -68,11 +95,17 @@ struct RootView: View {
             case .loading:
                 LoadingView()
 
+            case .freeTrialWelcome:
+                FreeTrialWelcomeView()
+
             case .unauthenticated:
-                AuthView()
+                AuthView(initialScreen: appViewModel.preferSignUp ? .signUp : .signIn)
 
             case .onboarding:
                 OnboardingContainerView(viewModel: OnboardingViewModel())
+
+            case .paywall:
+                PaywallView()
 
             case .authenticated:
                 MainContainerView()
@@ -85,44 +118,74 @@ struct RootView: View {
 // MARK: - Loading View
 
 struct LoadingView: View {
-    @State private var isAnimating = false
+    @State private var showContent = false
+    @State private var logoGlow: Double = 0.6
+    @State private var logoScale: CGFloat = 0.9
 
     var body: some View {
-        ZStack {
-            IridescentBackground(intensity: 0.5)
-                .ignoresSafeArea()
+        GeometryReader { geometry in
+            ZStack {
+                // Aurora background - consistent with auth
+                AuroraBackground.auth
 
-            VStack(spacing: Theme.Spacing.lg) {
-                // Animated logo
-                ZStack {
-                    IridescentOrb(size: 100)
-                        .blur(radius: 20)
-                        .scaleEffect(isAnimating ? 1.2 : 0.8)
-                        .animation(
-                            .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
-                            value: isAnimating
-                        )
+                VStack(spacing: Aurora.Layout.spacingXL) {
+                    Spacer()
 
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 50, weight: .light))
-                        .foregroundStyle(Theme.Colors.accent)
-                        .rotationEffect(.degrees(isAnimating ? 360 : 0))
-                        .animation(
-                            .linear(duration: 3).repeatForever(autoreverses: false),
-                            value: isAnimating
-                        )
+                    // Animated App Logo
+                    AppLogoView(
+                        size: .large,
+                        isAnimating: true,
+                        showParticles: true
+                    )
+                    .scaleEffect(logoScale)
+                    .opacity(showContent ? 1 : 0)
+
+                    // Editorial thin typography - matching AuthView
+                    VStack(spacing: Aurora.Layout.spacingSmall) {
+                        Text("MyTasksAI")
+                            .font(.system(size: 42, weight: .thin, design: .default))
+                            .foregroundStyle(Aurora.Colors.textPrimary)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 10)
+
+                        Text("AI-Powered Productivity")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Aurora.Colors.textSecondary)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 10)
+                    }
+
+                    // Subtle loading indicator
+                    ProgressView()
+                        .tint(Aurora.Colors.electric)
+                        .scaleEffect(0.9)
+                        .opacity(showContent ? 0.8 : 0)
+                        .padding(.top, Aurora.Layout.spacing)
+
+                    Spacer()
+                    Spacer()
                 }
-
-                Text("MyTasksAI")
-                    .font(Theme.Typography.largeTitle)
-                    .foregroundStyle(Theme.Colors.textPrimary)
-
-                ProgressView()
-                    .tint(Theme.Colors.accent)
             }
         }
         .onAppear {
-            isAnimating = true
+            startAnimations()
+        }
+    }
+
+    private func startAnimations() {
+        // Fade in content
+        withAnimation(Aurora.Animation.spring.delay(0.2)) {
+            showContent = true
+        }
+
+        // Logo breathing
+        withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+            logoScale = 1.05
+        }
+
+        // Glow pulse
+        withAnimation(Aurora.Animation.glowPulse) {
+            logoGlow = 0.9
         }
     }
 }
