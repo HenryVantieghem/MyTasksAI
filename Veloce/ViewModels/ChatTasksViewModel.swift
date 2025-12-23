@@ -240,7 +240,7 @@ final class ChatTasksViewModel {
         duplicate.scheduledTime = task.scheduledTime
         duplicate.duration = task.duration
         duplicate.contextNotes = task.contextNotes
-        duplicate.isRecurring = task.isRecurring
+        // Note: isRecurring is computed from recurringType
         duplicate.recurringType = task.recurringType
         duplicate.recurringDays = task.recurringDays
 

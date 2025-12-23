@@ -37,7 +37,7 @@ struct AIRoadmapApprovalSheet: View {
 
                 if isLoading {
                     loadingView
-                } else if let roadmap = roadmap ?? goal.roadmap {
+                } else if let roadmap = roadmap ?? goal.decodedRoadmap {
                     roadmapContent(roadmap)
                 } else {
                     emptyState
@@ -56,10 +56,10 @@ struct AIRoadmapApprovalSheet: View {
         .presentationDragIndicator(.visible)
         .presentationBackground(.clear)
         .task {
-            if goal.roadmap == nil && roadmap == nil {
+            if goal.decodedRoadmap == nil && roadmap == nil {
                 await loadRoadmap()
             } else {
-                roadmap = goal.roadmap
+                roadmap = goal.decodedRoadmap
             }
         }
     }
@@ -367,7 +367,7 @@ struct AIRoadmapApprovalSheet: View {
 
         await goalsVM.generateRoadmap(for: goal, context: modelContext)
 
-        roadmap = goal.roadmap
+        roadmap = goal.decodedRoadmap
         isLoading = false
 
         if roadmap == nil {
@@ -449,7 +449,7 @@ private struct PhaseCard: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(.white)
 
-                        Text(phase.focus)
+                        Text("Weeks \(phase.startWeek)-\(phase.endWeek)")
                             .font(.system(size: 13))
                             .foregroundStyle(.white.opacity(0.6))
                             .lineLimit(1)

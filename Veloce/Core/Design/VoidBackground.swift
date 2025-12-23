@@ -157,6 +157,11 @@ struct VoidBackground: View {
 // MARK: - Void Background Variants
 
 extension VoidBackground {
+    /// Standard background (default settings)
+    static var standard: VoidBackground {
+        VoidBackground(glowPosition: .bottom, glowColor: Theme.Colors.aiPurple)
+    }
+
     /// Tasks page background (glow at bottom)
     static var tasks: VoidBackground {
         VoidBackground(glowPosition: .bottom, glowColor: Theme.Colors.aiPurple)

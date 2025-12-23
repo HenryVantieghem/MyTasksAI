@@ -774,8 +774,8 @@ struct PendingTaskRow: View {
                     }
                     .foregroundStyle(Theme.Colors.aiPurple.opacity(0.7))
 
-                    if suggestion.estimatedMinutes > 0 {
-                        Text("\(suggestion.estimatedMinutes)min")
+                    if let minutes = suggestion.estimatedMinutes, minutes > 0 {
+                        Text("\(minutes)min")
                             .font(.system(size: 11))
                             .foregroundStyle(.white.opacity(0.4))
                     }
@@ -808,6 +808,72 @@ struct PendingTaskRow: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(.white.opacity(0.05))
         )
+    }
+}
+
+// MARK: - Weekly Check-In Sheet
+
+/// Weekly check-in sheet for goal coaching
+struct WeeklyCheckInSheet: View {
+    let goal: Goal
+    @Bindable var goalsVM: GoalsViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                VoidBackground.standard
+
+                VStack(spacing: 24) {
+                    // Header
+                    VStack(spacing: 8) {
+                        Image(systemName: "calendar.badge.checkmark")
+                            .font(.system(size: 48))
+                            .foregroundStyle(Theme.Colors.aiPurple)
+
+                        Text("Weekly Check-In")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(.white)
+
+                        Text("How's your progress on \"\(goal.displayTitle)\"?")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.white.opacity(0.6))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    .padding(.top, 40)
+
+                    Spacer()
+
+                    // Coming soon placeholder
+                    VStack(spacing: 12) {
+                        Text("Coming Soon")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.7))
+
+                        Text("AI-powered weekly coaching sessions will help you stay on track and adjust your approach.")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .voidCard()
+                    .padding(.horizontal)
+
+                    Spacer()
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") { dismiss() }
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+            }
+        }
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(.clear)
     }
 }
 

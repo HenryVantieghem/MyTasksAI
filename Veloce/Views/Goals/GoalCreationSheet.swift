@@ -166,9 +166,9 @@ struct GoalCreationSheet: View {
                 .foregroundStyle(.white.opacity(0.6))
 
             CrystallineTextField(
-                placeholder: "e.g., Launch my side project",
                 text: $title,
-                icon: nil
+                placeholder: "e.g., Launch my side project",
+                icon: "target"
             )
             .focused($titleFocused)
         }
@@ -226,7 +226,7 @@ struct GoalCreationSheet: View {
             }
 
             // Timeframe description
-            Text(selectedTimeframe.description)
+            Text(selectedTimeframe.detailedDescription)
                 .font(.system(size: 12))
                 .foregroundStyle(.white.opacity(0.5))
                 .padding(.top, 4)

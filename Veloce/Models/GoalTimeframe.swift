@@ -34,7 +34,7 @@ enum GoalTimeframe: String, Codable, Sendable, CaseIterable {
         }
     }
 
-    var description: String {
+    var detailedDescription: String {
         switch self {
         case .sprint:
             return "Quick wins and momentum builders. Perfect for breaking down larger goals into actionable chunks."
