@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Supabase
 
 // MARK: - Task Detail Content View
 
@@ -603,33 +604,73 @@ struct TaskDetailContentView: View {
 
     @MainActor
     private func loadSubTasks() {
-        // TODO: Call GeminiService.generateSubTaskBreakdown() in production
-        // For now, generate sample sub-tasks based on task title
+        // Call GeminiService for AI-powered task breakdown
+        Task {
+            do {
+                guard GeminiService.shared.isReady else {
+                    // Fallback to mock data if Gemini not configured
+                    generateFallbackSubTasks()
+                    return
+                }
+
+                let analysis = try await GeminiService.shared.generateGeniusAnalysis(
+                    title: task.title,
+                    notes: task.contextNotes,
+                    context: nil,
+                    userPatterns: nil
+                )
+
+                // Convert execution steps to SubTasks
+                subTasks = analysis.executionSteps.enumerated().map { index, step in
+                    SubTask(
+                        title: step.description,
+                        estimatedMinutes: step.estimatedMinutes,
+                        status: step.isCompleted ? .completed : .pending,
+                        orderIndex: step.orderIndex ?? index + 1,
+                        aiReasoning: nil,
+                        taskId: task.id
+                    )
+                }
+
+                // Set thought process from mentor advice
+                aiThoughtProcessText = analysis.mentorAdvice.mainAdvice
+
+                // Save to Supabase
+                await saveSubTasksToSupabase()
+
+            } catch {
+                print("GeminiService error: \(error.localizedDescription)")
+                generateFallbackSubTasks()
+            }
+        }
+    }
+
+    private func generateFallbackSubTasks() {
         let taskWords = task.title.lowercased()
 
         if taskWords.contains("report") || taskWords.contains("presentation") {
             subTasks = [
-                SubTask(title: "Research and gather data", estimatedMinutes: 15, status: .pending, orderIndex: 1, aiReasoning: "Start with data collection to inform content"),
-                SubTask(title: "Create outline/structure", estimatedMinutes: 10, status: .pending, orderIndex: 2, aiReasoning: "Structure before detailed content"),
-                SubTask(title: "Write main content", estimatedMinutes: 25, status: .pending, orderIndex: 3),
-                SubTask(title: "Add visuals/formatting", estimatedMinutes: 15, status: .pending, orderIndex: 4),
-                SubTask(title: "Review and polish", estimatedMinutes: 10, status: .pending, orderIndex: 5)
+                SubTask(title: "Research and gather data", estimatedMinutes: 15, status: .pending, orderIndex: 1, aiReasoning: "Start with data collection to inform content", taskId: task.id),
+                SubTask(title: "Create outline/structure", estimatedMinutes: 10, status: .pending, orderIndex: 2, aiReasoning: "Structure before detailed content", taskId: task.id),
+                SubTask(title: "Write main content", estimatedMinutes: 25, status: .pending, orderIndex: 3, taskId: task.id),
+                SubTask(title: "Add visuals/formatting", estimatedMinutes: 15, status: .pending, orderIndex: 4, taskId: task.id),
+                SubTask(title: "Review and polish", estimatedMinutes: 10, status: .pending, orderIndex: 5, taskId: task.id)
             ]
             aiThoughtProcessText = "Recognized this as a document creation task. Structured breakdown follows best practices: research → outline → content → visuals → review."
         } else if taskWords.contains("meeting") || taskWords.contains("call") {
             subTasks = [
-                SubTask(title: "Prepare agenda points", estimatedMinutes: 10, status: .pending, orderIndex: 1, aiReasoning: "Clear agenda ensures productive meeting"),
-                SubTask(title: "Gather relevant materials", estimatedMinutes: 10, status: .pending, orderIndex: 2),
-                SubTask(title: "Send calendar invite/reminder", estimatedMinutes: 5, status: .pending, orderIndex: 3),
-                SubTask(title: "Conduct meeting", estimatedMinutes: 30, status: .pending, orderIndex: 4)
+                SubTask(title: "Prepare agenda points", estimatedMinutes: 10, status: .pending, orderIndex: 1, aiReasoning: "Clear agenda ensures productive meeting", taskId: task.id),
+                SubTask(title: "Gather relevant materials", estimatedMinutes: 10, status: .pending, orderIndex: 2, taskId: task.id),
+                SubTask(title: "Send calendar invite/reminder", estimatedMinutes: 5, status: .pending, orderIndex: 3, taskId: task.id),
+                SubTask(title: "Conduct meeting", estimatedMinutes: 30, status: .pending, orderIndex: 4, taskId: task.id)
             ]
             aiThoughtProcessText = "Identified as a meeting task. Breaking into preparation and execution phases for maximum effectiveness."
         } else {
             subTasks = [
-                SubTask(title: "Define clear objectives", estimatedMinutes: 5, status: .pending, orderIndex: 1, aiReasoning: "Clarity on goals improves focus"),
-                SubTask(title: "Break into actionable steps", estimatedMinutes: 10, status: .pending, orderIndex: 2),
-                SubTask(title: "Execute main work", estimatedMinutes: 20, status: .pending, orderIndex: 3),
-                SubTask(title: "Review and complete", estimatedMinutes: 10, status: .pending, orderIndex: 4)
+                SubTask(title: "Define clear objectives", estimatedMinutes: 5, status: .pending, orderIndex: 1, aiReasoning: "Clarity on goals improves focus", taskId: task.id),
+                SubTask(title: "Break into actionable steps", estimatedMinutes: 10, status: .pending, orderIndex: 2, taskId: task.id),
+                SubTask(title: "Execute main work", estimatedMinutes: 20, status: .pending, orderIndex: 3, taskId: task.id),
+                SubTask(title: "Review and complete", estimatedMinutes: 10, status: .pending, orderIndex: 4, taskId: task.id)
             ]
             aiThoughtProcessText = "Created a general task breakdown following the define → plan → execute → review pattern."
         }
@@ -637,14 +678,110 @@ struct TaskDetailContentView: View {
 
     @MainActor
     private func loadYouTubeResources() {
-        // TODO: Call GeminiService.findYouTubeResources() in production
-        // For now, leave empty - will be populated by AI
-        youtubeResources = []
+        // YouTube resources are loaded from GeniusTaskAnalysis in loadSubTasks
+        // The AI provides TaskResource objects which we convert to YouTubeResource
+        Task {
+            do {
+                guard GeminiService.shared.isReady else {
+                    youtubeResources = []
+                    return
+                }
+
+                let analysis = try await GeminiService.shared.generateGeniusAnalysis(
+                    title: task.title,
+                    notes: task.contextNotes,
+                    context: nil,
+                    userPatterns: nil
+                )
+
+                // Convert TaskResource to YouTubeResource for youtube types
+                youtubeResources = analysis.resources
+                    .filter { $0.type == .youtube }
+                    .map { resource in
+                        YouTubeResource(
+                            videoId: extractYouTubeId(from: resource.url) ?? "",
+                            title: resource.title,
+                            channelName: resource.source,
+                            durationSeconds: parseDuration(resource.duration),
+                            viewCount: nil,
+                            thumbnailURL: nil,
+                            relevanceScore: nil,
+                            taskId: task.id
+                        )
+                    }
+
+                // Save to Supabase
+                await saveYouTubeResourcesToSupabase()
+
+            } catch {
+                print("Failed to load YouTube resources: \(error.localizedDescription)")
+                youtubeResources = []
+            }
+        }
+    }
+
+    private func extractYouTubeId(from url: String) -> String? {
+        // Extract video ID from YouTube URL
+        if let range = url.range(of: "v=") {
+            let startIndex = range.upperBound
+            let endIndex = url[startIndex...].firstIndex(of: "&") ?? url.endIndex
+            return String(url[startIndex..<endIndex])
+        }
+        if url.contains("youtu.be/") {
+            return url.components(separatedBy: "youtu.be/").last?.components(separatedBy: "?").first
+        }
+        return nil
+    }
+
+    private func parseDuration(_ duration: String?) -> Int? {
+        guard let duration else { return nil }
+        // Parse "8 min" format to seconds
+        let components = duration.lowercased().components(separatedBy: " ")
+        if let minutes = Int(components.first ?? "") {
+            return minutes * 60
+        }
+        return nil
     }
 
     @MainActor
     private func loadScheduleSuggestion() {
-        // TODO: Call GeminiService.generateScheduleSuggestion() in production
+        Task {
+            do {
+                guard GeminiService.shared.isReady else {
+                    // Use default suggestion
+                    setDefaultScheduleSuggestion()
+                    return
+                }
+
+                let suggestions = try await GeminiService.shared.generateScheduleSuggestions(
+                    task: task,
+                    calendar: [],
+                    userPatterns: nil
+                )
+
+                if let best = suggestions.first {
+                    scheduleSuggestion = ScheduleSuggestion(
+                        suggestedTime: best.date,
+                        reason: best.reason,
+                        confidence: best.rank == .best ? 0.9 : (best.rank == .good ? 0.75 : 0.6),
+                        alternativeTimes: suggestions.dropFirst().prefix(2).map { $0.date },
+                        conflictingEvents: nil
+                    )
+
+                    // Save to task
+                    await saveScheduleToSupabase()
+                } else {
+                    setDefaultScheduleSuggestion()
+                }
+
+            } catch {
+                print("Failed to load schedule suggestion: \(error.localizedDescription)")
+                setDefaultScheduleSuggestion()
+            }
+        }
+    }
+
+    private func setDefaultScheduleSuggestion() {
         let tomorrow9am = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
         let components = Calendar.current.dateComponents([.year, .month, .day], from: tomorrow9am)
         var ninAM = DateComponents()
@@ -668,7 +805,7 @@ struct TaskDetailContentView: View {
     private func updateSubTaskStatus(_ updatedSubTask: SubTask) {
         if let index = subTasks.firstIndex(where: { $0.id == updatedSubTask.id }) {
             subTasks[index] = updatedSubTask
-            // TODO: Save to Supabase
+            Task { await saveSubTaskToSupabase(updatedSubTask) }
         }
     }
 
@@ -678,10 +815,11 @@ struct TaskDetailContentView: View {
             estimatedMinutes: nil,
             status: .pending,
             orderIndex: subTasks.count + 1,
-            aiReasoning: nil
+            aiReasoning: nil,
+            taskId: task.id
         )
         subTasks.append(newSubTask)
-        // TODO: Save to Supabase
+        Task { await saveSubTaskToSupabase(newSubTask) }
     }
 
     private func deleteSubTask(_ subtask: SubTask) {
@@ -690,19 +828,209 @@ struct TaskDetailContentView: View {
         for (index, _) in subTasks.enumerated() {
             subTasks[index].orderIndex = index + 1
         }
-        // TODO: Save to Supabase
+        Task { await deleteSubTaskFromSupabase(subtask) }
     }
 
     private func updateSubTask(_ subtask: SubTask) {
         if let index = subTasks.firstIndex(where: { $0.id == subtask.id }) {
             subTasks[index] = subtask
-            // TODO: Save to Supabase
+            Task { await saveSubTaskToSupabase(subtask) }
         }
     }
 
     private func saveReflection(_ reflection: TaskReflection) {
-        // TODO: Save reflection to Supabase and update user patterns
-        print("Saving reflection: \(reflection)")
+        Task { await saveReflectionToSupabase(reflection) }
+    }
+
+    // MARK: - Supabase Persistence
+
+    private func saveSubTasksToSupabase() async {
+        guard !subTasks.isEmpty else { return }
+
+        do {
+            // Delete existing subtasks for this task
+            try await SupabaseService.shared.supabase
+                .from("sub_tasks")
+                .delete()
+                .eq("task_id", value: task.id.uuidString)
+                .execute()
+
+            // Insert all subtasks
+            let subtasksWithTaskId = subTasks.map { subtask -> SubTask in
+                var copy = subtask
+                copy.taskId = task.id
+                return copy
+            }
+            try await SupabaseService.shared.supabase
+                .from("sub_tasks")
+                .insert(subtasksWithTaskId)
+                .execute()
+
+            print("Saved \(subTasks.count) subtasks to Supabase")
+        } catch {
+            print("Failed to save subtasks to Supabase: \(error.localizedDescription)")
+        }
+    }
+
+    private func saveSubTaskToSupabase(_ subtask: SubTask) async {
+        do {
+            var subtaskToSave = subtask
+            subtaskToSave.taskId = task.id
+
+            try await SupabaseService.shared.supabase
+                .from("sub_tasks")
+                .upsert(subtaskToSave)
+                .execute()
+        } catch {
+            print("Failed to save subtask to Supabase: \(error.localizedDescription)")
+        }
+    }
+
+    private func deleteSubTaskFromSupabase(_ subtask: SubTask) async {
+        do {
+            try await SupabaseService.shared.supabase
+                .from("sub_tasks")
+                .delete()
+                .eq("id", value: subtask.id.uuidString)
+                .execute()
+        } catch {
+            print("Failed to delete subtask from Supabase: \(error.localizedDescription)")
+        }
+    }
+
+    private func saveYouTubeResourcesToSupabase() async {
+        guard !youtubeResources.isEmpty else { return }
+
+        do {
+            // Delete existing resources for this task
+            try await SupabaseService.shared.supabase
+                .from("task_youtube_resources")
+                .delete()
+                .eq("task_id", value: task.id.uuidString)
+                .execute()
+
+            // Insert new resources
+            let resourcesToSave = youtubeResources.map { resource -> YouTubeResource in
+                var copy = resource
+                copy.taskId = task.id
+                return copy
+            }
+            try await SupabaseService.shared.supabase
+                .from("task_youtube_resources")
+                .insert(resourcesToSave)
+                .execute()
+
+            print("Saved \(youtubeResources.count) YouTube resources to Supabase")
+        } catch {
+            print("Failed to save YouTube resources to Supabase: \(error.localizedDescription)")
+        }
+    }
+
+    private func saveScheduleToSupabase() async {
+        guard let suggestion = scheduleSuggestion else { return }
+
+        do {
+            // Encode schedule suggestion as JSON
+            let encoder = JSONEncoder()
+            let scheduleData = try encoder.encode(suggestion)
+
+            try await SupabaseService.shared.supabase
+                .from("tasks")
+                .update(["schedule_suggestion": scheduleData])
+                .eq("id", value: task.id.uuidString)
+                .execute()
+
+            print("Saved schedule suggestion to task")
+        } catch {
+            print("Failed to save schedule suggestion: \(error.localizedDescription)")
+        }
+    }
+
+    private func saveReflectionToSupabase(_ reflection: TaskReflection) async {
+        guard let userId = await SupabaseService.shared.currentUserId else {
+            print("No user logged in")
+            return
+        }
+
+        do {
+            // Create reflection with user ID
+            let reflectionToSave = TaskReflection(
+                id: UUID(),
+                taskId: task.id,
+                userId: userId,
+                difficultyRating: reflection.difficultyRating,
+                wasEstimateAccurate: reflection.wasEstimateAccurate,
+                learnings: reflection.learnings,
+                tipsForNext: reflection.tipsForNext,
+                actualMinutes: reflection.actualMinutes,
+                createdAt: Date()
+            )
+
+            try await SupabaseService.shared.supabase
+                .from("task_reflections")
+                .insert(reflectionToSave)
+                .execute()
+
+            // Update user productivity patterns
+            await updateUserPatterns(reflection: reflection)
+
+            print("Saved reflection to Supabase")
+        } catch {
+            print("Failed to save reflection: \(error.localizedDescription)")
+        }
+    }
+
+    private func updateUserPatterns(reflection: TaskReflection) async {
+        guard let userId = await SupabaseService.shared.currentUserId else { return }
+
+        do {
+            // Check if patterns exist for this user
+            let existing: [UserProductivityPatterns] = try await SupabaseService.shared.supabase
+                .from("user_productivity_patterns")
+                .select()
+                .eq("user_id", value: userId.uuidString)
+                .execute()
+                .value
+
+            if var patterns = existing.first {
+                // Update existing patterns
+                var updatedPatterns = patterns
+                updatedPatterns.completedTaskCount = patterns.completedTaskCount + 1
+                updatedPatterns.updatedAt = Date()
+
+                // Update AI accuracy if estimate existed
+                if let estimated = task.estimatedMinutes,
+                   let actual = reflection.actualMinutes {
+                    let accuracy = 1.0 - abs(Double(estimated - actual) / Double(estimated))
+                    let currentScore = patterns.aiAccuracyScore ?? 0.5
+                    updatedPatterns.aiAccuracyScore = (currentScore + accuracy) / 2.0
+                }
+
+                try await SupabaseService.shared.supabase
+                    .from("user_productivity_patterns")
+                    .update(updatedPatterns)
+                    .eq("user_id", value: userId.uuidString)
+                    .execute()
+            } else {
+                // Create new patterns
+                let newPatterns = UserProductivityPatterns(
+                    id: UUID(),
+                    userId: userId,
+                    energyPatterns: nil,
+                    aiAccuracyScore: nil,
+                    completedTaskCount: 1,
+                    createdAt: Date(),
+                    updatedAt: Date()
+                )
+
+                try await SupabaseService.shared.supabase
+                    .from("user_productivity_patterns")
+                    .insert(newPatterns)
+                    .execute()
+            }
+        } catch {
+            print("Failed to update user patterns: \(error.localizedDescription)")
+        }
     }
 
     private func triggerReflection() {

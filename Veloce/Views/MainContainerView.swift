@@ -1628,6 +1628,8 @@ struct ScheduledTaskRow: View {
 struct GoalsPageView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var goals: [Goal]
+    @State private var goalsVM = GoalsViewModel()
+    @State private var showingGoalCreationSheet = false
 
     var body: some View {
         NavigationStack {
@@ -1642,6 +1644,12 @@ struct GoalsPageView: View {
                 }
             }
             .navigationTitle("Goals")
+            .sheet(isPresented: $showingGoalCreationSheet) {
+                GoalCreationSheet(goalsVM: goalsVM)
+            }
+            .task {
+                await goalsVM.loadGoals(context: modelContext)
+            }
         }
     }
 
@@ -1665,7 +1673,7 @@ struct GoalsPageView: View {
 
             // CTA Button
             Button {
-                // TODO: Show add goal sheet
+                showingGoalCreationSheet = true
                 HapticsService.shared.impact(.medium)
             } label: {
                 HStack(spacing: 8) {

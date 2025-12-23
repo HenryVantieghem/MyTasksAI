@@ -9,6 +9,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import Supabase
 
 // MARK: - Goals ViewModel
 @MainActor
@@ -26,6 +27,7 @@ final class GoalsViewModel {
     var taskLinks: [GoalTaskLink] = []
     var selectedGoal: Goal?
     var pendingTaskSuggestions: [PendingTaskSuggestion] = []
+    var userPatterns: UserProductivityPatterns?
 
     // MARK: Loading States
     var isLoading = false
@@ -112,8 +114,29 @@ final class GoalsViewModel {
             taskLinks = try context.fetch(linksDescriptor)
 
             error = nil
+
+            // Load user patterns from Supabase
+            await loadUserPatterns()
         } catch {
             self.error = error.localizedDescription
+        }
+    }
+
+    /// Load user productivity patterns from Supabase
+    func loadUserPatterns() async {
+        guard let userId = await SupabaseService.shared.currentUserId else { return }
+
+        do {
+            let patterns: [UserProductivityPatterns] = try await SupabaseService.shared.supabase
+                .from("user_productivity_patterns")
+                .select()
+                .eq("user_id", value: userId.uuidString)
+                .execute()
+                .value
+
+            userPatterns = patterns.first
+        } catch {
+            print("Failed to load user patterns: \(error.localizedDescription)")
         }
     }
 
@@ -236,9 +259,19 @@ final class GoalsViewModel {
         defer { isGeneratingRoadmap = false }
 
         do {
+            // Convert UserProductivityPatterns to UserPatterns format if available
+            let patterns: UserPatterns? = userPatterns.flatMap { productivity in
+                UserPatterns(
+                    preferredLearningStyle: nil,
+                    peakProductivityHours: productivity.energyPatterns?.max(by: { $0.value < $1.value })?.key,
+                    bestDays: nil,
+                    avgDurationByType: nil
+                )
+            }
+
             let roadmap = try await gemini.generateGoalRoadmap(
                 goal: goal,
-                userPatterns: nil  // TODO: Load user patterns
+                userPatterns: patterns
             )
 
             // Store roadmap
