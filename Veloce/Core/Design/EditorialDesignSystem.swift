@@ -238,7 +238,7 @@ struct EditorialStatsPill: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .capsule)
+        .modifier(GlassEffectModifier(cornerRadius: 20, opacity: 0.15, borderWidth: 0.5))
     }
 }
 
@@ -291,7 +291,7 @@ struct EditorialEmptyState: View {
                         .padding(.horizontal, 24)
                         .padding(.vertical, 14)
                 }
-                .buttonStyle(.glassProminent)
+                .buttonStyle(CelestialGlassButtonStyle())
             }
         }
         .padding(40)

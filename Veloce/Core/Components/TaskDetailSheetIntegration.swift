@@ -2,8 +2,15 @@
 //  TaskDetailSheetIntegration.swift
 //  Veloce
 //
-//  Integration guide for adding cognitive productivity components to TaskDetailSheet
-//  Copy these sections into your existing TaskDetailSheet.swift
+//  DEPRECATED: This file is a legacy integration guide.
+//  All features are now implemented in TaskDetailSheet.swift
+//
+//  See TaskDetailSheet.swift for the actual implementation:
+//  - loadSubTasks() - GeminiService AI breakdown + Supabase persistence
+//  - loadYouTubeResources() - GeminiService YouTube search + Supabase persistence
+//  - loadScheduleSuggestion() - GeminiService scheduling + Supabase persistence
+//  - saveReflectionToSupabase() - Task reflection persistence
+//  - updateUserPatterns() - User productivity patterns tracking
 //
 
 import SwiftUI

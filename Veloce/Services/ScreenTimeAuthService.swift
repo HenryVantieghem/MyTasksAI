@@ -147,18 +147,4 @@ enum ScreenTimeAuthError: LocalizedError {
 }
 
 // MARK: - AuthorizationStatus Extension
-
-extension AuthorizationStatus: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .notDetermined:
-            return "Not Determined"
-        case .denied:
-            return "Denied"
-        case .approved:
-            return "Approved"
-        @unknown default:
-            return "Unknown"
-        }
-    }
-}
+// Note: CustomStringConvertible conformance is already provided by FamilyControls

@@ -165,13 +165,13 @@ extension Goal {
     }
 
     /// Decoded AI roadmap
-    var decodedRoadmap: GoalRoadmap? {
+    nonisolated var decodedRoadmap: GoalRoadmap? {
         guard let data = aiRoadmap else { return nil }
         return try? JSONDecoder().decode(GoalRoadmap.self, from: data)
     }
 
     /// Decoded progress history
-    var decodedProgressHistory: [ProgressSnapshot] {
+    nonisolated var decodedProgressHistory: [ProgressSnapshot] {
         guard let data = progressHistory else { return [] }
         return (try? JSONDecoder().decode([ProgressSnapshot].self, from: data)) ?? []
     }
@@ -289,10 +289,14 @@ extension Goal {
 
     /// Set AI roadmap (encodes to Data)
     func setRoadmap(_ roadmap: GoalRoadmap) throws {
-        let encoder = JSONEncoder()
-        aiRoadmap = try encoder.encode(roadmap)
+        aiRoadmap = try Self.encodeRoadmap(roadmap)
         milestoneCount = roadmap.totalMilestones
         updatedAt = .now
+    }
+
+    /// Helper to encode roadmap in nonisolated context
+    nonisolated private static func encodeRoadmap(_ roadmap: GoalRoadmap) throws -> Data {
+        try JSONEncoder().encode(roadmap)
     }
 
     /// Add progress snapshot

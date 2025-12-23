@@ -621,12 +621,12 @@ struct TaskDetailContentView: View {
                 )
 
                 // Convert execution steps to SubTasks
-                subTasks = analysis.executionSteps.enumerated().map { index, step in
+                subTasks = analysis.executionSteps.map { step in
                     SubTask(
                         title: step.description,
                         estimatedMinutes: step.estimatedMinutes,
                         status: step.isCompleted ? .completed : .pending,
-                        orderIndex: step.orderIndex ?? index + 1,
+                        orderIndex: step.orderIndex,
                         aiReasoning: nil,
                         taskId: task.id
                     )
@@ -947,7 +947,7 @@ struct TaskDetailContentView: View {
     }
 
     private func saveReflectionToSupabase(_ reflection: TaskReflection) async {
-        guard let userId = await SupabaseService.shared.currentUserId else {
+        guard let userId = SupabaseService.shared.currentUserId else {
             print("No user logged in")
             return
         }
@@ -981,7 +981,7 @@ struct TaskDetailContentView: View {
     }
 
     private func updateUserPatterns(reflection: TaskReflection) async {
-        guard let userId = await SupabaseService.shared.currentUserId else { return }
+        guard let userId = SupabaseService.shared.currentUserId else { return }
 
         do {
             // Check if patterns exist for this user
@@ -992,7 +992,7 @@ struct TaskDetailContentView: View {
                 .execute()
                 .value
 
-            if var patterns = existing.first {
+            if let patterns = existing.first {
                 // Update existing patterns
                 var updatedPatterns = patterns
                 updatedPatterns.completedTaskCount = patterns.completedTaskCount + 1

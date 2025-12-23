@@ -398,7 +398,7 @@ struct GlassSheetBackground: View {
 struct GlassNavigationBarModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .toolbarBackgroundVisibility(.hidden, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .background {
                 VStack(spacing: 0) {
                     Rectangle()

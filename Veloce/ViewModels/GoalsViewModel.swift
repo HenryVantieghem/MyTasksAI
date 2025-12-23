@@ -124,7 +124,7 @@ final class GoalsViewModel {
 
     /// Load user productivity patterns from Supabase
     func loadUserPatterns() async {
-        guard let userId = await SupabaseService.shared.currentUserId else { return }
+        guard let userId = SupabaseService.shared.currentUserId else { return }
 
         do {
             let patterns: [UserProductivityPatterns] = try await SupabaseService.shared.supabase
