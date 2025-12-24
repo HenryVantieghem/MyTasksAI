@@ -337,13 +337,13 @@ struct TaskTypeOrb: View {
     var body: some View {
         ZStack {
             // Outer glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(color.opacity(0.3 * glowPhase))
                 .frame(width: size * 1.3, height: size * 1.3)
                 .blur(radius: 3)
 
             // Main orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -359,7 +359,7 @@ struct TaskTypeOrb: View {
                 .scaleEffect(1 + breathePhase * 0.08)
 
             // Highlight
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [.white.opacity(0.6), .clear],

@@ -197,7 +197,7 @@ struct CelestialTaskDetailsSection: View {
         VStack(spacing: Theme.Spacing.sm) {
             ForEach(0..<3, id: \.self) { index in
                 HStack(spacing: Theme.Spacing.sm) {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(.white.opacity(0.1))
                         .frame(width: 18, height: 18)
 
@@ -608,21 +608,21 @@ struct CelestialSubTaskRow: View {
         Group {
             switch subTask.status {
             case .pending:
-                Circle()
+                SwiftUI.Circle()
                     .strokeBorder(Theme.CelestialColors.starDim, lineWidth: 1.5)
                     .frame(width: 18, height: 18)
             case .inProgress:
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(Theme.Colors.accent, lineWidth: 1.5)
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.accent)
                         .frame(width: 6, height: 6)
                 }
                 .frame(width: 18, height: 18)
             case .completed:
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.success)
                     Image(systemName: "checkmark")
                         .font(.system(size: 9, weight: .bold))

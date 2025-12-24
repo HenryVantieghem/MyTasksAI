@@ -34,7 +34,7 @@ struct PhotoBlockView: View {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 22))
                     .foregroundStyle(.white)
-                    .background(Circle().fill(.black.opacity(0.5)))
+                    .background(SwiftUI.Circle().fill(.black.opacity(0.5)))
             }
             .buttonStyle(.plain)
             .padding(Theme.Spacing.xs)

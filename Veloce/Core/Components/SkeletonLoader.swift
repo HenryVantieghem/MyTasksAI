@@ -70,7 +70,7 @@ struct TaskRowSkeleton: View {
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {
             // Checkbox skeleton
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.Colors.textTertiary.opacity(0.3))
                 .frame(width: 24, height: 24)
                 .shimmer()
@@ -90,7 +90,7 @@ struct TaskRowSkeleton: View {
             Spacer()
 
             // Priority indicator skeleton
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.Colors.textTertiary.opacity(0.3))
                 .frame(width: 8, height: 8)
         }
@@ -162,7 +162,7 @@ struct CalendarSkeleton: View {
                 ForEach(0..<21, id: \.self) { _ in
                     VStack(spacing: 4) {
                         SkeletonShape(width: 20, height: 10, cornerRadius: 2)
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.textTertiary.opacity(0.3))
                             .frame(width: 36, height: 36)
                             .shimmer()

@@ -114,7 +114,7 @@ struct FocusModeGlow: View {
     private func outerGlowRings(centerSize: CGFloat) -> some View {
         ZStack {
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         AngularGradient(
                             colors: [
@@ -143,12 +143,12 @@ struct FocusModeGlow: View {
     private func progressRing(size: CGFloat) -> some View {
         ZStack {
             // Background ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(Color.white.opacity(0.08), lineWidth: 10)
                 .frame(width: size, height: size)
 
             // Progress fill with iridescent gradient
-            Circle()
+            SwiftUI.Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
                     AngularGradient(
@@ -171,7 +171,7 @@ struct FocusModeGlow: View {
 
             // Progress end cap glow
             if progress > 0.02 {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.aiCyan)
                     .frame(width: 14, height: 14)
                     .offset(y: -size / 2)
@@ -187,7 +187,7 @@ struct FocusModeGlow: View {
     private func centralOrb(size: CGFloat) -> some View {
         ZStack {
             // Outer soft glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -205,7 +205,7 @@ struct FocusModeGlow: View {
                 .scaleEffect(breatheScale)
 
             // Core gradient orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -222,7 +222,7 @@ struct FocusModeGlow: View {
                 .frame(width: size, height: size)
                 .overlay(
                     // Shine highlight (like Apple Sign In button)
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             LinearGradient(
                                 colors: [.white.opacity(0.8), .clear],
@@ -255,7 +255,7 @@ struct FocusModeGlow: View {
         let radius = bounds.width * 0.3 + sin(particlePhase * 2 + Double(index)) * 30
         let size = CGFloat(4 + (index % 3) * 2)
 
-        return Circle()
+        return SwiftUI.Circle()
             .fill(particleColor(for: index))
             .frame(width: size, height: size)
             .blur(radius: 1)

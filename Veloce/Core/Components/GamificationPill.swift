@@ -184,7 +184,7 @@ struct LevelBadge: View {
     var body: some View {
         ZStack {
             // Background circle with gradient
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     LinearGradient(
                         colors: Theme.Colors.iridescentGradient.prefix(3).map { $0 },

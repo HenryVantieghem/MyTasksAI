@@ -106,11 +106,11 @@ struct WeekViewTimeline: View {
 
             ZStack {
                 if isToday {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.accent)
                         .frame(width: 32, height: 32)
                 } else if isSelected {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.glassBackground)
                         .frame(width: 32, height: 32)
                 }
@@ -326,7 +326,7 @@ struct CurrentTimeLineView: View {
                     .frame(width: dayWidth, height: 2)
 
                 // Circle indicator
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.error)
                     .frame(width: 10, height: 10)
                     .offset(x: -5)

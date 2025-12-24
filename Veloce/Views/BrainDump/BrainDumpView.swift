@@ -69,7 +69,7 @@ struct BrainDumpView: View {
 
             // Error icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Color.red.opacity(0.2))
                     .frame(width: 80, height: 80)
 

@@ -254,7 +254,7 @@ struct UnscheduledTaskChip: View {
             onTap()
         } label: {
             HStack(spacing: Theme.Spacing.xs) {
-                Circle()
+                SwiftUI.Circle()
                     .fill(priorityColor)
                     .frame(width: 8, height: 8)
 

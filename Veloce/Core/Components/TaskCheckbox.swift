@@ -24,7 +24,7 @@ struct TaskCheckbox: View {
         } label: {
             ZStack {
                 // Background circle
-                Circle()
+                SwiftUI.Circle()
                     .strokeBorder(
                         isChecked ? Theme.Colors.success : Theme.Colors.textTertiary,
                         lineWidth: 2
@@ -32,7 +32,7 @@ struct TaskCheckbox: View {
                     .frame(width: size, height: size)
 
                 // Fill circle (animated)
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.success)
                     .frame(width: size, height: size)
                     .scaleEffect(isChecked ? 1 : 0)
@@ -56,7 +56,7 @@ struct TaskCheckbox: View {
             }
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
+        .contentShape(SwiftUI.Circle())
         .scaleEffect(isAnimating && !reduceMotion ? 1.2 : 1.0)
         .animation(reduceMotion ? .none : Theme.Animation.bouncySpring, value: isChecked)
         .animation(reduceMotion ? .none : Theme.Animation.quickSpring, value: isAnimating)
@@ -112,7 +112,7 @@ struct ParticleBurst: View {
     var body: some View {
         ZStack {
             ForEach(particles) { particle in
-                Circle()
+                SwiftUI.Circle()
                     .fill(particle.color)
                     .frame(width: particle.size, height: particle.size)
                     .offset(particle.offset)
@@ -250,11 +250,11 @@ struct CircleCheckbox: View {
                 isChecked.toggle()
             }
         } label: {
-            Circle()
+            SwiftUI.Circle()
                 .fill(isChecked ? activeColor : Color.clear)
                 .frame(width: size, height: size)
                 .overlay(
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(
                             isChecked ? activeColor : Theme.Colors.textTertiary,
                             lineWidth: 1.5

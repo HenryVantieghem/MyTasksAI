@@ -103,7 +103,7 @@ struct CrystallineTextField: View {
         ZStack {
             // Glow behind icon when focused
             if isFocused {
-                Circle()
+                SwiftUI.Circle()
                     .fill(accentColor.opacity(0.2))
                     .frame(width: 36, height: 36)
                     .blur(radius: 6)

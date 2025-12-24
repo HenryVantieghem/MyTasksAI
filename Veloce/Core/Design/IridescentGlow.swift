@@ -26,7 +26,7 @@ struct IridescentBackground: View {
 
                 // Animated iridescent layers
                 ForEach(0..<3, id: \.self) { index in
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: iridescentColors(for: index),
@@ -75,7 +75,7 @@ struct IridescentOrb: View {
     var body: some View {
         ZStack {
             // Outer glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     AngularGradient(
                         colors: [
@@ -94,7 +94,7 @@ struct IridescentOrb: View {
                 .opacity(0.6)
 
             // Inner orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -110,7 +110,7 @@ struct IridescentOrb: View {
                 .frame(width: size, height: size)
 
             // Highlight
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [.white.opacity(0.8), .clear],
@@ -312,14 +312,14 @@ struct GlowingProgressRing: View {
     var body: some View {
         ZStack {
             // Background ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     Theme.Colors.textSecondary.opacity(0.2),
                     lineWidth: lineWidth
                 )
 
             // Progress ring
-            Circle()
+            SwiftUI.Circle()
                 .trim(from: 0, to: CGFloat(min(progress, 1.0)))
                 .stroke(
                     Theme.Colors.accentGradient,
@@ -332,7 +332,7 @@ struct GlowingProgressRing: View {
 
             // Glow
             if showGlow && progress > 0 {
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: CGFloat(min(progress, 1.0)))
                     .stroke(
                         Theme.Colors.accent,
@@ -581,7 +581,7 @@ struct SuccessCheckModifier: ViewModifier {
                 if isShowing {
                     ZStack {
                         // Expanding ring
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(Theme.Colors.success, lineWidth: 2)
                             .scaleEffect(ringScale)
                             .opacity(ringOpacity)
@@ -639,7 +639,7 @@ struct RippleEffectModifier: ViewModifier {
             .overlay {
                 GeometryReader { geometry in
                     ForEach(ripples) { ripple in
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(color.opacity(ripple.opacity))
                             .frame(width: 40, height: 40)
                             .scaleEffect(ripple.scale)

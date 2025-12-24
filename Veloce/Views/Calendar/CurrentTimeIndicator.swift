@@ -71,7 +71,7 @@ struct CurrentTimeIndicator: View {
         ZStack {
             // Outer glow rings
             ForEach(0..<3, id: \.self) { ring in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         beaconColor.opacity(0.2 - Double(ring) * 0.05),
                         lineWidth: 1
@@ -84,7 +84,7 @@ struct CurrentTimeIndicator: View {
             }
 
             // Inner glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -101,13 +101,13 @@ struct CurrentTimeIndicator: View {
                 .blur(radius: 8)
 
             // Bright core
-            Circle()
+            SwiftUI.Circle()
                 .fill(beaconColor)
                 .frame(width: 8, height: 8)
                 .shadow(color: beaconColor, radius: 4 + glowIntensity * 4)
 
             // White hot center
-            Circle()
+            SwiftUI.Circle()
                 .fill(.white)
                 .frame(width: 4, height: 4)
                 .blur(radius: 1)
@@ -201,7 +201,7 @@ struct TimeParticle: View {
         let x = cos(currentAngle) * cfg.orbitRadius
         let y = sin(currentAngle) * cfg.orbitRadius * 0.3 // Flattened orbit
 
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [color, color.opacity(0.3), .clear],

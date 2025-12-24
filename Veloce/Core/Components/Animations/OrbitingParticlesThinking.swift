@@ -12,7 +12,7 @@ struct OrbitingParticlesThinking: View {
     var body: some View {
         ZStack {
             ForEach(0..<particleCount, id: \.self) { i in
-                Circle()
+                SwiftUI.Circle()
                     .fill(i < 3 ? Theme.Colors.aiPurple : Theme.Colors.aiCyan)
                     .frame(width: 6, height: 6)
                     .offset(x: i < 3 ? 25 : 40)

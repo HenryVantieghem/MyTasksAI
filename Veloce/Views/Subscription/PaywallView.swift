@@ -145,11 +145,11 @@ struct PaywallView: View {
         HStack(spacing: Aurora.Layout.spacing) {
             // Checkmark with glow
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.success.opacity(0.15))
                     .frame(width: 32, height: 32)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.success.opacity(0.1))
                     .frame(width: 32, height: 32)
                     .blur(radius: 6)

@@ -19,7 +19,7 @@ struct AITaskBuddy: View {
             if !isExpanded {
                 Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { isExpanded = true } } label: {
                     ZStack {
-                        Circle().fill(Theme.Colors.aiPurple.opacity(0.2)).frame(width: 60, height: 60).blur(radius: 10)
+                        SwiftUI.Circle().fill(Theme.Colors.aiPurple.opacity(0.2)).frame(width: 60, height: 60).blur(radius: 10)
                         AIOrb(size: .small, animationStyle: .breathing)
                     }
                 }

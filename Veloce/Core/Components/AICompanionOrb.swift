@@ -108,7 +108,7 @@ struct AICompanionOrb: View {
     // MARK: - Layers
 
     private var outerGlow: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -126,7 +126,7 @@ struct AICompanionOrb: View {
     }
 
     private var mainOrb: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 AngularGradient(
                     colors: Theme.Colors.aiGradient + [Theme.Colors.aiGradient[0]],
@@ -139,7 +139,7 @@ struct AICompanionOrb: View {
     }
 
     private var innerHighlight: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -228,7 +228,7 @@ struct CelebrationParticles: View {
     var body: some View {
         ZStack {
             ForEach(particles) { particle in
-                Circle()
+                SwiftUI.Circle()
                     .fill(particle.color)
                     .frame(width: 4, height: 4)
                     .scaleEffect(particle.scale)

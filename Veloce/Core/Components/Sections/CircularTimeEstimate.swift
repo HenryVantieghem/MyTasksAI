@@ -16,11 +16,11 @@ struct CircularTimeEstimate: View {
 
     var body: some View {
         ZStack {
-            Circle()
+            SwiftUI.Circle()
                 .stroke(Color.white.opacity(0.1), lineWidth: 6)
                 .frame(width: 64, height: 64)
 
-            Circle()
+            SwiftUI.Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
                     LinearGradient(colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan], startPoint: .topLeading, endPoint: .bottomTrailing),

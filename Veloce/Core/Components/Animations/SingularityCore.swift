@@ -59,7 +59,7 @@ struct SingularityCore: View {
     // MARK: - Outer Glow
 
     private var outerGlow: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -79,7 +79,7 @@ struct SingularityCore: View {
     // MARK: - Main Orb
 
     private var mainOrb: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 AngularGradient(
                     colors: gradientColors + [gradientColors[0]],
@@ -98,7 +98,7 @@ struct SingularityCore: View {
     // MARK: - Inner Core
 
     private var innerCore: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 AngularGradient(
                     colors: gradientColors.reversed() + [gradientColors.last!],
@@ -114,7 +114,7 @@ struct SingularityCore: View {
     // MARK: - Top Highlight
 
     private var topHighlight: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -199,7 +199,7 @@ struct SingularityCoreExpanded: View {
     var body: some View {
         ZStack {
             // Shockwave ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     LinearGradient(
                         colors: [
@@ -215,7 +215,7 @@ struct SingularityCoreExpanded: View {
                 .opacity(1 - expansion)
 
             // Core fade out
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [

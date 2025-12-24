@@ -35,7 +35,7 @@ struct AnimatedAuthBackground: View {
                 // Floating particles
                 if !reduceMotion {
                     ForEach(particles) { particle in
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(particle.color)
                             .frame(width: particle.size, height: particle.size)
                             .blur(radius: particle.size * 0.3)

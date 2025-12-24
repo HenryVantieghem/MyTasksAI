@@ -93,19 +93,19 @@ struct AuroraToggle: View {
     private var thumb: some View {
         ZStack {
             // Thumb shadow
-            Circle()
+            SwiftUI.Circle()
                 .fill(Color.black.opacity(0.15))
                 .frame(width: thumbSize, height: thumbSize)
                 .blur(radius: 2)
                 .offset(y: 1)
 
             // Main thumb
-            Circle()
+            SwiftUI.Circle()
                 .fill(Color.white)
                 .frame(width: thumbSize, height: thumbSize)
 
             // Inner highlight
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     LinearGradient(
                         colors: [
@@ -120,7 +120,7 @@ struct AuroraToggle: View {
 
             // Colored dot when on
             if isOn {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Gradients.aurora)
                     .frame(width: 8, height: 8)
                     .transition(.scale.combined(with: .opacity))
@@ -202,7 +202,7 @@ struct AuroraToggleRow: View {
         HStack(spacing: Aurora.Layout.spacing) {
             // Icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(isOn ? Aurora.Colors.violet.opacity(0.2) : Aurora.Colors.cosmicElevated)
                     .frame(width: 44, height: 44)
 

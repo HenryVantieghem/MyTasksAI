@@ -95,8 +95,8 @@ struct EnergyMeter: View {
     var body: some View {
         HStack(spacing: 12) {
             ZStack {
-                Circle().stroke(Color.white.opacity(0.1), lineWidth: 4).frame(width: 44, height: 44)
-                Circle().trim(from: 0, to: currentEnergy).stroke(LinearGradient(colors: [Theme.Colors.success, .yellow, .orange], startPoint: .top, endPoint: .bottom), style: StrokeStyle(lineWidth: 4, lineCap: .round)).frame(width: 44, height: 44).rotationEffect(.degrees(-90))
+                SwiftUI.Circle().stroke(Color.white.opacity(0.1), lineWidth: 4).frame(width: 44, height: 44)
+                SwiftUI.Circle().trim(from: 0, to: currentEnergy).stroke(LinearGradient(colors: [Theme.Colors.success, .yellow, .orange], startPoint: .top, endPoint: .bottom), style: StrokeStyle(lineWidth: 4, lineCap: .round)).frame(width: 44, height: 44).rotationEffect(.degrees(-90))
                 Image(systemName: "bolt.fill").font(.caption).foregroundStyle(.white)
             }
             VStack(alignment: .leading) {

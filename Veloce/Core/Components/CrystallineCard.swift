@@ -243,7 +243,7 @@ struct CrystallineSelectionCard: View {
 
     private var iconCircle: some View {
         ZStack {
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     isSelected
                         ? accentColor.opacity(0.2)
@@ -252,7 +252,7 @@ struct CrystallineSelectionCard: View {
                 .frame(width: 48, height: 48)
 
             if isSelected {
-                Circle()
+                SwiftUI.Circle()
                     .stroke(accentColor.opacity(0.4), lineWidth: 1)
                     .frame(width: 48, height: 48)
             }
@@ -289,12 +289,12 @@ struct CrystallineFeatureCard: View {
         HStack(spacing: Aurora.Layout.spacing) {
             // Glowing icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(accentColor.opacity(0.15))
                     .frame(width: 44, height: 44)
                     .blur(radius: 4)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(accentColor.opacity(0.1))
                     .frame(width: 44, height: 44)
 

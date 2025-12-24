@@ -210,7 +210,7 @@ struct WorkflowStepRow: View {
             VStack(spacing: 0) {
                 // Number circle
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.aiCyan.opacity(0.3))
                         .frame(width: 24, height: 24)
 

@@ -232,7 +232,7 @@ struct TaskDetailContentView: View {
                     onToggleComplete()
                 }) {
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .strokeBorder(
                                 task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary,
                                 lineWidth: 2
@@ -240,7 +240,7 @@ struct TaskDetailContentView: View {
                             .frame(width: 28, height: 28)
 
                         if task.isCompleted {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.Colors.success)
                                 .frame(width: 28, height: 28)
 

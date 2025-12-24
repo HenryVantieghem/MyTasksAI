@@ -63,13 +63,13 @@ struct FocusAreasView: View {
             // Animated icon
             ZStack {
                 // Glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.violet.opacity(0.2))
                     .frame(width: 90, height: 90)
                     .blur(radius: 20)
                     .scaleEffect(iconPulse)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.cosmicElevated)
                     .frame(width: 80, height: 80)
 
@@ -173,13 +173,13 @@ struct EnhancedFocusAreaCard: View {
                 // Icon with glow
                 ZStack {
                     if isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(area.color.opacity(0.2))
                             .frame(width: 70, height: 70)
                             .blur(radius: 10)
                     }
 
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(isSelected ? area.color.opacity(0.2) : Aurora.Colors.cosmicElevated)
                         .frame(width: 56, height: 56)
 
@@ -243,7 +243,7 @@ struct FocusAreaCard: View {
         } label: {
             VStack(spacing: Aurora.Layout.spacingSmall) {
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(isSelected ? area.color.opacity(0.2) : Aurora.Colors.glassBase)
                         .frame(width: 60, height: 60)
 

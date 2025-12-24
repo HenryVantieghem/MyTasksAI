@@ -58,7 +58,7 @@ struct EnergyCore: View {
             .scaleEffect(isImploding ? 0.3 : completionScale)
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
+        .contentShape(SwiftUI.Circle())
         .onAppear {
             startAnimations()
         }
@@ -74,21 +74,21 @@ struct EnergyCore: View {
     // MARK: - Subviews
 
     private var outerGlow: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(glowColor.opacity(energyState.glowIntensity * glowMultiplier))
             .blur(radius: DesignTokens.EnergyCore.glowRadius + (pulsePhase * 4))
             .scaleEffect(1.3 + (pulsePhase * 0.15))
     }
 
     private var backgroundRing: some View {
-        Circle()
+        SwiftUI.Circle()
             .stroke(
                 Theme.EnergyColors.ringInner,
                 lineWidth: DesignTokens.EnergyCore.ringInnerWidth
             )
             .overlay(
                 // Charged ring for high energy
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         energyState == .high || energyState == .max
                             ? Theme.EnergyColors.ringCharged
@@ -101,12 +101,12 @@ struct EnergyCore: View {
     }
 
     private var energyOrb: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(energyFillGradient)
             .mask(energyFillMask)
             .overlay(
                 // Shimmer effect for high energy
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [
@@ -149,11 +149,11 @@ struct EnergyCore: View {
                     )
             }
         }
-        .clipShape(Circle())
+        .clipShape(SwiftUI.Circle())
     }
 
     private var innerHighlight: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -175,7 +175,7 @@ struct EnergyCore: View {
             let angle = (Double(index) / Double(DesignTokens.EnergyCore.particleCount)) * 360 + rotationAngle
             let colorIndex = index % Theme.EnergyColors.particleColors.count
 
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.EnergyColors.particleColors[colorIndex])
                 .frame(
                     width: DesignTokens.EnergyCore.particleSize,
@@ -192,7 +192,7 @@ struct EnergyCore: View {
     private var completionCheckmark: some View {
         ZStack {
             // Success glow background
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.CelestialColors.successNebula.opacity(0.3))
 
             // Checkmark

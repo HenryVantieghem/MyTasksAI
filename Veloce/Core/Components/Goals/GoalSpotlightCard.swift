@@ -275,7 +275,7 @@ struct GoalSpotlightSection: View {
         Button(action: onAddGoal) {
             VStack(spacing: 16) {
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.aiPurple.opacity(0.1))
                         .frame(width: 64, height: 64)
 

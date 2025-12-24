@@ -73,11 +73,11 @@ struct StepRow: View {
         HStack(alignment: .top, spacing: 12) {
             Button(action: onToggle) {
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(isCompleted ? Theme.Colors.success : Color.white.opacity(0.3), lineWidth: 2)
                         .frame(width: 24, height: 24)
                     if isCompleted {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.success)
                             .frame(width: 24, height: 24)
                         Image(systemName: "checkmark")

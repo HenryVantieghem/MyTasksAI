@@ -176,7 +176,7 @@ struct LevelProgressOrb: View {
             ZStack {
                 // Outer glow rings
                 ForEach(0..<3, id: \.self) { ring in
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(
                             AngularGradient(
                                 colors: orbColors + [orbColors[0]],
@@ -193,7 +193,7 @@ struct LevelProgressOrb: View {
                 // Main orb container
                 ZStack {
                     // Outer glow
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -210,12 +210,12 @@ struct LevelProgressOrb: View {
                         .blur(radius: 20)
 
                     // Progress ring background
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(Color.white.opacity(0.1), lineWidth: 6)
                         .frame(width: 160, height: 160)
 
                     // Progress ring
-                    Circle()
+                    SwiftUI.Circle()
                         .trim(from: 0, to: progress)
                         .stroke(
                             AngularGradient(
@@ -228,7 +228,7 @@ struct LevelProgressOrb: View {
                         .rotationEffect(.degrees(-90))
 
                     // Core orb
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -261,7 +261,7 @@ struct LevelProgressOrb: View {
 
                 // Streak ring (when active)
                 if streak > 0 {
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(
                             LinearGradient(
                                 colors: [.orange, .red, .orange],
@@ -540,11 +540,11 @@ struct DayProgressCard: View {
     var body: some View {
         HStack(spacing: 20) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Color.white.opacity(0.1), lineWidth: 6)
                     .frame(width: 60, height: 60)
 
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: ringProgress)
                     .stroke(
                         isComplete ?
@@ -638,7 +638,7 @@ struct AchievementBadge: View {
     var body: some View {
         VStack(spacing: 8) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [achievement.color.opacity(0.3), achievement.color.opacity(0.1)],

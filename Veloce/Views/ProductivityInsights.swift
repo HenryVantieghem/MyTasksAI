@@ -50,7 +50,7 @@ struct ProductivityInsights: View {
                     Text("Streak Calendar").font(.headline).foregroundStyle(.white)
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
                         ForEach(0..<28, id: \.self) { day in
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Bool.random() ? Theme.Colors.success : Color.white.opacity(0.1))
                                 .frame(width: 20, height: 20)
                         }

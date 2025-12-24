@@ -169,7 +169,7 @@ struct TimelineCurrentTimeIndicator: View {
         let yOffset = CGFloat(hour) * hourHeight + CGFloat(minute) / 60 * hourHeight
 
         HStack(spacing: 0) {
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.Colors.destructive)
                 .frame(width: 8, height: 8)
 

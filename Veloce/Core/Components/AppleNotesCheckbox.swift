@@ -26,7 +26,7 @@ struct AppleNotesCheckbox: View {
         Button(action: performToggle) {
             ZStack {
                 // Outer circle
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         isChecked ? Theme.Colors.success : Theme.Colors.textTertiary.opacity(0.5),
                         lineWidth: strokeWidth
@@ -35,7 +35,7 @@ struct AppleNotesCheckbox: View {
 
                 // Fill when checked
                 if isChecked {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.success)
                         .frame(width: size - strokeWidth * 2, height: size - strokeWidth * 2)
                         .scaleEffect(animationProgress)
@@ -50,7 +50,7 @@ struct AppleNotesCheckbox: View {
             .frame(width: size, height: size)
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
+        .contentShape(SwiftUI.Circle())
         .onChange(of: isChecked) { _, newValue in
             if newValue {
                 animateIn()
@@ -95,7 +95,7 @@ struct AppleNotesCheckboxIcon: View {
 
     var body: some View {
         ZStack {
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     isActive ? Theme.Colors.accent : Theme.Colors.textSecondary,
                     lineWidth: 1.5
@@ -103,7 +103,7 @@ struct AppleNotesCheckboxIcon: View {
                 .frame(width: size, height: size)
 
             if isActive {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.accent.opacity(0.2))
                     .frame(width: size - 4, height: size - 4)
             }

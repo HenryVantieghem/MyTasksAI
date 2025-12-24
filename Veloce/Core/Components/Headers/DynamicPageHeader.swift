@@ -48,10 +48,10 @@ struct TasksHeader: View {
         HStack(spacing: 16) {
             // Progress ring
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Color.white.opacity(0.1), lineWidth: 3)
                     .frame(width: isCollapsed ? 28 : 36, height: isCollapsed ? 28 : 36)
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: taskCount > 0 ? CGFloat(completedCount) / CGFloat(taskCount) : 0)
                     .stroke(Theme.Colors.aiPurple, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                     .frame(width: isCollapsed ? 28 : 36, height: isCollapsed ? 28 : 36)
@@ -130,7 +130,7 @@ struct NeuralParticles: View {
     var body: some View {
         ZStack {
             ForEach(0..<6, id: \.self) { i in
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.aiPurple.opacity(0.5))
                     .frame(width: 4, height: 4)
                     .offset(x: cos(phase + CGFloat(i) * .pi / 3) * 15,

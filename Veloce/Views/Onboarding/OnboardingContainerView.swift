@@ -232,7 +232,7 @@ struct AuroraProgressIndicator: View {
         let isComplete = index < currentStep
         let isCurrent = index == currentStep
 
-        return Circle()
+        return SwiftUI.Circle()
             .fill(dotColor(isComplete: isComplete, isCurrent: isCurrent))
             .frame(width: isCurrent ? 12 : 8, height: isCurrent ? 12 : 8)
             .shadow(
@@ -363,11 +363,11 @@ struct AuroraFeatureRow: View {
     var body: some View {
         HStack(spacing: Aurora.Layout.spacing) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.15))
                     .frame(width: 50, height: 50)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.1))
                     .frame(width: 50, height: 50)
                     .blur(radius: 8)
@@ -628,12 +628,12 @@ struct AuroraFocusAreaCard: View {
             VStack(spacing: Aurora.Layout.spacingSmall) {
                 // Icon circle
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(isSelected ? area.color.opacity(0.2) : Aurora.Colors.cosmicElevated)
                         .frame(width: 56, height: 56)
 
                     if isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(area.color.opacity(0.5), lineWidth: 2)
                             .frame(width: 56, height: 56)
                     }
@@ -914,7 +914,7 @@ struct FloatingOrb: View {
     let position: CGPoint
 
     var body: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [color.opacity(0.4), color.opacity(0.2), Color.clear],

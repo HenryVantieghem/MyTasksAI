@@ -112,7 +112,7 @@ struct CelestialOrb: View {
     // MARK: - Outer Glow
 
     private var outerGlow: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -134,7 +134,7 @@ struct CelestialOrb: View {
     private var orbRings: some View {
         ZStack {
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         AngularGradient(
                             colors: [
@@ -170,7 +170,7 @@ struct CelestialOrb: View {
     // MARK: - Main Glow
 
     private var mainGlow: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -191,7 +191,7 @@ struct CelestialOrb: View {
     // MARK: - Core Orb
 
     private var coreOrb: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 LinearGradient(
                     colors: [stateColor, Aurora.Colors.electric, stateSecondaryColor],
@@ -210,7 +210,7 @@ struct CelestialOrb: View {
     private var innerShine: some View {
         ZStack {
             // Top-left highlight
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     LinearGradient(
                         colors: [
@@ -252,7 +252,7 @@ struct CelestialOrb: View {
 
     private var floatingParticles: some View {
         ForEach(0..<particleCount, id: \.self) { index in
-            Circle()
+            SwiftUI.Circle()
                 .fill(particleColor(for: index))
                 .frame(width: particleSize(for: index))
                 .offset(particleOffset(for: index))
@@ -293,7 +293,7 @@ struct CelestialOrb: View {
 
     private var celebrationBurst: some View {
         ForEach(0..<8, id: \.self) { index in
-            Circle()
+            SwiftUI.Circle()
                 .fill(celebrationColor(for: index))
                 .frame(width: size * 0.15)
                 .offset(celebrationBurstOffset(for: index))

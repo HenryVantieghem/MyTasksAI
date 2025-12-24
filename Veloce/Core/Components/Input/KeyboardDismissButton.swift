@@ -23,12 +23,12 @@ struct KeyboardDismissButton: View {
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .frame(width: 36, height: 36)
                 .background(
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.glassBackground.opacity(0.5))
                 )
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
+        .contentShape(SwiftUI.Circle())
         .accessibilityLabel("Dismiss keyboard")
         .accessibilityHint("Double tap to hide the keyboard")
     }

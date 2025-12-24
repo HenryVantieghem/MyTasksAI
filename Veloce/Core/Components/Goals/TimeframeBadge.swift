@@ -186,11 +186,11 @@ struct MilestoneProgressBar: View {
                     if total > 0 && total <= 10 {
                         ForEach(0..<total, id: \.self) { index in
                             let position = Double(index + 1) / Double(total)
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(index < completed ? accentColor : Color.white.opacity(0.3))
                                 .frame(width: 8, height: 8)
                                 .overlay(
-                                    Circle()
+                                    SwiftUI.Circle()
                                         .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
                                 )
                                 .position(

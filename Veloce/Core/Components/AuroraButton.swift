@@ -297,10 +297,10 @@ struct AuroraIconButton: View {
             action()
         } label: {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.glassBase)
 
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Aurora.Gradients.glassBorder, lineWidth: 1)
 
                 Image(systemName: icon)

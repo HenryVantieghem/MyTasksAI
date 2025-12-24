@@ -104,7 +104,7 @@ struct AmbientSoundPicker: View {
                                     .font(.title2)
                                     .frame(width: 50, height: 50)
                                     .background(service.currentSound == sound ? Theme.Colors.aiPurple : .white.opacity(0.1))
-                                    .clipShape(Circle())
+                                    .clipShape(SwiftUI.Circle())
                                 Text(sound.rawValue)
                                     .font(.caption2)
                                     .lineLimit(1)

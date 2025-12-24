@@ -28,7 +28,7 @@ struct ConstellationPasswordStrength: View {
             HStack(spacing: Aurora.Layout.spacingSmall) {
                 // Strength label
                 HStack(spacing: 4) {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(strength.color)
                         .frame(width: 6, height: 6)
                         .shadow(color: strength.color.opacity(0.5), radius: 3)
@@ -83,7 +83,7 @@ struct ConstellationPasswordStrength: View {
         return ZStack {
             // Outer glow when lit
             if isLit {
-                Circle()
+                SwiftUI.Circle()
                     .fill(starColor.opacity(0.4 + glowPulse * 0.2))
                     .frame(width: 18, height: 18)
                     .blur(radius: 6)
@@ -167,7 +167,7 @@ struct ConstellationPasswordStrength: View {
 
     private func requirementDot(met: Bool, label: String) -> some View {
         HStack(spacing: 2) {
-            Circle()
+            SwiftUI.Circle()
                 .fill(met ? Aurora.Colors.success : Aurora.Colors.textQuaternary)
                 .frame(width: 5, height: 5)
 

@@ -69,7 +69,7 @@ struct ClusterCard: View {
             Spacer()
             ZStack {
                 ForEach(0..<min(3, cluster.tasks.count), id: \.self) { i in
-                    Circle().fill(Theme.Colors.aiPurple.opacity(0.5)).frame(width: 24, height: 24).offset(x: CGFloat(i * 12))
+                    SwiftUI.Circle().fill(Theme.Colors.aiPurple.opacity(0.5)).frame(width: 24, height: 24).offset(x: CGFloat(i * 12))
                 }
             }
         }

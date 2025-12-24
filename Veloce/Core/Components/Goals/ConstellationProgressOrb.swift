@@ -53,7 +53,7 @@ struct ConstellationProgressOrb: View {
     // MARK: - Subviews
 
     private var nebulaBackground: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -66,7 +66,7 @@ struct ConstellationProgressOrb: View {
                 )
             )
             .overlay(
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         LinearGradient(
                             colors: [
@@ -93,7 +93,7 @@ struct ConstellationProgressOrb: View {
         let isActive = star.isActive
         let twinkleOffset = reduceMotion ? 0 : sin(animationPhase + Double(index) * 0.5) * 0.2
 
-        return Circle()
+        return SwiftUI.Circle()
             .fill(isActive ? accentColor : Color.white.opacity(0.3))
             .frame(width: starSize(for: star), height: starSize(for: star))
             .shadow(
@@ -203,11 +203,11 @@ struct GoalProgressRing: View {
     var body: some View {
         ZStack {
             // Background ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(Color.white.opacity(0.1), lineWidth: lineWidth)
 
             // Progress ring
-            Circle()
+            SwiftUI.Circle()
                 .trim(from: 0, to: animatedProgress)
                 .stroke(
                     AngularGradient(
@@ -287,7 +287,7 @@ struct GoalStatusOrb: View {
 
             // Overlay icon for special states
             if goal.isOverdue || goal.isCheckInDue {
-                Circle()
+                SwiftUI.Circle()
                     .fill(statusColor)
                     .frame(width: size * 0.3, height: size * 0.3)
                     .overlay(

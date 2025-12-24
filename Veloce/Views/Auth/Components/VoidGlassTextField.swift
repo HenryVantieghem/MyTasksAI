@@ -67,7 +67,7 @@ struct VoidGlassTextField: View {
     private var iconView: some View {
         ZStack {
             if isFocused {
-                Circle()
+                SwiftUI.Circle()
                     .fill(glowColor.opacity(0.2))
                     .frame(width: 36, height: 36)
                     .blur(radius: 6)
@@ -298,7 +298,7 @@ struct VoidPasswordStrengthIndicator: View {
                         .animation(.spring(response: 0.4, dampingFraction: 0.7), value: strength)
 
                     // Glow at tip
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(strengthColor)
                         .frame(width: 10, height: 10)
                         .blur(radius: 4)
@@ -311,7 +311,7 @@ struct VoidPasswordStrengthIndicator: View {
 
             // Label
             HStack(spacing: Theme.Spacing.xs) {
-                Circle()
+                SwiftUI.Circle()
                     .fill(strengthColor)
                     .frame(width: 6, height: 6)
 

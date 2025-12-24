@@ -57,7 +57,7 @@ struct BrainDumpProcessingView: View {
         ZStack {
             // Outer glow rings
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         LinearGradient(
                             colors: [
@@ -77,7 +77,7 @@ struct BrainDumpProcessingView: View {
             }
 
             // Main glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -97,7 +97,7 @@ struct BrainDumpProcessingView: View {
             // Inner orb
             ZStack {
                 // Gradient orb
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [
@@ -112,7 +112,7 @@ struct BrainDumpProcessingView: View {
                     .frame(width: 80, height: 80)
 
                 // Shine overlay
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [
@@ -137,7 +137,7 @@ struct BrainDumpProcessingView: View {
 
             // Floating particles
             ForEach(0..<8, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .fill(particleColor(for: index))
                     .frame(width: CGFloat.random(in: 4...8))
                     .offset(
@@ -172,7 +172,7 @@ struct BrainDumpProcessingView: View {
             // Dots animation
             HStack(spacing: 6) {
                 ForEach(0..<3, id: \.self) { index in
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Color.white.opacity(0.6))
                         .frame(width: 6, height: 6)
                         .scaleEffect(dotScale(for: index))

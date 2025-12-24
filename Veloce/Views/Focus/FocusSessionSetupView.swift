@@ -119,7 +119,7 @@ struct FocusSessionSetupView: View {
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .frame(width: 36, height: 36)
                     .background(Theme.CelestialColors.abyss)
-                    .clipShape(Circle())
+                    .clipShape(SwiftUI.Circle())
             }
 
             Spacer()
@@ -295,7 +295,7 @@ struct FocusSessionSetupView: View {
         } label: {
             HStack(spacing: 12) {
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.CelestialColors.nebulaCore.opacity(0.2))
                         .frame(width: 40, height: 40)
 

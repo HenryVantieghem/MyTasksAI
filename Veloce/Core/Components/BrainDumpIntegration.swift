@@ -119,14 +119,14 @@ struct BrainDumpFAB: View {
         } label: {
             ZStack {
                 // Background glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.accent.opacity(0.2))
                     .frame(width: 70, height: 70)
                     .blur(radius: 8)
                     .scaleEffect(isPulsing ? 1.2 : 1.0)
 
                 // Main button
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [Theme.Colors.accent, Theme.Colors.accent.opacity(0.8)],
@@ -168,7 +168,7 @@ struct BrainDumpQuickAccessCard: View {
             HStack(spacing: 12) {
                 // Icon
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.accent.opacity(0.1))
                         .frame(width: 44, height: 44)
 

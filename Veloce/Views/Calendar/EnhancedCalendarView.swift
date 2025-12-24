@@ -458,12 +458,12 @@ struct DateCarouselItem: View {
                 // Event indicator with glow
                 ZStack {
                     if hasEvents {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(eventIndicatorColor)
                             .frame(width: 6, height: 6)
                             .shadow(color: eventIndicatorColor.opacity(0.6), radius: glowPulse ? 4 : 2)
                     } else {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(.clear)
                             .frame(width: 6, height: 6)
                     }
@@ -706,7 +706,7 @@ struct MonthDayCell: View {
                     .foregroundStyle(foregroundColor)
 
                 // Event dot
-                Circle()
+                SwiftUI.Circle()
                     .fill(hasEvents && isInCurrentMonth ? dotColor : .clear)
                     .frame(width: 4, height: 4)
             }
@@ -715,7 +715,7 @@ struct MonthDayCell: View {
             .background(
                 ZStack {
                     if isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(
                                 LinearGradient(
                                     colors: [
@@ -728,7 +728,7 @@ struct MonthDayCell: View {
                             )
                             .frame(width: 40, height: 40)
                     } else if isToday {
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(.white.opacity(0.3), lineWidth: 1)
                             .frame(width: 40, height: 40)
                     }

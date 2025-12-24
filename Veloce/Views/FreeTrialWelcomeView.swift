@@ -237,11 +237,11 @@ struct WelcomeFeatureRow: View {
         HStack(spacing: Aurora.Layout.spacing) {
             // Icon with glow
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.15))
                     .frame(width: 50, height: 50)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.1))
                     .frame(width: 50, height: 50)
                     .blur(radius: 8)

@@ -262,7 +262,7 @@ struct QuickAIIndicator: View {
     var body: some View {
         ZStack {
             // Outer ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     AngularGradient(
                         colors: Theme.TaskCardColors.iridescent,

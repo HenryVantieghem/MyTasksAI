@@ -79,7 +79,7 @@ struct ParticleView: View {
         let x = cos(currentAngle) * config.orbitRadius
         let y = sin(currentAngle) * config.orbitRadius * 0.6 // Elliptical orbit
 
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [

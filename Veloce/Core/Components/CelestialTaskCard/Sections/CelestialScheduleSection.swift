@@ -126,7 +126,7 @@ struct CelestialScheduleSection: View {
             .foregroundStyle(color)
             .frame(width: 28, height: 28)
             .background(
-                Circle()
+                SwiftUI.Circle()
                     .fill(color.opacity(0.15))
             )
     }

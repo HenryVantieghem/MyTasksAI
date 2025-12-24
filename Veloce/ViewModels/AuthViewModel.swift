@@ -369,7 +369,9 @@ final class AuthViewModel {
         password = ""
         confirmPassword = ""
         fullName = ""
+        username = ""
         emailValidation = .idle
+        usernameValidation = .idle
         passwordStrength = .weak
     }
 

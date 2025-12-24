@@ -91,13 +91,13 @@ struct PermissionsView: View {
             // Animated icon
             ZStack {
                 // Glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.electric.opacity(0.2))
                     .frame(width: 90, height: 90)
                     .blur(radius: 20)
                     .scaleEffect(iconPulse)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.cosmicElevated)
                     .frame(width: 80, height: 80)
 
@@ -128,7 +128,7 @@ struct PermissionsView: View {
     private var enhancedPrivacyNote: some View {
         HStack(spacing: Aurora.Layout.spacing) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Aurora.Colors.success.opacity(0.1))
                     .frame(width: 40, height: 40)
 
@@ -219,13 +219,13 @@ struct EnhancedPermissionCard: View {
                 // Icon with glow
                 ZStack {
                     if isEnabled {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(iconColor.opacity(0.2))
                             .frame(width: 60, height: 60)
                             .blur(radius: 10)
                     }
 
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(iconColor.opacity(0.15))
                         .frame(width: 50, height: 50)
 
@@ -253,7 +253,7 @@ struct EnhancedPermissionCard: View {
             HStack {
                 // Status indicator
                 HStack(spacing: 8) {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(isEnabled ? Aurora.Colors.success : Aurora.Colors.glassBorder)
                         .frame(width: 10, height: 10)
 

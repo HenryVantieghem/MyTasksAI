@@ -193,7 +193,7 @@ struct TaskDragPreview: View {
 
     var body: some View {
         HStack(spacing: Theme.Spacing.sm) {
-            Circle()
+            SwiftUI.Circle()
                 .fill(priorityColor)
                 .frame(width: 8, height: 8)
 

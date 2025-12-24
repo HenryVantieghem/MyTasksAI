@@ -36,7 +36,7 @@ struct AchievementCard: View {
         VStack(spacing: 8) {
             ZStack {
                 if achievement.isUnlocked {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(RadialGradient(colors: [Theme.Colors.aiGold.opacity(0.3), .clear], center: .center, startRadius: 0, endRadius: 40))
                         .blur(radius: 10)
                         .opacity(glowOpacity)

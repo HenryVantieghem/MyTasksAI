@@ -39,7 +39,7 @@ struct AIScheduleSuggestionView: View {
                             .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
                             .frame(width: 28, height: 28)
                             .background(isSelected ? Theme.Colors.aiBlue : .clear)
-                            .clipShape(Circle())
+                            .clipShape(SwiftUI.Circle())
                     }
                 }
             }

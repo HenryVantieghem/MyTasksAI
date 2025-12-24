@@ -259,7 +259,7 @@ struct GoalDetailSheet: View {
         VStack(spacing: 16) {
             // Icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.aiPurple.opacity(0.2))
                     .frame(width: 60, height: 60)
 
@@ -753,7 +753,7 @@ struct MilestoneCard: View {
             HStack(spacing: 14) {
                 // Checkbox
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(
                             milestone.isCompleted ?
                             Theme.Colors.success : .white.opacity(0.3),
@@ -762,7 +762,7 @@ struct MilestoneCard: View {
                         .frame(width: 28, height: 28)
 
                     if milestone.isCompleted {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.success)
                             .frame(width: 28, height: 28)
 
@@ -872,7 +872,7 @@ struct PendingTaskRow: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.white.opacity(0.5))
                         .frame(width: 32, height: 32)
-                        .background(Circle().fill(.white.opacity(0.1)))
+                        .background(SwiftUI.Circle().fill(.white.opacity(0.1)))
                 }
 
                 Button(action: onApprove) {
@@ -880,7 +880,7 @@ struct PendingTaskRow: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.white)
                         .frame(width: 32, height: 32)
-                        .background(Circle().fill(Theme.Colors.success))
+                        .background(SwiftUI.Circle().fill(Theme.Colors.success))
                 }
             }
             .buttonStyle(.plain)

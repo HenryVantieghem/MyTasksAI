@@ -77,7 +77,7 @@ struct StatsBottomSheet: View {
             // Level badge with glow
             ZStack {
                 // Glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.iridescentGradientLinear)
                     .frame(width: 120, height: 120)
                     .blur(radius: 30)
@@ -85,7 +85,7 @@ struct StatsBottomSheet: View {
 
                 // Badge
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.iridescentGradientLinear)
                         .frame(width: 80, height: 80)
 
@@ -191,11 +191,11 @@ struct StatsBottomSheet: View {
             HStack(spacing: Theme.Spacing.lg) {
                 // Progress ring
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(Theme.Colors.glassBackground, lineWidth: 8)
                         .frame(width: 80, height: 80)
 
-                    Circle()
+                    SwiftUI.Circle()
                         .trim(from: 0, to: min(Double(gamification.tasksCompletedToday) / Double(gamification.dailyGoal), 1.0))
                         .stroke(Theme.Colors.accentGradient, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                         .frame(width: 80, height: 80)
@@ -246,7 +246,7 @@ struct StatsBottomSheet: View {
             HStack(spacing: Theme.Spacing.sm) {
                 ForEach(0..<7, id: \.self) { day in
                     VStack(spacing: Theme.Spacing.xs) {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(dayCompleted(day) ? AnyShapeStyle(Theme.Colors.accentGradient) : AnyShapeStyle(Theme.Colors.glassBackground))
                             .frame(width: 36, height: 36)
                             .overlay {

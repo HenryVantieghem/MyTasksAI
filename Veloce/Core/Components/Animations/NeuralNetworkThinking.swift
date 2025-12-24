@@ -23,7 +23,7 @@ struct NeuralNetworkThinking: View {
 
             // Nodes
             ForEach(0..<nodeCount, id: \.self) { i in
-                Circle()
+                SwiftUI.Circle()
                     .fill(LinearGradient(colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue], startPoint: .top, endPoint: .bottom))
                     .frame(width: 8, height: 8)
                     .position(nodePosition(i))

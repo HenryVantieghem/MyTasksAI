@@ -81,7 +81,7 @@ struct PomodoroTimerSection: View {
             ZStack {
                 // Glow effect when running
                 if isTimerActiveForThisTask && isTimerRunning {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.accent.opacity(0.2))
                         .blur(radius: 30)
                         .frame(width: 120, height: 120)
@@ -172,7 +172,7 @@ struct PomodoroTimerSection: View {
     private func sessionCounter(sessionsCompleted: Int) -> some View {
         HStack(spacing: 4) {
             ForEach(0..<4, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .fill(index < sessionsCompleted ? Theme.Colors.aiCyan : Color.white.opacity(0.2))
                     .frame(width: 8, height: 8)
             }

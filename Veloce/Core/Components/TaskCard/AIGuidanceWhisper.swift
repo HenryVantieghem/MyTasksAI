@@ -51,7 +51,7 @@ struct AIGuidanceWhisper: View {
     private var sparkleIcon: some View {
         ZStack {
             // Glow background
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.Colors.aiPurple.opacity(0.15))
                 .frame(width: 24, height: 24)
                 .blur(radius: 4)

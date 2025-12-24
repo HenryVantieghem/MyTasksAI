@@ -103,7 +103,7 @@ struct GoalCreationSheet: View {
     private var headerOrb: some View {
         ZStack {
             // Outer glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -120,7 +120,7 @@ struct GoalCreationSheet: View {
                 .blur(radius: 20)
 
             // Inner orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -134,7 +134,7 @@ struct GoalCreationSheet: View {
                 )
                 .frame(width: 100, height: 100)
                 .overlay(
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(
                             LinearGradient(
                                 colors: [
@@ -466,7 +466,7 @@ private struct TimeframePillButton: View {
         Button(action: action) {
             VStack(spacing: 8) {
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(isSelected ? timeframe.color : timeframe.color.opacity(0.15))
                         .frame(width: 48, height: 48)
 

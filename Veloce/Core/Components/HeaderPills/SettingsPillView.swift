@@ -37,7 +37,7 @@ struct SettingsPillView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 32, height: 32)
-                            .clipShape(Circle())
+                            .clipShape(SwiftUI.Circle())
                     case .failure, .empty:
                         fallbackContent
                     @unknown default:

@@ -130,7 +130,7 @@ struct VoidBackground: View {
                 )
 
                 context.fill(
-                    Circle().path(in: rect),
+                    SwiftUI.Circle().path(in: rect),
                     with: .color(star.isBright ? VoidDesign.Colors.starWhite.opacity(opacity) : VoidDesign.Colors.starDim.opacity(opacity))
                 )
             }

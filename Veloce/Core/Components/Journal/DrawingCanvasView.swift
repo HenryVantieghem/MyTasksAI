@@ -101,11 +101,11 @@ struct DrawingToolPalette: View {
                 Button {
                     showColorPicker.toggle()
                 } label: {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(selectedColor)
                         .frame(width: 28, height: 28)
                         .overlay {
-                            Circle()
+                            SwiftUI.Circle()
                                 .stroke(.white.opacity(0.3), lineWidth: 2)
                         }
                 }
@@ -188,7 +188,7 @@ struct DrawingToolPalette: View {
     private var strokeWidthSlider: some View {
         HStack(spacing: Theme.Spacing.md) {
             // Thin stroke preview
-            Circle()
+            SwiftUI.Circle()
                 .fill(selectedColor)
                 .frame(width: 4, height: 4)
 
@@ -196,7 +196,7 @@ struct DrawingToolPalette: View {
                 .tint(Theme.Colors.accent)
 
             // Thick stroke preview
-            Circle()
+            SwiftUI.Circle()
                 .fill(selectedColor)
                 .frame(width: 20, height: 20)
         }
@@ -214,12 +214,12 @@ struct DrawingToolPalette: View {
                     showColorPicker = false
                     HapticsService.shared.selectionFeedback()
                 } label: {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(color)
                         .frame(width: 32, height: 32)
                         .overlay {
                             if selectedColor == color {
-                                Circle()
+                                SwiftUI.Circle()
                                     .stroke(.white, lineWidth: 2)
                             }
                         }

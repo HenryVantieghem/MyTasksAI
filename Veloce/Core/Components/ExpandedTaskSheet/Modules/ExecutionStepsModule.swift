@@ -89,7 +89,7 @@ struct ExecutionStepsModule: View {
         VStack(spacing: Theme.Spacing.sm) {
             ForEach(0..<3, id: \.self) { index in
                 HStack(spacing: Theme.Spacing.sm) {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Color.white.opacity(0.1))
                         .frame(width: 24, height: 24)
 
@@ -240,7 +240,7 @@ struct ExecutionStepRow: View {
             HapticsService.shared.selectionFeedback()
         } label: {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .strokeBorder(
                         step.isCompleted ? Theme.Colors.success : Color.white.opacity(0.3),
                         lineWidth: 2
@@ -248,7 +248,7 @@ struct ExecutionStepRow: View {
                     .frame(width: 24, height: 24)
 
                 if step.isCompleted {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.success)
                         .frame(width: 24, height: 24)
 

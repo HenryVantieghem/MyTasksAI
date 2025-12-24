@@ -60,7 +60,7 @@ struct AccountabilityView: View {
                             }
                         } else {
                             HStack {
-                                Circle()
+                                SwiftUI.Circle()
                                     .fill(Theme.Colors.aiPurple)
                                     .frame(width: 40, height: 40)
                                     .overlay(Text(String(partnerName.prefix(1))).foregroundStyle(.white).font(.headline))
@@ -90,7 +90,7 @@ struct AccountabilityView: View {
                         ForEach(0..<5, id: \.self) { i in
                             HStack {
                                 Text("\(i + 1)").font(.caption.bold()).foregroundStyle(.white.opacity(0.5)).frame(width: 20)
-                                Circle().fill(Theme.Colors.aiPurple.opacity(0.5)).frame(width: 32, height: 32)
+                                SwiftUI.Circle().fill(Theme.Colors.aiPurple.opacity(0.5)).frame(width: 32, height: 32)
                                 Text(["You", "Alex", "Jordan", "Sam", "Taylor"][i]).foregroundStyle(.white)
                                 Spacer()
                                 Text("\(50 - i * 8) tasks").font(.caption).foregroundStyle(.white.opacity(0.6))

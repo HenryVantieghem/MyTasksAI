@@ -650,21 +650,21 @@ struct SubTaskRow: View {
         Group {
             switch subTask.status {
             case .pending:
-                Circle()
+                SwiftUI.Circle()
                     .strokeBorder(Theme.Colors.tertiaryText, lineWidth: 1.5)
                     .frame(width: 20, height: 20)
             case .inProgress:
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(Theme.Colors.accent, lineWidth: 1.5)
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.accent)
                         .frame(width: 8, height: 8)
                 }
                 .frame(width: 20, height: 20)
             case .completed:
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.success)
                     Image(systemName: "checkmark")
                         .font(.system(size: 10, weight: .bold))

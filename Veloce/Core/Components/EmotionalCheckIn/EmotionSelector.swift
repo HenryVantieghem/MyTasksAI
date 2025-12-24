@@ -118,7 +118,7 @@ struct EmotionButton: View {
                 ZStack {
                     // Glow when selected
                     if isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(emotion.color.opacity(0.3))
                             .frame(width: 70, height: 70)
                             .blur(radius: 12)
@@ -126,7 +126,7 @@ struct EmotionButton: View {
                     }
 
                     // Main circle
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             isSelected ?
                             LinearGradient(colors: [emotion.color, emotion.color.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing) :
@@ -134,7 +134,7 @@ struct EmotionButton: View {
                         )
                         .frame(width: 56, height: 56)
                         .overlay(
-                            Circle()
+                            SwiftUI.Circle()
                                 .stroke(
                                     isSelected ? emotion.color.opacity(0.5) : .white.opacity(0.15),
                                     lineWidth: 1
@@ -174,7 +174,7 @@ struct EmotionResponseCard: View {
             HStack(spacing: 12) {
                 // AI indicator
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             LinearGradient(
                                 colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")],

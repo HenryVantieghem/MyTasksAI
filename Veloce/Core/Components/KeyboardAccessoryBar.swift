@@ -154,7 +154,7 @@ struct KeyboardAccessoryBar: View {
                     HapticsService.shared.selectionFeedback()
                 } label: {
                     VStack(spacing: 4) {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(priority.color)
                             .frame(width: 24, height: 24)
                             .overlay {
@@ -270,7 +270,7 @@ struct AIMagicAccessoryButton: View {
             HStack(spacing: 6) {
                 // Animated gradient orb
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             AngularGradient(
                                 colors: Theme.Colors.aiGradient + [Theme.Colors.aiGradient[0]],
@@ -280,7 +280,7 @@ struct AIMagicAccessoryButton: View {
                         .frame(width: 18, height: 18)
                         .rotationEffect(.degrees(rotation))
 
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -429,7 +429,7 @@ struct ExpandedKeyboardToolbar: View {
                         .foregroundStyle(Theme.Colors.textSecondary)
                         .frame(width: 36, height: 36)
                         .background(
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.Colors.backgroundSecondary)
                         )
                 }

@@ -28,12 +28,12 @@ struct PomodoroTimerWidget: View {
 
             // Timer ring
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Color.white.opacity(0.1), lineWidth: 8)
                     .frame(width: 120, height: 120)
 
                 if let session = service.currentSession {
-                    Circle()
+                    SwiftUI.Circle()
                         .trim(from: 0, to: session.progress)
                         .stroke(
                             LinearGradient(colors: [.red, .orange], startPoint: .topLeading, endPoint: .bottomTrailing),
@@ -70,7 +70,7 @@ struct PomodoroTimerWidget: View {
                             .font(.title2)
                             .frame(width: 50, height: 50)
                             .background(LinearGradient(colors: [.red, .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
-                            .clipShape(Circle())
+                            .clipShape(SwiftUI.Circle())
                     }
                 } else if service.isRunning {
                     Button { service.pauseSession() } label: {
@@ -78,14 +78,14 @@ struct PomodoroTimerWidget: View {
                             .font(.title3)
                             .frame(width: 44, height: 44)
                             .background(.ultraThinMaterial)
-                            .clipShape(Circle())
+                            .clipShape(SwiftUI.Circle())
                     }
                     Button { service.stopSession() } label: {
                         Image(systemName: "stop.fill")
                             .font(.title3)
                             .frame(width: 44, height: 44)
                             .background(.ultraThinMaterial)
-                            .clipShape(Circle())
+                            .clipShape(SwiftUI.Circle())
                     }
                 } else {
                     Button { service.resumeSession() } label: {
@@ -93,14 +93,14 @@ struct PomodoroTimerWidget: View {
                             .font(.title3)
                             .frame(width: 44, height: 44)
                             .background(.ultraThinMaterial)
-                            .clipShape(Circle())
+                            .clipShape(SwiftUI.Circle())
                     }
                     Button { service.stopSession() } label: {
                         Image(systemName: "stop.fill")
                             .font(.title3)
                             .frame(width: 44, height: 44)
                             .background(.ultraThinMaterial)
-                            .clipShape(Circle())
+                            .clipShape(SwiftUI.Circle())
                     }
                 }
             }

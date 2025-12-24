@@ -98,7 +98,7 @@ struct ConstellationProgress: View {
         return ZStack {
             // Glow for current/completed
             if state != .upcoming {
-                Circle()
+                SwiftUI.Circle()
                     .fill(starGlowColor(for: state))
                     .frame(width: 30, height: 30)
                     .blur(radius: 8)
@@ -106,11 +106,11 @@ struct ConstellationProgress: View {
             }
 
             // Star shape
-            Circle()
+            SwiftUI.Circle()
                 .fill(starFillColor(for: state))
                 .frame(width: starSize(for: state))
                 .overlay(
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(starBorderColor(for: state), lineWidth: state == .upcoming ? 1.5 : 0)
                 )
                 .scaleEffect(state == .current ? starPulse : 1.0)

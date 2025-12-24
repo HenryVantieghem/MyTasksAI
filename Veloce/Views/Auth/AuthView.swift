@@ -37,7 +37,7 @@ struct AuthView: View {
     }
 
     enum AuthField: Hashable {
-        case email, password, confirmPassword, name
+        case email, password, confirmPassword, name, username
     }
 
     var body: some View {
@@ -317,9 +317,25 @@ struct AuthView: View {
                     onFocusChange: { focused in
                         if focused { focusedField = .name }
                     },
-                    onSubmit: { focusedField = .email }
+                    onSubmit: { focusedField = .username }
                 )
                 .focused($focusedField, equals: .name)
+
+                // Username field (required for Circles)
+                CrystallineTextField(
+                    text: $viewModel.username,
+                    placeholder: "Username",
+                    icon: "at",
+                    validation: mapValidationState(viewModel.usernameValidation),
+                    textContentType: .username,
+                    submitLabel: .next,
+                    onFocusChange: { focused in
+                        if focused { focusedField = .username }
+                    },
+                    onSubmit: { focusedField = .email }
+                )
+                .textInputAutocapitalization(.never)
+                .focused($focusedField, equals: .username)
 
                 // Email field
                 CrystallineTextField(

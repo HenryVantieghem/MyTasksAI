@@ -212,14 +212,14 @@ struct CircularProgressStat: View {
         VStack(spacing: Theme.Spacing.xxs) {
             ZStack {
                 // Background track
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         Theme.Colors.cardBackgroundSecondary,
                         lineWidth: lineWidth
                     )
 
                 // Progress arc
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
                         color,

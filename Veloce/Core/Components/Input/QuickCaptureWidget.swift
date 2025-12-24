@@ -28,7 +28,7 @@ struct QuickCaptureWidget: View {
     private var collapsedView: some View {
         Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { isExpanded = true } } label: {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(LinearGradient(colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 56, height: 56)
                     .shadow(color: Theme.Colors.aiPurple.opacity(0.5), radius: 10)

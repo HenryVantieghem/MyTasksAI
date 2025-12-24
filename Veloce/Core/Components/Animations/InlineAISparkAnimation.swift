@@ -83,7 +83,7 @@ struct InlineAISparkAnimation: View {
     // MARK: - Glow Halo
 
     private var glowHalo: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -103,7 +103,7 @@ struct InlineAISparkAnimation: View {
     // MARK: - Galaxy Swirl
 
     private var galaxySwirl: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 AngularGradient(
                     colors: gradientColors.map { $0.opacity(0.6) } + [gradientColors[0].opacity(0.6)],
@@ -123,7 +123,7 @@ struct InlineAISparkAnimation: View {
         let scaleX = 1 + sin(morphPhase * .pi * 2) * 0.08
         let scaleY = 1 + cos(morphPhase * .pi * 2) * 0.08
 
-        return Circle()
+        return SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -146,7 +146,7 @@ struct InlineAISparkAnimation: View {
     private var starField: some View {
         ZStack {
             ForEach(starParticles) { particle in
-                Circle()
+                SwiftUI.Circle()
                     .fill(.white)
                     .frame(width: particle.size, height: particle.size)
                     .offset(particle.offset)
@@ -315,14 +315,14 @@ struct MiniThinkingOrb: View {
     var body: some View {
         ZStack {
             // Glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.TaskCardColors.strategy.opacity(0.3))
                 .frame(width: size * 1.5, height: size * 1.5)
                 .blur(radius: 2)
                 .scaleEffect(pulse)
 
             // Gradient ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     AngularGradient(
                         colors: Theme.TaskCardColors.iridescent,
@@ -334,7 +334,7 @@ struct MiniThinkingOrb: View {
                 .rotationEffect(.degrees(rotation))
 
             // Center dot
-            Circle()
+            SwiftUI.Circle()
                 .fill(.white)
                 .frame(width: size * 0.3, height: size * 0.3)
         }

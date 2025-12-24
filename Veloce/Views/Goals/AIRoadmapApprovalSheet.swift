@@ -71,7 +71,7 @@ struct AIRoadmapApprovalSheet: View {
             // Animated orb
             ZStack {
                 ForEach(0..<3, id: \.self) { index in
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(
                             Theme.Colors.aiPurple.opacity(0.3 - Double(index) * 0.1),
                             lineWidth: 2
@@ -199,11 +199,11 @@ struct AIRoadmapApprovalSheet: View {
         VStack(spacing: 16) {
             // Success probability
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Color.white.opacity(0.1), lineWidth: 8)
                     .frame(width: 100, height: 100)
 
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: roadmap.successProbability)
                     .stroke(
                         LinearGradient(
@@ -435,7 +435,7 @@ private struct PhaseCard: View {
                 HStack(spacing: 12) {
                     // Phase number badge
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.aiPurple.opacity(0.2))
                             .frame(width: 32, height: 32)
 

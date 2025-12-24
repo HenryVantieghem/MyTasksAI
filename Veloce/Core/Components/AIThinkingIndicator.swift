@@ -32,7 +32,7 @@ struct AIThinkingIndicator: View {
             // Animated orb
             ZStack {
                 // Outer glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -49,7 +49,7 @@ struct AIThinkingIndicator: View {
                     .scaleEffect(pulse)
 
                 // Main rotating gradient orb
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         AngularGradient(
                             colors: gradientColors + [gradientColors[0]],
@@ -61,7 +61,7 @@ struct AIThinkingIndicator: View {
                     .frame(width: size, height: size)
 
                 // Inner highlight
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -219,7 +219,7 @@ struct ClaudeCodeOrb: View {
     var body: some View {
         ZStack {
             // Outer glow (pulsing)
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -236,7 +236,7 @@ struct ClaudeCodeOrb: View {
                 .scaleEffect(pulse)
 
             // Main gradient ring
-            Circle()
+            SwiftUI.Circle()
                 .strokeBorder(
                     AngularGradient(
                         colors: Theme.Colors.aiGradient + [Theme.Colors.aiGradient.first!],
@@ -248,7 +248,7 @@ struct ClaudeCodeOrb: View {
                 .rotationEffect(.degrees(rotation))
 
             // Inner fill with counter-rotation
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     AngularGradient(
                         colors: Theme.Colors.aiGradient.reversed() + [Theme.Colors.aiGradient.last!],
@@ -259,7 +259,7 @@ struct ClaudeCodeOrb: View {
                 .rotationEffect(.degrees(innerRotation))
 
             // Center highlight
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -309,7 +309,7 @@ struct NotesLineAIIndicator: View {
     var body: some View {
         HStack(spacing: dotSpacing) {
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.aiPurple)
                     .frame(width: dotSize, height: dotSize)
                     .opacity(dotOpacities[index])
@@ -376,7 +376,7 @@ struct InlineAITypingIndicator: View {
     var body: some View {
         HStack(spacing: 3) {
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [Theme.Colors.aiOrange, Theme.Colors.aiPurple],
@@ -409,7 +409,7 @@ struct CompactAIIndicator: View {
 
     var body: some View {
         if isProcessing {
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     AngularGradient(
                         colors: Theme.Colors.aiGradient + [Theme.Colors.aiGradient[0]],

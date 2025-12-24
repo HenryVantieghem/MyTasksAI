@@ -104,7 +104,7 @@ struct GoldBurstEffect: View {
     var body: some View {
         ZStack {
             // Central ring burst
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     LinearGradient(
                         colors: [Color(hex: "FFD700"), Color(hex: "FFA500")],
@@ -172,7 +172,7 @@ struct GoldParticlePiece: View {
     @State private var opacity: Double = 1
 
     var body: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [Color(hex: "FFD700"), Color(hex: "FFA500").opacity(0.5), .clear],
@@ -263,7 +263,7 @@ struct ShowerParticlePiece: View {
     @State private var opacity: Double = 0
 
     var body: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [particle.color, particle.color.opacity(0.3), .clear],

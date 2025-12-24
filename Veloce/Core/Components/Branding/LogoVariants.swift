@@ -55,7 +55,7 @@ struct MonochromeLogo: View {
     var body: some View {
         ZStack {
             // Glow in specified color
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -72,7 +72,7 @@ struct MonochromeLogo: View {
                 .blur(radius: size.dimension * 0.1)
 
             // Core orb in specified color
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -88,7 +88,7 @@ struct MonochromeLogo: View {
                 .frame(width: size.dimension * 0.5, height: size.dimension * 0.5)
 
             // White hot center
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -226,7 +226,7 @@ struct AppIconView: View {
             )
 
             // Main orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     AngularGradient(
                         colors: gradientColors + [gradientColors[0]],
@@ -236,7 +236,7 @@ struct AppIconView: View {
                 .frame(width: iconSize * 0.35, height: iconSize * 0.35)
 
             // Inner core
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -259,7 +259,7 @@ struct AppIconView: View {
                 .blur(radius: 2)
 
             // Outer glow ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     AngularGradient(
                         colors: gradientColors.map { $0.opacity(0.4) } + [gradientColors[0].opacity(0.4)],

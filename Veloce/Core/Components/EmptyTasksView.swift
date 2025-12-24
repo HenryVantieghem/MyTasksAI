@@ -81,7 +81,7 @@ struct EmptyTasksView: View {
     private var animatedIcon: some View {
         ZStack {
             // Glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.Colors.accentGradient)
                 .frame(width: 120, height: 120)
                 .blur(radius: 40)
@@ -91,7 +91,7 @@ struct EmptyTasksView: View {
             ZStack {
                 // Background circles
                 ForEach(0..<3, id: \.self) { index in
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(Theme.Colors.accent.opacity(0.1 + Double(index) * 0.05), lineWidth: 1)
                         .frame(width: CGFloat(80 + index * 20), height: CGFloat(80 + index * 20))
                 }

@@ -86,11 +86,11 @@ struct StartHereModule: View {
             // Countdown circle
             ZStack {
                 // Background circle
-                Circle()
+                SwiftUI.Circle()
                     .stroke(accentColor.opacity(0.2), lineWidth: 4)
 
                 // Progress circle
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: CGFloat(viewModel.countdown) / CGFloat(viewModel.firstStepSeconds))
                     .stroke(
                         accentColor,
@@ -134,7 +134,7 @@ struct StartHereModule: View {
     private var completedView: some View {
         HStack(spacing: Theme.Spacing.md) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(accentColor.opacity(0.2))
                     .frame(width: 50, height: 50)
 

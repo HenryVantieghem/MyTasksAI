@@ -48,7 +48,7 @@ struct CelestialFocusSection: View {
                     .foregroundStyle(viewModel.suggestedWorkMode.color)
                     .frame(width: 36, height: 36)
                     .background(
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(viewModel.suggestedWorkMode.color.opacity(0.15))
                     )
 

@@ -157,10 +157,10 @@ struct BrainDumpInputView: View {
             Button(action: sendMessage) {
                 ZStack {
                     if chatInput.isEmpty {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Color.secondary.opacity(0.3))
                     } else {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(
                                 LinearGradient(
                                     colors: [Color(hex: "8B5CF6"), Color(hex: "3B82F6")],
@@ -359,7 +359,7 @@ struct AIChatBubble: View {
             HStack(alignment: .top, spacing: 12) {
                 if isAI {
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(
                                 LinearGradient(
                                     colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")],

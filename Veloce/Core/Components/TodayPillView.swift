@@ -76,7 +76,7 @@ struct TodayPillView: View {
         HStack(spacing: Theme.Spacing.sm) {
             // Today indicator dot
             if Calendar.current.isDateInToday(selectedDate) {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.accent)
                     .frame(width: 6, height: 6)
             }

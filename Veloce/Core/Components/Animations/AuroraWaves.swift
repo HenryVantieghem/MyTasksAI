@@ -66,7 +66,7 @@ struct AuroraWaves: View {
         // Expansion effect - waves grow outward
         let expansionOffset = expansionPhase * 0.1 * CGFloat(index)
 
-        return Circle()
+        return SwiftUI.Circle()
             .stroke(
                 RadialGradient(
                     colors: [
@@ -208,7 +208,7 @@ struct CosmicRipple: View {
     @State private var opacity: Double = 0.8
 
     var body: some View {
-        Circle()
+        SwiftUI.Circle()
             .stroke(color, lineWidth: 2)
             .scaleEffect(scale)
             .opacity(opacity)

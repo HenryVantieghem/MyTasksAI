@@ -452,7 +452,7 @@ struct AIThoughtProcessSheet: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 ForEach(0..<5) { index in
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(index < confidenceScore ? Theme.Colors.aiPurple : Theme.Colors.glassBackground)
                         .frame(width: 12, height: 12)
                 }

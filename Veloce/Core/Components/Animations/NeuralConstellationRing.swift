@@ -69,7 +69,7 @@ struct NeuralConstellationRing: View {
         return ZStack {
             // Glow when activated
             if isActivated {
-                Circle()
+                SwiftUI.Circle()
                     .fill(nodeColor.opacity(0.5))
                     .frame(width: 12, height: 12)
                     .blur(radius: 4)
@@ -77,7 +77,7 @@ struct NeuralConstellationRing: View {
             }
 
             // Node core
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: isActivated
@@ -208,7 +208,7 @@ struct NeuralPulse: View {
     @State private var opacity: Double = 1
 
     var body: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(color)
             .frame(width: 6, height: 6)
             .scaleEffect(scale)

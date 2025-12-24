@@ -79,7 +79,7 @@ struct BrainDumpResultsView: View {
         VStack(spacing: Theme.Spacing.sm) {
             // Success icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.success.opacity(0.2))
                     .frame(width: 60, height: 60)
 
@@ -104,7 +104,7 @@ struct BrainDumpResultsView: View {
         HStack(alignment: .top, spacing: Theme.Spacing.md) {
             // AI Avatar
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.iridescentGradientLinear)
                     .frame(width: 36, height: 36)
 
@@ -252,7 +252,7 @@ struct BrainDumpResultsView: View {
                         .foregroundStyle(Color.white.opacity(0.7))
                         .frame(width: 50, height: 50)
                         .background(
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(.ultraThinMaterial)
                         )
                 }
@@ -361,12 +361,12 @@ struct ExtractedTaskCard: View {
             HStack(spacing: Theme.Spacing.md) {
                 // Checkbox
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(isSelected ? Theme.Colors.accent : Color.white.opacity(0.3), lineWidth: 2)
                         .frame(width: 24, height: 24)
 
                     if isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.accent)
                             .frame(width: 24, height: 24)
 

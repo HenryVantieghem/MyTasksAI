@@ -167,7 +167,7 @@ struct FloatingInputBar: View {
             }
         } label: {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(showQuickActions
                         ? Color(hex: "8B5CF6").opacity(0.2)
                         : Color.white.opacity(0.08))
@@ -182,7 +182,7 @@ struct FloatingInputBar: View {
             }
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
+        .contentShape(SwiftUI.Circle())
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: showQuickActions)
     }
 
@@ -225,7 +225,7 @@ struct FloatingInputBar: View {
             ZStack {
                 // Background glow when enabled
                 if isAIEnabled {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -242,7 +242,7 @@ struct FloatingInputBar: View {
                 }
 
                 // Button circle
-                Circle()
+                SwiftUI.Circle()
                     .fill(isAIEnabled
                         ? Color(hex: "8B5CF6").opacity(0.15)
                         : Color.white.opacity(0.05))
@@ -269,7 +269,7 @@ struct FloatingInputBar: View {
             }
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
+        .contentShape(SwiftUI.Circle())
         .accessibilityLabel(isAIEnabled ? "AI enabled" : "AI disabled")
         .accessibilityHint("Toggle AI task processing")
     }
@@ -282,7 +282,7 @@ struct FloatingInputBar: View {
         } label: {
             ZStack {
                 // Outer glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -300,12 +300,12 @@ struct FloatingInputBar: View {
                     .scaleEffect(sendOrbPulse)
 
                 // Main orb
-                Circle()
+                SwiftUI.Circle()
                     .fill(orbGradient)
                     .frame(width: InputBarMetrics.orbButtonSize, height: InputBarMetrics.orbButtonSize)
                     .overlay {
                         // Inner highlight
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(
                                 RadialGradient(
                                     colors: [
@@ -610,7 +610,7 @@ private struct InputBarPreview: View {
     var body: some View {
         HStack(spacing: 12) {
             // Plus
-            Circle()
+            SwiftUI.Circle()
                 .fill(Color.white.opacity(0.08))
                 .frame(width: 40, height: 40)
                 .overlay(
@@ -628,7 +628,7 @@ private struct InputBarPreview: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             // AI toggle
-            Circle()
+            SwiftUI.Circle()
                 .fill(Color(hex: "8B5CF6").opacity(0.15))
                 .frame(width: 40, height: 40)
                 .overlay(
@@ -645,7 +645,7 @@ private struct InputBarPreview: View {
 
             // Send
             if showSend {
-                Circle()
+                SwiftUI.Circle()
                     .fill(orbGradient)
                     .frame(width: 44, height: 44)
                     .overlay(

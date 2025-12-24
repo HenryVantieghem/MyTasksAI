@@ -106,7 +106,7 @@ struct RequirementDot: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            Circle()
+            SwiftUI.Circle()
                 .fill(met ? Theme.Colors.success : Theme.Colors.textTertiary.opacity(0.3))
                 .frame(width: 6, height: 6)
 

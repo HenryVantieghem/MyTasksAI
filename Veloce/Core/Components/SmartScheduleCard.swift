@@ -184,11 +184,11 @@ struct SmartScheduleCard: View {
         VStack(spacing: 4) {
             // Circular progress
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Theme.Colors.glassBackground, lineWidth: 4)
                     .frame(width: 50, height: 50)
 
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: confidence)
                     .stroke(
                         confidenceColor(for: confidence),

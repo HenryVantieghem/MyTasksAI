@@ -82,7 +82,7 @@ struct OrbitingThoughtParticles: View {
             // Trail (3 fading copies behind)
             ForEach(1..<4) { trailIndex in
                 let trailAngle = currentAngle - Double(trailIndex) * 15
-                Circle()
+                SwiftUI.Circle()
                     .fill(particleColor.opacity(0.3 / Double(trailIndex)))
                     .frame(width: 4, height: 4)
                     .blur(radius: CGFloat(trailIndex))
@@ -90,7 +90,7 @@ struct OrbitingThoughtParticles: View {
             }
 
             // Main particle
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [.white, particleColor],
@@ -207,14 +207,14 @@ struct SparkBurst: View {
     var body: some View {
         ZStack {
             // Main burst
-            Circle()
+            SwiftUI.Circle()
                 .stroke(color, lineWidth: 2)
                 .frame(width: 20, height: 20)
                 .scaleEffect(scale)
                 .opacity(opacity)
 
             // Inner glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(color.opacity(0.5))
                 .frame(width: 10, height: 10)
                 .scaleEffect(scale * 0.8)
@@ -250,13 +250,13 @@ struct ThoughtParticle: View {
     var body: some View {
         ZStack {
             // Glow halo
-            Circle()
+            SwiftUI.Circle()
                 .fill(color.opacity(0.4))
                 .frame(width: size * 2, height: size * 2)
                 .blur(radius: size / 2)
 
             // Core particle
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [.white, color],

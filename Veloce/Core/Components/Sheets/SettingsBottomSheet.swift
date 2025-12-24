@@ -108,7 +108,7 @@ struct SettingsBottomSheet: View {
         VStack(spacing: Theme.Spacing.md) {
             // Avatar
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.accentGradient)
                     .frame(width: 80, height: 80)
 
@@ -118,7 +118,7 @@ struct SettingsBottomSheet: View {
 
                 // Level badge
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.iridescentGradientLinear)
                         .frame(width: 28, height: 28)
 
@@ -175,7 +175,7 @@ struct SettingsBottomSheet: View {
                 // Theme picker
                 HStack(spacing: Theme.Spacing.md) {
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.aiBlue.opacity(0.15))
                             .frame(width: 36, height: 36)
 
@@ -251,7 +251,7 @@ struct SettingsBottomSheet: View {
                 // Subscription
                 HStack(spacing: Theme.Spacing.md) {
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.xp.opacity(0.15))
                             .frame(width: 36, height: 36)
 
@@ -281,7 +281,7 @@ struct SettingsBottomSheet: View {
                 } label: {
                     HStack(spacing: Theme.Spacing.md) {
                         ZStack {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.Colors.warning.opacity(0.15))
                                 .frame(width: 36, height: 36)
 
@@ -312,7 +312,7 @@ struct SettingsBottomSheet: View {
                 } label: {
                     HStack(spacing: Theme.Spacing.md) {
                         ZStack {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.Colors.error.opacity(0.15))
                                 .frame(width: 36, height: 36)
 
@@ -376,7 +376,7 @@ struct SettingsToggleRow: View {
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.15))
                     .frame(width: 36, height: 36)
 
@@ -413,7 +413,7 @@ struct SettingsStepperRow: View {
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.15))
                     .frame(width: 36, height: 36)
 

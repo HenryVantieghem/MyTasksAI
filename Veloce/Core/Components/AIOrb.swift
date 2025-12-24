@@ -101,7 +101,7 @@ struct AIOrb: View {
 
     private var glowRings: some View {
         ForEach(0..<3, id: \.self) { index in
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     LinearGradient(
                         colors: [
@@ -144,7 +144,7 @@ struct AIOrb: View {
     // MARK: - Main Glow
 
     private var mainGlow: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -167,12 +167,12 @@ struct AIOrb: View {
     private var innerOrb: some View {
         ZStack {
             // Gradient orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(VoidDesign.orbGradient)
                 .frame(width: orbDiameter, height: orbDiameter)
 
             // Shine overlay
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     LinearGradient(
                         colors: [
@@ -201,7 +201,7 @@ struct AIOrb: View {
 
     private var floatingParticles: some View {
         ForEach(0..<particleCount, id: \.self) { index in
-            Circle()
+            SwiftUI.Circle()
                 .fill(particleColor(for: index))
                 .frame(width: particleSize(for: index))
                 .offset(
@@ -334,13 +334,13 @@ struct MiniAIOrb: View {
     var body: some View {
         ZStack {
             // Glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.Colors.aiPurple.opacity(0.4))
                 .frame(width: size * 1.5, height: size * 1.5)
                 .blur(radius: size * 0.3)
 
             // Orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(VoidDesign.orbGradient)
                 .frame(width: size, height: size)
                 .scaleEffect(scale)
@@ -372,7 +372,7 @@ struct AIStatusIndicator: View {
     }
 
     var body: some View {
-        Circle()
+        SwiftUI.Circle()
             .fill(isActive ? Theme.Colors.aiPurple : Theme.Colors.textTertiary)
             .frame(width: size, height: size)
             .scaleEffect(pulse)

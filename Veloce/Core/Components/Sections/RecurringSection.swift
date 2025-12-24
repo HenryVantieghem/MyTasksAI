@@ -192,7 +192,7 @@ struct RecurringSection: View {
                 .font(.system(size: 14, weight: .semibold))
                 .frame(width: 38, height: 38)
                 .background(
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(isSelected ? accentColor : Color.white.opacity(0.08))
                 )
                 .foregroundStyle(isSelected ? .white : .white.opacity(0.5))

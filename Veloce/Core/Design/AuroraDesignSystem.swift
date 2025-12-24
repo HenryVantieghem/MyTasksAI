@@ -496,7 +496,7 @@ struct AuroraStarParticle: Identifiable {
 
 private func colorSwatch(_ name: String, _ color: Color) -> some View {
     VStack(spacing: 4) {
-        Circle()
+        SwiftUI.Circle()
             .fill(color)
             .frame(width: 50, height: 50)
             .shadow(color: color.opacity(0.5), radius: 8)

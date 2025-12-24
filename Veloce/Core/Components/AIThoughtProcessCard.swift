@@ -210,7 +210,7 @@ struct AIThoughtProcessCard: View {
                 // Confidence indicator
                 let confidence = calculateConfidence()
                 ForEach(0..<5) { index in
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(index < confidence
                               ? Theme.Colors.aiPurple
                               : Theme.Colors.glassBackground.opacity(0.5))

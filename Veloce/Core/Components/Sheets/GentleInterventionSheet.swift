@@ -66,7 +66,7 @@ struct GentleInterventionSheet: View {
         VStack(spacing: 12) {
             // Gentle icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [Color(hex: "8B5CF6").opacity(0.3), Color(hex: "06B6D4").opacity(0.2)],

@@ -199,11 +199,11 @@ struct PremiumTaskDetailView: View {
                     .foregroundStyle(.white.opacity(0.9))
                     .frame(width: 36, height: 36)
                     .background(
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(.ultraThinMaterial)
                     )
                     .overlay(
-                        Circle()
+                        SwiftUI.Circle()
                             .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                     )
             }
@@ -247,11 +247,11 @@ struct PremiumTaskDetailView: View {
                     .foregroundStyle(.white.opacity(0.9))
                     .frame(width: 36, height: 36)
                     .background(
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(.ultraThinMaterial)
                     )
                     .overlay(
-                        Circle()
+                        SwiftUI.Circle()
                             .strokeBorder(.white.opacity(0.1), lineWidth: 1)
                     )
             }
@@ -272,7 +272,7 @@ struct PremiumTaskDetailView: View {
         } label: {
             HStack(spacing: 8) {
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(
                             task.isCompleted ? Theme.Colors.success : .white.opacity(0.3),
                             lineWidth: 2
@@ -280,7 +280,7 @@ struct PremiumTaskDetailView: View {
                         .frame(width: 24, height: 24)
 
                     if task.isCompleted {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.success)
                             .frame(width: 24, height: 24)
 
@@ -325,7 +325,7 @@ struct PremiumTaskDetailView: View {
                     HapticsService.shared.impact()
                 } label: {
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .strokeBorder(
                                 task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary,
                                 lineWidth: 2
@@ -333,7 +333,7 @@ struct PremiumTaskDetailView: View {
                             .frame(width: 28, height: 28)
 
                         if task.isCompleted {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.Colors.success)
                                 .frame(width: 28, height: 28)
 
@@ -1307,7 +1307,7 @@ struct PremiumSubTaskRow: View {
             HStack(spacing: 12) {
                 // Checkbox
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(
                             subtask.status == .completed ? Theme.Colors.success : Theme.Colors.textTertiary,
                             lineWidth: 1.5
@@ -1315,7 +1315,7 @@ struct PremiumSubTaskRow: View {
                         .frame(width: 20, height: 20)
 
                     if subtask.status == .completed {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.success)
                             .frame(width: 20, height: 20)
 

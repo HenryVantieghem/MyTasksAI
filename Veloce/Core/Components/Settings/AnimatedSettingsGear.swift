@@ -14,13 +14,13 @@ struct AnimatedSettingsGear: View {
         Button(action: {}) {
             ZStack {
                 // Outer ring
-                Circle()
+                SwiftUI.Circle()
                     .stroke(LinearGradient(colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 2)
                     .frame(width: 44, height: 44)
                     .rotationEffect(.degrees(rotation))
 
                 // Glass background
-                Circle()
+                SwiftUI.Circle()
                     .fill(.ultraThinMaterial)
                     .frame(width: 40, height: 40)
 
@@ -31,7 +31,7 @@ struct AnimatedSettingsGear: View {
                     .rotationEffect(.degrees(rotation * 0.5))
 
                 // Glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.aiPurple)
                     .frame(width: 44, height: 44)
                     .blur(radius: 15)

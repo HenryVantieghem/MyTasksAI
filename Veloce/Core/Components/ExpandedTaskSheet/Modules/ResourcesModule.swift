@@ -285,7 +285,7 @@ struct ResourceRow: View {
                         .overlay(
                             // Play button overlay
                             ZStack {
-                                Circle()
+                                SwiftUI.Circle()
                                     .fill(.black.opacity(0.5))
                                     .frame(width: 24, height: 24)
                                 Image(systemName: "play.fill")

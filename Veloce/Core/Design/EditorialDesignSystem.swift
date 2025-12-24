@@ -144,13 +144,13 @@ struct EditorialTaskCard: View {
             HStack(spacing: 16) {
                 // Checkbox
                 Button(action: onToggle) {
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(
                             isCompleted ? AppColors.accentSuccess : AppColors.textTertiary,
                             lineWidth: 1.5
                         )
                         .background(
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(isCompleted ? AppColors.accentSuccess : Color.clear)
                         )
                         .overlay {

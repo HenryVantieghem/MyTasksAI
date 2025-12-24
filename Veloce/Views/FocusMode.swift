@@ -154,7 +154,7 @@ struct FocusMode: View {
                 .foregroundStyle(.white.opacity(0.7))
                 .frame(width: 44, height: 44)
                 .background(.ultraThinMaterial.opacity(0.5))
-                .clipShape(Circle())
+                .clipShape(SwiftUI.Circle())
         }
     }
 
@@ -243,12 +243,12 @@ struct FocusMode: View {
 
     private func sessionDot(index: Int, completed: Bool) -> some View {
         ZStack {
-            Circle()
+            SwiftUI.Circle()
                 .fill(completed ? Theme.Colors.aiCyan : Color.white.opacity(0.15))
                 .frame(width: 12, height: 12)
 
             if completed {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.aiCyan)
                     .frame(width: 12, height: 12)
                     .shadow(color: Theme.Colors.aiCyan.opacity(0.8), radius: 6)
@@ -393,7 +393,7 @@ struct FocusMode: View {
                         )
                         : AnyShapeStyle(.ultraThinMaterial.opacity(0.5))
                 )
-                .clipShape(Circle())
+                .clipShape(SwiftUI.Circle())
                 .shadow(color: isPrimary ? Theme.Colors.aiPurple.opacity(0.4) : .clear, radius: 10)
         }
     }

@@ -25,7 +25,7 @@ struct StreakFlame: View {
     var body: some View {
         ZStack {
             // Glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(RadialGradient(colors: flameIntensity.colors.map { $0.opacity(0.3) }, center: .center, startRadius: 0, endRadius: 60))
                 .frame(width: 120, height: 120)
                 .blur(radius: 20)
@@ -125,7 +125,7 @@ struct EmberParticles: View {
 
     var body: some View {
         ForEach(0..<count, id: \.self) { i in
-            Circle()
+            SwiftUI.Circle()
                 .fill(Color.orange)
                 .frame(width: 3, height: 3)
                 .offset(

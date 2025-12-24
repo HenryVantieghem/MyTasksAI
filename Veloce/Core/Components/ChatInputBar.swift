@@ -82,7 +82,7 @@ struct ChatInputBar: View {
             }
         } label: {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(showQuickActions ? Theme.Colors.accent.opacity(0.2) : Theme.Colors.glassBackground.opacity(0.3))
                     .frame(width: 32, height: 32)
 
@@ -168,14 +168,14 @@ struct ChatInputBar: View {
             ZStack {
                 // Glow effect when can send
                 if canSend {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.accent.opacity(0.4))
                         .blur(radius: 10)
                         .frame(width: 40, height: 40)
                 }
 
                 // Button background
-                Circle()
+                SwiftUI.Circle()
                     .fill(canSend ? AnyShapeStyle(Theme.Colors.accentGradient) : AnyShapeStyle(Theme.Colors.glassBackground.opacity(0.3)))
                     .frame(width: 32, height: 32)
 
@@ -291,7 +291,7 @@ struct QuickActionButton: View {
     var body: some View {
         Button(action: action) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(color.opacity(0.15))
                     .frame(width: 36, height: 36)
 

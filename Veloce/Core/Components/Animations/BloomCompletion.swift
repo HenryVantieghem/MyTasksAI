@@ -43,7 +43,7 @@ struct BloomCompletion: View {
     var body: some View {
         ZStack {
             // Shockwave ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     LinearGradient(
                         colors: [
@@ -59,7 +59,7 @@ struct BloomCompletion: View {
                 .opacity(shockwaveOpacity)
 
             // Inner shockwave glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -112,7 +112,7 @@ struct BloomCompletion: View {
         let color = gradientColors[index % gradientColors.count]
         let radians = angle * .pi / 180
 
-        return Circle()
+        return SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [.white, color],
@@ -278,7 +278,7 @@ struct MiniBloom: View {
     var body: some View {
         ZStack {
             // Central burst
-            Circle()
+            SwiftUI.Circle()
                 .fill(color)
                 .frame(width: 10, height: 10)
                 .scaleEffect(scale)
@@ -286,7 +286,7 @@ struct MiniBloom: View {
 
             // Mini particles
             ForEach(0..<6, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .fill(color)
                     .frame(width: 3, height: 3)
                     .offset(particleOffsets[index])

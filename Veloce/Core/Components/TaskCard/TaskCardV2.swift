@@ -126,7 +126,7 @@ struct TaskCardV2: View {
 
             // Completion particles overlay
             ForEach(completionParticles) { particle in
-                Circle()
+                SwiftUI.Circle()
                     .fill(particle.color)
                     .frame(width: particle.size, height: particle.size)
                     .offset(x: particle.x, y: particle.y)
@@ -544,7 +544,7 @@ struct TaskEnergyBar: View {
 
                 // Glow effect at tip (if not completed)
                 if !isCompleted && animatedLevel > 0.1 {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(taskTypeColor.opacity(0.6))
                         .frame(width: 6, height: 6)
                         .blur(radius: 4)

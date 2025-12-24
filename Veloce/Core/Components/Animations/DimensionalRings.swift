@@ -84,7 +84,7 @@ struct DimensionalRings: View {
         let breatheScale = 1 + sin(breathePhase * .pi * 2) * 0.05
         let shiftedColors = shiftColors(by: colorOffset)
 
-        return Circle()
+        return SwiftUI.Circle()
             .stroke(
                 AngularGradient(
                     colors: shiftedColors,
@@ -182,7 +182,7 @@ struct DimensionalRingSingle: View {
     let colors: [Color]
 
     var body: some View {
-        Circle()
+        SwiftUI.Circle()
             .stroke(
                 AngularGradient(
                     colors: colors + [colors[0]],

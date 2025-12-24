@@ -139,7 +139,7 @@ struct ConfettiPiece: View {
             RoundedRectangle(cornerRadius: 2)
                 .fill(particle.color)
         case .circle:
-            Circle()
+            SwiftUI.Circle()
                 .fill(particle.color)
         case .triangle:
             Triangle()
@@ -397,7 +397,7 @@ struct LevelUpCelebration: View {
                     // Level badge with rings
                     ZStack {
                         // Outer ring
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(
                                 LinearGradient(
                                     colors: Theme.Colors.aiGradient,
@@ -412,7 +412,7 @@ struct LevelUpCelebration: View {
                             .accessibilityHidden(true)
 
                         // Inner circle
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(
                                 LinearGradient(
                                     colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],

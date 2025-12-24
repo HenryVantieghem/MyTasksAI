@@ -148,7 +148,7 @@ struct PointsBurst: View {
 
                 // Particles
                 ForEach(particles) { particle in
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(particle.color)
                         .frame(width: particle.size, height: particle.size)
                         .position(particle.position)

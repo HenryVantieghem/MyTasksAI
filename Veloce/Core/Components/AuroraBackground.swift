@@ -181,7 +181,7 @@ struct AuroraBackground: View {
                     ? Aurora.Colors.starBright.opacity(opacity)
                     : Aurora.Colors.starDim.opacity(opacity)
 
-                context.fill(Circle().path(in: rect), with: .color(color))
+                context.fill(SwiftUI.Circle().path(in: rect), with: .color(color))
             }
         }
         .onAppear {
