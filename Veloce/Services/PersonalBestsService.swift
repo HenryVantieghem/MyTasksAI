@@ -356,7 +356,7 @@ struct NewRecordBanner: View {
             VStack(spacing: 16) {
                 // Trophy with glow
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [

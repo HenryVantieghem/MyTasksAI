@@ -203,11 +203,29 @@ final class CelebrationEngine {
     let momentumChanged = PassthroughSubject<MomentumState, Never>()
     let personalBestAchieved = PassthroughSubject<PersonalBest, Never>()
 
-    // MARK: Settings
-    @AppStorage("celebrationSoundsEnabled") private var soundsEnabled = true
-    @AppStorage("celebrationHapticsEnabled") private var hapticsEnabled = true
-    @AppStorage("celebrationConfettiEnabled") private var confettiEnabled = true
-    @AppStorage("celebrationIntensity") private var intensity: CelebrationIntensity = .medium
+    // MARK: Settings (using UserDefaults directly to avoid @Observable conflict)
+    private var soundsEnabled: Bool {
+        get { UserDefaults.standard.object(forKey: "celebrationSoundsEnabled") as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "celebrationSoundsEnabled") }
+    }
+    private var hapticsEnabled: Bool {
+        get { UserDefaults.standard.object(forKey: "celebrationHapticsEnabled") as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "celebrationHapticsEnabled") }
+    }
+    private var confettiEnabled: Bool {
+        get { UserDefaults.standard.object(forKey: "celebrationConfettiEnabled") as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "celebrationConfettiEnabled") }
+    }
+    private var intensity: CelebrationIntensity {
+        get {
+            guard let rawValue = UserDefaults.standard.string(forKey: "celebrationIntensity"),
+                  let value = CelebrationIntensity(rawValue: rawValue) else {
+                return .medium
+            }
+            return value
+        }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: "celebrationIntensity") }
+    }
 
     // MARK: Decay Timer
     private var decayCheckTimer: Timer?
