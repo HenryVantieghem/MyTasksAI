@@ -3,7 +3,7 @@
 //  Veloce
 //
 //  Focus Tab - Timer and Focus Sessions
-//  Opal + Tiimo inspired design with deep focus modes
+//  Opal + Tiimo inspired design with working countdown timer
 //
 
 import SwiftUI
@@ -59,11 +59,13 @@ struct FocusTabView: View {
     @State private var selectedMode: FocusTimerMode = .pomodoro
     @State private var isSessionActive = false
     @State private var remainingSeconds: Int = 25 * 60
+    @State private var totalSeconds: Int = 25 * 60
     @State private var showModeSelector = false
     @State private var showBlockingSheet = false
+    @State private var timer: Timer?
 
     // Animation states
-    @State private var timerRingProgress: Double = 0
+    @State private var timerRingProgress: Double = 1.0
     @State private var breathingScale: CGFloat = 1.0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -76,7 +78,6 @@ struct FocusTabView: View {
 
     var body: some View {
         ZStack {
-            // Background
             VoidBackground.focus
 
             VStack(spacing: Theme.Spacing.xl) {
@@ -89,8 +90,8 @@ struct FocusTabView: View {
                 // Mode Selector
                 modeSelectorView
 
-                // Action Button
-                actionButton
+                // Action Buttons
+                actionButtons
 
                 Spacer()
 
@@ -115,11 +116,16 @@ struct FocusTabView: View {
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
-            remainingSeconds = selectedMode.duration * 60
+            resetTimer()
             startBreathingAnimation()
         }
         .onChange(of: selectedMode) { _, newMode in
-            remainingSeconds = newMode.duration * 60
+            if !isSessionActive {
+                resetTimer()
+            }
+        }
+        .onDisappear {
+            timer?.invalidate()
         }
     }
 
@@ -166,12 +172,14 @@ struct FocusTabView: View {
                 )
                 .frame(width: 240, height: 240)
                 .rotationEffect(.degrees(-90))
+                .animation(.linear(duration: 1), value: timerRingProgress)
 
             // Time display
             VStack(spacing: Theme.Spacing.sm) {
                 Text(formattedTime)
                     .font(.system(size: 56, weight: .thin, design: .monospaced))
                     .foregroundStyle(.white)
+                    .contentTransition(.numericText())
 
                 Text(isSessionActive ? "Focus Mode" : "Ready to focus")
                     .font(.system(size: 14, weight: .medium))
@@ -217,40 +225,64 @@ struct FocusTabView: View {
         .padding(.horizontal, -Theme.Spacing.screenPadding)
     }
 
-    // MARK: - Action Button
+    // MARK: - Action Buttons
 
-    private var actionButton: some View {
-        Button {
-            HapticsService.shared.impact()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                isSessionActive.toggle()
-            }
-            if isSessionActive {
-                startTimer()
-            }
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: isSessionActive ? "pause.fill" : "play.fill")
-                    .font(.system(size: 18, weight: .semibold))
-                Text(isSessionActive ? "Pause Session" : "Start Focus")
-                    .font(.system(size: 16, weight: .semibold))
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        LinearGradient(
-                            colors: [Theme.Colors.aiAmber, Theme.Colors.aiOrange],
-                            startPoint: .leading,
-                            endPoint: .trailing
+    private var actionButtons: some View {
+        HStack(spacing: 16) {
+            // Start/Pause Button
+            Button {
+                HapticsService.shared.impact()
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                    if isSessionActive {
+                        pauseTimer()
+                    } else {
+                        startTimer()
+                    }
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: isSessionActive ? "pause.fill" : "play.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text(isSessionActive ? "Pause" : "Start Focus")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(
+                            LinearGradient(
+                                colors: [Theme.Colors.aiAmber, Theme.Colors.aiOrange],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
-                    )
+                }
+            }
+            .buttonStyle(.plain)
+            .shadow(color: Theme.Colors.aiAmber.opacity(0.4), radius: 16, y: 8)
+
+            // Reset Button (only when active or paused with time remaining)
+            if isSessionActive || remainingSeconds != totalSeconds {
+                Button {
+                    HapticsService.shared.lightImpact()
+                    resetTimer()
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .frame(width: 52, height: 52)
+                        .background {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                        }
+                        .glassEffect(.regular, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .transition(.scale.combined(with: .opacity))
             }
         }
-        .buttonStyle(.plain)
-        .shadow(color: Theme.Colors.aiAmber.opacity(0.4), radius: 16, y: 8)
     }
 
     // MARK: - Focus Insight Card
@@ -312,7 +344,64 @@ struct FocusTabView: View {
                 .fill(.ultraThinMaterial)
         }
         .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
-        .padding(.bottom, 100) // Tab bar clearance
+        .padding(.bottom, 100)
+    }
+
+    // MARK: - Timer Logic
+
+    private func startTimer() {
+        isSessionActive = true
+        HapticsService.shared.success()
+
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if remainingSeconds > 0 {
+                remainingSeconds -= 1
+                updateProgress()
+
+                // Haptic feedback at milestones
+                if remainingSeconds == 60 {
+                    HapticsService.shared.lightImpact()
+                } else if remainingSeconds <= 3 && remainingSeconds > 0 {
+                    HapticsService.shared.lightImpact()
+                }
+            } else {
+                completeSession()
+            }
+        }
+    }
+
+    private func pauseTimer() {
+        isSessionActive = false
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func resetTimer() {
+        pauseTimer()
+        totalSeconds = selectedMode.duration * 60
+        remainingSeconds = totalSeconds
+        timerRingProgress = 1.0
+    }
+
+    private func updateProgress() {
+        if totalSeconds > 0 {
+            timerRingProgress = Double(remainingSeconds) / Double(totalSeconds)
+        }
+    }
+
+    private func completeSession() {
+        pauseTimer()
+        HapticsService.shared.success()
+
+        // Show completion feedback
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+            timerRingProgress = 0
+        }
+
+        // Reset after delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            resetTimer()
+        }
     }
 
     // MARK: - Animations
@@ -322,11 +411,6 @@ struct FocusTabView: View {
         withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
             breathingScale = 1.05
         }
-    }
-
-    private func startTimer() {
-        // Timer logic will be implemented with PomodoroTimerService
-        timerRingProgress = 1.0
     }
 }
 
@@ -442,7 +526,7 @@ struct FocusTimerModePickerSheet: View {
     }
 }
 
-// MARK: - App Blocking Sheet (Placeholder)
+// MARK: - App Blocking Sheet
 
 struct AppBlockingSheet: View {
     @Environment(\.dismiss) private var dismiss

@@ -2,21 +2,22 @@
 //  GlowingOrbLogo.swift
 //  Veloce
 //
-//  Pure Spherical Glowing Orb Logo
-//  Premium 3D orb with concentric glow rings and orbiting particles
+//  Celestial Floating Orb Logo
+//  Ultra-premium 3D orb with levitation, aurora glow, and ethereal particles
 //
 
 import SwiftUI
 
 // MARK: - Glowing Orb Logo
 
-/// Pure spherical glowing orb logo replacing the infinity curve
+/// Celestial floating orb logo with ethereal presence
 /// Features:
-/// - 3D sphere with radial gradient
-/// - White-hot inner core
-/// - 3 concentric pulsing glow rings
-/// - 8 orbiting particles
-/// - Breathing animation
+/// - Levitating animation with subtle bounce
+/// - Multi-layer aurora glow system
+/// - Liquid glass sphere with depth
+/// - Ethereal particle nebula
+/// - Pulsing energy core
+/// - Dynamic light reflections
 struct GlowingOrbLogo: View {
     let size: LogoSize
     var isAnimating: Bool = true
@@ -24,219 +25,293 @@ struct GlowingOrbLogo: View {
     var intensity: Double = 1.0
 
     // Animation states
+    @State private var floatPhase: Double = 0
     @State private var breathePhase: Double = 0
-    @State private var glowRingPhase: Double = 0
-    @State private var gradientRotation: Double = 0
+    @State private var auroraRotation: Double = 0
+    @State private var coreEnergyPhase: Double = 0
     @State private var particleOrbitPhase: Double = 0
-    @State private var innerPulsePhase: Double = 0
+    @State private var glowPulsePhase: Double = 0
+    @State private var shimmerPhase: Double = 0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // MARK: - Gradient Colors (Same as original logo)
+    // MARK: - Aurora Color Palette
 
-    private let gradientColors: [Color] = [
+    private let auroraColors: [Color] = [
+        Color(hex: "A855F7"), // Vivid Purple
         Color(hex: "8B5CF6"), // Purple
         Color(hex: "6366F1"), // Indigo
         Color(hex: "3B82F6"), // Blue
         Color(hex: "0EA5E9"), // Sky
         Color(hex: "06B6D4"), // Cyan
         Color(hex: "14B8A6"), // Teal
+        Color(hex: "10B981"), // Emerald
     ]
 
     var body: some View {
         ZStack {
-            // Layer 1: Outer atmospheric glow
+            // Layer 0: Ground shadow (floating effect)
             if size.showGlow {
-                atmosphericGlow
+                groundShadow
             }
 
-            // Layer 2: Concentric glow rings (pulsing outward)
+            // Layer 1: Outer aurora nebula
             if size.showGlow {
-                concentricGlowRings
+                auroraNebula
             }
 
-            // Layer 3: Orbiting particles
+            // Layer 2: Energy field rings
+            if size.showGlow {
+                energyFieldRings
+            }
+
+            // Layer 3: Ethereal particle cloud
             if showParticles && size.showParticles && !reduceMotion {
-                orbitingParticles
+                etherealParticles
             }
 
-            // Layer 4: Main orb sphere
-            orbSphere
+            // Layer 4: Glass sphere body
+            glassSphere
 
-            // Layer 5: Inner hot core
-            innerCore
+            // Layer 5: Inner plasma core
+            plasmaCore
 
-            // Layer 6: Top highlight (3D effect)
-            topHighlight
+            // Layer 6: Surface shimmer
+            surfaceShimmer
+
+            // Layer 7: Specular highlight
+            specularHighlight
         }
-        .frame(width: size.dimension, height: size.dimension)
+        .frame(width: size.dimension * 1.8, height: size.dimension * 1.8)
+        .offset(y: -floatPhase * size.dimension * 0.05) // Floating offset
         .onAppear {
             guard isAnimating && !reduceMotion else { return }
             startAnimations()
         }
     }
 
-    // MARK: - Atmospheric Glow
+    // MARK: - Ground Shadow (Floating Effect)
 
-    private var atmosphericGlow: some View {
+    private var groundShadow: some View {
+        Ellipse()
+            .fill(
+                RadialGradient(
+                    colors: [
+                        auroraColors[0].opacity(0.25 * intensity * (1 - floatPhase * 0.3)),
+                        auroraColors[3].opacity(0.15 * intensity * (1 - floatPhase * 0.3)),
+                        Color.clear
+                    ],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: size.dimension * 0.4
+                )
+            )
+            .frame(width: size.dimension * 0.7, height: size.dimension * 0.15)
+            .offset(y: size.dimension * 0.45 + floatPhase * size.dimension * 0.08)
+            .blur(radius: size.dimension * 0.08)
+    }
+
+    // MARK: - Aurora Nebula
+
+    private var auroraNebula: some View {
         ZStack {
-            // Primary atmospheric halo
+            // Primary aurora sweep
+            ForEach(0..<3, id: \.self) { layer in
+                Circle()
+                    .fill(
+                        AngularGradient(
+                            colors: rotatedColors(by: layer * 2),
+                            center: .center,
+                            angle: .degrees(auroraRotation + Double(layer) * 60)
+                        )
+                    )
+                    .frame(
+                        width: size.dimension * (1.4 - Double(layer) * 0.15),
+                        height: size.dimension * (1.4 - Double(layer) * 0.15)
+                    )
+                    .blur(radius: size.dimension * (0.25 - Double(layer) * 0.05))
+                    .opacity((0.3 - Double(layer) * 0.08) * intensity * (0.8 + glowPulsePhase * 0.2))
+            }
+
+            // Radial atmosphere
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            gradientColors[0].opacity(0.25 * intensity),
-                            gradientColors[2].opacity(0.15 * intensity),
-                            gradientColors[4].opacity(0.08 * intensity),
+                            auroraColors[0].opacity(0.35 * intensity),
+                            auroraColors[2].opacity(0.2 * intensity),
+                            auroraColors[4].opacity(0.1 * intensity),
                             Color.clear
                         ],
                         center: .center,
-                        startRadius: size.dimension * 0.2,
-                        endRadius: size.dimension * 0.8
+                        startRadius: size.dimension * 0.15,
+                        endRadius: size.dimension * 0.75
                     )
                 )
-                .frame(width: size.dimension * 1.6, height: size.dimension * 1.6)
-                .blur(radius: size.dimension * 0.2)
-
-            // Secondary color wash
-            Circle()
-                .fill(
-                    AngularGradient(
-                        colors: gradientColors + [gradientColors[0]],
-                        center: .center,
-                        angle: .degrees(gradientRotation)
-                    )
-                )
-                .frame(width: size.dimension * 1.3, height: size.dimension * 1.3)
-                .blur(radius: size.dimension * 0.35)
-                .opacity(0.2 * intensity)
+                .frame(width: size.dimension * 1.5, height: size.dimension * 1.5)
+                .blur(radius: size.dimension * 0.15)
+                .scaleEffect(1.0 + breathePhase * 0.08)
         }
     }
 
-    // MARK: - Concentric Glow Rings
+    private func rotatedColors(by offset: Int) -> [Color] {
+        var colors = auroraColors
+        for _ in 0..<offset {
+            let first = colors.removeFirst()
+            colors.append(first)
+        }
+        return colors + [colors[0]]
+    }
 
-    private var concentricGlowRings: some View {
+    // MARK: - Energy Field Rings
+
+    private var energyFieldRings: some View {
         ZStack {
-            // Ring 1 - Innermost (brightest)
-            glowRing(
-                radiusMultiplier: 0.55 + glowRingPhase * 0.05,
-                opacity: 0.6 - glowRingPhase * 0.2,
-                strokeWidth: size.dimension * 0.03
-            )
+            ForEach(0..<4, id: \.self) { index in
+                let progress = (glowPulsePhase + Double(index) * 0.25).truncatingRemainder(dividingBy: 1.0)
+                let scale = 0.5 + progress * 0.5
+                let opacity = (1.0 - progress) * 0.4 * intensity
 
-            // Ring 2 - Middle
-            glowRing(
-                radiusMultiplier: 0.65 + glowRingPhase * 0.08,
-                opacity: 0.4 - glowRingPhase * 0.15,
-                strokeWidth: size.dimension * 0.02
-            )
-
-            // Ring 3 - Outermost (faintest)
-            glowRing(
-                radiusMultiplier: 0.75 + glowRingPhase * 0.1,
-                opacity: 0.2 - glowRingPhase * 0.1,
-                strokeWidth: size.dimension * 0.015
-            )
+                Circle()
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                auroraColors[index % auroraColors.count].opacity(opacity),
+                                auroraColors[(index + 2) % auroraColors.count].opacity(opacity * 0.5),
+                                Color.clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: size.dimension * 0.015 * (1.0 - progress * 0.5)
+                    )
+                    .frame(width: size.dimension * scale, height: size.dimension * scale)
+                    .blur(radius: size.dimension * 0.02)
+            }
         }
     }
 
-    private func glowRing(radiusMultiplier: Double, opacity: Double, strokeWidth: CGFloat) -> some View {
-        Circle()
-            .stroke(
-                AngularGradient(
-                    colors: gradientColors.map { $0.opacity(max(0, opacity * intensity)) } + [gradientColors[0].opacity(max(0, opacity * intensity))],
-                    center: .center,
-                    angle: .degrees(gradientRotation * 0.5)
-                ),
-                lineWidth: strokeWidth
-            )
-            .frame(
-                width: size.dimension * radiusMultiplier,
-                height: size.dimension * radiusMultiplier
-            )
-            .blur(radius: strokeWidth * 2)
-    }
+    // MARK: - Ethereal Particles
 
-    // MARK: - Orbiting Particles
-
-    private var orbitingParticles: some View {
+    private var etherealParticles: some View {
         ZStack {
+            // Inner orbit particles
+            ForEach(0..<12, id: \.self) { index in
+                EtherealParticle(
+                    index: index,
+                    totalCount: 12,
+                    phase: particleOrbitPhase,
+                    orbRadius: size.dimension * 0.35,
+                    particleSize: size.dimension * 0.025,
+                    colors: auroraColors,
+                    orbitTilt: 0.6
+                )
+            }
+
+            // Outer nebula particles
             ForEach(0..<8, id: \.self) { index in
-                OrbParticle(
+                EtherealParticle(
                     index: index,
                     totalCount: 8,
-                    phase: particleOrbitPhase,
-                    orbRadius: size.dimension * 0.42,
-                    particleSize: size.dimension * 0.04,
-                    color: gradientColors[index % gradientColors.count]
+                    phase: particleOrbitPhase * 0.7,
+                    orbRadius: size.dimension * 0.55,
+                    particleSize: size.dimension * 0.018,
+                    colors: auroraColors,
+                    orbitTilt: 0.4
+                )
+            }
+
+            // Sparkle dust
+            ForEach(0..<16, id: \.self) { index in
+                SparkleParticle(
+                    index: index,
+                    phase: shimmerPhase,
+                    fieldSize: size.dimension * 0.5,
+                    particleSize: size.dimension * 0.012
                 )
             }
         }
     }
 
-    // MARK: - Main Orb Sphere
+    // MARK: - Glass Sphere Body
 
-    private var orbSphere: some View {
+    private var glassSphere: some View {
         ZStack {
-            // Base sphere with conic gradient (rotating)
+            // Base sphere with rotating aurora
             Circle()
                 .fill(
                     AngularGradient(
-                        colors: gradientColors + [gradientColors[0]],
+                        colors: auroraColors + [auroraColors[0]],
                         center: .center,
-                        angle: .degrees(gradientRotation)
+                        angle: .degrees(auroraRotation * 1.5)
                     )
                 )
-                .frame(width: size.dimension * 0.5, height: size.dimension * 0.5)
+                .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
 
-            // 3D depth overlay - darker at edges
+            // Glass overlay with depth
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
+                            Color.white.opacity(0.15),
                             Color.clear,
-                            Color.black.opacity(0.3)
+                            Color.black.opacity(0.25)
                         ],
-                        center: UnitPoint(x: 0.35, y: 0.35),
-                        startRadius: size.dimension * 0.1,
+                        center: UnitPoint(x: 0.3, y: 0.3),
+                        startRadius: 0,
                         endRadius: size.dimension * 0.3
                     )
                 )
-                .frame(width: size.dimension * 0.5, height: size.dimension * 0.5)
+                .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
 
-            // Gradient overlay for richness
+            // Inner refraction
             Circle()
                 .fill(
-                    RadialGradient(
+                    LinearGradient(
                         colors: [
-                            gradientColors[0].opacity(0.4),
-                            gradientColors[2].opacity(0.3),
-                            gradientColors[4].opacity(0.2),
+                            auroraColors[4].opacity(0.3),
+                            auroraColors[0].opacity(0.2),
                             Color.clear
                         ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: size.dimension * 0.25
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
                 )
-                .frame(width: size.dimension * 0.5, height: size.dimension * 0.5)
+                .frame(width: size.dimension * 0.48, height: size.dimension * 0.48)
                 .blendMode(.overlay)
+
+            // Edge glow
+            Circle()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.5),
+                            auroraColors[4].opacity(0.3),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: size.dimension * 0.01
+                )
+                .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
+                .blur(radius: 1)
         }
-        .scaleEffect(1.0 + breathePhase * 0.04)
+        .scaleEffect(1.0 + breathePhase * 0.03)
     }
 
-    // MARK: - Inner Hot Core
+    // MARK: - Plasma Core
 
-    private var innerCore: some View {
+    private var plasmaCore: some View {
         ZStack {
-            // White hot center
+            // Outer core halo
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color.white.opacity(0.95 + innerPulsePhase * 0.05),
-                            Color.white.opacity(0.7),
-                            gradientColors[4].opacity(0.5),
+                            Color.white.opacity(0.9),
+                            auroraColors[4].opacity(0.6),
+                            auroraColors[0].opacity(0.3),
                             Color.clear
                         ],
                         center: .center,
@@ -244,123 +319,214 @@ struct GlowingOrbLogo: View {
                         endRadius: size.dimension * 0.18
                     )
                 )
-                .frame(width: size.dimension * 0.35, height: size.dimension * 0.35)
+                .frame(width: size.dimension * 0.36, height: size.dimension * 0.36)
                 .blur(radius: size.dimension * 0.02)
+                .scaleEffect(1.0 + coreEnergyPhase * 0.1)
 
-            // Inner glow pulse
+            // Hot white center
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color.white.opacity(0.6 + innerPulsePhase * 0.2),
+                            Color.white,
+                            Color.white.opacity(0.85),
+                            Color(hex: "E0F2FE").opacity(0.6),
                             Color.clear
                         ],
                         center: .center,
                         startRadius: 0,
-                        endRadius: size.dimension * 0.12
+                        endRadius: size.dimension * 0.1
                     )
                 )
-                .frame(width: size.dimension * 0.25, height: size.dimension * 0.25)
-                .blur(radius: size.dimension * 0.015)
+                .frame(width: size.dimension * 0.2, height: size.dimension * 0.2)
+                .blur(radius: size.dimension * 0.01)
+                .scaleEffect(1.0 + coreEnergyPhase * 0.15)
+
+            // Energy flare
+            Circle()
+                .fill(Color.white.opacity(0.95 + coreEnergyPhase * 0.05))
+                .frame(width: size.dimension * 0.08, height: size.dimension * 0.08)
+                .blur(radius: size.dimension * 0.005)
         }
-        .scaleEffect(1.0 + breathePhase * 0.06)
     }
 
-    // MARK: - Top Highlight (3D Effect)
+    // MARK: - Surface Shimmer
 
-    private var topHighlight: some View {
-        Ellipse()
-            .fill(
-                RadialGradient(
-                    colors: [
-                        Color.white.opacity(0.5),
-                        Color.white.opacity(0.2),
-                        Color.clear
-                    ],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: size.dimension * 0.1
+    private var surfaceShimmer: some View {
+        ZStack {
+            // Traveling light band
+            Capsule()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.clear,
+                            Color.white.opacity(0.4),
+                            Color.clear
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
                 )
-            )
-            .frame(width: size.dimension * 0.15, height: size.dimension * 0.08)
-            .offset(x: -size.dimension * 0.08, y: -size.dimension * 0.12)
-            .blur(radius: size.dimension * 0.01)
+                .frame(width: size.dimension * 0.4, height: size.dimension * 0.03)
+                .offset(x: -size.dimension * 0.1, y: -size.dimension * 0.08)
+                .rotationEffect(.degrees(-30))
+                .blur(radius: 2)
+                .opacity(0.6 + shimmerPhase * 0.4)
+        }
+    }
+
+    // MARK: - Specular Highlight
+
+    private var specularHighlight: some View {
+        ZStack {
+            // Primary highlight
+            Ellipse()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.white.opacity(0.7),
+                            Color.white.opacity(0.3),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size.dimension * 0.08
+                    )
+                )
+                .frame(width: size.dimension * 0.14, height: size.dimension * 0.07)
+                .offset(x: -size.dimension * 0.1, y: -size.dimension * 0.14)
+                .blur(radius: size.dimension * 0.008)
+
+            // Secondary soft highlight
+            Ellipse()
+                .fill(Color.white.opacity(0.25))
+                .frame(width: size.dimension * 0.08, height: size.dimension * 0.04)
+                .offset(x: -size.dimension * 0.06, y: -size.dimension * 0.18)
+                .blur(radius: 3)
+        }
     }
 
     // MARK: - Animations
 
     private func startAnimations() {
-        // Breathing animation (3s cycle)
+        // Floating levitation (2.5s gentle bounce)
+        withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+            floatPhase = 1.0
+        }
+
+        // Breathing scale (3s subtle pulse)
         withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
             breathePhase = 1.0
         }
 
-        // Glow ring pulse (2s staggered cycle)
-        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-            glowRingPhase = 1.0
+        // Aurora rotation (12s smooth spin)
+        withAnimation(.linear(duration: 12.0).repeatForever(autoreverses: false)) {
+            auroraRotation = 360
         }
 
-        // Gradient rotation (8s continuous)
-        withAnimation(.linear(duration: 8.0).repeatForever(autoreverses: false)) {
-            gradientRotation = 360
+        // Core energy pulse (1.2s fast pulse)
+        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+            coreEnergyPhase = 1.0
         }
 
-        // Particle orbit (10s continuous)
-        withAnimation(.linear(duration: 10.0).repeatForever(autoreverses: false)) {
+        // Particle orbit (15s continuous)
+        withAnimation(.linear(duration: 15.0).repeatForever(autoreverses: false)) {
             particleOrbitPhase = 1.0
         }
 
-        // Inner core pulse (1.5s fast pulse)
-        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-            innerPulsePhase = 1.0
+        // Glow ring expansion (3s wave)
+        withAnimation(.linear(duration: 3.0).repeatForever(autoreverses: false)) {
+            glowPulsePhase = 1.0
+        }
+
+        // Surface shimmer (2s sparkle)
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+            shimmerPhase = 1.0
         }
     }
 }
 
-// MARK: - Orb Particle
+// MARK: - Ethereal Particle
 
-private struct OrbParticle: View {
+private struct EtherealParticle: View {
     let index: Int
     let totalCount: Int
     let phase: Double
     let orbRadius: CGFloat
     let particleSize: CGFloat
-    let color: Color
+    let colors: [Color]
+    let orbitTilt: Double
 
-    private var config: (baseAngle: Double, speed: Double, verticalOffset: Double) {
+    private var config: (baseAngle: Double, speed: Double, verticalScale: Double) {
         let seed = Double(index)
         let baseAngle = (seed / Double(totalCount)) * 2 * .pi
-        let speed = 0.7 + sin(seed * 1.5) * 0.3 // Varying speeds
-        let verticalOffset = sin(seed * 2.3) * 0.3 // Different orbital planes
-        return (baseAngle, speed, verticalOffset)
+        let speed = 0.6 + sin(seed * 1.7) * 0.4
+        let verticalScale = orbitTilt + sin(seed * 2.3) * 0.2
+        return (baseAngle, speed, verticalScale)
     }
 
     var body: some View {
-        let (baseAngle, speed, verticalOffset) = config
+        let (baseAngle, speed, verticalScale) = config
         let currentAngle = baseAngle + phase * 2 * .pi * speed
 
-        // Elliptical orbit with varying inclination
         let x = cos(currentAngle) * orbRadius
-        let y = sin(currentAngle) * orbRadius * (0.5 + verticalOffset * 0.3)
+        let y = sin(currentAngle) * orbRadius * verticalScale
 
-        // Depth-based opacity (particles in "front" are brighter)
-        let depthOpacity = 0.5 + sin(currentAngle) * 0.3
+        // Depth-based effects
+        let depthFactor = (sin(currentAngle) + 1) / 2
+        let currentOpacity = 0.3 + depthFactor * 0.5
+        let currentSize = particleSize * (0.7 + depthFactor * 0.6)
 
         Circle()
             .fill(
                 RadialGradient(
                     colors: [
-                        Color.white.opacity(0.9),
-                        color.opacity(depthOpacity),
+                        Color.white.opacity(0.95),
+                        colors[index % colors.count].opacity(currentOpacity),
                         Color.clear
                     ],
                     center: .center,
                     startRadius: 0,
-                    endRadius: particleSize
+                    endRadius: currentSize
                 )
             )
-            .frame(width: particleSize * 2, height: particleSize * 2)
+            .frame(width: currentSize * 2, height: currentSize * 2)
             .offset(x: x, y: y)
+            .blur(radius: currentSize * 0.15)
+    }
+}
+
+// MARK: - Sparkle Particle
+
+private struct SparkleParticle: View {
+    let index: Int
+    let phase: Double
+    let fieldSize: CGFloat
+    let particleSize: CGFloat
+
+    private var position: (x: CGFloat, y: CGFloat, opacity: Double) {
+        let seed = Double(index) * 1.618 // Golden ratio distribution
+        let angle = seed * 2.4 // Golden angle
+        let radius = fieldSize * (0.3 + sin(seed * 3.1) * 0.4)
+
+        let x = cos(angle) * radius
+        let y = sin(angle) * radius * 0.7
+
+        // Twinkle based on phase
+        let twinkle = sin(phase * .pi * 2 + seed * 2.7)
+        let opacity = max(0, twinkle) * 0.7
+
+        return (x, y, opacity)
+    }
+
+    var body: some View {
+        let pos = position
+
+        Circle()
+            .fill(Color.white)
+            .frame(width: particleSize, height: particleSize)
+            .offset(x: pos.x, y: pos.y)
+            .opacity(pos.opacity)
             .blur(radius: particleSize * 0.2)
     }
 }
@@ -371,7 +537,8 @@ struct StaticOrbLogo: View {
     let size: LogoSize
     var intensity: Double = 1.0
 
-    private let gradientColors: [Color] = [
+    private let auroraColors: [Color] = [
+        Color(hex: "A855F7"),
         Color(hex: "8B5CF6"),
         Color(hex: "6366F1"),
         Color(hex: "3B82F6"),
@@ -388,50 +555,78 @@ struct StaticOrbLogo: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                gradientColors[0].opacity(0.2 * intensity),
-                                gradientColors[2].opacity(0.1 * intensity),
+                                auroraColors[0].opacity(0.25 * intensity),
+                                auroraColors[3].opacity(0.15 * intensity),
                                 Color.clear
                             ],
                             center: .center,
-                            startRadius: size.dimension * 0.2,
-                            endRadius: size.dimension * 0.7
+                            startRadius: size.dimension * 0.15,
+                            endRadius: size.dimension * 0.6
                         )
                     )
-                    .frame(width: size.dimension * 1.4, height: size.dimension * 1.4)
-                    .blur(radius: size.dimension * 0.15)
+                    .frame(width: size.dimension * 1.3, height: size.dimension * 1.3)
+                    .blur(radius: size.dimension * 0.12)
             }
 
             // Main orb
             Circle()
                 .fill(
                     AngularGradient(
-                        colors: gradientColors + [gradientColors[0]],
+                        colors: auroraColors + [auroraColors[0]],
                         center: .center
                     )
                 )
-                .frame(width: size.dimension * 0.5, height: size.dimension * 0.5)
+                .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
+
+            // Glass overlay
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.white.opacity(0.15),
+                            Color.clear,
+                            Color.black.opacity(0.2)
+                        ],
+                        center: UnitPoint(x: 0.3, y: 0.3),
+                        startRadius: 0,
+                        endRadius: size.dimension * 0.3
+                    )
+                )
+                .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
 
             // Inner core
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color.white.opacity(0.9),
-                            Color.white.opacity(0.5),
+                            Color.white.opacity(0.95),
+                            Color.white.opacity(0.6),
+                            auroraColors[4].opacity(0.3),
                             Color.clear
                         ],
                         center: .center,
                         startRadius: 0,
-                        endRadius: size.dimension * 0.15
+                        endRadius: size.dimension * 0.12
                     )
                 )
-                .frame(width: size.dimension * 0.3, height: size.dimension * 0.3)
+                .frame(width: size.dimension * 0.24, height: size.dimension * 0.24)
 
             // Top highlight
             Ellipse()
-                .fill(Color.white.opacity(0.4))
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.white.opacity(0.6),
+                            Color.white.opacity(0.2),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size.dimension * 0.06
+                    )
+                )
                 .frame(width: size.dimension * 0.12, height: size.dimension * 0.06)
-                .offset(x: -size.dimension * 0.06, y: -size.dimension * 0.1)
+                .offset(x: -size.dimension * 0.08, y: -size.dimension * 0.12)
                 .blur(radius: 2)
         }
         .frame(width: size.dimension, height: size.dimension)
@@ -443,17 +638,50 @@ struct StaticOrbLogo: View {
 struct LoadingOrbLogo: View {
     let size: LogoSize
     @State private var pulsePhase: Double = 0
+    @State private var rotationPhase: Double = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        GlowingOrbLogo(size: size, isAnimating: true, showParticles: false, intensity: 0.8 + pulsePhase * 0.4)
-            .opacity(0.7 + pulsePhase * 0.3)
-            .onAppear {
-                guard !reduceMotion else { return }
-                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                    pulsePhase = 1.0
-                }
+        ZStack {
+            // Pulsing rings
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color(hex: "8B5CF6").opacity(0.5 - Double(index) * 0.15),
+                                Color(hex: "06B6D4").opacity(0.3 - Double(index) * 0.1),
+                                Color.clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 2
+                    )
+                    .frame(
+                        width: size.dimension * (0.6 + pulsePhase * 0.3 + Double(index) * 0.15),
+                        height: size.dimension * (0.6 + pulsePhase * 0.3 + Double(index) * 0.15)
+                    )
+                    .opacity(1.0 - pulsePhase * 0.5 - Double(index) * 0.2)
+                    .rotationEffect(.degrees(rotationPhase + Double(index) * 30))
             }
+
+            GlowingOrbLogo(
+                size: size,
+                isAnimating: true,
+                showParticles: false,
+                intensity: 0.9 + pulsePhase * 0.2
+            )
+        }
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                pulsePhase = 1.0
+            }
+            withAnimation(.linear(duration: 4.0).repeatForever(autoreverses: false)) {
+                rotationPhase = 360
+            }
+        }
     }
 }
 
@@ -465,19 +693,33 @@ struct SuccessOrbBurst: View {
 
     @State private var burstParticles: [BurstParticle] = []
     @State private var showCheckmark = false
+    @State private var ringScale: CGFloat = 0.5
 
-    private let gradientColors: [Color] = [
+    private let successColors: [Color] = [
         Color(hex: "8B5CF6"),
         Color(hex: "3B82F6"),
         Color(hex: "06B6D4"),
-        Color(hex: "14B8A6"),
-        Color(hex: "22C55E"), // Success green
+        Color(hex: "10B981"),
+        Color(hex: "22C55E"),
     ]
 
     var body: some View {
         ZStack {
-            // Base orb (green success tint)
-            GlowingOrbLogo(size: size, isAnimating: true, showParticles: false, intensity: 1.2)
+            // Success ring burst
+            Circle()
+                .stroke(
+                    LinearGradient(
+                        colors: [Color(hex: "22C55E"), Color(hex: "10B981")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 3
+                )
+                .frame(width: size.dimension * ringScale, height: size.dimension * ringScale)
+                .opacity(showCheckmark ? 0 : 0.8)
+
+            // Base orb with success tint
+            GlowingOrbLogo(size: size, isAnimating: true, showParticles: false, intensity: 1.3)
 
             // Burst particles
             ForEach(burstParticles) { particle in
@@ -486,18 +728,19 @@ struct SuccessOrbBurst: View {
                     .frame(width: particle.size, height: particle.size)
                     .offset(x: particle.offset.width, y: particle.offset.height)
                     .opacity(particle.opacity)
-                    .blur(radius: particle.size * 0.2)
+                    .blur(radius: particle.size * 0.15)
             }
 
             // Success checkmark overlay
             if showCheckmark {
                 Image(systemName: "checkmark")
-                    .font(.system(size: size.dimension * 0.25, weight: .bold))
+                    .font(.system(size: size.dimension * 0.22, weight: .bold))
                     .foregroundStyle(.white)
+                    .shadow(color: Color(hex: "22C55E").opacity(0.8), radius: 10)
                     .transition(.scale.combined(with: .opacity))
             }
         }
-        .frame(width: size.dimension, height: size.dimension)
+        .frame(width: size.dimension * 1.8, height: size.dimension * 1.8)
         .onChange(of: shouldBurst) { _, newValue in
             if newValue {
                 triggerBurst()
@@ -507,13 +750,13 @@ struct SuccessOrbBurst: View {
 
     private func triggerBurst() {
         // Create burst particles
-        burstParticles = (0..<20).map { index in
-            let angle = Double(index) / 20.0 * 2 * .pi
-            let distance = CGFloat.random(in: size.dimension * 0.3...size.dimension * 0.8)
+        burstParticles = (0..<24).map { index in
+            let angle = Double(index) / 24.0 * 2 * .pi
+            let distance = CGFloat.random(in: size.dimension * 0.4...size.dimension * 0.9)
             return BurstParticle(
                 id: UUID(),
-                color: gradientColors[index % gradientColors.count],
-                size: CGFloat.random(in: 4...12),
+                color: successColors[index % successColors.count],
+                size: CGFloat.random(in: 5...14),
                 offset: .zero,
                 targetOffset: CGSize(
                     width: cos(angle) * distance,
@@ -523,30 +766,36 @@ struct SuccessOrbBurst: View {
             )
         }
 
+        // Animate ring expansion
+        withAnimation(.easeOut(duration: 0.5)) {
+            ringScale = 1.5
+        }
+
         // Animate particles outward
-        withAnimation(.easeOut(duration: 0.6)) {
+        withAnimation(.easeOut(duration: 0.7)) {
             for i in burstParticles.indices {
                 burstParticles[i].offset = burstParticles[i].targetOffset
             }
         }
 
         // Fade out particles
-        withAnimation(.easeOut(duration: 0.4).delay(0.4)) {
+        withAnimation(.easeOut(duration: 0.5).delay(0.5)) {
             for i in burstParticles.indices {
                 burstParticles[i].opacity = 0
             }
         }
 
         // Show checkmark
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.6).delay(0.2)) {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.6).delay(0.25)) {
             showCheckmark = true
         }
 
         // Reset after animation
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
             shouldBurst = false
             showCheckmark = false
             burstParticles = []
+            ringScale = 0.5
         }
     }
 }
@@ -567,19 +816,25 @@ struct OrbLogoWithText: View {
     var showTagline: Bool = true
 
     var body: some View {
-        VStack(spacing: size.dimension * 0.15) {
+        VStack(spacing: size.dimension * 0.12) {
             GlowingOrbLogo(size: size)
 
-            VStack(spacing: 4) {
-                Text("MyTasksAI")
-                    .font(.system(size: size.dimension * 0.2, weight: .thin, design: .default))
-                    .foregroundStyle(.white)
+            VStack(spacing: 6) {
+                Text("Veloce")
+                    .font(.system(size: size.dimension * 0.18, weight: .thin, design: .default))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.white, .white.opacity(0.85)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
 
                 if showTagline {
-                    Text("INFINITE PRODUCTIVITY")
-                        .font(.system(size: size.dimension * 0.06, weight: .medium, design: .default))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .tracking(2)
+                    Text("INFINITE MOMENTUM")
+                        .font(.system(size: size.dimension * 0.055, weight: .medium, design: .default))
+                        .foregroundStyle(.white.opacity(0.5))
+                        .tracking(3)
                 }
             }
         }
@@ -588,19 +843,19 @@ struct OrbLogoWithText: View {
 
 // MARK: - Preview
 
-#Preview("Glowing Orb Logo - All Sizes") {
+#Preview("Celestial Floating Orb - All Sizes") {
     ZStack {
         Color.black.ignoresSafeArea()
 
-        VStack(spacing: 40) {
+        VStack(spacing: 50) {
             GlowingOrbLogo(size: .hero)
 
-            HStack(spacing: 40) {
+            HStack(spacing: 50) {
                 GlowingOrbLogo(size: .large)
                 GlowingOrbLogo(size: .medium)
             }
 
-            HStack(spacing: 30) {
+            HStack(spacing: 40) {
                 GlowingOrbLogo(size: .small)
                 GlowingOrbLogo(size: .tiny)
             }
@@ -615,16 +870,16 @@ struct OrbLogoWithText: View {
     }
 }
 
-#Preview("Static Orb Logo") {
-    ZStack {
-        Color.black.ignoresSafeArea()
-        StaticOrbLogo(size: .large)
-    }
-}
-
 #Preview("Loading Orb Logo") {
     ZStack {
         Color.black.ignoresSafeArea()
         LoadingOrbLogo(size: .large)
+    }
+}
+
+#Preview("Static Orb Logo") {
+    ZStack {
+        Color.black.ignoresSafeArea()
+        StaticOrbLogo(size: .large)
     }
 }
