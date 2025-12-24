@@ -26,6 +26,7 @@ struct CalendarSchedulingSheet: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var existingEvents: [EKEvent] = []
+    @State private var showSuccess = false
 
     private let durationPresets = [15, 30, 45, 60, 90, 120]
 
@@ -62,10 +63,20 @@ struct CalendarSchedulingSheet: View {
             } message: {
                 Text(errorMessage)
             }
+            .overlay {
+                if showSuccess {
+                    successOverlay
+                }
+            }
         }
         .task {
             // Default duration to AI estimate
             selectedDuration = task.estimatedMinutes ?? 30
+
+            // Ensure calendars are loaded
+            if calendarService.isAuthorized {
+                await calendarService.loadCalendars()
+            }
 
             // Load existing events for preview
             await loadEventsForSelectedDate()
@@ -364,6 +375,39 @@ struct CalendarSchedulingSheet: View {
         existingEvents = []
     }
 
+    // MARK: - Success Overlay
+    private var successOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.7)
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                ZStack {
+                    SwiftUI.Circle()
+                        .fill(Theme.Colors.success.opacity(0.2))
+                        .frame(width: 100, height: 100)
+
+                    SwiftUI.Circle()
+                        .fill(Theme.Colors.success)
+                        .frame(width: 70, height: 70)
+
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+
+                Text("Added to Calendar")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.white)
+
+                Text(combinedDateTime.formatted(date: .abbreviated, time: .shortened))
+                    .font(.system(size: 15))
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+            .transition(.scale.combined(with: .opacity))
+        }
+    }
+
     private func scheduleTask() async {
         isCreating = true
         defer { isCreating = false }
@@ -392,6 +436,13 @@ struct CalendarSchedulingSheet: View {
             onScheduled?(scheduledTime, selectedDuration)
 
             HapticsService.shared.celebration()
+
+            // Show success then dismiss
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showSuccess = true
+            }
+
+            try? await Task.sleep(for: .seconds(1.2))
             dismiss()
 
         } catch {

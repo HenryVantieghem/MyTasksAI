@@ -33,10 +33,17 @@ final class CalendarService {
 
     // MARK: - Authorization
 
-    /// Check current authorization status
+    /// Check current authorization status and load calendars if authorized
     func checkAuthorizationStatus() {
         let status = EKEventStore.authorizationStatus(for: .event)
         isAuthorized = status == .fullAccess || status == .writeOnly
+
+        // Load calendars if already authorized
+        if isAuthorized && selectedCalendar == nil {
+            calendars = eventStore.calendars(for: .event)
+                .filter { $0.allowsContentModifications }
+            selectedCalendar = eventStore.defaultCalendarForNewEvents
+        }
     }
 
     /// Request calendar access
