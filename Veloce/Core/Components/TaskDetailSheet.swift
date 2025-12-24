@@ -604,16 +604,16 @@ struct TaskDetailContentView: View {
 
     @MainActor
     private func loadSubTasks() {
-        // Call GeminiService for AI-powered task breakdown
+        // Call PerplexityService for AI-powered task breakdown
         Task {
             do {
-                guard GeminiService.shared.isReady else {
+                guard PerplexityService.shared.isReady else {
                     // Fallback to mock data if Gemini not configured
                     generateFallbackSubTasks()
                     return
                 }
 
-                let analysis = try await GeminiService.shared.generateGeniusAnalysis(
+                let analysis = try await PerplexityService.shared.generateGeniusAnalysis(
                     title: task.title,
                     notes: task.contextNotes,
                     context: nil,
@@ -639,7 +639,7 @@ struct TaskDetailContentView: View {
                 await saveSubTasksToSupabase()
 
             } catch {
-                print("GeminiService error: \(error.localizedDescription)")
+                print("PerplexityService error: \(error.localizedDescription)")
                 generateFallbackSubTasks()
             }
         }
@@ -682,12 +682,12 @@ struct TaskDetailContentView: View {
         // The AI provides TaskResource objects which we convert to YouTubeResource
         Task {
             do {
-                guard GeminiService.shared.isReady else {
+                guard PerplexityService.shared.isReady else {
                     youtubeResources = []
                     return
                 }
 
-                let analysis = try await GeminiService.shared.generateGeniusAnalysis(
+                let analysis = try await PerplexityService.shared.generateGeniusAnalysis(
                     title: task.title,
                     notes: task.contextNotes,
                     context: nil,
@@ -747,13 +747,13 @@ struct TaskDetailContentView: View {
     private func loadScheduleSuggestion() {
         Task {
             do {
-                guard GeminiService.shared.isReady else {
+                guard PerplexityService.shared.isReady else {
                     // Use default suggestion
                     setDefaultScheduleSuggestion()
                     return
                 }
 
-                let suggestions = try await GeminiService.shared.generateScheduleSuggestions(
+                let suggestions = try await PerplexityService.shared.generateScheduleSuggestions(
                     task: task,
                     calendar: [],
                     userPatterns: nil
@@ -985,7 +985,7 @@ struct TaskDetailContentView: View {
 
         do {
             // Check if patterns exist for this user
-            let existing: [UserProductivityPatterns] = try await SupabaseService.shared.supabase
+            let existing: [UserProductivityProfile] = try await SupabaseService.shared.supabase
                 .from("user_productivity_patterns")
                 .select()
                 .eq("user_id", value: userId.uuidString)
@@ -1013,7 +1013,7 @@ struct TaskDetailContentView: View {
                     .execute()
             } else {
                 // Create new patterns
-                let newPatterns = UserProductivityPatterns(
+                let newPatterns = UserProductivityProfile(
                     id: UUID(),
                     userId: userId,
                     energyPatterns: nil,

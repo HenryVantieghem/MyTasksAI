@@ -19,10 +19,30 @@ enum Theme {
         // MARK: Deep Space Blacks (Layered Depth)
         /// True deep space - the darkest background
         static let void = Color(red: 0.02, green: 0.02, blue: 0.04)
+        /// Ultimate void - even darker for depth layers
+        static let voidDeep = Color(red: 0.01, green: 0.01, blue: 0.03)
         /// Card backgrounds on void
         static let abyss = Color(red: 0.04, green: 0.04, blue: 0.06)
         /// Elevated surfaces
         static let nebulaDust = Color(red: 0.06, green: 0.06, blue: 0.10)
+
+        // MARK: Bioluminescent Accents (Living Cosmos)
+        /// Plasma core - bright cyan energy
+        static let plasmaCore = Color(red: 0.4, green: 0.9, blue: 1.0)
+        /// Aurora green - organic vitality
+        static let auroraGreen = Color(red: 0.2, green: 1.0, blue: 0.6)
+        /// Solar flare - warm energy burst
+        static let solarFlare = Color(red: 1.0, green: 0.7, blue: 0.3)
+        /// Supernova white - completion celebration
+        static let supernovaWhite = Color(red: 1.0, green: 0.98, blue: 0.95)
+
+        // MARK: Urgency Spectrum (Time-Based Glow)
+        /// Calm cyan - plenty of time remaining
+        static let urgencyCalm = Color(hex: "06B6D4")
+        /// Near amber - deadline approaching
+        static let urgencyNear = Color(hex: "FBBF24")
+        /// Critical red - overdue or imminent
+        static let urgencyCritical = Color(hex: "EF4444")
 
         // MARK: Nebula Core (Primary AI Palette)
         /// Vivid purple - primary AI accent
@@ -441,6 +461,28 @@ enum Theme {
         /// Small display text
         static let displaySmall = Font.system(size: 24, weight: .thin, design: .default)
 
+        // MARK: Living Cosmos Typography
+        /// Task title - SF Pro Rounded for softer, approachable feel
+        static let cosmosTitle = Font.system(size: 16, weight: .semibold, design: .rounded)
+        /// Task title large - for expanded card headers
+        static let cosmosTitleLarge = Font.system(size: 22, weight: .semibold, design: .rounded)
+        /// Section headers in expanded card
+        static let cosmosSectionHeader = Font.system(size: 13, weight: .semibold, design: .rounded)
+        /// Metadata - SF Mono for technical precision feel
+        static let cosmosMeta = Font.system(size: 11, weight: .medium, design: .monospaced)
+        /// Metadata small - for timestamps
+        static let cosmosMetaSmall = Font.system(size: 10, weight: .regular, design: .monospaced)
+        /// AI whisper - New York (serif) italic for editorial human feel
+        static let cosmosWhisper = Font.system(size: 14, weight: .regular, design: .serif).italic()
+        /// AI whisper small
+        static let cosmosWhisperSmall = Font.system(size: 12, weight: .regular, design: .serif).italic()
+        /// Points display - rounded for gamification
+        static let cosmosPoints = Font.system(size: 14, weight: .bold, design: .rounded)
+        /// Points display large
+        static let cosmosPointsLarge = Font.system(size: 24, weight: .bold, design: .rounded)
+        /// Energy label - thin for ethereal feel
+        static let cosmosEnergy = Font.system(size: 10, weight: .light, design: .rounded)
+
         // MARK: Display (Standard weights)
         static let largeTitle = Font.system(.largeTitle, design: .default, weight: .bold)
         static let title = Font.system(.title, design: .default, weight: .semibold)
@@ -594,6 +636,26 @@ enum Theme {
         static let aiPulse = SwiftUI.Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true)
         static let aiShimmer = SwiftUI.Animation.linear(duration: 1.5).repeatForever(autoreverses: false)
         static let iridescentRotation = SwiftUI.Animation.linear(duration: 8.0).repeatForever(autoreverses: false)
+
+        // MARK: Cosmic Springs (Living Cosmos)
+        /// Portal opening - dramatic expansion for card detail transition
+        static let portalOpen = SwiftUI.Animation.spring(response: 0.5, dampingFraction: 0.75)
+        /// Stellar bounce - satisfying bounce for interactions
+        static let stellarBounce = SwiftUI.Animation.spring(response: 0.35, dampingFraction: 0.6)
+        /// Orbital float - gentle ambient floating motion
+        static let orbitalFloat = SwiftUI.Animation.easeInOut(duration: 3.0).repeatForever(autoreverses: true)
+        /// Supernova burst - explosive completion celebration
+        static let supernovaBurst = SwiftUI.Animation.easeOut(duration: 0.4)
+        /// Plasma pulse - living energy core heartbeat
+        static let plasmaPulse = SwiftUI.Animation.easeInOut(duration: 1.2).repeatForever(autoreverses: true)
+        /// Aurora wave - flowing aurora tendrils
+        static let auroraWave = SwiftUI.Animation.easeInOut(duration: 2.5).repeatForever(autoreverses: true)
+        /// Gravity pull - items being attracted
+        static let gravityPull = SwiftUI.Animation.spring(response: 0.6, dampingFraction: 0.7)
+        /// Parallax shift - device tilt response
+        static let parallaxShift = SwiftUI.Animation.interactiveSpring(response: 0.15, dampingFraction: 0.8)
+        /// Stagger delay base - for orchestrated entry animations
+        static let staggerDelay: Double = 0.06
     }
 }
 

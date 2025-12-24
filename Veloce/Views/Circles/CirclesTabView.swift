@@ -21,7 +21,10 @@ struct CirclesTabView: View {
     @State private var isRefreshing = false
 
     var body: some View {
-        NavigationStack {
+        ZStack {
+            // Living Cosmos background
+            VoidBackground.circles
+
             ScrollView {
                 VStack(spacing: Theme.Spacing.xl) {
                     // Friend Requests Banner (if any pending)
@@ -41,7 +44,7 @@ struct CirclesTabView: View {
                     }
                 }
                 .padding(.horizontal, Theme.Spacing.md)
-                .padding(.top, Theme.Spacing.md)
+                .padding(.top, Theme.Spacing.universalHeaderHeight + Theme.Spacing.md)
                 .padding(.bottom, 120) // Space for tab bar
             }
             .refreshable {
@@ -51,6 +54,7 @@ struct CirclesTabView: View {
                 fabButton
             }
         }
+        .preferredColorScheme(.dark)
         .sheet(isPresented: $showAddFriend) {
             AddFriendSheet()
                 .presentationDetents([.medium, .large])
@@ -96,28 +100,21 @@ struct CirclesTabView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Friend Requests")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Theme.Colors.textPrimary)
+                        .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text("\(friendService.pendingCount) pending")
                         .font(.system(size: 14))
-                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .foregroundStyle(Theme.CelestialColors.starDim)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .foregroundStyle(Theme.CelestialColors.starGhost)
             }
             .padding(Theme.Spacing.md)
-            .background {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.ultraThinMaterial)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(Theme.Colors.aiPurple.opacity(0.3), lineWidth: 1)
-                    }
-            }
+            .celestialGlass()
         }
         .buttonStyle(.plain)
     }
@@ -129,7 +126,7 @@ struct CirclesTabView: View {
             HStack {
                 Text("My Circles")
                     .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Spacer()
 
@@ -159,11 +156,11 @@ struct CirclesTabView: View {
                 VStack(spacing: Theme.Spacing.md) {
                     Image(systemName: "person.3")
                         .font(.system(size: 40, weight: .light))
-                        .foregroundStyle(Theme.Colors.textTertiary)
+                        .foregroundStyle(Theme.CelestialColors.starGhost)
 
                     Text("No circles yet")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .foregroundStyle(Theme.CelestialColors.starDim)
 
                     HStack(spacing: Theme.Spacing.sm) {
                         Button {
@@ -194,10 +191,7 @@ struct CirclesTabView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Theme.Spacing.xl)
-                .background {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(.ultraThinMaterial)
-                }
+                .celestialGlass()
             } else {
                 // Circle cards
                 LazyVStack(spacing: Theme.Spacing.sm) {
@@ -219,11 +213,11 @@ struct CirclesTabView: View {
             HStack {
                 Text("Friends")
                     .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("(\(friendService.friendCount))")
                     .font(.system(size: 16))
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .foregroundStyle(Theme.CelestialColors.starGhost)
 
                 Spacer()
 
@@ -241,7 +235,7 @@ struct CirclesTabView: View {
                 VStack(spacing: Theme.Spacing.sm) {
                     Text("Add friends to see their progress")
                         .font(.system(size: 14))
-                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .foregroundStyle(Theme.CelestialColors.starDim)
 
                     Button {
                         showAddFriend = true
@@ -274,7 +268,7 @@ struct CirclesTabView: View {
                 .font(.system(size: 60, weight: .ultraLight))
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
+                        colors: [Theme.Colors.aiPurple, Theme.CelestialColors.plasmaCore],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -283,11 +277,11 @@ struct CirclesTabView: View {
             VStack(spacing: Theme.Spacing.xs) {
                 Text("Welcome to Circles")
                     .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("Connect with friends and stay accountable together")
                     .font(.system(size: 16))
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .foregroundStyle(Theme.CelestialColors.starDim)
                     .multilineTextAlignment(.center)
             }
         }
@@ -366,7 +360,7 @@ struct CircleCardView: View {
                 SwiftUI.Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
+                            colors: [Theme.Colors.aiPurple, Theme.CelestialColors.plasmaCore],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -381,12 +375,12 @@ struct CircleCardView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(circle.name)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 HStack(spacing: Theme.Spacing.sm) {
                     Label("\(circle.memberCount)", systemImage: "person.2")
                         .font(.system(size: 13))
-                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .foregroundStyle(Theme.CelestialColors.starDim)
 
                     if circle.circleStreak > 0 {
                         Label("\(circle.circleStreak)", systemImage: "flame")
@@ -400,13 +394,10 @@ struct CircleCardView: View {
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Theme.Colors.textTertiary)
+                .foregroundStyle(Theme.CelestialColors.starGhost)
         }
         .padding(Theme.Spacing.md)
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-        }
+        .celestialGlass()
     }
 }
 
@@ -420,23 +411,23 @@ struct FriendRowView: View {
             // Avatar
             ZStack {
                 SwiftUI.Circle()
-                    .fill(Theme.Colors.backgroundSecondary)
+                    .fill(Theme.CelestialColors.void)
                     .frame(width: 44, height: 44)
 
                 Text(friend.displayName.prefix(1).uppercased())
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .foregroundStyle(Theme.CelestialColors.starDim)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(friend.displayName)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 if let username = friend.atUsername {
                     Text(username)
                         .font(.system(size: 13))
-                        .foregroundStyle(Theme.Colors.textTertiary)
+                        .foregroundStyle(Theme.CelestialColors.starGhost)
                 }
             }
 

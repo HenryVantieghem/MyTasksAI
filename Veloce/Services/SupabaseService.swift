@@ -560,12 +560,12 @@ final class SupabaseService {
     // MARK: - Productivity Patterns Operations
 
     /// Fetch user productivity patterns
-    func fetchProductivityPatterns() async throws -> UserProductivityPatterns? {
+    func fetchProductivityPatterns() async throws -> UserProductivityProfile? {
         guard let userId = currentUserId else {
             throw SupabaseError.notAuthenticated
         }
 
-        let patterns: [UserProductivityPatterns] = try await supabase
+        let patterns: [UserProductivityProfile] = try await supabase
             .from("user_productivity_patterns")
             .select()
             .eq("user_id", value: userId.uuidString)
@@ -577,7 +577,7 @@ final class SupabaseService {
     }
 
     /// Update productivity patterns
-    func updateProductivityPatterns(_ patterns: UserProductivityPatterns) async throws {
+    func updateProductivityPatterns(_ patterns: UserProductivityProfile) async throws {
         try await supabase
             .from("user_productivity_patterns")
             .upsert(patterns)

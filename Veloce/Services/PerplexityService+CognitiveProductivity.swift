@@ -1,5 +1,5 @@
 //
-//  GeminiService+CognitiveProductivity.swift
+//  PerplexityService+CognitiveProductivity.swift
 //  Veloce
 //
 //  Extension for cognitive productivity AI features
@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Cognitive Productivity Extension
 
-extension GeminiService {
+extension PerplexityService {
 
     // MARK: - Sub-Task Breakdown (Claude Code Style)
 
@@ -58,7 +58,7 @@ extension GeminiService {
         }
         """
 
-        let response = try await generateText(prompt: prompt)
+        let (response, _) = try await generateText(prompt: prompt)
 
         // Parse JSON response
         guard let data = response.data(using: .utf8),
@@ -167,7 +167,8 @@ extension GeminiService {
         Keep it conversational and helpful, like a productivity coach.
         """
 
-        return try await generateText(prompt: prompt)
+        let (response, _) = try await generateText(prompt: prompt)
+        return response
     }
 
     // MARK: - YouTube Search Queries (Smart Hybrid Approach)
@@ -275,7 +276,7 @@ extension GeminiService {
         }
         """
 
-        let response = try await generateText(prompt: prompt)
+        let (response, _) = try await generateText(prompt: prompt)
 
         guard let data = response.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -308,7 +309,7 @@ extension GeminiService {
         taskTitle: String,
         estimatedMinutes: Int?,
         freeSlots: [DateInterval],
-        userPatterns: UserProductivityPatterns?
+        userPatterns: UserProductivityProfile?
     ) async throws -> ScheduleSuggestion {
         let duration = estimatedMinutes ?? 30
         let slotsDescription = freeSlots.prefix(5).map { interval in
@@ -349,7 +350,7 @@ extension GeminiService {
         }
         """
 
-        let response = try await generateText(prompt: prompt)
+        let (response, _) = try await generateText(prompt: prompt)
 
         // Parse or use defaults
         let defaultSlot = freeSlots.first?.start ?? Calendar.current.date(byAdding: .day, value: 1, to: Date())!
@@ -428,7 +429,7 @@ extension GeminiService {
         ["tip 1", "tip 2", "tip 3"]
         """
 
-        let response = try await generateText(prompt: prompt)
+        let (response, _) = try await generateText(prompt: prompt)
 
         if let data = response.data(using: .utf8),
            let tips = try? JSONSerialization.jsonObject(with: data) as? [String] {
@@ -475,7 +476,7 @@ extension GeminiService {
         Respond as JSON array: ["question 1?", "question 2?", "question 3?"]
         """
 
-        let response = try await generateText(prompt: prompt)
+        let (response, _) = try await generateText(prompt: prompt)
 
         if let data = response.data(using: .utf8),
            let questions = try? JSONSerialization.jsonObject(with: data) as? [String] {
@@ -490,40 +491,6 @@ extension GeminiService {
         ]
     }
 }
-
-// MARK: - Integration Notes
-/*
- IMPORTANT: Connect this extension to your existing GeminiService
-
- The methods in this extension use `generateText(prompt:)` which should
- call your existing Gemini API method. You have a few options:
-
- OPTION 1: If you have an existing `generate()` or similar method
- ---------------------------------------------------------------
- Add this helper method to bridge the calls:
-
-     private func generateText(prompt: String) async throws -> String {
-         // Call your existing method, e.g.:
-         return try await generate(prompt: prompt, task: nil).text
-     }
-
- OPTION 2: If using GoogleGenerativeAI SDK directly
- --------------------------------------------------
- Add this implementation:
-
-     private func generateText(prompt: String) async throws -> String {
-         let model = GenerativeModel(name: "gemini-pro", apiKey: apiKey)
-         let response = try await model.generateContent(prompt)
-         return response.text ?? ""
-     }
-
- OPTION 3: Use the methods standalone
- ------------------------------------
- Replace calls to `generateText(prompt:)` with your existing service calls.
-
- The fallback methods (generateFallbackBreakdown, generateFallbackTips, etc.)
- work without AI and provide sensible defaults based on pattern matching.
-*/
 
 // MARK: - Error Types
 

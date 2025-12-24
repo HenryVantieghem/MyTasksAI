@@ -86,7 +86,7 @@ struct TaskCardView: View {
                 // Chevron with subtle glow
                 ZStack {
                     if task.hasAIProcessing {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.CelestialColors.nebulaCore.opacity(0.15))
                             .frame(width: 28, height: 28)
                     }
@@ -112,7 +112,7 @@ struct TaskCardView: View {
                     HStack(alignment: .top, spacing: Theme.Spacing.md) {
                         // Lightbulb icon with glow
                         ZStack {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.Colors.xp.opacity(0.15))
                                 .frame(width: 24, height: 24)
 
@@ -296,13 +296,13 @@ struct TaskCardCheckbox: View {
         Button(action: action) {
             ZStack {
                 // Background circle
-                Circle()
+                SwiftUI.Circle()
                     .stroke(isChecked ? Theme.Colors.success : Theme.Colors.glassBorder, lineWidth: 2)
                     .frame(width: 24, height: 24)
 
                 // Filled background when checked
                 if isChecked {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.success)
                         .frame(width: 24, height: 24)
 

@@ -2,9 +2,9 @@
 //  AuthView.swift
 //  Veloce
 //
-//  Authentication View - Apple Intelligence-Inspired Design
-//  Premium auth experience with animated logo, flowing aurora,
-//  and crystalline glass components.
+//  Authentication View - Living Cosmos Design
+//  Premium auth experience with celestial void background, animated logo,
+//  nebula effects, and staggered reveal animations.
 //
 
 import SwiftUI
@@ -43,59 +43,45 @@ struct AuthView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Celestial Aurora background
-                AuroraBackground.auth
+                // Living Cosmos void background with orb
+                VoidBackground.auth
 
-                // Animated Logo - The new hero element
-                ZStack {
-                    // Success burst effect
-                    if triggerSuccessBurst {
-                        SuccessLogoBurst(
-                            size: logoSize(for: geometry),
-                            shouldBurst: $triggerSuccessBurst
-                        )
-                    } else {
-                        // Main animated logo
-                        AppLogoView(
-                            size: logoSize(for: geometry),
-                            isAnimating: true,
-                            showParticles: orbState == .processing || orbState == .active
-                        )
-                        .scaleEffect(logoScale)
-                        .opacity(logoOpacity)
-                    }
+                // Success burst effect
+                if triggerSuccessBurst {
+                    SuccessLogoBurst(
+                        size: logoSize(for: geometry),
+                        shouldBurst: $triggerSuccessBurst
+                    )
+                    .position(
+                        x: geometry.size.width / 2,
+                        y: logoYPosition(for: geometry)
+                    )
                 }
-                .position(
-                    x: geometry.size.width / 2,
-                    y: logoYPosition(for: geometry)
-                )
 
                 // Content
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: Aurora.Layout.spacingXL) {
+                    VStack(spacing: Theme.Spacing.xl) {
                         // Spacer for logo
                         Spacer(minLength: logoSpacerHeight(for: geometry))
 
                         // Logo & Title
                         headerSection
-                            .opacity(showContent ? 1 : 0)
-                            .offset(y: showContent ? 0 : -20)
+                            .staggeredReveal(index: 0, isVisible: showContent)
 
-                        Spacer(minLength: Aurora.Layout.spacingLarge)
+                        Spacer(minLength: Theme.Spacing.xl)
 
                         // Auth form
                         authFormSection
-                            .opacity(showContent ? 1 : 0)
-                            .offset(y: showContent ? 0 : 20)
+                            .staggeredReveal(index: 1, isVisible: showContent)
 
-                        Spacer(minLength: Aurora.Layout.spacing)
+                        Spacer(minLength: Theme.Spacing.lg)
 
                         // Terms
                         termsSection
-                            .opacity(showContent ? 1 : 0)
-                            .padding(.bottom, Aurora.Layout.spacingXL)
+                            .staggeredReveal(index: 2, isVisible: showContent)
+                            .padding(.bottom, Theme.Spacing.xl)
                     }
-                    .padding(.horizontal, Aurora.Layout.screenPadding)
+                    .padding(.horizontal, Theme.Spacing.lg)
                 }
             }
             // Tap anywhere to dismiss keyboard
@@ -104,7 +90,7 @@ struct AuthView: View {
             }
         }
         .onAppear {
-            withAnimation(Aurora.Animation.spring.delay(0.3)) {
+            withAnimation(LivingCosmos.Animations.portalOpen.delay(0.3)) {
                 showContent = true
             }
         }
@@ -121,7 +107,7 @@ struct AuthView: View {
                 if orbState == .error {
                     orbState = .dormant
                 }
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                withAnimation(LivingCosmos.Animations.spring) {
                     logoIntensity = 1.0
                 }
             }
@@ -157,7 +143,7 @@ struct AuthView: View {
     }
 
     private func updateLogoIntensity(for field: AuthField?) {
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+        withAnimation(LivingCosmos.Animations.spring) {
             if field != nil {
                 logoIntensity = 1.2
             } else {
@@ -200,15 +186,21 @@ struct AuthView: View {
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: Aurora.Layout.spacingSmall) {
-            // Editorial thin typography - no circular rings
-            Text("MyTasksAI")
+        VStack(spacing: Theme.Spacing.sm) {
+            // Cosmic display typography
+            Text("Veloce")
                 .font(.system(size: 42, weight: .thin, design: .default))
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Theme.CelestialColors.starWhite, Theme.CelestialColors.starWhite.opacity(0.8)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
 
             Text("AI-Powered Productivity")
-                .font(AppTypography.subheadline)
-                .foregroundStyle(AppColors.textSecondary)
+                .font(Theme.Typography.cosmosWhisper)
+                .foregroundStyle(Theme.CelestialColors.starDim)
         }
     }
 
@@ -216,7 +208,7 @@ struct AuthView: View {
 
     @ViewBuilder
     private var authFormSection: some View {
-        VStack(spacing: Aurora.Layout.spacingLarge) {
+        VStack(spacing: Theme.Spacing.xl) {
             switch currentScreen {
             case .signIn:
                 signInForm
@@ -226,16 +218,16 @@ struct AuthView: View {
                 forgotPasswordForm
             }
         }
-        .animation(Aurora.Animation.spring, value: currentScreen)
+        .animation(LivingCosmos.Animations.spring, value: currentScreen)
     }
 
     // MARK: - Sign In Form
 
     private var signInForm: some View {
-        VStack(spacing: Aurora.Layout.spacingLarge) {
-            VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: Theme.Spacing.xl) {
+            VStack(spacing: Theme.Spacing.md) {
                 // Email field
-                CrystallineTextField(
+                CelestialTextField(
                     text: $viewModel.email,
                     placeholder: "Email",
                     icon: "envelope.fill",
@@ -251,7 +243,7 @@ struct AuthView: View {
                 .focused($focusedField, equals: .email)
 
                 // Password field
-                CrystallineTextField(
+                CelestialTextField(
                     text: $viewModel.password,
                     placeholder: "Password",
                     icon: "lock.fill",
@@ -268,9 +260,10 @@ struct AuthView: View {
             }
 
             // Sign in button
-            AuroraButton(
+            CosmicButton(
                 "Sign In",
                 style: .primary,
+                icon: "arrow.right",
                 isLoading: viewModel.isLoading,
                 isEnabled: viewModel.canSignIn
             ) {
@@ -278,21 +271,21 @@ struct AuthView: View {
             }
 
             // Secondary actions
-            VStack(spacing: Aurora.Layout.spacing) {
-                AuroraLinkButton("Forgot Password?", color: Aurora.Colors.textTertiary) {
-                    withAnimation(Aurora.Animation.spring) {
+            VStack(spacing: Theme.Spacing.md) {
+                CosmicLinkButton("Forgot Password?", color: Theme.CelestialColors.starDim) {
+                    withAnimation(LivingCosmos.Animations.spring) {
                         currentScreen = .forgotPassword
                     }
                 }
 
-                HStack(spacing: Aurora.Layout.spacingTiny) {
+                HStack(spacing: Theme.Spacing.xs) {
                     Text("Don't have an account?")
                         .font(.system(size: 15))
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .foregroundStyle(Theme.CelestialColors.starDim)
 
-                    AuroraLinkButton("Sign Up") {
+                    CosmicLinkButton("Sign Up") {
                         HapticsService.shared.selectionFeedback()
-                        withAnimation(Aurora.Animation.spring) {
+                        withAnimation(LivingCosmos.Animations.spring) {
                             currentScreen = .signUp
                             viewModel.clearForm()
                         }
@@ -305,10 +298,10 @@ struct AuthView: View {
     // MARK: - Sign Up Form
 
     private var signUpForm: some View {
-        VStack(spacing: Aurora.Layout.spacingLarge) {
-            VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: Theme.Spacing.xl) {
+            VStack(spacing: Theme.Spacing.md) {
                 // Name field (optional)
-                CrystallineTextField(
+                CelestialTextField(
                     text: $viewModel.fullName,
                     placeholder: "Full Name (optional)",
                     icon: "person.fill",
@@ -322,7 +315,7 @@ struct AuthView: View {
                 .focused($focusedField, equals: .name)
 
                 // Username field (required for Circles)
-                CrystallineTextField(
+                CelestialTextField(
                     text: $viewModel.username,
                     placeholder: "Username",
                     icon: "at",
@@ -338,7 +331,7 @@ struct AuthView: View {
                 .focused($focusedField, equals: .username)
 
                 // Email field
-                CrystallineTextField(
+                CelestialTextField(
                     text: $viewModel.email,
                     placeholder: "Email",
                     icon: "envelope.fill",
@@ -354,8 +347,8 @@ struct AuthView: View {
                 .focused($focusedField, equals: .email)
 
                 // Password field with strength indicator
-                VStack(spacing: Aurora.Layout.spacingSmall) {
-                    CrystallineTextField(
+                VStack(spacing: Theme.Spacing.sm) {
+                    CelestialTextField(
                         text: $viewModel.password,
                         placeholder: "Password",
                         icon: "lock.fill",
@@ -370,9 +363,9 @@ struct AuthView: View {
                     )
                     .focused($focusedField, equals: .password)
 
-                    // Constellation password strength
+                    // Celestial password strength
                     if !viewModel.password.isEmpty {
-                        ConstellationPasswordStrength(
+                        CelestialPasswordStrength(
                             strength: viewModel.passwordStrength,
                             password: viewModel.password
                         )
@@ -381,7 +374,7 @@ struct AuthView: View {
                 }
 
                 // Confirm password
-                CrystallineTextField(
+                CelestialTextField(
                     text: $viewModel.confirmPassword,
                     placeholder: "Confirm Password",
                     icon: "lock.fill",
@@ -397,12 +390,13 @@ struct AuthView: View {
                 )
                 .focused($focusedField, equals: .confirmPassword)
             }
-            .animation(Aurora.Animation.spring, value: viewModel.password.isEmpty)
+            .animation(LivingCosmos.Animations.spring, value: viewModel.password.isEmpty)
 
             // Sign up button
-            AuroraButton(
+            CosmicButton(
                 "Create Account",
                 style: .primary,
+                icon: "sparkles",
                 isLoading: viewModel.isLoading,
                 isEnabled: viewModel.canSignUp
             ) {
@@ -410,14 +404,14 @@ struct AuthView: View {
             }
 
             // Back to sign in
-            HStack(spacing: Aurora.Layout.spacingTiny) {
+            HStack(spacing: Theme.Spacing.xs) {
                 Text("Already have an account?")
                     .font(.system(size: 15))
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(Theme.CelestialColors.starDim)
 
-                AuroraLinkButton("Sign In") {
+                CosmicLinkButton("Sign In") {
                     HapticsService.shared.selectionFeedback()
-                    withAnimation(Aurora.Animation.spring) {
+                    withAnimation(LivingCosmos.Animations.spring) {
                         currentScreen = .signIn
                         viewModel.clearForm()
                     }
@@ -429,36 +423,47 @@ struct AuthView: View {
     // MARK: - Forgot Password Form
 
     private var forgotPasswordForm: some View {
-        VStack(spacing: Aurora.Layout.spacingLarge) {
-            // Icon with aurora glow
+        VStack(spacing: Theme.Spacing.xl) {
+            // Icon with nebula glow
             ZStack {
-                Circle()
-                    .fill(Aurora.Colors.electric.opacity(0.2))
+                SwiftUI.Circle()
+                    .fill(Theme.Colors.aiPurple.opacity(0.2))
                     .frame(width: 80, height: 80)
                     .blur(radius: 12)
 
-                Circle()
-                    .fill(Aurora.Colors.cosmicSurface)
+                SwiftUI.Circle()
+                    .fill(.ultraThinMaterial)
                     .frame(width: 80, height: 80)
+                    .overlay {
+                        SwiftUI.Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [Color.white.opacity(0.2), Theme.Colors.aiPurple.opacity(0.3)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    }
 
                 Image(systemName: "envelope.badge.shield.half.filled")
                     .font(.system(size: 32, weight: .light))
-                    .foregroundStyle(Aurora.Colors.electric)
+                    .foregroundStyle(Theme.Colors.aiPurple)
             }
 
-            VStack(spacing: Aurora.Layout.spacingTiny) {
+            VStack(spacing: Theme.Spacing.xs) {
                 Text("Reset Password")
                     .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("Enter your email and we'll send you a link to reset your password")
                     .font(.system(size: 15))
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(Theme.CelestialColors.starDim)
                     .multilineTextAlignment(.center)
             }
 
             // Email field
-            CrystallineTextField(
+            CelestialTextField(
                 text: $viewModel.email,
                 placeholder: "Email",
                 icon: "envelope.fill",
@@ -474,9 +479,10 @@ struct AuthView: View {
             .focused($focusedField, equals: .email)
 
             // Send button
-            AuroraButton(
+            CosmicButton(
                 "Send Reset Link",
                 style: .primary,
+                icon: "paperplane.fill",
                 isLoading: viewModel.isLoading,
                 isEnabled: viewModel.emailValidation.isValid
             ) {
@@ -484,9 +490,9 @@ struct AuthView: View {
             }
 
             // Back to sign in
-            AuroraButton("Back to Sign In", style: .ghost, icon: "arrow.left") {
+            CosmicButton("Back to Sign In", style: .ghost, icon: "arrow.left", iconPosition: .leading) {
                 HapticsService.shared.selectionFeedback()
-                withAnimation(Aurora.Animation.spring) {
+                withAnimation(LivingCosmos.Animations.spring) {
                     currentScreen = .signIn
                     viewModel.clearForm()
                 }
@@ -497,21 +503,21 @@ struct AuthView: View {
     // MARK: - Terms Section
 
     private var termsSection: some View {
-        VStack(spacing: Aurora.Layout.spacingTiny) {
+        VStack(spacing: Theme.Spacing.xs) {
             Text("By continuing, you agree to our")
                 .font(.system(size: 12))
-                .foregroundStyle(Aurora.Colors.textQuaternary)
+                .foregroundStyle(Theme.CelestialColors.starGhost)
 
-            HStack(spacing: Aurora.Layout.spacingTiny) {
-                AuroraLinkButton("Terms of Service", color: Aurora.Colors.electric.opacity(0.8)) {
+            HStack(spacing: Theme.Spacing.xs) {
+                CosmicLinkButton("Terms of Service", color: Theme.Colors.aiPurple.opacity(0.8)) {
                     // Open terms
                 }
 
                 Text("and")
                     .font(.system(size: 12))
-                    .foregroundStyle(Aurora.Colors.textQuaternary)
+                    .foregroundStyle(Theme.CelestialColors.starGhost)
 
-                AuroraLinkButton("Privacy Policy", color: Aurora.Colors.electric.opacity(0.8)) {
+                CosmicLinkButton("Privacy Policy", color: Theme.Colors.aiPurple.opacity(0.8)) {
                     // Open privacy
                 }
             }
@@ -547,7 +553,7 @@ struct AuthView: View {
     // MARK: - Orb State Management
 
     private func updateOrbState(for field: AuthField?) {
-        withAnimation(Aurora.Animation.spring) {
+        withAnimation(LivingCosmos.Animations.spring) {
             if field != nil {
                 orbState = .aware
             } else if !viewModel.email.isEmpty || !viewModel.password.isEmpty {
@@ -564,7 +570,7 @@ struct AuthView: View {
             orbState = .success
             // Trigger the success burst animation
             HapticsService.shared.celebration()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+            withAnimation(LivingCosmos.Animations.spring) {
                 triggerSuccessBurst = true
             }
         case .error(let message):

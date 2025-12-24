@@ -82,7 +82,9 @@ final class AppViewModel {
         ai.loadConfiguration()
 
         // Configure subscription service
-        SubscriptionService.shared.configure()
+        Task {
+            await SubscriptionService.shared.configure()
+        }
     }
 
     // MARK: - Authentication

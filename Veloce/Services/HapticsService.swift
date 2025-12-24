@@ -369,6 +369,89 @@ final class HapticsService {
         playCustomPattern(.aiComplete)
     }
 
+    // MARK: - Gamification Haptics
+
+    /// Combo increase - rising intensity based on combo level
+    /// - Parameter comboCount: Current combo count
+    func comboUp(comboCount: Int) {
+        guard hapticsEnabled, supportsHaptics else {
+            if comboCount >= 4 {
+                impact(.heavy)
+            } else {
+                impact(.medium)
+            }
+            return
+        }
+
+        if comboCount >= 6 {
+            playCustomPattern(.comboMax)
+        } else if comboCount >= 4 {
+            playCustomPattern(.comboHigh)
+        } else {
+            playCustomPattern(.comboUp)
+        }
+    }
+
+    /// Boss hit - sharp impact for dealing damage
+    func bossHit() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.heavy)
+            return
+        }
+
+        playCustomPattern(.bossHit)
+    }
+
+    /// Boss defeated - extended celebration sequence
+    func bossDefeated() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        playCustomPattern(.bossDefeated)
+    }
+
+    /// Power-up activation - soft pulse → sharp confirm
+    func powerUpActivate() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.heavy)
+            return
+        }
+
+        playCustomPattern(.powerUpActivate)
+    }
+
+    /// Secret/rare achievement unlock - mysterious pattern
+    func achievementSecret() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        playCustomPattern(.achievementSecret)
+    }
+
+    /// Daily quest complete
+    func questComplete() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        playCustomPattern(.questComplete)
+    }
+
+    /// Milestone reached on a goal
+    func milestoneReached() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        playCustomPattern(.milestone)
+    }
+
     // MARK: - Dynamic Pattern Playback
 
     private func playDynamicPattern(intensity: Float, sharpness: Float) {
@@ -399,6 +482,16 @@ final class HapticsService {
         case taskComplete
         case calendarDrop
         case aiComplete
+        // Gamification patterns
+        case comboUp
+        case comboHigh
+        case comboMax
+        case bossHit
+        case bossDefeated
+        case powerUpActivate
+        case achievementSecret
+        case questComplete
+        case milestone
 
         var events: [CHHapticEvent] {
             switch self {
@@ -550,6 +643,174 @@ final class HapticsService {
                         CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
                     ], relativeTime: 0.25)
                 ]
+
+            // MARK: Gamification Patterns
+
+            case .comboUp:
+                // Rising intensity for building combo
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.08)
+                ]
+
+            case .comboHigh:
+                // Higher combo (x2) - more intense rising sequence
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.06),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.12)
+                ]
+
+            case .comboMax:
+                // Maximum combo (x3) - epic power surge
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0, duration: 0.1),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.1),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.9),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0.15),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+                    ], relativeTime: 0.2)
+                ]
+
+            case .bossHit:
+                // Sharp impact for boss damage
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0.08)
+                ]
+
+            case .bossDefeated:
+                // Extended victory celebration
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0, duration: 0.3),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0.35),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.5),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+                    ], relativeTime: 0.65),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.7, duration: 0.5)
+                ]
+
+            case .powerUpActivate:
+                // Soft pulse → sharp confirm
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0, duration: 0.15),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.2)
+                ]
+
+            case .achievementSecret:
+                // Mysterious pattern for rare achievements
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.1)
+                    ], relativeTime: 0.1, duration: 0.3),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.45),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.6),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0.65, duration: 0.4)
+                ]
+
+            case .questComplete:
+                // Daily quest complete - satisfying finish
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.9),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0.1),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.15, duration: 0.2)
+                ]
+
+            case .milestone:
+                // Goal milestone reached - celebratory
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0, duration: 0.2),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.25),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.35),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.5)
+                ]
+
             }
         }
     }

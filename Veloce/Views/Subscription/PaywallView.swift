@@ -134,7 +134,7 @@ struct PaywallView: View {
 
     private var featuresSection: some View {
         VStack(spacing: Aurora.Layout.spacing) {
-            ForEach(Array(SubscriptionTier.monthly.features.enumerated()), id: \.offset) { index, feature in
+            ForEach(Array(SubscriptionTier.pro.features.enumerated()), id: \.offset) { index, feature in
                 featureRow(feature, index: index)
             }
         }
@@ -315,7 +315,7 @@ struct PaywallView: View {
         HapticsService.shared.impact()
 
         do {
-            try await subscription.purchaseMonthly()
+            try await subscription.purchasePro()
 
             if subscription.canAccessApp {
                 HapticsService.shared.celebration()

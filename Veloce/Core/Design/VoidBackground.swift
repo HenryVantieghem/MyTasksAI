@@ -2,9 +2,9 @@
 //  VoidBackground.swift
 //  Veloce
 //
-//  Void Background View
-//  Deep cosmic background with twinkling stars and ambient glow
-//  Used across all pages for unified void aesthetic
+//  Living Cosmos - Dynamic Productivity Nebula
+//  Deep cosmic background with dynamic nebula that responds to productivity,
+//  ambient star field, and parallax effects for scroll response
 //
 
 import SwiftUI
@@ -19,9 +19,52 @@ struct VoidBackground: View {
     let showOrb: Bool
     let orbSize: VoidDesign.OrbSize
     let orbStyle: AIOrbAnimationStyle
+    let productivity: ProductivityLevel
+    let enableParallax: Bool
 
     @State private var twinklePhase: Double = 0
-    @State private var stars: [StarParticle] = []
+    @State private var nebulaPhase: CGFloat = 0
+    @State private var stars: [CosmicStar] = []
+    @State private var scrollOffset: CGFloat = 0
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    enum ProductivityLevel {
+        case neutral
+        case productive
+        case struggling
+
+        var nebulaColors: [Color] {
+            switch self {
+            case .neutral:
+                return [
+                    Theme.CelestialColors.nebulaCore,
+                    Theme.CelestialColors.nebulaEdge,
+                    Theme.Colors.aiPurple
+                ]
+            case .productive:
+                return [
+                    Theme.CelestialColors.auroraGreen.opacity(0.8),
+                    Theme.CelestialColors.plasmaCore,
+                    Theme.Colors.aiPurple
+                ]
+            case .struggling:
+                return [
+                    Theme.CelestialColors.nebulaCore.opacity(0.6),
+                    Theme.CelestialColors.nebulaEdge.opacity(0.4),
+                    Color.clear
+                ]
+            }
+        }
+
+        var intensity: Double {
+            switch self {
+            case .neutral: return 0.12
+            case .productive: return 0.18
+            case .struggling: return 0.06
+            }
+        }
+    }
 
     init(
         glowPosition: VoidDesign.GlowPosition = .bottom,
@@ -29,7 +72,9 @@ struct VoidBackground: View {
         starCount: Int = VoidDesign.Stars.countStandard,
         showOrb: Bool = false,
         orbSize: VoidDesign.OrbSize = .medium,
-        orbStyle: AIOrbAnimationStyle = .breathing
+        orbStyle: AIOrbAnimationStyle = .breathing,
+        productivity: ProductivityLevel = .neutral,
+        enableParallax: Bool = true
     ) {
         self.glowPosition = glowPosition
         self.glowColor = glowColor
@@ -37,19 +82,24 @@ struct VoidBackground: View {
         self.showOrb = showOrb
         self.orbSize = orbSize
         self.orbStyle = orbStyle
+        self.productivity = productivity
+        self.enableParallax = enableParallax
     }
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Deep black gradient base
+                // Deep void gradient base
                 voidGradient
+
+                // Dynamic nebula layers
+                dynamicNebula(in: geometry)
 
                 // Ambient glow
                 ambientGlow(in: geometry)
 
-                // Star field
-                starField(in: geometry)
+                // Enhanced star field
+                cosmicStarField(in: geometry)
 
                 // Optional centered orb
                 if showOrb {
@@ -68,7 +118,7 @@ struct VoidBackground: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            startTwinkle()
+            startCosmicAnimations()
         }
     }
 
@@ -77,13 +127,54 @@ struct VoidBackground: View {
     private var voidGradient: some View {
         LinearGradient(
             colors: [
-                VoidDesign.Colors.voidBlack,
-                VoidDesign.Colors.voidSurface,
-                VoidDesign.Colors.voidDeep
+                Theme.CelestialColors.voidDeep,
+                Theme.CelestialColors.void,
+                Theme.CelestialColors.abyss
             ],
             startPoint: .top,
             endPoint: .bottom
         )
+    }
+
+    // MARK: - Dynamic Nebula
+
+    private func dynamicNebula(in geometry: GeometryProxy) -> some View {
+        ZStack {
+            // Primary nebula cloud
+            NebulaCloud(
+                colors: productivity.nebulaColors,
+                position: UnitPoint(x: 0.3, y: 0.2),
+                radius: 300,
+                phase: nebulaPhase,
+                intensity: productivity.intensity
+            )
+
+            // Secondary nebula wisp
+            NebulaCloud(
+                colors: [
+                    Theme.Colors.aiPurple.opacity(0.1),
+                    Theme.CelestialColors.plasmaCore.opacity(0.05),
+                    Color.clear
+                ],
+                position: UnitPoint(x: 0.7, y: 0.6),
+                radius: 200,
+                phase: nebulaPhase * 0.7,
+                intensity: 0.08
+            )
+
+            // Tertiary distant wisp
+            NebulaCloud(
+                colors: [
+                    Theme.CelestialColors.nebulaEdge.opacity(0.06),
+                    Color.clear
+                ],
+                position: UnitPoint(x: 0.1, y: 0.8),
+                radius: 250,
+                phase: nebulaPhase * 0.5,
+                intensity: 0.05
+            )
+        }
+        .offset(y: enableParallax ? scrollOffset * 0.1 : 0)
     }
 
     // MARK: - Ambient Glow
@@ -91,7 +182,8 @@ struct VoidBackground: View {
     private func ambientGlow(in geometry: GeometryProxy) -> some View {
         RadialGradient(
             colors: [
-                glowColor.opacity(glowPosition.intensity),
+                glowColor.opacity(glowPosition.intensity * (productivity == .productive ? 1.3 : 1)),
+                glowColor.opacity(glowPosition.intensity * 0.3),
                 Color.clear
             ],
             center: glowUnitPoint(in: geometry),
@@ -101,7 +193,6 @@ struct VoidBackground: View {
     }
 
     private func glowUnitPoint(in geometry: GeometryProxy) -> UnitPoint {
-        // Convert glow position to actual unit point
         switch glowPosition {
         case .bottom:
             return .bottom
@@ -114,42 +205,168 @@ struct VoidBackground: View {
         }
     }
 
-    // MARK: - Star Field
+    // MARK: - Cosmic Star Field
 
-    private func starField(in geometry: GeometryProxy) -> some View {
+    private func cosmicStarField(in geometry: GeometryProxy) -> some View {
         Canvas { context, size in
             for star in stars {
-                let twinkle = sin(twinklePhase + star.twinkleDelay * .pi) * 0.5 + 0.5
+                let twinkle = reduceMotion ? 1.0 : sin(twinklePhase + star.twinkleDelay * .pi) * 0.5 + 0.5
                 let opacity = star.baseOpacity * (0.5 + twinkle * 0.5)
+
+                // Parallax offset for depth
+                let parallaxY = enableParallax ? scrollOffset * star.parallaxFactor * 0.05 : 0
 
                 let rect = CGRect(
                     x: star.position.x - star.size / 2,
-                    y: star.position.y - star.size / 2,
+                    y: star.position.y - star.size / 2 + parallaxY,
                     width: star.size,
                     height: star.size
                 )
 
+                // Color based on star type
+                let starColor: Color
+                switch star.starType {
+                case .bright:
+                    starColor = Color.white.opacity(opacity)
+                case .plasma:
+                    starColor = Theme.CelestialColors.plasmaCore.opacity(opacity * 0.8)
+                case .nebula:
+                    starColor = Theme.CelestialColors.nebulaEdge.opacity(opacity * 0.6)
+                case .dim:
+                    starColor = Theme.CelestialColors.starDim.opacity(opacity)
+                }
+
                 context.fill(
                     SwiftUI.Circle().path(in: rect),
-                    with: .color(star.isBright ? VoidDesign.Colors.starWhite.opacity(opacity) : VoidDesign.Colors.starDim.opacity(opacity))
+                    with: .color(starColor)
                 )
+
+                // Glow for larger stars
+                if star.size > 2 && !reduceMotion {
+                    let glowRect = CGRect(
+                        x: star.position.x - star.size,
+                        y: star.position.y - star.size + parallaxY,
+                        width: star.size * 2,
+                        height: star.size * 2
+                    )
+                    context.fill(
+                        SwiftUI.Circle().path(in: glowRect),
+                        with: .color(starColor.opacity(0.2))
+                    )
+                }
             }
         }
         .onAppear {
-            regenerateStars(in: geometry.size)
-        }
-        .onChange(of: geometry.size) { _, newSize in
-            regenerateStars(in: newSize)
+            regenerateStars(in: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
         }
     }
 
     private func regenerateStars(in size: CGSize) {
-        stars = StarParticle.generateField(count: starCount, in: size, brightPercentage: 0.15)
+        stars = CosmicStar.generateField(count: starCount, in: size)
     }
 
-    private func startTwinkle() {
+    // MARK: - Animations
+
+    private func startCosmicAnimations() {
+        guard !reduceMotion else { return }
+
+        // Star twinkle
         withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
             twinklePhase = .pi * 2
+        }
+
+        // Nebula drift
+        withAnimation(.linear(duration: 60).repeatForever(autoreverses: false)) {
+            nebulaPhase = 1
+        }
+    }
+
+    // MARK: - Scroll Tracking
+
+    func trackScroll(offset: CGFloat) -> VoidBackground {
+        var copy = self
+        copy.scrollOffset = offset
+        return copy
+    }
+}
+
+// MARK: - Nebula Cloud
+
+struct NebulaCloud: View {
+    let colors: [Color]
+    let position: UnitPoint
+    let radius: CGFloat
+    let phase: CGFloat
+    let intensity: Double
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        RadialGradient(
+            colors: colors.map { $0.opacity(intensity) } + [Color.clear],
+            center: animatedPosition,
+            startRadius: 20,
+            endRadius: radius
+        )
+        .blur(radius: 30)
+    }
+
+    private var animatedPosition: UnitPoint {
+        guard !reduceMotion else { return position }
+
+        let xDrift = Darwin.sin(Double(phase) * .pi * 2) * 0.05
+        let yDrift = Darwin.cos(Double(phase) * .pi * 2) * 0.03
+
+        return UnitPoint(
+            x: position.x + xDrift,
+            y: position.y + yDrift
+        )
+    }
+}
+
+// MARK: - Cosmic Star
+
+struct CosmicStar: Identifiable {
+    let id = UUID()
+    let position: CGPoint
+    let size: CGFloat
+    let baseOpacity: Double
+    let twinkleDelay: Double
+    let parallaxFactor: CGFloat
+    let starType: StarType
+
+    enum StarType {
+        case bright
+        case plasma
+        case nebula
+        case dim
+    }
+
+    static func generateField(count: Int, in size: CGSize) -> [CosmicStar] {
+        (0..<count).map { _ in
+            let starType: StarType
+            let random = Double.random(in: 0...1)
+            if random < 0.1 {
+                starType = .bright
+            } else if random < 0.2 {
+                starType = .plasma
+            } else if random < 0.3 {
+                starType = .nebula
+            } else {
+                starType = .dim
+            }
+
+            return CosmicStar(
+                position: CGPoint(
+                    x: CGFloat.random(in: 0...size.width),
+                    y: CGFloat.random(in: 0...size.height)
+                ),
+                size: starType == .bright ? CGFloat.random(in: 2...3) : CGFloat.random(in: 0.8...2),
+                baseOpacity: starType == .bright ? Double.random(in: 0.6...0.9) : Double.random(in: 0.3...0.6),
+                twinkleDelay: Double.random(in: 0...2),
+                parallaxFactor: CGFloat.random(in: 0.2...1.0),
+                starType: starType
+            )
         }
     }
 }
@@ -164,7 +381,16 @@ extension VoidBackground {
 
     /// Tasks page background (glow at bottom)
     static var tasks: VoidBackground {
-        VoidBackground(glowPosition: .bottom, glowColor: Theme.Colors.aiPurple)
+        VoidBackground(glowPosition: .bottom, glowColor: Theme.Colors.aiPurple, productivity: .neutral)
+    }
+
+    /// Productive tasks background (enhanced glow)
+    static func tasksProductive(completedCount: Int) -> VoidBackground {
+        VoidBackground(
+            glowPosition: .bottom,
+            glowColor: Theme.Colors.aiPurple,
+            productivity: completedCount > 3 ? .productive : .neutral
+        )
     }
 
     /// Calendar page background (glow at top trailing)
@@ -174,7 +400,7 @@ extension VoidBackground {
 
     /// Momentum tab background (unified purple glow)
     static var momentum: VoidBackground {
-        VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiPurple, starCount: VoidDesign.Stars.countDense)
+        VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiPurple, starCount: VoidDesign.Stars.countDense, productivity: .productive)
     }
 
     /// Journal page background (unified purple glow with standard stars)
@@ -202,6 +428,16 @@ extension VoidBackground {
         VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiPurple, starCount: VoidDesign.Stars.countStandard)
     }
 
+    /// Circles/Social tab background (purple/blue social glow)
+    static var circles: VoidBackground {
+        VoidBackground(
+            glowPosition: .center,
+            glowColor: Theme.Colors.aiPurple,
+            starCount: VoidDesign.Stars.countStandard,
+            productivity: .neutral
+        )
+    }
+
     /// Auth background with hero orb
     static var auth: VoidBackground {
         VoidBackground(
@@ -225,6 +461,16 @@ extension VoidBackground {
             orbStyle: .breathing
         )
     }
+
+    /// Celebration background (task completed)
+    static var celebration: VoidBackground {
+        VoidBackground(
+            glowPosition: .center,
+            glowColor: Theme.CelestialColors.auroraGreen,
+            starCount: VoidDesign.Stars.countDense,
+            productivity: .productive
+        )
+    }
 }
 
 // MARK: - Simple Void Background
@@ -241,7 +487,18 @@ struct SimpleVoidBackground: View {
 
     var body: some View {
         ZStack {
-            VoidDesign.Colors.voidBlack
+            Theme.CelestialColors.voidDeep
+
+            // Nebula hint
+            RadialGradient(
+                colors: [
+                    Theme.CelestialColors.nebulaCore.opacity(glowOpacity * 0.5),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.3, y: 0.3),
+                startRadius: 0,
+                endRadius: 200
+            )
 
             RadialGradient(
                 colors: [
@@ -272,18 +529,29 @@ struct VoidSheetBackground: View {
             // Void overlay
             LinearGradient(
                 colors: [
-                    VoidDesign.Colors.voidSurface.opacity(0.8),
-                    VoidDesign.Colors.voidDeep.opacity(0.6)
+                    Theme.CelestialColors.abyss.opacity(0.9),
+                    Theme.CelestialColors.void.opacity(0.7)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
+            )
+
+            // Nebula hint
+            RadialGradient(
+                colors: [
+                    Theme.CelestialColors.nebulaCore.opacity(0.06),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.2, y: 0.2),
+                startRadius: 0,
+                endRadius: 200
             )
 
             // Subtle AI gradient
             LinearGradient(
                 colors: [
                     Theme.Colors.aiPurple.opacity(0.05),
-                    Theme.Colors.aiBlue.opacity(0.03),
+                    Theme.CelestialColors.plasmaCore.opacity(0.02),
                     Color.clear
                 ],
                 startPoint: .topLeading,
@@ -296,8 +564,8 @@ struct VoidSheetBackground: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Theme.Colors.aiPurple.opacity(0.3),
-                                Theme.Colors.aiBlue.opacity(0.2),
+                                Theme.CelestialColors.plasmaCore.opacity(0.4),
+                                Theme.Colors.aiPurple.opacity(0.2),
                                 Color.clear
                             ],
                             startPoint: .leading,
@@ -319,13 +587,15 @@ extension View {
     func voidBackground(
         glowPosition: VoidDesign.GlowPosition = .bottom,
         glowColor: Color = Theme.Colors.aiPurple,
-        starCount: Int = VoidDesign.Stars.countStandard
+        starCount: Int = VoidDesign.Stars.countStandard,
+        productivity: VoidBackground.ProductivityLevel = .neutral
     ) -> some View {
         self.background {
             VoidBackground(
                 glowPosition: glowPosition,
                 glowColor: glowColor,
-                starCount: starCount
+                starCount: starCount,
+                productivity: productivity
             )
         }
     }
@@ -334,6 +604,28 @@ extension View {
     func simpleVoidBackground(glowColor: Color = Theme.Colors.aiPurple) -> some View {
         self.background {
             SimpleVoidBackground(glowColor: glowColor)
+        }
+    }
+
+    /// Apply dynamic void background based on productivity
+    func dynamicVoidBackground(completedTasks: Int, totalTasks: Int) -> some View {
+        let productivity: VoidBackground.ProductivityLevel
+        if totalTasks == 0 {
+            productivity = .neutral
+        } else if Double(completedTasks) / Double(totalTasks) > 0.5 {
+            productivity = .productive
+        } else if completedTasks == 0 {
+            productivity = .struggling
+        } else {
+            productivity = .neutral
+        }
+
+        return self.background {
+            VoidBackground(
+                glowPosition: .bottom,
+                glowColor: Theme.Colors.aiPurple,
+                productivity: productivity
+            )
         }
     }
 }
@@ -363,11 +655,26 @@ extension View {
     }
 }
 
+#Preview("Void Background - Productive") {
+    VStack {
+        Text("Productive Mode")
+            .font(.largeTitle)
+            .foregroundStyle(.white)
+
+        Text("3+ tasks completed")
+            .foregroundStyle(Theme.CelestialColors.auroraGreen)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background {
+        VoidBackground.tasksProductive(completedCount: 5)
+    }
+}
+
 #Preview("Void Background - Auth") {
     VStack {
         Spacer()
 
-        Text("MyTasksAI")
+        Text("Veloce")
             .font(.system(size: 40, weight: .bold))
             .foregroundStyle(.white)
 
@@ -384,15 +691,15 @@ extension View {
     }
 }
 
-#Preview("Void Background - Calendar") {
+#Preview("Void Background - Celebration") {
     VStack {
-        Text("Calendar Page")
+        Text("Task Completed!")
             .font(.largeTitle)
             .foregroundStyle(.white)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background {
-        VoidBackground.calendar
+        VoidBackground.celebration
     }
 }
 
@@ -416,16 +723,16 @@ extension View {
             }
             .tabItem { Text("Brain") }
 
-        VoidBackground.settings
-            .overlay {
-                Text("Settings").foregroundStyle(.white)
-            }
-            .tabItem { Text("Settings") }
-
         VoidBackground.focus
             .overlay {
                 Text("Focus").foregroundStyle(.white)
             }
             .tabItem { Text("Focus") }
+
+        VoidBackground.celebration
+            .overlay {
+                Text("Celebration").foregroundStyle(.white)
+            }
+            .tabItem { Text("Celebrate") }
     }
 }

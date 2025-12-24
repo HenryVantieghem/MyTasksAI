@@ -224,8 +224,23 @@ struct CreateBlockRequest: Codable, Sendable {
     }
 }
 
-// MARK: - AI Schedule Suggestion
-struct ScheduleSuggestion: Codable, Sendable {
+// MARK: - Create Feedback Request
+struct CreateFeedbackRequest: Codable, Sendable {
+    let userId: UUID
+    let blockId: UUID
+    let feedbackType: String
+    let reason: String?
+
+    enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+        case blockId = "block_id"
+        case feedbackType = "feedback_type"
+        case reason
+    }
+}
+
+// MARK: - AI Block Suggestion
+struct AIBlockSuggestion: Codable, Sendable {
     let taskId: UUID
     let suggestedStart: Date
     let suggestedEnd: Date

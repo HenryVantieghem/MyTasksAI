@@ -6,9 +6,9 @@
 //  All features are now implemented in TaskDetailSheet.swift
 //
 //  See TaskDetailSheet.swift for the actual implementation:
-//  - loadSubTasks() - GeminiService AI breakdown + Supabase persistence
-//  - loadYouTubeResources() - GeminiService YouTube search + Supabase persistence
-//  - loadScheduleSuggestion() - GeminiService scheduling + Supabase persistence
+//  - loadSubTasks() - PerplexityService AI breakdown + Supabase persistence
+//  - loadYouTubeResources() - PerplexityService YouTube search + Supabase persistence
+//  - loadScheduleSuggestion() - PerplexityService scheduling + Supabase persistence
 //  - saveReflectionToSupabase() - Task reflection persistence
 //  - updateUserPatterns() - User productivity patterns tracking
 //
@@ -278,7 +278,7 @@ struct TaskDetailSheetEnhanced: View {
 
     @MainActor
     private func loadSubTasks() {
-        // TODO: Call GeminiService.generateSubTaskBreakdown()
+        // TODO: Call PerplexityService.generateSubTaskBreakdown()
         // For now, using placeholder data
         subTasks = [
             SubTask(title: "Research requirements", estimatedMinutes: 10, status: .pending, orderIndex: 1, aiReasoning: "Start by understanding what's needed"),
@@ -292,13 +292,13 @@ struct TaskDetailSheetEnhanced: View {
 
     @MainActor
     private func loadYouTubeResources() {
-        // TODO: Call GeminiService.findYouTubeResources()
+        // TODO: Call PerplexityService.findYouTubeResources()
         youtubeResources = [] // Will be populated by AI
     }
 
     @MainActor
     private func loadScheduleSuggestion() {
-        // TODO: Call GeminiService.generateScheduleSuggestion()
+        // TODO: Call PerplexityService.generateScheduleSuggestion()
         // with CalendarService.getFreeSlots() and user patterns
         let tomorrow9am = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
             .addingTimeInterval(9 * 3600)
@@ -357,11 +357,11 @@ struct TaskDetailSheetEnhanced: View {
 */
 
 // MARK: - ============================================
-// MARK: - STEP 4: Add GeminiService Methods (in GeminiService.swift)
+// MARK: - STEP 4: Add PerplexityService Methods (in PerplexityService.swift)
 // MARK: - ============================================
 
 /*
- Add these methods to your existing GeminiService:
+ Add these methods to your existing PerplexityService:
 
  // 1. Generate sub-task breakdown
  func generateSubTaskBreakdown(taskTitle: String, context: String?) async throws -> [SubTask]
@@ -377,7 +377,7 @@ struct TaskDetailSheetEnhanced: View {
      taskTitle: String,
      estimatedMinutes: Int?,
      freeSlots: [DateInterval],
-     userPatterns: UserProductivityPatterns?
+     userPatterns: UserProductivityProfile?
  ) async throws -> ScheduleSuggestion
 
  // 5. Generate reflection tips

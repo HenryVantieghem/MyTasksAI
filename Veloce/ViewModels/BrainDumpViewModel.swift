@@ -25,7 +25,7 @@ final class BrainDumpViewModel {
     var isProcessing: Bool { state == .processing }
 
     // MARK: Services
-    private let gemini = GeminiService.shared
+    private let perplexity = PerplexityService.shared
     private let haptics = HapticsService.shared
 
     // MARK: Context
@@ -47,7 +47,7 @@ final class BrainDumpViewModel {
     func processBrainDump() async {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
-        guard gemini.isReady else {
+        guard perplexity.isReady else {
             state = .error("AI not configured. Please add your API key in settings.")
             return
         }
@@ -79,7 +79,7 @@ final class BrainDumpViewModel {
                 attempts += 1
 
                 // Check if error is retryable
-                if let geminiError = error as? GeminiError, geminiError.isRetryable, attempts <= maxRetries {
+                if let geminiError = error as? PerplexityError, geminiError.isRetryable, attempts <= maxRetries {
                     print("[BrainDump] Retrying (\(attempts)/\(maxRetries)) after error: \(error.localizedDescription)")
                     try? await Task.sleep(nanoseconds: retryDelay)
                     continue
@@ -137,7 +137,7 @@ final class BrainDumpViewModel {
         Be empathetic in your observation - you're a supportive friend, not a robot.
         """
 
-        let response = try await gemini.generateText(
+        let (response, _) = try await perplexity.generateText(
             prompt: prompt,
             temperature: 0.3,  // Lower for more consistent JSON
             maxTokens: 2048

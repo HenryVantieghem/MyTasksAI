@@ -26,7 +26,7 @@ final class AISchedulingService {
 
     // MARK: Dependencies
     private let supabase = SupabaseService.shared
-    private let gemini = GeminiService.shared
+    private let perplexity = PerplexityService.shared
 
     // MARK: Initialization
     private init() {}
@@ -112,7 +112,7 @@ final class AISchedulingService {
 
     // MARK: - Generate Suggestions with Gemini
 
-    private func generateSuggestions(tasks: [TaskItem], date: Date) async throws -> [ScheduleSuggestion] {
+    private func generateSuggestions(tasks: [TaskItem], date: Date) async throws -> [AIBlockSuggestion] {
         // Build task list for prompt
         let taskDescriptions = tasks.map { task -> String in
             let duration = task.estimatedMinutes ?? 30
@@ -146,8 +146,8 @@ final class AISchedulingService {
         return generateHeuristicSchedule(tasks: tasks, date: date)
     }
 
-    private func generateHeuristicSchedule(tasks: [TaskItem], date: Date) -> [ScheduleSuggestion] {
-        var suggestions: [ScheduleSuggestion] = []
+    private func generateHeuristicSchedule(tasks: [TaskItem], date: Date) -> [AIBlockSuggestion] {
+        var suggestions: [AIBlockSuggestion] = []
         let calendar = Calendar.current
 
         // Start at focus hours start
@@ -175,7 +175,7 @@ final class AISchedulingService {
             let endHour = calendar.component(.hour, from: endTime)
             guard endHour <= preferences.focusHoursEnd else { break }
 
-            let suggestion = ScheduleSuggestion(
+            let suggestion = AIBlockSuggestion(
                 taskId: task.id,
                 suggestedStart: currentTime,
                 suggestedEnd: endTime,
@@ -300,12 +300,12 @@ final class AISchedulingService {
             let client = try supabase.getClient()
             guard let userId = try await client.auth.session.user.id as UUID? else { return }
 
-            let feedback: [String: Any] = [
-                "user_id": userId.uuidString,
-                "block_id": blockId.uuidString,
-                "feedback_type": type.rawValue,
-                "reason": reason as Any
-            ]
+            let feedback = CreateFeedbackRequest(
+                userId: userId,
+                blockId: blockId,
+                feedbackType: type.rawValue,
+                reason: reason
+            )
 
             try await client
                 .from("scheduling_feedback")

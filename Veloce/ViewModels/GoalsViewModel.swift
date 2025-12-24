@@ -17,7 +17,7 @@ import Supabase
 final class GoalsViewModel {
 
     // MARK: Dependencies
-    private let gemini = GeminiService.shared
+    private let perplexity = PerplexityService.shared
     private let gamification = GamificationService.shared
     private let haptics = HapticsService.shared
 
@@ -27,7 +27,7 @@ final class GoalsViewModel {
     var taskLinks: [GoalTaskLink] = []
     var selectedGoal: Goal?
     var pendingTaskSuggestions: [PendingTaskSuggestion] = []
-    var userPatterns: UserProductivityPatterns?
+    var userPatterns: UserProductivityProfile?
 
     // MARK: Loading States
     var isLoading = false
@@ -127,7 +127,7 @@ final class GoalsViewModel {
         guard let userId = SupabaseService.shared.currentUserId else { return }
 
         do {
-            let patterns: [UserProductivityPatterns] = try await SupabaseService.shared.supabase
+            let patterns: [UserProductivityProfile] = try await SupabaseService.shared.supabase
                 .from("user_productivity_patterns")
                 .select()
                 .eq("user_id", value: userId.uuidString)
@@ -168,7 +168,7 @@ final class GoalsViewModel {
         haptics.impact(.medium)
 
         // Auto-refine with AI if available
-        if gemini.isReady {
+        if perplexity.isReady {
             await refineGoalWithAI(goal, context: context)
         }
 
@@ -212,7 +212,7 @@ final class GoalsViewModel {
     /// Generate all AI content for a goal (refinement + roadmap)
     /// Call this when user taps "Generate AI Analysis" CTA
     func generateAllAIContent(for goal: Goal, context: ModelContext) async {
-        guard gemini.isReady else {
+        guard perplexity.isReady else {
             error = "AI service not available. Please check your settings."
             return
         }
@@ -233,18 +233,18 @@ final class GoalsViewModel {
 
     /// Check if AI service is available
     var isAIAvailable: Bool {
-        gemini.isReady
+        perplexity.isReady
     }
 
     /// Refine goal with AI SMART analysis
     func refineGoalWithAI(_ goal: Goal, context: ModelContext) async {
-        guard gemini.isReady else { return }
+        guard perplexity.isReady else { return }
 
         isRefiningGoal = true
         defer { isRefiningGoal = false }
 
         do {
-            let refinement = try await gemini.refineGoalToSMART(
+            let refinement = try await perplexity.refineGoalToSMART(
                 title: goal.title,
                 description: goal.goalDescription,
                 category: goal.categoryEnum,
@@ -277,7 +277,7 @@ final class GoalsViewModel {
 
     /// Generate AI roadmap for a goal
     func generateRoadmap(for goal: Goal, context: ModelContext) async {
-        guard gemini.isReady else {
+        guard perplexity.isReady else {
             error = "AI service not available"
             return
         }
@@ -286,7 +286,7 @@ final class GoalsViewModel {
         defer { isGeneratingRoadmap = false }
 
         do {
-            // Convert UserProductivityPatterns to UserPatterns format if available
+            // Convert UserProductivityProfile to UserPatterns format if available
             let patterns: UserPatterns? = userPatterns.flatMap { productivity in
                 UserPatterns(
                     preferredLearningStyle: nil,
@@ -296,7 +296,7 @@ final class GoalsViewModel {
                 )
             }
 
-            let roadmap = try await gemini.generateGoalRoadmap(
+            let roadmap = try await perplexity.generateGoalRoadmap(
                 goal: goal,
                 userPatterns: patterns
             )
@@ -369,7 +369,7 @@ final class GoalsViewModel {
         blockers: [String]?,
         context: ModelContext
     ) async -> WeeklyCheckIn? {
-        guard gemini.isReady else {
+        guard perplexity.isReady else {
             error = "AI service not available"
             return nil
         }
@@ -378,7 +378,7 @@ final class GoalsViewModel {
         defer { isCheckingIn = false }
 
         do {
-            let checkIn = try await gemini.generateWeeklyCheckIn(
+            let checkIn = try await perplexity.generateWeeklyCheckIn(
                 goal: goal,
                 recentProgress: goal.progress,
                 completedMilestones: goal.completedMilestoneCount,

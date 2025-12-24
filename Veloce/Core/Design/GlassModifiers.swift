@@ -958,3 +958,524 @@ extension ButtonStyle where Self == CelestialGlassButtonStyle {
         CelestialGlassButtonStyle(tint: tint)
     }
 }
+
+// MARK: - Living Cosmos: Morphic Glass System
+/// Advanced glass effects for the Living Cosmos task card redesign
+/// Features: shape morphing, refraction effects, multi-layer depth, organic breathing
+
+// MARK: - Morphic Glass Modifier
+/// Glass container that subtly morphs on interaction with organic breathing
+struct MorphicGlassModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    let cornerRadius: CGFloat
+    let taskTypeColor: Color
+    let isPressed: Bool
+    let isHighPriority: Bool
+
+    @State private var breathePhase: CGFloat = 0
+    @State private var morphOffset: CGSize = .zero
+
+    // Morphing intensity
+    private var morphScale: CGFloat {
+        if isPressed {
+            return 0.97  // Sink into void
+        }
+        if isHighPriority && !reduceMotion {
+            return 1.0 + (breathePhase * 0.008)  // Subtle breathing
+        }
+        return 1.0
+    }
+
+    private var innerGlowIntensity: Double {
+        if isPressed {
+            return 0.25  // Intensify on press
+        }
+        if isHighPriority {
+            return 0.12 + (Double(breathePhase) * 0.08)
+        }
+        return 0.08
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                ZStack {
+                    // Layer 1: Deep void shadow (creates depth)
+                    RoundedRectangle(cornerRadius: cornerRadius + 2)
+                        .fill(Theme.CelestialColors.voidDeep)
+                        .offset(y: isPressed ? 1 : 3)
+                        .blur(radius: isPressed ? 2 : 4)
+
+                    // Layer 2: Base glass material
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(.ultraThinMaterial)
+
+                    // Layer 3: Task type nebula tint
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    taskTypeColor.opacity(innerGlowIntensity),
+                                    taskTypeColor.opacity(innerGlowIntensity * 0.3),
+                                    Color.clear
+                                ],
+                                center: .topLeading,
+                                startRadius: 0,
+                                endRadius: 200
+                            )
+                        )
+
+                    // Layer 4: Inner light (glass depth illusion)
+                    RoundedRectangle(cornerRadius: cornerRadius - 1)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    .white.opacity(0.15),
+                                    .white.opacity(0.05),
+                                    .clear
+                                ],
+                                startPoint: .top,
+                                endPoint: .center
+                            ),
+                            lineWidth: 1
+                        )
+                        .padding(1)
+                }
+            }
+            // Refraction border (prismatic edge)
+            .overlay {
+                MorphicRefractionBorder(
+                    cornerRadius: cornerRadius,
+                    taskTypeColor: taskTypeColor,
+                    isPressed: isPressed
+                )
+            }
+            // Multi-layer shadow system
+            .shadow(
+                color: taskTypeColor.opacity(isPressed ? 0.3 : 0.2),
+                radius: isPressed ? 8 : 16,
+                x: 0,
+                y: isPressed ? 2 : 6
+            )
+            .shadow(
+                color: Color.black.opacity(isPressed ? 0.4 : 0.25),
+                radius: isPressed ? 4 : 8,
+                x: 0,
+                y: isPressed ? 1 : 3
+            )
+            // Morphing transforms
+            .scaleEffect(morphScale)
+            .animation(Theme.Animation.stellarBounce, value: isPressed)
+            .onAppear {
+                if isHighPriority && !reduceMotion {
+                    withAnimation(Theme.Animation.plasmaPulse) {
+                        breathePhase = 1
+                    }
+                }
+            }
+    }
+}
+
+// MARK: - Morphic Refraction Border
+/// Creates prismatic light-splitting effect on glass edges
+struct MorphicRefractionBorder: View {
+    let cornerRadius: CGFloat
+    let taskTypeColor: Color
+    let isPressed: Bool
+
+    @State private var shimmerPhase: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        ZStack {
+            // Base border gradient
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            .white.opacity(0.3),
+                            taskTypeColor.opacity(0.4),
+                            Theme.CelestialColors.nebulaEdge.opacity(0.3),
+                            .white.opacity(0.15),
+                            .clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: isPressed ? 2 : 1.5
+                )
+
+            // Traveling shimmer highlight (refraction simulation)
+            if !reduceMotion {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .strokeBorder(
+                        AngularGradient(
+                            colors: [
+                                .clear,
+                                .clear,
+                                .white.opacity(0.4),
+                                Theme.CelestialColors.plasmaCore.opacity(0.3),
+                                .white.opacity(0.3),
+                                .clear,
+                                .clear,
+                                .clear
+                            ],
+                            center: .center,
+                            angle: .degrees(shimmerPhase)
+                        ),
+                        lineWidth: 1
+                    )
+                    .onAppear {
+                        withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
+                            shimmerPhase = 360
+                        }
+                    }
+            }
+        }
+    }
+}
+
+// MARK: - Plasma Core Glow
+/// Animated glow effect for energy core visualization
+struct PlasmaGlowModifier: ViewModifier {
+    let color: Color
+    let intensity: Double  // 0-1
+    let isAnimated: Bool
+
+    @State private var pulsePhase: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var glowRadius: CGFloat {
+        let base: CGFloat = 8 + (CGFloat(intensity) * 12)
+        if isAnimated && !reduceMotion {
+            return base + (pulsePhase * 4)
+        }
+        return base
+    }
+
+    private var glowOpacity: Double {
+        let base = 0.3 + (intensity * 0.4)
+        if isAnimated && !reduceMotion {
+            return base + (Double(pulsePhase) * 0.15)
+        }
+        return base
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                SwiftUI.Circle()
+                    .fill(color.opacity(glowOpacity))
+                    .blur(radius: glowRadius)
+                    .scaleEffect(1.5 + (pulsePhase * 0.2))
+            }
+            .onAppear {
+                if isAnimated && !reduceMotion {
+                    withAnimation(Theme.Animation.plasmaPulse) {
+                        pulsePhase = 1
+                    }
+                }
+            }
+    }
+}
+
+// MARK: - Supernova Burst Effect
+/// Explosive particle burst for completion celebrations
+struct SupernovaBurstModifier: ViewModifier {
+    let isTriggered: Bool
+    let color: Color
+    let particleCount: Int
+
+    @State private var particles: [SupernovaParticle] = []
+    @State private var burstScale: CGFloat = 0
+    @State private var burstOpacity: Double = 1
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                ZStack {
+                    // Central flash
+                    SwiftUI.Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    .white,
+                                    color.opacity(0.8),
+                                    color.opacity(0.3),
+                                    .clear
+                                ],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 60
+                            )
+                        )
+                        .scaleEffect(burstScale)
+                        .opacity(burstOpacity)
+
+                    // Particles
+                    ForEach(particles) { particle in
+                        SwiftUI.Circle()
+                            .fill(particle.color)
+                            .frame(width: particle.size, height: particle.size)
+                            .offset(x: particle.offset.width, y: particle.offset.height)
+                            .opacity(particle.opacity)
+                            .blur(radius: particle.blur)
+                    }
+                }
+            }
+            .onChange(of: isTriggered) { _, triggered in
+                if triggered {
+                    triggerSupernova()
+                }
+            }
+    }
+
+    private func triggerSupernova() {
+        // Flash burst
+        withAnimation(Theme.Animation.supernovaBurst) {
+            burstScale = 2
+            burstOpacity = 0.8
+        }
+
+        // Fade flash
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            withAnimation(.easeOut(duration: 0.3)) {
+                burstOpacity = 0
+            }
+        }
+
+        // Generate particles
+        let colors: [Color] = [
+            .white,
+            color,
+            Theme.CelestialColors.plasmaCore,
+            Theme.CelestialColors.auroraGreen,
+            Theme.CelestialColors.solarFlare
+        ]
+
+        for i in 0..<particleCount {
+            let angle = Double(i) * (2 * .pi / Double(particleCount))
+            let distance = CGFloat.random(in: 50...120)
+            let particle = SupernovaParticle(
+                id: UUID(),
+                color: colors.randomElement() ?? .white,
+                size: CGFloat.random(in: 3...8),
+                offset: .zero,
+                targetOffset: CGSize(
+                    width: CGFloat(Darwin.cos(Double(angle))) * distance,
+                    height: CGFloat(Darwin.sin(Double(angle))) * distance
+                ),
+                opacity: 1,
+                blur: CGFloat.random(in: 0...2)
+            )
+            particles.append(particle)
+
+            // Animate particle outward
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+                if let index = particles.firstIndex(where: { $0.id == particle.id }) {
+                    particles[index].offset = particle.targetOffset
+                }
+            }
+
+            // Fade particle
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.easeOut(duration: 0.4)) {
+                    if let index = particles.firstIndex(where: { $0.id == particle.id }) {
+                        particles[index].opacity = 0
+                    }
+                }
+            }
+        }
+
+        // Clear particles
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            particles.removeAll()
+            burstScale = 0
+        }
+    }
+}
+
+struct SupernovaParticle: Identifiable {
+    let id: UUID
+    let color: Color
+    let size: CGFloat
+    var offset: CGSize
+    let targetOffset: CGSize
+    var opacity: Double
+    let blur: CGFloat
+}
+
+// MARK: - Urgency Glow Modifier
+/// Time-based glow that shifts from calm cyan to critical red
+struct UrgencyGlowModifier: ViewModifier {
+    let urgencyLevel: UrgencyLevel  // 0 = calm, 1 = near, 2 = critical
+    let isAnimated: Bool
+
+    @State private var pulsePhase: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    enum UrgencyLevel {
+        case calm
+        case near
+        case critical
+        case overdue
+
+        var color: Color {
+            switch self {
+            case .calm: return Theme.CelestialColors.urgencyCalm
+            case .near: return Theme.CelestialColors.urgencyNear
+            case .critical, .overdue: return Theme.CelestialColors.urgencyCritical
+            }
+        }
+
+        var pulseSpeed: Double {
+            switch self {
+            case .calm: return 3.0
+            case .near: return 2.0
+            case .critical: return 1.2
+            case .overdue: return 0.8
+            }
+        }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(
+                        urgencyLevel.color.opacity(0.3 + (Double(pulsePhase) * 0.3)),
+                        lineWidth: 2
+                    )
+                    .blur(radius: 4 + (pulsePhase * 2))
+                    .opacity(urgencyLevel == .calm ? 0 : 1)
+            }
+            .shadow(
+                color: urgencyLevel.color.opacity(0.2 + (Double(pulsePhase) * 0.2)),
+                radius: 12 + (pulsePhase * 4),
+                x: 0,
+                y: 4
+            )
+            .onAppear {
+                if isAnimated && !reduceMotion && urgencyLevel != .calm {
+                    withAnimation(
+                        .easeInOut(duration: urgencyLevel.pulseSpeed)
+                        .repeatForever(autoreverses: true)
+                    ) {
+                        pulsePhase = 1
+                    }
+                }
+            }
+    }
+}
+
+// MARK: - View Extensions for Living Cosmos
+
+extension View {
+    /// Apply morphic glass effect (Living Cosmos task cards)
+    func morphicGlass(
+        cornerRadius: CGFloat = 18,
+        taskTypeColor: Color = Theme.CelestialColors.nebulaCore,
+        isPressed: Bool = false,
+        isHighPriority: Bool = false
+    ) -> some View {
+        modifier(MorphicGlassModifier(
+            cornerRadius: cornerRadius,
+            taskTypeColor: taskTypeColor,
+            isPressed: isPressed,
+            isHighPriority: isHighPriority
+        ))
+    }
+
+    /// Apply plasma core glow effect
+    func plasmaGlow(
+        color: Color = Theme.CelestialColors.plasmaCore,
+        intensity: Double = 0.5,
+        isAnimated: Bool = true
+    ) -> some View {
+        modifier(PlasmaGlowModifier(
+            color: color,
+            intensity: intensity,
+            isAnimated: isAnimated
+        ))
+    }
+
+    /// Apply supernova burst effect on trigger
+    func supernovaBurst(
+        isTriggered: Bool,
+        color: Color = Theme.CelestialColors.auroraGreen,
+        particleCount: Int = 24
+    ) -> some View {
+        modifier(SupernovaBurstModifier(
+            isTriggered: isTriggered,
+            color: color,
+            particleCount: particleCount
+        ))
+    }
+
+    /// Apply urgency glow based on deadline proximity
+    func urgencyGlow(
+        level: UrgencyGlowModifier.UrgencyLevel,
+        isAnimated: Bool = true
+    ) -> some View {
+        modifier(UrgencyGlowModifier(
+            urgencyLevel: level,
+            isAnimated: isAnimated
+        ))
+    }
+}
+
+// MARK: - Floating Island Modifier
+/// Creates floating glass island effect for expanded card sections
+struct FloatingIslandModifier: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    let depth: CGFloat  // 0 = background, 1 = foreground
+    let floatPhase: CGFloat  // 0-1 for staggered animation
+
+    @State private var floatOffset: CGFloat = 0
+
+    private var baseOffset: CGFloat {
+        if reduceMotion { return 0 }
+        return sin(floatPhase * .pi * 2) * 3  // Subtle 3pt float
+    }
+
+    private var shadowIntensity: Double {
+        0.15 + (Double(depth) * 0.1)
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .offset(y: floatOffset + baseOffset)
+            .shadow(
+                color: Theme.CelestialColors.nebulaCore.opacity(shadowIntensity),
+                radius: 12 + (depth * 8),
+                x: 0,
+                y: 4 + (depth * 4)
+            )
+            .shadow(
+                color: Color.black.opacity(0.2),
+                radius: 8,
+                x: 0,
+                y: 2
+            )
+            .onAppear {
+                if !reduceMotion {
+                    withAnimation(
+                        Theme.Animation.orbitalFloat
+                            .delay(Double(floatPhase) * 0.5)
+                    ) {
+                        floatOffset = 4
+                    }
+                }
+            }
+    }
+}
+
+extension View {
+    /// Apply floating island effect for expanded card sections
+    func floatingIsland(depth: CGFloat = 0.5, floatPhase: CGFloat = 0) -> some View {
+        modifier(FloatingIslandModifier(depth: depth, floatPhase: floatPhase))
+    }
+}

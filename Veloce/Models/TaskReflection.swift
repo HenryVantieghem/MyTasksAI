@@ -62,10 +62,10 @@ extension TaskReflection {
     }
 }
 
-// MARK: - User Productivity Patterns
+// MARK: - User Productivity Profile
 
 /// Aggregated user patterns for AI personalization
-struct UserProductivityPatterns: Codable, Sendable {
+struct UserProductivityProfile: Codable, Sendable {
     let id: UUID
     let userId: UUID
 
@@ -119,9 +119,9 @@ struct UserProductivityPatterns: Codable, Sendable {
     }
 }
 
-// MARK: - Supabase Coding Keys for UserProductivityPatterns
+// MARK: - Supabase Coding Keys for UserProductivityProfile
 
-extension UserProductivityPatterns {
+extension UserProductivityProfile {
     enum CodingKeys: String, CodingKey {
         case id
         case userId = "user_id"

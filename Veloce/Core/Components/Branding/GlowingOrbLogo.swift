@@ -118,7 +118,7 @@ struct GlowingOrbLogo: View {
         ZStack {
             // Primary aurora sweep - enhanced intensity
             ForEach(0..<4, id: \.self) { layer in
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         AngularGradient(
                             colors: rotatedColors(by: layer * 2),
@@ -135,7 +135,7 @@ struct GlowingOrbLogo: View {
             }
 
             // Radial atmosphere - enhanced glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -173,7 +173,7 @@ struct GlowingOrbLogo: View {
                 let scale = 0.5 + progress * 0.5
                 let opacity = (1.0 - progress) * 0.4 * intensity
 
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         LinearGradient(
                             colors: [
@@ -224,7 +224,7 @@ struct GlowingOrbLogo: View {
 
             // Sparkle dust
             ForEach(0..<16, id: \.self) { index in
-                SparkleParticle(
+                OrbSparkle(
                     index: index,
                     phase: shimmerPhase,
                     fieldSize: size.dimension * 0.5,
@@ -239,7 +239,7 @@ struct GlowingOrbLogo: View {
     private var glassSphere: some View {
         ZStack {
             // Base sphere with rotating aurora
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     AngularGradient(
                         colors: auroraColors + [auroraColors[0]],
@@ -250,7 +250,7 @@ struct GlowingOrbLogo: View {
                 .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
 
             // Glass overlay with depth
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -266,7 +266,7 @@ struct GlowingOrbLogo: View {
                 .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
 
             // Inner refraction
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     LinearGradient(
                         colors: [
@@ -282,7 +282,7 @@ struct GlowingOrbLogo: View {
                 .blendMode(.overlay)
 
             // Edge glow
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     LinearGradient(
                         colors: [
@@ -306,7 +306,7 @@ struct GlowingOrbLogo: View {
     private var plasmaCore: some View {
         ZStack {
             // Outer core halo
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -325,7 +325,7 @@ struct GlowingOrbLogo: View {
                 .scaleEffect(1.0 + coreEnergyPhase * 0.1)
 
             // Hot white center
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -344,7 +344,7 @@ struct GlowingOrbLogo: View {
                 .scaleEffect(1.0 + coreEnergyPhase * 0.15)
 
             // Energy flare
-            Circle()
+            SwiftUI.Circle()
                 .fill(Color.white.opacity(0.95 + coreEnergyPhase * 0.05))
                 .frame(width: size.dimension * 0.08, height: size.dimension * 0.08)
                 .blur(radius: size.dimension * 0.005)
@@ -478,7 +478,7 @@ private struct EtherealParticle: View {
         let currentOpacity = 0.3 + depthFactor * 0.5
         let currentSize = particleSize * (0.7 + depthFactor * 0.6)
 
-        Circle()
+        SwiftUI.Circle()
             .fill(
                 RadialGradient(
                     colors: [
@@ -497,9 +497,9 @@ private struct EtherealParticle: View {
     }
 }
 
-// MARK: - Sparkle Particle
+// MARK: - Orb Sparkle
 
-private struct SparkleParticle: View {
+private struct OrbSparkle: View {
     let index: Int
     let phase: Double
     let fieldSize: CGFloat
@@ -523,7 +523,7 @@ private struct SparkleParticle: View {
     var body: some View {
         let pos = position
 
-        Circle()
+        SwiftUI.Circle()
             .fill(Color.white)
             .frame(width: particleSize, height: particleSize)
             .offset(x: pos.x, y: pos.y)
@@ -552,7 +552,7 @@ struct StaticOrbLogo: View {
         ZStack {
             // Atmospheric glow
             if size.showGlow {
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -570,7 +570,7 @@ struct StaticOrbLogo: View {
             }
 
             // Main orb
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     AngularGradient(
                         colors: auroraColors + [auroraColors[0]],
@@ -580,7 +580,7 @@ struct StaticOrbLogo: View {
                 .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
 
             // Glass overlay
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -596,7 +596,7 @@ struct StaticOrbLogo: View {
                 .frame(width: size.dimension * 0.52, height: size.dimension * 0.52)
 
             // Inner core
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -646,7 +646,7 @@ struct LoadingOrbLogo: View {
         ZStack {
             // Pulsing rings
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         LinearGradient(
                             colors: [
@@ -707,7 +707,7 @@ struct SuccessOrbBurst: View {
     var body: some View {
         ZStack {
             // Success ring burst
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     LinearGradient(
                         colors: [Color(hex: "22C55E"), Color(hex: "10B981")],
@@ -724,7 +724,7 @@ struct SuccessOrbBurst: View {
 
             // Burst particles
             ForEach(burstParticles) { particle in
-                Circle()
+                SwiftUI.Circle()
                     .fill(particle.color)
                     .frame(width: particle.size, height: particle.size)
                     .offset(x: particle.offset.width, y: particle.offset.height)

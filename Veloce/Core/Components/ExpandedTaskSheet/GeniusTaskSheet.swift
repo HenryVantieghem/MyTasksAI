@@ -412,7 +412,7 @@ class GeniusSheetViewModel {
         chatInput = ""
         isAIThinking = true
 
-        // Simulate AI response (would connect to GeminiService)
+        // Simulate AI response (would connect to PerplexityService)
         try? await Task.sleep(for: .seconds(1.5))
 
         isAIThinking = false

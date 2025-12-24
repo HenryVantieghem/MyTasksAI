@@ -2,31 +2,32 @@
 //  TaskCardV2.swift
 //  Veloce
 //
-//  Task Card V2 - Premium Living Task
-//  Ultra-premium task card with Energy Core, AI Whisper, Energy Bar,
-//  and celebration animations for completion
+//  Living Cosmos Task Card - Apple Design Award Level
+//  Bioluminescent deep sea meets cosmic nebula
+//  Features: Morphic glass, parallax depth, plasma core, urgency glow, supernova completion
 //
 
 import SwiftUI
 
-// MARK: - Task Card V2
+// MARK: - Task Card V2 (Living Cosmos Edition)
 
 struct TaskCardV2: View {
     let task: TaskItem
     let onTap: () -> Void
     let onToggleComplete: () -> Void
 
+    // Interaction states
     @State private var isPressed: Bool = false
+    @State private var showCompletionBurst: Bool = false
+
+    // Animation states
     @State private var breathePhase: CGFloat = 0
     @State private var showWhisper: Bool = true
-    @State private var isHovering: Bool = false
+    @State private var entryScale: CGFloat = 0.9
+    @State private var entryOpacity: Double = 0
 
-    // Completion animation states
-    @State private var showCompletionGlow: Bool = false
-    @State private var completionParticles: [CompletionParticle] = []
-    @State private var checkmarkScale: CGFloat = 0
-    @State private var pointsOffset: CGFloat = 0
-    @State private var pointsOpacity: Double = 1
+    // Parallax
+    @ObservedObject private var parallax = ParallaxMotionManager.shared
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
@@ -56,7 +57,6 @@ struct TaskCardV2: View {
     }
 
     private var guidanceText: String {
-        // Prefer aiAdvice, fall back to quickTip, then generate fallback
         if let advice = task.aiAdvice, !advice.isEmpty {
             return advice
         }
@@ -64,6 +64,23 @@ struct TaskCardV2: View {
             return tip
         }
         return AIGuidanceGenerator.generateFallback(for: task.title, taskType: task.taskType)
+    }
+
+    private var urgencyLevel: UrgencyGlowModifier.UrgencyLevel {
+        guard let scheduledTime = task.scheduledTime else { return .calm }
+        let now = Date()
+
+        if scheduledTime < now {
+            return .overdue
+        }
+
+        let hoursUntil = scheduledTime.timeIntervalSince(now) / 3600
+        if hoursUntil < 1 {
+            return .critical
+        } else if hoursUntil < 4 {
+            return .near
+        }
+        return .calm
     }
 
     // MARK: - Body
@@ -75,10 +92,14 @@ struct TaskCardV2: View {
         } label: {
             cardContent
         }
-        .buttonStyle(TaskCardV2ButtonStyle(isPressed: $isPressed))
+        .buttonStyle(LivingCosmosCardButtonStyle(isPressed: $isPressed))
         .onAppear {
+            startEntryAnimation()
             if isHighPriority && !reduceMotion {
                 startBreathingAnimation()
+            }
+            if !reduceMotion {
+                parallax.startUpdates()
             }
         }
         .contextMenu {
@@ -90,32 +111,24 @@ struct TaskCardV2: View {
 
     private var cardContent: some View {
         ZStack {
+            // Parallax container with 3 depth layers
+            parallaxLayers
+
+            // Main content
             VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-                // Top row: Energy Core + Title + Points Badge
+                // Top row: Plasma Core + Title + Points Badge
                 topRow
 
                 // AI Guidance Whisper (collapsible)
                 if shouldShowWhisper {
-                    AIGuidanceWhisper(
-                        guidance: guidanceText,
-                        isExpanded: false
-                    ) {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            showWhisper.toggle()
-                        }
-                    }
-                    .padding(.leading, 36) // Align with title after energy core
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .top).combined(with: .opacity),
-                        removal: .opacity
-                    ))
+                    aiWhisperSection
                 }
 
                 // Metadata row
                 metadataRow
 
-                // Energy Bar - shows task "value"
-                TaskEnergyBar(
+                // Living Energy Bar
+                LivingEnergyBar(
                     energyLevel: energyLevel,
                     taskTypeColor: taskTypeColor,
                     isCompleted: task.isCompleted
@@ -123,103 +136,154 @@ struct TaskCardV2: View {
                 .padding(.top, 4)
             }
             .padding(Theme.Spacing.md + 2)
+            .parallax(depth: 0.6)  // Content floats in middle layer
+        }
+        // Morphic glass container
+        .morphicGlass(
+            cornerRadius: 20,
+            taskTypeColor: taskTypeColor,
+            isPressed: isPressed,
+            isHighPriority: isHighPriority
+        )
+        // Urgency glow for time-sensitive tasks
+        .urgencyGlow(level: urgencyLevel, isAnimated: !reduceMotion)
+        // Supernova burst on completion
+        .supernovaBurst(
+            isTriggered: showCompletionBurst,
+            color: Theme.CelestialColors.auroraGreen,
+            particleCount: 32
+        )
+        // Entry animation
+        .scaleEffect(entryScale)
+        .opacity(entryOpacity)
+        // Completion state
+        .opacity(task.isCompleted ? 0.7 : 1.0)
+    }
 
-            // Completion particles overlay
-            ForEach(completionParticles) { particle in
-                SwiftUI.Circle()
-                    .fill(particle.color)
-                    .frame(width: particle.size, height: particle.size)
-                    .offset(x: particle.x, y: particle.y)
-                    .opacity(particle.opacity)
+    // MARK: - Parallax Layers
+
+    private var parallaxLayers: some View {
+        ZStack {
+            // Background nebula layer (furthest)
+            nebulaBackground
+                .parallax(layer: .background)
+
+            // Floating particles layer
+            if hasGuidanceText && !reduceMotion {
+                AISparkleParticles(color: taskTypeColor)
+                    .parallax(layer: .floating)
+                    .opacity(0.6)
             }
         }
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.lg + 2))
-        .overlay(cardBorder)
-        .overlay(completionGlowOverlay)
-        .shadow(
-            color: shadowColor,
-            radius: shadowRadius,
-            y: 2
-        )
-        .scaleEffect(isPressed ? 0.96 : 1)
-        .opacity(task.isCompleted ? 0.75 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressed)
     }
 
-    // MARK: - Completion Glow Overlay
+    private var nebulaBackground: some View {
+        ZStack {
+            // Deep void base
+            Theme.CelestialColors.voidDeep
 
-    @ViewBuilder
-    private var completionGlowOverlay: some View {
-        if showCompletionGlow {
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.lg + 2)
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Color.green.opacity(0.4),
-                            Color.green.opacity(0.1),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 150
-                    )
-                )
-                .allowsHitTesting(false)
+            // Task type nebula glow
+            RadialGradient(
+                colors: [
+                    taskTypeColor.opacity(isHighPriority ? 0.15 : 0.08),
+                    taskTypeColor.opacity(0.03),
+                    Color.clear
+                ],
+                center: .topLeading,
+                startRadius: 0,
+                endRadius: 180
+            )
+
+            // Secondary accent glow
+            RadialGradient(
+                colors: [
+                    Theme.CelestialColors.nebulaEdge.opacity(0.06),
+                    Color.clear
+                ],
+                center: .bottomTrailing,
+                startRadius: 0,
+                endRadius: 120
+            )
         }
-    }
-
-    // MARK: - Energy Level
-
-    private var energyLevel: Double {
-        // Calculate energy based on points and priority
-        let baseEnergy = Double(task.potentialPoints) / 50.0 // 50 points = full
-        let priorityBonus = Double(task.starRating) * 0.1
-        return min(1.0, baseEnergy + priorityBonus)
     }
 
     // MARK: - Top Row
 
     private var topRow: some View {
         HStack(alignment: .center, spacing: Theme.Spacing.sm + 2) {
-            // Energy Core (completion toggle)
-            EnergyCore(
+            // Plasma Energy Core (completion toggle)
+            PlasmaEnergyCore(
                 energyState: task.energyState,
                 potentialPoints: task.potentialPoints,
                 taskTypeColor: taskTypeColor,
                 isCompleted: task.isCompleted,
-                size: DesignTokens.EnergyCore.size
+                size: 28
             ) {
-                HapticsService.shared.impact()
-                onToggleComplete()
+                triggerCompletion()
             }
 
-            // Task title
+            // Task title with Living Cosmos typography
             VStack(alignment: .leading, spacing: 2) {
                 Text(task.title)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(Theme.Typography.cosmosTitle)
                     .foregroundStyle(task.isCompleted ? .secondary : .primary)
                     .strikethrough(task.isCompleted, color: .secondary.opacity(0.5))
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
 
-                // Task type label (subtle)
+                // Task type label (subtle monospace)
                 if !task.isCompleted {
-                    Text(task.taskType.rawValue.capitalized)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(taskTypeColor.opacity(0.8))
+                    Text(task.taskType.rawValue.uppercased())
+                        .font(Theme.Typography.cosmosMetaSmall)
+                        .foregroundStyle(taskTypeColor.opacity(0.7))
+                        .tracking(1.2)
                 }
             }
 
             Spacer()
 
-            // Points Badge
-            EnergyPointsBadge(
+            // Points Badge with cosmic styling
+            CosmicPointsBadge(
                 points: task.potentialPoints,
                 energyState: task.energyState,
                 isEarned: task.isCompleted
             )
         }
+    }
+
+    // MARK: - AI Whisper Section
+
+    private var aiWhisperSection: some View {
+        HStack(alignment: .top, spacing: Theme.Spacing.sm) {
+            // AI indicator orb
+            SwiftUI.Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Theme.CelestialColors.nebulaCore.opacity(0.8),
+                            Theme.CelestialColors.nebulaGlow.opacity(0.4),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 8
+                    )
+                )
+                .frame(width: 6, height: 6)
+                .padding(.top, 6)
+
+            // Whisper text with serif italic (editorial feel)
+            Text(guidanceText)
+                .font(Theme.Typography.cosmosWhisperSmall)
+                .foregroundStyle(Theme.CelestialColors.starDim)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+        }
+        .padding(.leading, 36) // Align with title
+        .transition(.asymmetric(
+            insertion: .move(edge: .top).combined(with: .opacity),
+            removal: .opacity
+        ))
     }
 
     // MARK: - Metadata Row
@@ -247,7 +311,7 @@ struct TaskCardV2: View {
                 metadataChip(
                     icon: "calendar",
                     text: formatScheduledTime(scheduledTime),
-                    color: task.isOverdue ? Theme.Colors.error : .secondary
+                    color: urgencyLevel == .overdue ? Theme.CelestialColors.urgencyCritical : .secondary
                 )
             }
         }
@@ -259,7 +323,7 @@ struct TaskCardV2: View {
             Image(systemName: icon)
                 .font(.system(size: 10, weight: .medium))
             Text(text)
-                .font(.system(size: 11, weight: .medium))
+                .font(Theme.Typography.cosmosMeta)
         }
         .foregroundStyle(color)
     }
@@ -280,117 +344,12 @@ struct TaskCardV2: View {
         }
     }
 
-    // MARK: - Explore Indicator (Inline)
+    // MARK: - Energy Level
 
-    private var exploreIndicator: some View {
-        HStack(spacing: 4) {
-            Text("explore")
-                .font(.system(size: 10, weight: .medium))
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 8, weight: .bold))
-        }
-        .foregroundStyle(
-            task.hasAIProcessing
-                ? taskTypeColor.opacity(0.6 + breathePhase * 0.2)
-                : Color.secondary.opacity(0.4)
-        )
-    }
-
-    // MARK: - Card Background
-
-    private var cardBackground: some View {
-        ZStack {
-            // Base glass
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.lg + 2)
-                .fill(.ultraThinMaterial)
-
-            // Task type tint gradient
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.lg + 2)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            taskTypeColor.opacity(task.isCompleted ? 0.02 : 0.06),
-                            .clear
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-
-            // High priority breathing glow
-            if isHighPriority && !task.isCompleted && !reduceMotion {
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.lg + 2)
-                    .fill(taskTypeColor.opacity(0.04 * breathePhase))
-            }
-
-            // Completion celebration overlay
-            if task.isCompleted {
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.lg + 2)
-                    .fill(Theme.CelestialColors.successNebula.opacity(0.03))
-            }
-        }
-    }
-
-    // MARK: - Card Border
-
-    private var cardBorder: some View {
-        RoundedRectangle(cornerRadius: Theme.CornerRadius.lg + 2)
-            .stroke(borderGradient, lineWidth: borderWidth)
-    }
-
-    private var borderGradient: LinearGradient {
-        if task.isCompleted {
-            return LinearGradient(
-                colors: [
-                    Theme.CelestialColors.successNebula.opacity(0.3),
-                    Theme.CelestialColors.successNebula.opacity(0.1),
-                    Color.clear
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        }
-
-        if task.hasAIProcessing {
-            return LinearGradient(
-                colors: [
-                    taskTypeColor.opacity(0.4),
-                    Theme.Colors.aiCyan.opacity(0.2),
-                    Color.clear
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        }
-
-        return LinearGradient(
-            colors: [
-                Color.white.opacity(0.15),
-                Color.white.opacity(0.05),
-                Color.clear
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    private var borderWidth: CGFloat {
-        task.hasAIProcessing || task.isCompleted ? 1.5 : 1
-    }
-
-    private var shadowColor: Color {
-        if task.isCompleted {
-            return Theme.CelestialColors.successNebula.opacity(0.15)
-        }
-        if isHighPriority {
-            return taskTypeColor.opacity(0.2 + breathePhase * 0.1)
-        }
-        return Color.black.opacity(0.1)
-    }
-
-    private var shadowRadius: CGFloat {
-        isHighPriority ? 8 + breathePhase * 4 : 4
+    private var energyLevel: Double {
+        let baseEnergy = Double(task.potentialPoints) / 50.0
+        let priorityBonus = Double(task.starRating) * 0.1
+        return min(1.0, baseEnergy + priorityBonus)
     }
 
     // MARK: - Context Menu
@@ -398,7 +357,7 @@ struct TaskCardV2: View {
     @ViewBuilder
     private var contextMenuContent: some View {
         Button {
-            onToggleComplete()
+            triggerCompletion()
         } label: {
             Label(
                 task.isCompleted ? "Mark Incomplete" : "Mark Complete",
@@ -423,76 +382,145 @@ struct TaskCardV2: View {
 
     // MARK: - Animations
 
+    private func startEntryAnimation() {
+        guard !reduceMotion else {
+            entryScale = 1.0
+            entryOpacity = 1.0
+            return
+        }
+
+        withAnimation(Theme.Animation.portalOpen) {
+            entryScale = 1.0
+            entryOpacity = 1.0
+        }
+    }
+
     private func startBreathingAnimation() {
-        withAnimation(
-            .easeInOut(duration: 3)
-            .repeatForever(autoreverses: true)
-        ) {
+        withAnimation(Theme.Animation.plasmaPulse) {
             breathePhase = 1
         }
     }
 
-    /// Triggers the premium completion celebration animation
-    func triggerCompletionCelebration() {
-        guard !reduceMotion else { return }
-
-        // Haptic feedback
+    private func triggerCompletion() {
         HapticsService.shared.taskCompleteEnhanced()
 
-        // 1. Show completion glow
-        withAnimation(.easeOut(duration: 0.2)) {
-            showCompletionGlow = true
+        // Show supernova burst
+        showCompletionBurst = true
+
+        // Reset burst after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            showCompletionBurst = false
         }
 
-        // 2. Spawn particles
-        spawnCompletionParticles()
+        onToggleComplete()
+    }
+}
 
-        // 3. Fade glow after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            withAnimation(.easeIn(duration: 0.3)) {
-                showCompletionGlow = false
-            }
+// MARK: - Plasma Energy Core
+
+/// Living energy core with plasma pulse animation
+struct PlasmaEnergyCore: View {
+    let energyState: EnergyState
+    let potentialPoints: Int
+    let taskTypeColor: Color
+    let isCompleted: Bool
+    let size: CGFloat
+    let onTap: () -> Void
+
+    @State private var pulsePhase: CGFloat = 0
+    @State private var rotationAngle: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var coreColor: Color {
+        if isCompleted {
+            return Theme.CelestialColors.auroraGreen
         }
+        return taskTypeColor
+    }
 
-        // 4. Clear particles
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            completionParticles.removeAll()
+    private var glowIntensity: Double {
+        switch energyState {
+        case .low: return 0.4
+        case .medium: return 0.6
+        case .high: return 0.8
+        case .max: return 1.0
         }
     }
 
-    private func spawnCompletionParticles() {
-        let colors: [Color] = [
-            .green, .cyan, .white, taskTypeColor
-        ]
+    var body: some View {
+        Button {
+            HapticsService.shared.impact()
+            onTap()
+        } label: {
+            ZStack {
+                // Outer glow ring
+                SwiftUI.Circle()
+                    .fill(coreColor.opacity(0.2 + (Double(pulsePhase) * 0.15)))
+                    .blur(radius: 8 + (pulsePhase * 4))
+                    .frame(width: size * 1.8, height: size * 1.8)
 
-        for i in 0..<12 {
-            let angle = Double(i) * (2 * .pi / 12)
-            let distance: CGFloat = CGFloat.random(in: 40...80)
-            let particle = CompletionParticle(
-                id: UUID(),
-                x: 0,
-                y: 0,
-                targetX: cos(angle) * distance,
-                targetY: sin(angle) * distance,
-                size: CGFloat.random(in: 4...8),
-                color: colors.randomElement() ?? .white,
-                opacity: 1.0
-            )
-            completionParticles.append(particle)
+                // Plasma tendrils (for high energy)
+                if energyState == .max && !reduceMotion {
+                    ForEach(0..<3, id: \.self) { i in
+                        PlasmaRendril(
+                            color: coreColor,
+                            angle: rotationAngle + Double(i) * 120,
+                            size: size
+                        )
+                    }
+                }
 
-            // Animate particle outward
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                if let index = completionParticles.firstIndex(where: { $0.id == particle.id }) {
-                    completionParticles[index].x = particle.targetX
-                    completionParticles[index].y = particle.targetY
+                // Inner glow
+                SwiftUI.Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                coreColor.opacity(0.8),
+                                coreColor.opacity(0.4),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: size * 0.6
+                        )
+                    )
+                    .frame(width: size * 1.2, height: size * 1.2)
+                    .blur(radius: 4)
+
+                // Core orb
+                SwiftUI.Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                .white.opacity(0.9),
+                                coreColor.opacity(0.9),
+                                coreColor.opacity(0.6)
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: size * 0.5
+                        )
+                    )
+                    .frame(width: size, height: size)
+
+                // Completed checkmark
+                if isCompleted {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: size * 0.5, weight: .bold))
+                        .foregroundStyle(.white)
                 }
             }
+        }
+        .buttonStyle(.plain)
+        .onAppear {
+            if !reduceMotion {
+                withAnimation(Theme.Animation.plasmaPulse) {
+                    pulsePhase = 1
+                }
 
-            // Fade particle
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.easeOut(duration: 0.5)) {
-                    if let index = completionParticles.firstIndex(where: { $0.id == particle.id }) {
-                        completionParticles[index].opacity = 0
+                if energyState == .max {
+                    withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
+                        rotationAngle = 360
                     }
                 }
             }
@@ -500,41 +528,122 @@ struct TaskCardV2: View {
     }
 }
 
-// MARK: - Completion Particle
+// MARK: - Plasma Tendril
 
-struct CompletionParticle: Identifiable {
-    let id: UUID
-    var x: CGFloat
-    var y: CGFloat
-    var targetX: CGFloat
-    var targetY: CGFloat
-    var size: CGFloat
-    var color: Color
-    var opacity: Double
+struct PlasmaRendril: View {
+    let color: Color
+    let angle: Double
+    let size: CGFloat
+
+    var body: some View {
+        Capsule()
+            .fill(
+                LinearGradient(
+                    colors: [
+                        color.opacity(0.6),
+                        color.opacity(0.2),
+                        .clear
+                    ],
+                    startPoint: .center,
+                    endPoint: .trailing
+                )
+            )
+            .frame(width: size * 0.8, height: 2)
+            .offset(x: size * 0.4)
+            .rotationEffect(.degrees(angle))
+            .blur(radius: 1)
+    }
 }
 
-// MARK: - Task Energy Bar
+// MARK: - Cosmic Points Badge
 
-/// Horizontal energy bar showing task "value" based on points
-struct TaskEnergyBar: View {
+struct CosmicPointsBadge: View {
+    let points: Int
+    let energyState: EnergyState
+    let isEarned: Bool
+
+    @State private var shimmerPhase: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var badgeColor: Color {
+        if isEarned {
+            return Theme.CelestialColors.auroraGreen
+        }
+
+        switch energyState {
+        case .low: return Theme.CelestialColors.starGhost
+        case .medium: return Theme.CelestialColors.nebulaCore
+        case .high: return Theme.CelestialColors.solarFlare
+        case .max: return Theme.CelestialColors.plasmaCore
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 2) {
+            Text("+\(points)")
+                .font(Theme.Typography.cosmosPoints)
+                .foregroundStyle(badgeColor)
+
+            Image(systemName: isEarned ? "bolt.fill" : "bolt")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(badgeColor)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background {
+            Capsule()
+                .fill(badgeColor.opacity(0.15))
+                .overlay {
+                    if !reduceMotion && energyState == .max {
+                        Capsule()
+                            .stroke(
+                                AngularGradient(
+                                    colors: [
+                                        .clear,
+                                        .white.opacity(0.4),
+                                        .clear
+                                    ],
+                                    center: .center,
+                                    angle: .degrees(shimmerPhase)
+                                ),
+                                lineWidth: 1
+                            )
+                    }
+                }
+        }
+        .onAppear {
+            if !reduceMotion && energyState == .max {
+                withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                    shimmerPhase = 360
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Living Energy Bar
+
+struct LivingEnergyBar: View {
     let energyLevel: Double
     let taskTypeColor: Color
     let isCompleted: Bool
 
     @State private var animatedLevel: Double = 0
+    @State private var glowPulse: CGFloat = 0
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let barHeight: CGFloat = 4
-    private let cornerRadius: CGFloat = 2
 
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 // Background track
                 Capsule()
-                    .fill(Color.white.opacity(0.1))
+                    .fill(Color.white.opacity(0.08))
                     .frame(height: barHeight)
 
-                // Filled portion
+                // Filled portion with gradient
                 Capsule()
                     .fill(barGradient)
                     .frame(
@@ -542,13 +651,14 @@ struct TaskEnergyBar: View {
                         height: barHeight
                     )
 
-                // Glow effect at tip (if not completed)
-                if !isCompleted && animatedLevel > 0.1 {
+                // Glowing tip
+                if !isCompleted && animatedLevel > 0.1 && !reduceMotion {
                     SwiftUI.Circle()
-                        .fill(taskTypeColor.opacity(0.6))
+                        .fill(taskTypeColor)
                         .frame(width: 6, height: 6)
-                        .blur(radius: 4)
+                        .blur(radius: 4 + (glowPulse * 2))
                         .offset(x: geometry.size.width * animatedLevel - 3)
+                        .opacity(0.8)
                 }
             }
         }
@@ -556,6 +666,12 @@ struct TaskEnergyBar: View {
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                 animatedLevel = isCompleted ? 1.0 : energyLevel
+            }
+
+            if !reduceMotion {
+                withAnimation(Theme.Animation.plasmaPulse) {
+                    glowPulse = 1
+                }
             }
         }
         .onChange(of: isCompleted) { _, completed in
@@ -569,9 +685,9 @@ struct TaskEnergyBar: View {
         if isCompleted {
             return LinearGradient(
                 colors: [
-                    Color.green.opacity(0.8),
-                    Color.green.opacity(0.6),
-                    Color.green.opacity(0.4)
+                    Theme.CelestialColors.auroraGreen.opacity(0.9),
+                    Theme.CelestialColors.auroraGreen.opacity(0.6),
+                    Theme.CelestialColors.plasmaCore.opacity(0.4)
                 ],
                 startPoint: .leading,
                 endPoint: .trailing
@@ -580,9 +696,9 @@ struct TaskEnergyBar: View {
 
         return LinearGradient(
             colors: [
-                taskTypeColor.opacity(0.8),
-                taskTypeColor.opacity(0.5),
-                Color(hex: "06B6D4").opacity(0.4)
+                taskTypeColor.opacity(0.9),
+                taskTypeColor.opacity(0.6),
+                Theme.CelestialColors.nebulaEdge.opacity(0.4)
             ],
             startPoint: .leading,
             endPoint: .trailing
@@ -590,9 +706,76 @@ struct TaskEnergyBar: View {
     }
 }
 
+// MARK: - AI Sparkle Particles
+
+struct AISparkleParticles: View {
+    let color: Color
+
+    @State private var particles: [SparkleParticle] = []
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        GeometryReader { geometry in
+            ForEach(particles) { particle in
+                SwiftUI.Circle()
+                    .fill(particle.color)
+                    .frame(width: particle.size, height: particle.size)
+                    .position(particle.position)
+                    .opacity(particle.opacity)
+                    .blur(radius: 1)
+            }
+            .onAppear {
+                if !reduceMotion {
+                    generateParticles(in: geometry.size)
+                }
+            }
+        }
+    }
+
+    private func generateParticles(in size: CGSize) {
+        let colors: [Color] = [
+            .white.opacity(0.8),
+            color.opacity(0.6),
+            Theme.CelestialColors.nebulaEdge.opacity(0.5)
+        ]
+
+        for i in 0..<8 {
+            let particle = SparkleParticle(
+                id: UUID(),
+                position: CGPoint(
+                    x: CGFloat.random(in: 0...size.width),
+                    y: CGFloat.random(in: 0...size.height)
+                ),
+                size: CGFloat.random(in: 2...4),
+                color: colors.randomElement() ?? .white,
+                opacity: 0
+            )
+            particles.append(particle)
+
+            // Animate particle fade in/out
+            let delay = Double(i) * 0.3
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    if let index = particles.firstIndex(where: { $0.id == particle.id }) {
+                        particles[index].opacity = Double.random(in: 0.4...0.8)
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct SparkleParticle: Identifiable {
+    let id: UUID
+    var position: CGPoint
+    let size: CGFloat
+    let color: Color
+    var opacity: Double
+}
+
 // MARK: - Button Style
 
-private struct TaskCardV2ButtonStyle: ButtonStyle {
+private struct LivingCosmosCardButtonStyle: ButtonStyle {
     @Binding var isPressed: Bool
 
     func makeBody(configuration: Configuration) -> some View {
@@ -610,19 +793,19 @@ private struct TaskCardV2ButtonStyle: ButtonStyle {
 
 // MARK: - Preview
 
-#Preview("Task Card V2") {
+#Preview("Living Cosmos Task Card") {
     ScrollView {
-        VStack(spacing: 16) {
-            Text("Task Card V2")
-                .font(.title2.bold())
+        VStack(spacing: 20) {
+            Text("Living Cosmos Cards")
+                .font(Theme.Typography.cosmosTitleLarge)
                 .foregroundStyle(.white)
 
-            // High priority task with AI
+            // High priority with AI
             TaskCardV2(
                 task: {
                     let task = TaskItem(title: "Write quarterly report")
                     task.starRating = 3
-                    task.aiAdvice = "You've totally got this! Start by just outlining the three main sections. Your future self will thank you for getting the structure down first."
+                    task.aiAdvice = "Start with an outline of the three main sections. Your future self will thank you."
                     task.aiProcessedAt = .now
                     task.taskTypeRaw = TaskType.create.rawValue
                     task.estimatedMinutes = 60
@@ -633,7 +816,7 @@ private struct TaskCardV2ButtonStyle: ButtonStyle {
                 onToggleComplete: {}
             )
 
-            // Medium priority task
+            // Medium priority
             TaskCardV2(
                 task: {
                     let task = TaskItem(title: "Send email to Nicholas")
@@ -646,30 +829,26 @@ private struct TaskCardV2ButtonStyle: ButtonStyle {
                 onToggleComplete: {}
             )
 
-            // Low priority completed task
+            // Completed task
             TaskCardV2(
                 task: {
                     let task = TaskItem(title: "Review meeting notes")
                     task.starRating = 1
                     task.isCompleted = true
                     task.taskTypeRaw = TaskType.consume.rawValue
-                    task.pointsEarned = 25
                     return task
                 }(),
                 onTap: {},
                 onToggleComplete: {}
             )
 
-            // Max energy task
+            // Overdue task
             TaskCardV2(
                 task: {
-                    let task = TaskItem(title: "Prepare presentation for board meeting")
-                    task.starRating = 3
-                    task.aiAdvice = "This is your moment to shine! Break it into slides - intro, 3 key points, conclusion. You've done harder things before."
-                    task.aiProcessedAt = .now
-                    task.taskTypeRaw = TaskType.create.rawValue
-                    task.estimatedMinutes = 120
-                    task.scheduledTime = Calendar.current.date(byAdding: .day, value: 1, to: .now)
+                    let task = TaskItem(title: "Submit expense report")
+                    task.starRating = 2
+                    task.taskTypeRaw = TaskType.coordinate.rawValue
+                    task.scheduledTime = Calendar.current.date(byAdding: .hour, value: -2, to: .now)
                     return task
                 }(),
                 onTap: {},

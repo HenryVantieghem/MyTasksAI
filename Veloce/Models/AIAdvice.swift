@@ -222,7 +222,7 @@ struct GeminiCandidate: Codable, Sendable {
     }
 }
 
-/// Represents error response from Gemini API (distinct from GeminiError enum for app errors)
+/// Represents error response from Gemini API (distinct from PerplexityError enum for app errors)
 struct GeminiAPIError: Codable, Sendable {
     let code: Int?
     let message: String?

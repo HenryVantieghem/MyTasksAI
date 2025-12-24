@@ -58,8 +58,8 @@ final class SubscriptionService {
         updateListenerTask = listenForTransactions()
     }
 
-    deinit {
-        updateListenerTask?.cancel()
+    nonisolated func cleanup() {
+        // Note: This is called manually if needed, but Task will be deallocated naturally
     }
 
     // MARK: - Configuration
@@ -390,29 +390,31 @@ final class SubscriptionService {
             let status = isInTrial ? "trial" : (isSubscribed ? "active" : "expired")
 
             if existing.isEmpty {
-                let subscriptionData: [String: Any] = [
-                    "user_id": userId.uuidString,
-                    "tier": currentTier.rawValue,
-                    "status": status,
-                    "apple_transaction_id": appleTransactionId as Any,
-                    "expires_at": expiresAt?.ISO8601Format() as Any,
-                    "auto_renew": true
-                ]
+                let subscriptionData = CreateSubscriptionRequest(
+                    userId: userId,
+                    tier: currentTier.rawValue,
+                    status: status,
+                    appleTransactionId: appleTransactionId,
+                    expiresAt: expiresAt,
+                    autoRenew: true
+                )
 
                 try await client
                     .from("subscriptions")
                     .insert(subscriptionData)
                     .execute()
             } else {
+                let updateData = UpdateSubscriptionRequest(
+                    tier: currentTier.rawValue,
+                    status: status,
+                    appleTransactionId: appleTransactionId,
+                    expiresAt: expiresAt,
+                    updatedAt: Date()
+                )
+
                 try await client
                     .from("subscriptions")
-                    .update([
-                        "tier": currentTier.rawValue,
-                        "status": status,
-                        "apple_transaction_id": appleTransactionId as Any,
-                        "expires_at": expiresAt?.ISO8601Format() as Any,
-                        "updated_at": Date().ISO8601Format()
-                    ])
+                    .update(updateData)
                     .eq("user_id", value: userId)
                     .execute()
             }

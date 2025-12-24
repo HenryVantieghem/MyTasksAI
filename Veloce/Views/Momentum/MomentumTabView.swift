@@ -24,8 +24,23 @@ struct MomentumTabView: View {
     @State private var showGoalCreation = false
     @State private var showGoalDetail = false
     @State private var selectedGoal: Goal?
+    @State private var showVelocityDetails = false
 
     private var gamification: GamificationService { GamificationService.shared }
+
+    // Velocity Score calculation
+    private var velocityScore: VelocityScore {
+        VelocityScore(
+            currentStreak: gamification.currentStreak,
+            longestStreak: gamification.longestStreak,
+            tasksCompletedThisWeek: weeklyTasksCompleted,
+            weeklyGoal: gamification.weeklyGoal,
+            focusMinutesThisWeek: Int(gamification.focusHours * 60),
+            focusGoalMinutes: 5 * 60, // 5 hours default
+            tasksOnTime: gamification.totalTasksCompleted, // Using total as fallback
+            totalTasksCompleted: gamification.totalTasksCompleted
+        )
+    }
 
     // MARK: - Goal Computed Properties
 
@@ -71,6 +86,15 @@ struct MomentumTabView: View {
                         totalPoints: gamification.totalPoints,
                         streak: gamification.currentStreak
                     )
+
+                    // Velocity Score Card
+                    Button {
+                        showVelocityDetails = true
+                        HapticsService.shared.selectionFeedback()
+                    } label: {
+                        VelocityScoreCompact(score: velocityScore)
+                    }
+                    .buttonStyle(.plain)
 
                     // Goal Spotlight
                     GoalSpotlightSection(
@@ -133,6 +157,9 @@ struct MomentumTabView: View {
             if let goal = selectedGoal {
                 GoalDetailSheet(goal: goal, goalsVM: goalsVM)
             }
+        }
+        .sheet(isPresented: $showVelocityDetails) {
+            VelocityScoreDetailSheet(score: velocityScore)
         }
         .task {
             await goalsVM.loadGoals(context: modelContext)

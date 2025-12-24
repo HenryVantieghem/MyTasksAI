@@ -352,14 +352,14 @@ final class CelestialTaskCardViewModel {
         defer { isLoadingYouTube = false }
 
         do {
-            // Try generating via Gemini
-            let gemini = GeminiService.shared
-            guard gemini.isReady else {
+            // Try generating via Perplexity
+            let perplexity = PerplexityService.shared
+            guard perplexity.isReady else {
                 youtubeSearchResources = YouTubeSearchResource.fallbacks(for: task.title, taskId: task.id)
                 return
             }
 
-            let searches = try await gemini.generateYouTubeSearchQueries(
+            let searches = try await perplexity.generateYouTubeSearchQueries(
                 taskTitle: task.title,
                 context: task.contextNotes,
                 maxQueries: 3
@@ -434,8 +434,8 @@ final class CelestialTaskCardViewModel {
         defer { isStrategyLoading = false }
 
         do {
-            let gemini = GeminiService.shared
-            guard gemini.isReady else {
+            let perplexity = PerplexityService.shared
+            guard perplexity.isReady else {
                 // Use fallback strategy
                 let fallback = CelestialAIStrategy.fallback(for: task)
                 celestialStrategy = fallback
@@ -445,7 +445,7 @@ final class CelestialTaskCardViewModel {
                 return
             }
 
-            let strategy = try await gemini.generateCelestialStrategy(task: task)
+            let strategy = try await perplexity.generateCelestialStrategy(task: task)
             celestialStrategy = strategy
             aiStrategy = strategy.formattedStrategy
             strategySource = "AI Genius"
@@ -502,15 +502,15 @@ final class CelestialTaskCardViewModel {
         }
 
         do {
-            let gemini = GeminiService.shared
-            guard gemini.isReady else {
+            let perplexity = PerplexityService.shared
+            guard perplexity.isReady else {
                 // Use task type default
                 aiEstimatedDuration = task.taskType.suggestedDuration
                 durationConfidence = "low"
                 return
             }
 
-            let estimate = try await gemini.estimateDuration(task: task)
+            let estimate = try await perplexity.estimateDuration(task: task)
             aiEstimatedDuration = estimate.minutes
             durationConfidence = estimate.confidence
             durationReasoning = estimate.reasoning

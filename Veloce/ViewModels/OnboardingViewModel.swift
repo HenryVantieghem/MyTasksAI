@@ -170,7 +170,7 @@ final class OnboardingViewModel {
         switch currentStep {
         case .complete:
             Task {
-                await completeOnboarding()
+                await performOnboardingCompletion()
             }
         default:
             break
@@ -255,7 +255,13 @@ final class OnboardingViewModel {
 
     // MARK: - Complete Onboarding
 
-    private func completeOnboarding() async {
+    func completeOnboarding() {
+        Task {
+            await performOnboardingCompletion()
+        }
+    }
+
+    private func performOnboardingCompletion() async {
         isLoading = true
         defer { isLoading = false }
 

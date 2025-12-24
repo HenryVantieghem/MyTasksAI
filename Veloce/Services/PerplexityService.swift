@@ -1,20 +1,20 @@
 //
-//  GeminiService.swift
+//  PerplexityService.swift
 //  Veloce
 //
-//  Gemini AI Service - Core AI Integration
-//  Handles all AI-powered features using Google's Gemini API
+//  Perplexity Sonar AI Service - Core AI Integration
+//  Handles all AI-powered features using Perplexity's Sonar API
 //
 
 import Foundation
 
-// MARK: - Gemini Service
+// MARK: - Perplexity Service
 
 @MainActor
 @Observable
-final class GeminiService {
+final class PerplexityService {
     // MARK: Singleton
-    static let shared = GeminiService()
+    static let shared = PerplexityService()
 
     // MARK: State
     private(set) var isConfigured: Bool = false
@@ -23,8 +23,8 @@ final class GeminiService {
 
     // MARK: Configuration
     private var apiKey: String?
-    private let baseURL = "https://generativelanguage.googleapis.com/v1"
-    private let modelName = "gemini-2.0-flash"
+    private let baseURL = "https://api.perplexity.ai"
+    private let modelName = "sonar"  // Using sonar model (lightweight, fast)
 
     // MARK: Rate Limiting
     private var lastRequestTime: Date?
@@ -49,19 +49,23 @@ final class GeminiService {
 
     // MARK: - Core Generation Method
 
-    /// Generate text response from Gemini
+    /// Generate text response from Perplexity Sonar
     /// - Parameters:
-    ///   - prompt: The prompt to send to Gemini
-    ///   - temperature: Controls randomness (0.0 - 1.0)
+    ///   - prompt: The prompt to send to Perplexity
+    ///   - systemPrompt: Optional system prompt for context
+    ///   - temperature: Controls randomness (0.0 - 2.0)
     ///   - maxTokens: Maximum tokens in response
-    /// - Returns: Generated text response
+    ///   - enableSearch: Whether to enable web search (default: true)
+    /// - Returns: Generated text response and optional citations
     func generateText(
         prompt: String,
+        systemPrompt: String? = nil,
         temperature: Double = 0.7,
-        maxTokens: Int = 2048
-    ) async throws -> String {
+        maxTokens: Int = 2048,
+        enableSearch: Bool = true
+    ) async throws -> (text: String, citations: [String]?) {
         guard isReady else {
-            throw GeminiError.notConfigured
+            throw PerplexityError.notConfigured
         }
 
         // Rate limiting
@@ -70,39 +74,37 @@ final class GeminiService {
         isProcessing = true
         defer { isProcessing = false }
 
-        let request = GeminiRequest(
-            contents: [
-                GeminiContent(
-                    parts: [GeminiPart(text: prompt)],
-                    role: "user"
-                )
-            ],
-            generationConfig: GeminiGenerationConfig(
-                temperature: temperature,
-                maxOutputTokens: maxTokens,
-                responseMimeType: nil
-            )
-        )
+        var messages: [PerplexityMessage] = []
 
-        let response: GeminiResponse = try await performRequest(
-            endpoint: "models/\(modelName):generateContent",
-            body: request
-        )
-
-        if let error = response.error {
-            let message = error.message ?? "Unknown API error"
-            lastError = message
-            throw GeminiError.apiError(message)
+        // Add system prompt if provided
+        if let system = systemPrompt {
+            messages.append(PerplexityMessage(role: "system", content: system))
+        } else {
+            messages.append(PerplexityMessage(role: "system", content: "You are a helpful productivity assistant."))
         }
 
-        guard let text = response.candidates?.first?.content?.parts.first?.text else {
-            throw GeminiError.emptyResponse
+        // Add user message
+        messages.append(PerplexityMessage(role: "user", content: prompt))
+
+        let request = PerplexityRequest(
+            model: modelName,
+            messages: messages,
+            temperature: temperature,
+            maxTokens: maxTokens,
+            returnCitations: true,
+            returnRelatedQuestions: false
+        )
+
+        let response: PerplexityResponse = try await performRequest(body: request)
+
+        guard let choice = response.choices.first else {
+            throw PerplexityError.emptyResponse
         }
 
-        return text
+        return (text: choice.message.content, citations: response.citations)
     }
 
-    /// Generate JSON response from Gemini
+    /// Generate JSON response from Perplexity
     /// - Parameters:
     ///   - prompt: The prompt to send
     ///   - temperature: Controls randomness
@@ -117,10 +119,11 @@ final class GeminiService {
         IMPORTANT: Respond ONLY with valid JSON. No markdown, no code blocks, just the raw JSON object.
         """
 
-        let response = try await generateText(
+        let (response, _) = try await generateText(
             prompt: jsonPrompt,
             temperature: temperature,
-            maxTokens: 4096
+            maxTokens: 4096,
+            enableSearch: false  // Disable search for structured JSON responses
         )
 
         // Clean response if wrapped in markdown
@@ -177,7 +180,7 @@ final class GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let decoder = JSONDecoder()
@@ -200,7 +203,7 @@ final class GeminiService {
         Respond with ONLY one word: low, medium, or high
         """
 
-        let response = try await generateText(prompt: prompt, temperature: 0.3, maxTokens: 10)
+        let (response, _) = try await generateText(prompt: prompt, temperature: 0.3, maxTokens: 10)
         let cleaned = response.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
 
         switch cleaned {
@@ -230,7 +233,7 @@ final class GeminiService {
         Your answer (just the number):
         """
 
-        let response = try await generateText(prompt: prompt, temperature: 0.3, maxTokens: 10)
+        let (response, _) = try await generateText(prompt: prompt, temperature: 0.3, maxTokens: 10)
 
         // Extract number from response
         let numbers = response.components(separatedBy: CharacterSet.decimalDigits.inverted)
@@ -273,38 +276,67 @@ final class GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.5)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let decoder = JSONDecoder()
         return try decoder.decode([ParsedTask].self, from: data)
     }
+}
 
+// MARK: - Parsed Task Model
+
+struct ParsedTask: Codable, Sendable {
+    let title: String
+    let priority: String?
+    let estimatedMinutes: Int?
+    let category: String?
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case priority
+        case estimatedMinutes = "estimated_minutes"
+        case category
+    }
+
+    var priorityEnum: TaskPriority {
+        switch priority?.lowercased() {
+        case "high": return .high
+        case "low": return .low
+        default: return .medium
+        }
+    }
+}
+
+// MARK: - Private Helpers Extension
+
+extension PerplexityService {
     // MARK: - Private Helpers
 
     private func performRequest<T: Encodable, R: Decodable>(
-        endpoint: String,
         body: T
     ) async throws -> R {
         guard let apiKey else {
             logError("API key not configured")
-            throw GeminiError.notConfigured
+            throw PerplexityError.notConfigured
         }
 
-        guard let url = URL(string: "\(baseURL)/\(endpoint)?key=\(apiKey)") else {
-            logError("Invalid URL: \(baseURL)/\(endpoint)")
-            throw GeminiError.invalidURL
+        guard let url = URL(string: "\(baseURL)/chat/completions") else {
+            logError("Invalid URL: \(baseURL)/chat/completions")
+            throw PerplexityError.invalidURL
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = 30  // 30 second timeout
 
         let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
         request.httpBody = try encoder.encode(body)
 
-        logDebug("Making request to: \(endpoint)")
+        logDebug("Making request to: /chat/completions")
 
         let data: Data
         let response: URLResponse
@@ -313,12 +345,12 @@ final class GeminiService {
             (data, response) = try await URLSession.shared.data(for: request)
         } catch {
             logError("Network error: \(error.localizedDescription)")
-            throw GeminiError.networkError(error)
+            throw PerplexityError.networkError(error)
         }
 
         guard let httpResponse = response as? HTTPURLResponse else {
             logError("Invalid response type")
-            throw GeminiError.networkError(NSError(domain: "Invalid response", code: -1))
+            throw PerplexityError.networkError(NSError(domain: "Invalid response", code: -1))
         }
 
         logDebug("Response status: \(httpResponse.statusCode)")
@@ -330,21 +362,21 @@ final class GeminiService {
             }
 
             // Try to parse error message
-            if let errorResponse = try? JSONDecoder().decode(GeminiResponse.self, from: data),
-               let errorMessage = errorResponse.error?.message {
-                throw GeminiError.apiError(errorMessage)
+            if let errorResponse = try? JSONDecoder().decode(PerplexityErrorResponse.self, from: data) {
+                throw PerplexityError.apiError(errorResponse.error.message)
             }
-            throw GeminiError.httpError(httpResponse.statusCode)
+            throw PerplexityError.httpError(httpResponse.statusCode)
         }
 
         let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
         do {
             return try decoder.decode(R.self, from: data)
         } catch {
             if let responseBody = String(data: data, encoding: .utf8) {
                 logError("Parse error. Response: \(responseBody.prefix(500))")
             }
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
     }
 
@@ -352,12 +384,12 @@ final class GeminiService {
 
     private func logDebug(_ message: String) {
         #if DEBUG
-        print("[GeminiService] \(message)")
+        print("[PerplexityService] \(message)")
         #endif
     }
 
     private func logError(_ message: String) {
-        print("[GeminiService ERROR] \(message)")
+        print("[PerplexityService ERROR] \(message)")
         lastError = message
     }
 
@@ -392,7 +424,7 @@ final class GeminiService {
         // Try to extract basic fields even if full parsing fails
         guard let data = json.data(using: .utf8),
               let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let advice = dict["advice"] as? String ?? "Unable to parse AI response"
@@ -413,33 +445,73 @@ final class GeminiService {
     }
 }
 
-// MARK: - Parsed Task Model
+// MARK: - Perplexity Request/Response Models
 
-struct ParsedTask: Codable, Sendable {
-    let title: String
-    let priority: String?
-    let estimatedMinutes: Int?
-    let category: String?
+struct PerplexityRequest: Encodable {
+    let model: String
+    let messages: [PerplexityMessage]
+    let temperature: Double?
+    let maxTokens: Int?
+    let returnCitations: Bool?
+    let returnRelatedQuestions: Bool?
 
     enum CodingKeys: String, CodingKey {
-        case title
-        case priority
-        case estimatedMinutes = "estimated_minutes"
-        case category
-    }
-
-    var priorityEnum: TaskPriority {
-        switch priority?.lowercased() {
-        case "high": return .high
-        case "low": return .low
-        default: return .medium
-        }
+        case model, messages, temperature
+        case maxTokens = "max_tokens"
+        case returnCitations = "return_citations"
+        case returnRelatedQuestions = "return_related_questions"
     }
 }
 
-// MARK: - Gemini Error Types
+struct PerplexityMessage: Codable {
+    let role: String
+    let content: String
+}
 
-enum GeminiError: Error, LocalizedError {
+struct PerplexityResponse: Decodable {
+    let id: String
+    let model: String
+    let choices: [PerplexityChoice]
+    let usage: PerplexityUsage?
+    let citations: [String]?
+}
+
+struct PerplexityChoice: Decodable {
+    let index: Int
+    let message: PerplexityMessage
+    let finishReason: String?
+
+    enum CodingKeys: String, CodingKey {
+        case index, message
+        case finishReason = "finish_reason"
+    }
+}
+
+struct PerplexityUsage: Decodable {
+    let promptTokens: Int?
+    let completionTokens: Int?
+    let totalTokens: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case promptTokens = "prompt_tokens"
+        case completionTokens = "completion_tokens"
+        case totalTokens = "total_tokens"
+    }
+}
+
+struct PerplexityErrorResponse: Decodable {
+    let error: PerplexityAPIError
+}
+
+struct PerplexityAPIError: Decodable {
+    let message: String
+    let type: String?
+    let code: String?
+}
+
+// MARK: - Perplexity Error Types
+
+enum PerplexityError: Error, LocalizedError {
     case notConfigured
     case invalidURL
     case networkError(Error)
@@ -546,7 +618,7 @@ enum GeminiError: Error, LocalizedError {
 
 // MARK: - Genius Task Analysis
 
-extension GeminiService {
+extension PerplexityService {
     /// Generate comprehensive genius-level analysis for a task
     func generateGeniusAnalysis(
         title: String,
@@ -613,7 +685,7 @@ extension GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.5)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let decoder = JSONDecoder()
@@ -673,7 +745,7 @@ extension GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.4)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         // Parse the response
@@ -728,23 +800,23 @@ private struct ScheduleSuggestionDTO: Decodable {
 
 // MARK: - Configuration Extension
 
-extension GeminiService {
+extension PerplexityService {
     /// Load API key from Secrets.plist or fallback sources
     func loadConfiguration() {
         // Try Secrets.plist first (primary source)
-        if let apiKey = loadFromSecretsPlist("GEMINI_API_KEY") {
+        if let apiKey = loadFromSecretsPlist("PERPLEXITY_API_KEY") {
             configure(apiKey: apiKey)
             return
         }
 
         // Try environment variable
-        if let envKey = ProcessInfo.processInfo.environment["GEMINI_API_KEY"] {
+        if let envKey = ProcessInfo.processInfo.environment["PERPLEXITY_API_KEY"] {
             configure(apiKey: envKey)
             return
         }
 
         // Try UserDefaults (for development)
-        if let storedKey = UserDefaults.standard.string(forKey: "gemini_api_key"),
+        if let storedKey = UserDefaults.standard.string(forKey: "perplexity_api_key"),
            !storedKey.isEmpty {
             configure(apiKey: storedKey)
             return
@@ -779,14 +851,14 @@ extension GeminiService {
 
     /// Store API key (for development/testing)
     func storeAPIKey(_ key: String) {
-        UserDefaults.standard.set(key, forKey: "gemini_api_key")
+        UserDefaults.standard.set(key, forKey: "perplexity_api_key")
         configure(apiKey: key)
     }
 }
 
 // MARK: - Celestial Task Card AI Methods
 
-extension GeminiService {
+extension PerplexityService {
 
     /// Generate comprehensive strategy for CelestialTaskCard
     /// Returns rich AI guidance with overview, key points, actionable steps, and obstacles
@@ -849,7 +921,7 @@ extension GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.6)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let decoder = JSONDecoder()
@@ -943,7 +1015,7 @@ extension GeminiService {
 
 // MARK: - Goal Genius AI Methods
 
-extension GeminiService {
+extension PerplexityService {
 
     /// Transform a vague goal into a SMART goal
     /// - Parameters:
@@ -1002,7 +1074,7 @@ extension GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.6)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let decoder = JSONDecoder()
@@ -1101,7 +1173,7 @@ extension GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.5)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let decoder = JSONDecoder()
@@ -1175,7 +1247,7 @@ extension GeminiService {
         let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.7)
 
         guard let data = jsonResponse.data(using: .utf8) else {
-            throw GeminiError.parsingFailed
+            throw PerplexityError.parsingFailed
         }
 
         let decoder = JSONDecoder()

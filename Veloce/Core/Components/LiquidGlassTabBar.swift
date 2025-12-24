@@ -3,47 +3,64 @@
 //  Veloce
 //
 //  iOS 26 Native Liquid Glass Tab Bar
-//  Uses GlassEffectContainer with proper morphing animations
+//  Follows Apple's Liquid Glass Design Guidelines from WWDC 2025
+//
+//  Key Principles Applied:
+//  - GlassEffectContainer for optimized multi-element rendering
+//  - .glassEffect(.regular.interactive()) for navigation layer
+//  - No custom shadows (Liquid Glass has built-in shadow layers)
+//  - No over-tinting (reserve for primary actions only)
+//  - .glassEffectID for fluid morphing animations
+//  - System handles adaptive light/dark behavior
 //
 
 import SwiftUI
 
 // MARK: - Liquid Glass Tab Bar
 
-/// Native iOS 26 Liquid Glass tab bar with morphing animations
-/// Uses GlassEffectContainer for optimal rendering performance
+/// Native iOS 26 Liquid Glass floating pill tab bar
+/// Uses GlassEffectContainer with proper morphing animations per Apple guidelines
 struct LiquidGlassTabBar: View {
-    @Binding var selectedTab: MainTab
-    @Namespace private var glassNamespace
+    @Binding var selectedTab: AppTab
+    @Namespace private var tabBarNamespace
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
     var body: some View {
-        GlassEffectContainer(spacing: 8) {
-            HStack(spacing: 4) {
-                ForEach(MainTab.allCases, id: \.self) { tab in
+        // GlassEffectContainer optimizes rendering for multiple glass elements
+        GlassEffectContainer(spacing: 0) {
+            HStack(spacing: 2) {
+                ForEach(AppTab.allCases, id: \.self) { tab in
                     LiquidGlassTabItem(
                         tab: tab,
                         isSelected: selectedTab == tab,
-                        namespace: glassNamespace
+                        namespace: tabBarNamespace
                     ) {
                         selectTab(tab)
                     }
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 8)
         }
-        .glassEffect(.regular.interactive(), in: Capsule())
-        .padding(.horizontal, 20)
-        .shadow(color: Theme.CelestialColors.nebulaCore.opacity(0.25), radius: 24, y: 8)
-        .animation(reduceMotion ? .none : .spring(response: 0.4, dampingFraction: 0.8), value: selectedTab)
+        // Apply Liquid Glass to the entire pill container
+        // Using .regular variant (default) - most versatile, works in any context
+        // .interactive() enables proper touch feedback on iOS
+        .glassEffect(.regular.interactive(), in: .capsule)
+        .padding(.horizontal, 24)
+        // No custom shadows - Liquid Glass has built-in adaptive shadow layers
+        // that respond to content underneath automatically
+        .animation(
+            reduceMotion ? .none : .spring(response: 0.35, dampingFraction: 0.8),
+            value: selectedTab
+        )
     }
 
-    private func selectTab(_ tab: MainTab) {
+    private func selectTab(_ tab: AppTab) {
         guard selectedTab != tab else { return }
 
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
             selectedTab = tab
         }
         HapticsService.shared.tabSwitch()
@@ -52,118 +69,143 @@ struct LiquidGlassTabBar: View {
 
 // MARK: - Liquid Glass Tab Item
 
+/// Individual tab item with Liquid Glass morphing selection indicator
 struct LiquidGlassTabItem: View {
-    let tab: MainTab
+    let tab: AppTab
     let isSelected: Bool
     let namespace: Namespace.ID
     let action: () -> Void
 
-    @State private var isPressed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var tabColor: Color {
-        switch tab {
-        case .tasks: return Theme.CelestialColors.nebulaCore       // Purple
-        case .calendar: return Theme.CelestialColors.nebulaGlow    // Blue
-        case .focus: return Color(hex: "F59E0B")                   // Amber
-        case .momentum: return Color(hex: "10B981")                // Green
-        case .ai: return Theme.CelestialColors.nebulaEdge          // Cyan
-        }
-    }
-
+    // Dynamic width based on selection state
     private var itemWidth: CGFloat {
-        isSelected ? 72 : 48
+        isSelected ? 68 : 44
     }
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
-                ZStack {
-                    // Icon with symbol effect
-                    Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
-                        .font(.system(size: isSelected ? 18 : 20, weight: isSelected ? .semibold : .regular))
-                        .foregroundStyle(isSelected ? tabColor : Theme.CelestialColors.starDim)
-                        .symbolEffect(.bounce.up.byLayer, value: isSelected)
-                        .contentTransition(.symbolEffect(.replace.downUp.byLayer))
-                }
+            VStack(spacing: 3) {
+                // Icon with SF Symbol effects
+                Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
+                    .font(.system(size: isSelected ? 17 : 19, weight: isSelected ? .semibold : .medium))
+                    // Let system handle foreground color adaptation
+                    // Selected: uses primary, Unselected: uses secondary
+                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    // Bounce effect on selection
+                    .symbolEffect(.bounce.up.byLayer, value: isSelected)
+                    // Smooth symbol replacement transition
+                    .contentTransition(.symbolEffect(.replace.downUp.byLayer))
 
-                // Label appears when selected
+                // Label appears when selected - minimal text
                 if isSelected {
-                    Text(tab.rawValue)
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(tabColor)
+                    Text(tab.title)
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
                         .transition(.asymmetric(
-                            insertion: .scale(scale: 0.8).combined(with: .opacity),
-                            removal: .scale(scale: 0.8).combined(with: .opacity)
+                            insertion: .scale(scale: 0.7).combined(with: .opacity),
+                            removal: .scale(scale: 0.7).combined(with: .opacity)
                         ))
                 }
             }
-            .frame(width: itemWidth, height: 44)
+            .frame(width: itemWidth, height: 42)
             .background {
                 if isSelected {
-                    // Selected background with glass effect
+                    // Selected indicator morphs between tabs using glassEffectID
+                    // This creates the fluid Liquid Glass morphing animation
                     Capsule()
-                        .fill(tabColor.opacity(0.15))
-                        .overlay(
-                            Capsule()
-                                .stroke(tabColor.opacity(0.25), lineWidth: 1)
-                        )
-                        .matchedGeometryEffect(id: "selectedTab", in: namespace)
-                        .glassEffectID("selectedTab", in: namespace)
+                        .fill(.quaternary) // Subtle fill, glass handles the rest
+                        .matchedGeometryEffect(id: "selectedIndicator", in: namespace)
+                        .glassEffectID("selectedIndicator", in: namespace)
                 }
             }
-            .contentShape(Capsule())
+            .contentShape(.capsule)
         }
-        .buttonStyle(LiquidGlassTabButtonStyle(isPressed: $isPressed))
-        .accessibilityLabel(tab.rawValue)
+        .buttonStyle(LiquidGlassItemButtonStyle())
+        // Accessibility
+        .accessibilityLabel(tab.title)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-        .accessibilityHint(isSelected ? "Currently selected" : "Double tap to switch to \(tab.rawValue)")
+        .accessibilityHint(isSelected ? "Currently selected" : "Double tap to switch to \(tab.title)")
     }
 }
 
 // MARK: - Tab Button Style
 
-private struct LiquidGlassTabButtonStyle: ButtonStyle {
-    @Binding var isPressed: Bool
-
+/// Minimal button style - Liquid Glass handles visual feedback
+private struct LiquidGlassItemButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
-            .opacity(configuration.isPressed ? 0.8 : 1.0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
-            .onChange(of: configuration.isPressed) { _, newValue in
-                isPressed = newValue
-            }
+            // Subtle scale on press - glass handles the glow feedback
+            .scaleEffect(configuration.isPressed ? 0.92 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
 
 // MARK: - Compact Variant
 
 /// Compact version for smaller screens or when keyboard is active
+/// Uses icon-only design with Liquid Glass
 struct LiquidGlassTabBarCompact: View {
-    @Binding var selectedTab: MainTab
+    @Binding var selectedTab: AppTab
+    @Namespace private var compactNamespace
 
     var body: some View {
-        HStack(spacing: 24) {
-            ForEach(MainTab.allCases, id: \.self) { tab in
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        selectedTab = tab
+        GlassEffectContainer(spacing: 0) {
+            HStack(spacing: 16) {
+                ForEach(AppTab.allCases, id: \.self) { tab in
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                            selectedTab = tab
+                        }
+                        HapticsService.shared.tabSwitch()
+                    } label: {
+                        Image(systemName: selectedTab == tab ? tab.selectedIcon : tab.icon)
+                            .font(.system(size: 20, weight: selectedTab == tab ? .semibold : .regular))
+                            .foregroundStyle(selectedTab == tab ? .primary : .secondary)
+                            .symbolEffect(.bounce.up, value: selectedTab == tab)
+                            .frame(width: 32, height: 32)
                     }
-                    HapticsService.shared.tabSwitch()
-                } label: {
-                    Image(systemName: selectedTab == tab ? tab.selectedIcon : tab.icon)
-                        .font(.system(size: 22, weight: selectedTab == tab ? .semibold : .regular))
-                        .foregroundStyle(selectedTab == tab ? .primary : .secondary)
-                        .symbolEffect(.bounce.up, value: selectedTab == tab)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.glass)
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 12)
-        .glassEffect(.regular.interactive(), in: Capsule())
+        .glassEffect(.regular.interactive(), in: .capsule)
+    }
+}
+
+// MARK: - Minimized Tab Bar
+
+/// Ultra-minimal tab bar that can appear during scroll
+/// Uses tab bar minimization behavior from iOS 26
+struct LiquidGlassTabBarMinimal: View {
+    @Binding var selectedTab: AppTab
+
+    var body: some View {
+        GlassEffectContainer(spacing: 0) {
+            HStack(spacing: 24) {
+                ForEach(AppTab.allCases, id: \.self) { tab in
+                    Button {
+                        withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                            selectedTab = tab
+                        }
+                        HapticsService.shared.selectionFeedback()
+                    } label: {
+                        SwiftUI.Circle()
+                            .fill(selectedTab == tab ? .primary : .tertiary)
+                            .frame(width: 6, height: 6)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(tab.title)
+                    .accessibilityAddTraits(selectedTab == tab ? [.isSelected] : [])
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+        }
+        .glassEffect(.regular, in: .capsule)
     }
 }
 
@@ -171,30 +213,45 @@ struct LiquidGlassTabBarCompact: View {
 
 #Preview("Liquid Glass Tab Bar") {
     struct PreviewContainer: View {
-        @State private var selectedTab: MainTab = .tasks
+        @State private var selectedTab: AppTab = .tasks
 
         var body: some View {
             ZStack {
-                VoidBackground.tasks
+                // Rich content background to show glass effect
+                LinearGradient(
+                    colors: [
+                        Color(hex: "1a1a2e"),
+                        Color(hex: "16213e"),
+                        Color(hex: "0f0f23")
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+
+                // Sample content behind glass
+                VStack {
+                    ForEach(0..<8) { i in
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.ultraThinMaterial)
+                            .frame(height: 60)
+                            .padding(.horizontal)
+                    }
+                }
 
                 VStack {
                     // Page content indicator
                     Spacer()
 
-                    VStack(spacing: 16) {
+                    VStack(spacing: 12) {
                         Image(systemName: selectedTab.selectedIcon)
-                            .font(.system(size: 72, weight: .light))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [.white, .white.opacity(0.6)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
+                            .font(.system(size: 56, weight: .light))
+                            .foregroundStyle(.primary)
+                            .symbolEffect(.bounce, value: selectedTab)
 
-                        Text(selectedTab.rawValue)
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                        Text(selectedTab.title)
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundStyle(.primary)
                     }
                     .frame(maxHeight: .infinity)
 
@@ -211,23 +268,36 @@ struct LiquidGlassTabBarCompact: View {
 }
 
 #Preview("Tab Bar States") {
-    VStack(spacing: 40) {
-        ForEach(MainTab.allCases, id: \.self) { tab in
+    VStack(spacing: 32) {
+        ForEach(AppTab.allCases, id: \.self) { tab in
             LiquidGlassTabBar(selectedTab: .constant(tab))
         }
     }
     .padding()
-    .background(VoidBackground.tasks)
+    .background(Color(hex: "0f0f23"))
     .preferredColorScheme(.dark)
 }
 
 #Preview("Compact Tab Bar") {
     ZStack {
-        VoidBackground.tasks
+        Color(hex: "0f0f23").ignoresSafeArea()
 
         VStack {
             Spacer()
             LiquidGlassTabBarCompact(selectedTab: .constant(.tasks))
+                .padding(.bottom, 20)
+        }
+    }
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Minimal Tab Bar") {
+    ZStack {
+        Color(hex: "0f0f23").ignoresSafeArea()
+
+        VStack {
+            Spacer()
+            LiquidGlassTabBarMinimal(selectedTab: .constant(.focus))
                 .padding(.bottom, 20)
         }
     }

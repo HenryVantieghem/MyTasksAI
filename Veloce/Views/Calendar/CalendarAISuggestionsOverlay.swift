@@ -193,7 +193,7 @@ struct CalendarAISuggestionsOverlay: View {
         suggestions = []
 
         // Generate mock suggestions for now
-        // In production, this would call GeminiService.suggestOptimalSchedule()
+        // In production, this would call PerplexityService.suggestOptimalSchedule()
         Task {
             try? await Task.sleep(for: .milliseconds(800))
 

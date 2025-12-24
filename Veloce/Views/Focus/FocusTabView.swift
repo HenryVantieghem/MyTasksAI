@@ -9,6 +9,39 @@
 import SwiftUI
 import FamilyControls
 
+// MARK: - Focus Section
+
+enum FocusSection: String, CaseIterable {
+    case timer = "Timer"
+    case schedules = "Schedules"
+    case history = "History"
+    case presets = "Presets"
+
+    var icon: String {
+        switch self {
+        case .timer: return "timer"
+        case .schedules: return "calendar.badge.clock"
+        case .history: return "chart.bar.fill"
+        case .presets: return "shield.lefthalf.filled"
+        }
+    }
+}
+
+// MARK: - Focus Task Context
+
+/// Context passed from a task to pre-configure the Focus session
+struct FocusTaskContext {
+    let task: TaskItem
+    let suggestedDuration: Int
+    let enableAppBlocking: Bool
+
+    init(task: TaskItem) {
+        self.task = task
+        self.suggestedDuration = task.estimatedMinutes ?? 25
+        self.enableAppBlocking = false  // App blocking defaults to off
+    }
+}
+
 // MARK: - Focus Timer Mode
 
 enum FocusTimerMode: String, CaseIterable {
@@ -57,6 +90,14 @@ enum FocusTimerMode: String, CaseIterable {
 // MARK: - Focus Tab View
 
 struct FocusTabView: View {
+    // Task context (when launched from a task)
+    var taskContext: FocusTaskContext?
+    var onSessionComplete: ((Bool) -> Void)?
+
+    // Section navigation
+    @State private var selectedSection: FocusSection = .timer
+
+    // Timer state
     @State private var selectedMode: FocusTimerMode = .pomodoro
     @State private var isSessionActive = false
     @State private var remainingSeconds: Int = 25 * 60
@@ -65,16 +106,21 @@ struct FocusTabView: View {
     @State private var showBlockingSheet = false
     @State private var showAppBlockingPicker = false
     @State private var timer: Timer?
+    @State private var showTaskCompletionPrompt = false
 
     // App Blocking
     @State private var enableAppBlocking = false
     private let blockingService = FocusBlockingService.shared
+
+    // Pattern Learning
+    private let patternService = PatternLearningService.shared
 
     // Animation states
     @State private var timerRingProgress: Double = 1.0
     @State private var breathingScale: CGFloat = 1.0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.modelContext) private var modelContext
 
     private var formattedTime: String {
         let minutes = remainingSeconds / 60
@@ -82,36 +128,39 @@ struct FocusTabView: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    private var focusStatusText: String {
+        if let task = taskContext?.task {
+            if isSessionActive {
+                return task.title
+            } else {
+                return "Focus on: \(task.title)"
+            }
+        } else {
+            return isSessionActive ? "Focus Mode" : "Ready to focus"
+        }
+    }
+
     var body: some View {
         ZStack {
             VoidBackground.focus
 
-            VStack(spacing: Theme.Spacing.xl) {
-                Spacer()
+            VStack(spacing: 0) {
+                // Section Navigation
+                sectionNavigationView
+                    .padding(.top, Theme.Spacing.universalHeaderHeight + Theme.Spacing.sm)
 
-                // Timer Ring
-                timerRingView
-                    .padding(.bottom, Theme.Spacing.lg)
-
-                // Mode Selector
-                modeSelectorView
-
-                // App Blocking Toggle
-                appBlockingToggle
-
-                // Action Buttons
-                actionButtons
-
-                Spacer()
-
-                // AI Insight
-                focusInsightCard
-
-                // Today's Sessions
-                todaySessionsCard
+                // Section Content
+                switch selectedSection {
+                case .timer:
+                    timerSectionContent
+                case .schedules:
+                    FocusSchedulesView()
+                case .history:
+                    FocusHistoryView()
+                case .presets:
+                    FocusPresetsView()
+                }
             }
-            .padding(.horizontal, Theme.Spacing.screenPadding)
-            .padding(.top, Theme.Spacing.universalHeaderHeight + Theme.Spacing.lg)
         }
         .preferredColorScheme(.dark)
         .sheet(isPresented: $showModeSelector) {
@@ -132,8 +181,23 @@ struct FocusTabView: View {
             blockingService.saveSelection()
         }
         .onAppear {
+            configureFromTaskContext()
             resetTimer()
             startBreathingAnimation()
+        }
+        .alert("Task Completed?", isPresented: $showTaskCompletionPrompt) {
+            Button("Yes, completed!") {
+                onSessionComplete?(true)
+            }
+            Button("Not yet") {
+                onSessionComplete?(false)
+            }
+        } message: {
+            if let task = taskContext?.task {
+                Text("Did you complete '\(task.title)'?")
+            } else {
+                Text("Did you complete your task?")
+            }
         }
         .onChange(of: selectedMode) { _, newMode in
             if !isSessionActive {
@@ -145,12 +209,68 @@ struct FocusTabView: View {
         }
     }
 
+    // MARK: - Section Navigation
+
+    private var sectionNavigationView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(FocusSection.allCases, id: \.self) { section in
+                    FocusSectionPill(
+                        section: section,
+                        isSelected: selectedSection == section
+                    ) {
+                        HapticsService.shared.selectionFeedback()
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            selectedSection = section
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, Theme.Spacing.screenPadding)
+            .padding(.vertical, Theme.Spacing.sm)
+        }
+    }
+
+    // MARK: - Timer Section Content
+
+    private var timerSectionContent: some View {
+        ScrollView {
+            VStack(spacing: Theme.Spacing.xl) {
+                Spacer()
+                    .frame(height: Theme.Spacing.md)
+
+                // Timer Ring
+                timerRingView
+                    .padding(.bottom, Theme.Spacing.lg)
+
+                // Mode Selector
+                modeSelectorView
+
+                // App Blocking Toggle
+                appBlockingToggle
+
+                // Action Buttons
+                actionButtons
+
+                Spacer()
+                    .frame(height: Theme.Spacing.lg)
+
+                // AI Insight
+                focusInsightCard
+
+                // Today's Sessions
+                todaySessionsCard
+            }
+            .padding(.horizontal, Theme.Spacing.screenPadding)
+        }
+    }
+
     // MARK: - Timer Ring
 
     private var timerRingView: some View {
         ZStack {
             // Outer glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -168,7 +288,7 @@ struct FocusTabView: View {
                 .scaleEffect(breathingScale)
 
             // Track ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     Color.white.opacity(0.1),
                     style: StrokeStyle(lineWidth: 12, lineCap: .round)
@@ -176,7 +296,7 @@ struct FocusTabView: View {
                 .frame(width: 240, height: 240)
 
             // Progress ring
-            Circle()
+            SwiftUI.Circle()
                 .trim(from: 0, to: timerRingProgress)
                 .stroke(
                     LinearGradient(
@@ -197,9 +317,10 @@ struct FocusTabView: View {
                     .foregroundStyle(.white)
                     .contentTransition(.numericText())
 
-                Text(isSessionActive ? "Focus Mode" : "Ready to focus")
+                Text(focusStatusText)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.white.opacity(0.6))
+                    .lineLimit(1)
 
                 // Mode badge
                 HStack(spacing: 6) {
@@ -379,10 +500,10 @@ struct FocusTabView: View {
                         .foregroundStyle(.white.opacity(0.8))
                         .frame(width: 52, height: 52)
                         .background {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(.ultraThinMaterial)
                         }
-                        .glassEffect(.regular, in: Circle())
+                        .glassEffect(.regular, in: SwiftUI.Circle())
                 }
                 .buttonStyle(.plain)
                 .transition(.scale.combined(with: .opacity))
@@ -450,6 +571,22 @@ struct FocusTabView: View {
         }
         .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
         .padding(.bottom, 100)
+    }
+
+    // MARK: - Task Context Configuration
+
+    private func configureFromTaskContext() {
+        guard let context = taskContext else { return }
+
+        // Set custom mode with task duration
+        selectedMode = .custom
+
+        // Configure duration from task estimate
+        totalSeconds = context.suggestedDuration * 60
+        remainingSeconds = totalSeconds
+
+        // Configure app blocking based on task settings
+        enableAppBlocking = context.enableAppBlocking
     }
 
     // MARK: - Timer Logic
@@ -523,6 +660,14 @@ struct FocusTabView: View {
         isSessionActive = false
         HapticsService.shared.success()
 
+        // Record focus session for pattern learning
+        let durationMinutes = (totalSeconds - remainingSeconds) / 60
+        patternService.recordFocusSession(
+            mode: selectedMode.rawValue,
+            durationMinutes: durationMinutes,
+            completed: true
+        )
+
         // End app blocking on completion
         if blockingService.isBlocking {
             Task {
@@ -535,9 +680,16 @@ struct FocusTabView: View {
             timerRingProgress = 0
         }
 
-        // Reset after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            resetTimer()
+        // If launched from a task, prompt for task completion
+        if taskContext != nil {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showTaskCompletionPrompt = true
+            }
+        } else {
+            // Reset after delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                resetTimer()
+            }
         }
     }
 
@@ -677,7 +829,7 @@ struct FocusAppBlockingConfigSheet: View {
             VStack(spacing: Theme.Spacing.xl) {
                 // Hero Icon
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -831,6 +983,40 @@ struct FocusAppBlockingConfigSheet: View {
                 blockingService.saveSelection()
             }
         }
+    }
+}
+
+// MARK: - Focus Section Pill
+
+struct FocusSectionPill: View {
+    let section: FocusSection
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: section.icon)
+                    .font(.system(size: 14, weight: isSelected ? .semibold : .regular))
+                Text(section.rawValue)
+                    .font(.system(size: 14, weight: isSelected ? .semibold : .medium))
+            }
+            .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background {
+                if isSelected {
+                    Capsule()
+                        .fill(Theme.Colors.aiAmber)
+                        .shadow(color: Theme.Colors.aiAmber.opacity(0.4), radius: 8, y: 2)
+                } else {
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                }
+            }
+            .glassEffect(.regular, in: Capsule())
+        }
+        .buttonStyle(.plain)
     }
 }
 

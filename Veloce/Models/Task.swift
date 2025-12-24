@@ -72,6 +72,11 @@ final class TaskItem {
     var enableAppBlocking: Bool  // Whether to block apps during this task
     var blockedAppsData: Data?   // FamilyActivitySelection encoded data
 
+    // MARK: Tiimo Visual Customization
+    var taskIcon: String?        // SF Symbol name for custom icon
+    var taskEmoji: String?       // Emoji for task personalization
+    var taskColorHex: String?    // Custom color hex code override
+
     // MARK: Initialization
     init(
         id: UUID = UUID(),
@@ -108,7 +113,10 @@ final class TaskItem {
         recurringParentId: UUID? = nil,
         lastRecurrenceDate: Date? = nil,
         enableAppBlocking: Bool = false,
-        blockedAppsData: Data? = nil
+        blockedAppsData: Data? = nil,
+        taskIcon: String? = nil,
+        taskEmoji: String? = nil,
+        taskColorHex: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -145,6 +153,9 @@ final class TaskItem {
         self.lastRecurrenceDate = lastRecurrenceDate
         self.enableAppBlocking = enableAppBlocking
         self.blockedAppsData = blockedAppsData
+        self.taskIcon = taskIcon
+        self.taskEmoji = taskEmoji
+        self.taskColorHex = taskColorHex
     }
 }
 

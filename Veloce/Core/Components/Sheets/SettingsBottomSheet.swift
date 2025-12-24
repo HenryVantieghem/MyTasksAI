@@ -2,8 +2,9 @@
 //  SettingsBottomSheet.swift
 //  Veloce
 //
-//  Settings Bottom Sheet
-//  Profile, preferences, and account actions
+//  Settings Bottom Sheet - Living Cosmos Design
+//  Profile with editable avatar, preferences, and account actions
+//  with celestial glass styling and staggered reveal animations
 //
 
 import SwiftUI
@@ -14,64 +15,81 @@ struct SettingsBottomSheet: View {
     @Bindable var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(AppViewModel.self) private var appViewModel
-    @Environment(\.colorScheme) private var colorScheme
 
     @State private var showContent = false
+    @State private var sectionVisibility: [Bool] = [false, false, false, false, false]
     @State private var showDeleteAccountAlert = false
     @State private var showSignOutAlert = false
+    @State private var showProfileEditor = false
     @State private var isDeleting = false
+    @State private var avatarImage: UIImage?
 
     private let gamification = GamificationService.shared
+    @StateObject private var profileImageService = ProfileImageService.shared
 
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: Theme.Spacing.lg) {
+                VStack(spacing: Theme.Spacing.xl) {
                     // Profile section
                     profileSection
-                        .opacity(showContent ? 1 : 0)
-                        .offset(y: showContent ? 0 : 20)
+                        .staggeredReveal(index: 0, isVisible: sectionVisibility[0])
 
                     // Quick preferences
                     preferencesSection
-                        .opacity(showContent ? 1 : 0)
-                        .offset(y: showContent ? 0 : 20)
+                        .staggeredReveal(index: 1, isVisible: sectionVisibility[1])
 
                     // Goals section
                     goalsSection
-                        .opacity(showContent ? 1 : 0)
-                        .offset(y: showContent ? 0 : 20)
+                        .staggeredReveal(index: 2, isVisible: sectionVisibility[2])
 
                     // Account actions
                     accountSection
-                        .opacity(showContent ? 1 : 0)
-                        .offset(y: showContent ? 0 : 20)
+                        .staggeredReveal(index: 3, isVisible: sectionVisibility[3])
 
                     // App info
                     appInfoSection
-                        .opacity(showContent ? 1 : 0)
+                        .staggeredReveal(index: 4, isVisible: sectionVisibility[4])
                 }
                 .padding(Theme.Spacing.screenPadding)
+                .padding(.bottom, Theme.Spacing.xxxl)
             }
-            .background(Theme.Colors.background.ignoresSafeArea())
+            .background {
+                VoidSheetBackground()
+            }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Settings")
+                        .font(Theme.Typography.cosmosTitle)
+                        .foregroundStyle(Theme.CelestialColors.starWhite)
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
+                    CosmicIconButton("xmark.circle.fill", color: Theme.CelestialColors.starDim, size: 36) {
                         dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
-                            .foregroundStyle(Theme.Colors.textTertiary)
                     }
                 }
             }
         }
         .onAppear {
-            withAnimation(Theme.Animation.spring.delay(0.1)) {
-                showContent = true
-            }
+            startStaggeredReveal()
+            loadAvatar()
+        }
+        .sheet(isPresented: $showProfileEditor) {
+            ProfileEditSheet(
+                viewModel: viewModel,
+                avatarImage: $avatarImage,
+                onSave: { image in
+                    Task {
+                        await uploadAvatar(image)
+                    }
+                }
+            )
+            .presentationDetents([.medium, .large])
+            .voidPresentationBackground()
         }
         .alert("Sign Out?", isPresented: $showSignOutAlert) {
             Button("Cancel", role: .cancel) { }
@@ -102,91 +120,162 @@ struct SettingsBottomSheet: View {
         }
     }
 
+    // MARK: - Animation
+
+    private func startStaggeredReveal() {
+        for index in 0..<sectionVisibility.count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 + Double(index) * LivingCosmos.Animations.staggerDelay) {
+                withAnimation(LivingCosmos.Animations.stellarBounce) {
+                    sectionVisibility[index] = true
+                }
+            }
+        }
+    }
+
+    // MARK: - Avatar
+
+    private func loadAvatar() {
+        Task {
+            if let userId = appViewModel.currentUser?.id.uuidString {
+                avatarImage = await profileImageService.fetchAvatar(for: userId)
+            }
+        }
+    }
+
+    private func uploadAvatar(_ image: UIImage) async {
+        guard let userId = appViewModel.currentUser?.id.uuidString else { return }
+        do {
+            _ = try await profileImageService.uploadAvatar(image, for: userId)
+            avatarImage = image
+            HapticsService.shared.taskComplete()
+        } catch {
+            viewModel.error = error.localizedDescription
+        }
+    }
+
     // MARK: - Profile Section
 
     private var profileSection: some View {
-        VStack(spacing: Theme.Spacing.md) {
-            // Avatar
-            ZStack {
-                SwiftUI.Circle()
-                    .fill(Theme.Colors.accentGradient)
-                    .frame(width: 80, height: 80)
-
-                Text(viewModel.fullName.isEmpty ? "?" : String(viewModel.fullName.prefix(1)).uppercased())
-                    .font(.system(size: 32, weight: .bold, design: .default))
-                    .foregroundStyle(.white)
-
-                // Level badge
-                ZStack {
-                    SwiftUI.Circle()
-                        .fill(Theme.Colors.iridescentGradientLinear)
-                        .frame(width: 28, height: 28)
-
-                    Text("\(gamification.currentLevel)")
-                        .font(.system(size: 12, weight: .bold, design: .default))
-                        .foregroundStyle(.white)
-                }
-                .offset(x: 28, y: 28)
+        VStack(spacing: Theme.Spacing.lg) {
+            // Avatar with edit
+            ProfileAvatarView(
+                image: avatarImage,
+                name: viewModel.fullName.isEmpty ? "User" : viewModel.fullName,
+                size: .large,
+                level: gamification.currentLevel,
+                showEditButton: true
+            ) {
+                showProfileEditor = true
             }
 
+            // Name and email
             VStack(spacing: Theme.Spacing.xs) {
                 Text(viewModel.fullName.isEmpty ? "Your Name" : viewModel.fullName)
-                    .font(Theme.Typography.title3)
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
+
+                if !viewModel.username.isEmpty {
+                    Text("@\(viewModel.username)")
+                        .font(Theme.Typography.cosmosMeta)
+                        .foregroundStyle(Theme.Colors.aiPurple)
+                }
 
                 Text(viewModel.email)
-                    .font(Theme.Typography.body)
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.CelestialColors.starDim)
+            }
+
+            // Stats row
+            HStack(spacing: Theme.Spacing.xl) {
+                statItem(value: "\(gamification.currentLevel)", label: "Level", icon: "star.fill", color: Theme.Colors.xp)
+                statItem(value: "\(gamification.totalPoints)", label: "Points", icon: "sparkles", color: Theme.Colors.aiPurple)
+                statItem(value: "\(gamification.currentStreak)", label: "Streak", icon: "flame.fill", color: Theme.CelestialColors.solarFlare)
+            }
+
+            // Edit profile button
+            CosmicButton("Edit Profile", style: .ghost, icon: "pencil") {
+                showProfileEditor = true
             }
         }
         .padding(Theme.Spacing.xl)
         .frame(maxWidth: .infinity)
-        .glassCard()
+        .floatingIsland(accentColor: Theme.Colors.aiPurple)
+    }
+
+    private func statItem(value: String, label: String, icon: String, color: Color) -> some View {
+        VStack(spacing: Theme.Spacing.xs) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 12))
+                    .foregroundStyle(color)
+
+                Text(value)
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
+            }
+
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(Theme.CelestialColors.starDim)
+        }
     }
 
     // MARK: - Preferences Section
 
     private var preferencesSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Text("Preferences")
-                .font(Theme.Typography.caption1)
-                .foregroundStyle(Theme.Colors.textSecondary)
-                .padding(.horizontal, Theme.Spacing.sm)
-
+        CosmicSectionCard(header: "Preferences", headerIcon: "gearshape.fill", headerIconColor: Theme.CelestialColors.starDim) {
             VStack(spacing: 0) {
-                SettingsToggleRow(
+                CosmicToggleRow(
                     icon: "bell.fill",
                     iconColor: Theme.Colors.accent,
                     title: "Notifications",
+                    subtitle: "Task reminders & updates",
                     isOn: $viewModel.notificationsEnabled
                 )
 
-                Divider().padding(.leading, 52)
+                CosmicDivider()
 
-                SettingsToggleRow(
+                CosmicToggleRow(
                     icon: "hand.tap.fill",
                     iconColor: Theme.Colors.aiPurple,
                     title: "Haptic Feedback",
+                    subtitle: "Vibration for actions",
                     isOn: $viewModel.hapticsEnabled
                 )
 
-                Divider().padding(.leading, 52)
+                CosmicDivider()
 
-                // Theme picker
+                CosmicToggleRow(
+                    icon: "calendar.badge.clock",
+                    iconColor: Theme.Colors.aiBlue,
+                    title: "Calendar Sync",
+                    subtitle: "Sync with Apple Calendar",
+                    isOn: $viewModel.calendarSyncEnabled
+                )
+
+                CosmicDivider()
+
+                // Theme picker row
                 HStack(spacing: Theme.Spacing.md) {
                     ZStack {
                         SwiftUI.Circle()
-                            .fill(Theme.Colors.aiBlue.opacity(0.15))
-                            .frame(width: 36, height: 36)
+                            .fill(Theme.CelestialColors.plasmaCore.opacity(0.15))
+                            .frame(width: LivingCosmos.Controls.iconContainerSize, height: LivingCosmos.Controls.iconContainerSize)
 
                         Image(systemName: "paintbrush.fill")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(Theme.Colors.aiBlue)
+                            .font(.system(size: LivingCosmos.Controls.iconSize, weight: .medium))
+                            .foregroundStyle(Theme.CelestialColors.plasmaCore)
                     }
 
-                    Text("Theme")
-                        .font(Theme.Typography.body)
-                        .foregroundStyle(Theme.Colors.textPrimary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Theme")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.CelestialColors.starWhite)
+
+                        Text("App appearance")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.CelestialColors.starDim)
+                    }
 
                     Spacer()
 
@@ -196,115 +285,71 @@ struct SettingsBottomSheet: View {
                         }
                     }
                     .pickerStyle(.menu)
-                    .tint(Theme.Colors.accent)
+                    .tint(Theme.Colors.aiPurple)
                 }
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, Theme.Spacing.sm)
+                .padding(.horizontal, LivingCosmos.Controls.rowPadding)
+                .frame(minHeight: LivingCosmos.Controls.rowHeight)
             }
-            .glassCard()
         }
     }
 
     // MARK: - Goals Section
 
     private var goalsSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Text("Daily Goals")
-                .font(Theme.Typography.caption1)
-                .foregroundStyle(Theme.Colors.textSecondary)
-                .padding(.horizontal, Theme.Spacing.sm)
-
+        CosmicSectionCard(header: "Daily Goals", headerIcon: "target", headerIconColor: Theme.Colors.success) {
             VStack(spacing: 0) {
-                SettingsStepperRow(
-                    icon: "target",
+                CosmicStepperRow(
+                    icon: "sun.max.fill",
                     iconColor: Theme.Colors.success,
                     title: "Daily Tasks",
+                    subtitle: "Tasks to complete each day",
                     value: $viewModel.dailyTaskGoal,
                     range: 1...20
                 )
 
-                Divider().padding(.leading, 52)
+                CosmicDivider()
 
-                SettingsStepperRow(
+                CosmicStepperRow(
                     icon: "calendar",
                     iconColor: Theme.Colors.aiCyan,
                     title: "Weekly Tasks",
+                    subtitle: "Weekly target",
                     value: $viewModel.weeklyTaskGoal,
                     range: 5...100,
                     step: 5
                 )
             }
-            .glassCard()
         }
     }
 
     // MARK: - Account Section
 
     private var accountSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Text("Account")
-                .font(Theme.Typography.caption1)
-                .foregroundStyle(Theme.Colors.textSecondary)
-                .padding(.horizontal, Theme.Spacing.sm)
-
+        CosmicSectionCard(header: "Account", headerIcon: "person.fill", headerIconColor: Theme.Colors.aiPurple) {
             VStack(spacing: 0) {
                 // Subscription
-                HStack(spacing: Theme.Spacing.md) {
-                    ZStack {
-                        SwiftUI.Circle()
-                            .fill(Theme.Colors.xp.opacity(0.15))
-                            .frame(width: 36, height: 36)
-
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(Theme.Colors.xp)
-                    }
-
-                    Text("Subscription")
-                        .font(Theme.Typography.body)
-                        .foregroundStyle(Theme.Colors.textPrimary)
-
-                    Spacer()
-
-                    Text(viewModel.isProUser ? "Pro" : "Free")
-                        .font(Theme.Typography.body)
-                        .foregroundStyle(Theme.Colors.textSecondary)
+                CosmicNavigationRow(
+                    icon: "crown.fill",
+                    iconColor: Theme.Colors.xp,
+                    title: "Subscription",
+                    subtitle: viewModel.isProUser ? "Pro Plan Active" : "Upgrade to Pro",
+                    value: viewModel.isProUser ? "Pro" : "Free"
+                ) {
+                    // Open subscription management
                 }
-                .padding(.horizontal, Theme.Spacing.md)
-                .padding(.vertical, Theme.Spacing.sm)
 
-                Divider().padding(.leading, 52)
+                CosmicDivider()
 
                 // Sign out
-                Button {
+                CosmicNavigationRow(
+                    icon: "rectangle.portrait.and.arrow.right",
+                    iconColor: Theme.CelestialColors.warningNebula,
+                    title: "Sign Out"
+                ) {
                     showSignOutAlert = true
-                } label: {
-                    HStack(spacing: Theme.Spacing.md) {
-                        ZStack {
-                            SwiftUI.Circle()
-                                .fill(Theme.Colors.warning.opacity(0.15))
-                                .frame(width: 36, height: 36)
-
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(Theme.Colors.warning)
-                        }
-
-                        Text("Sign Out")
-                            .font(Theme.Typography.body)
-                            .foregroundStyle(Theme.Colors.textPrimary)
-
-                        Spacer()
-
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Theme.Colors.textTertiary)
-                    }
-                    .padding(.horizontal, Theme.Spacing.md)
-                    .padding(.vertical, Theme.Spacing.sm)
                 }
 
-                Divider().padding(.leading, 52)
+                CosmicDivider()
 
                 // Delete account
                 Button {
@@ -313,154 +358,214 @@ struct SettingsBottomSheet: View {
                     HStack(spacing: Theme.Spacing.md) {
                         ZStack {
                             SwiftUI.Circle()
-                                .fill(Theme.Colors.error.opacity(0.15))
-                                .frame(width: 36, height: 36)
+                                .fill(Theme.CelestialColors.errorNebula.opacity(0.15))
+                                .frame(width: LivingCosmos.Controls.iconContainerSize, height: LivingCosmos.Controls.iconContainerSize)
 
                             Image(systemName: "trash.fill")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(Theme.Colors.error)
+                                .font(.system(size: LivingCosmos.Controls.iconSize, weight: .medium))
+                                .foregroundStyle(Theme.CelestialColors.errorNebula)
                         }
 
                         Text("Delete Account")
-                            .font(Theme.Typography.body)
-                            .foregroundStyle(Theme.Colors.error)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.CelestialColors.errorNebula)
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Theme.Colors.textTertiary)
+                            .foregroundStyle(Theme.CelestialColors.starGhost)
                     }
-                    .padding(.horizontal, Theme.Spacing.md)
-                    .padding(.vertical, Theme.Spacing.sm)
+                    .padding(.horizontal, LivingCosmos.Controls.rowPadding)
+                    .frame(minHeight: LivingCosmos.Controls.rowHeight)
                 }
+                .buttonStyle(.plain)
                 .disabled(isDeleting)
             }
-            .glassCard()
         }
     }
 
     // MARK: - App Info Section
 
     private var appInfoSection: some View {
-        VStack(spacing: Theme.Spacing.xs) {
-            Text("MyTasksAI v1.0.0")
-                .font(Theme.Typography.caption1)
-                .foregroundStyle(Theme.Colors.textTertiary)
+        VStack(spacing: Theme.Spacing.sm) {
+            // App logo mini
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.Colors.aiPurple)
+
+                Text("Veloce")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
+
+                Text("v1.0.0")
+                    .font(Theme.Typography.cosmosMeta)
+                    .foregroundStyle(Theme.CelestialColors.starGhost)
+            }
 
             HStack(spacing: Theme.Spacing.md) {
-                Button("Privacy Policy") { }
-                    .font(Theme.Typography.caption1)
-                    .foregroundStyle(Theme.Colors.accent)
+                CosmicLinkButton("Privacy Policy", color: Theme.Colors.aiPurple) {
+                    // Open privacy policy
+                }
 
                 Text("•")
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .foregroundStyle(Theme.CelestialColors.starGhost)
 
-                Button("Terms of Service") { }
-                    .font(Theme.Typography.caption1)
-                    .foregroundStyle(Theme.Colors.accent)
+                CosmicLinkButton("Terms of Service", color: Theme.Colors.aiPurple) {
+                    // Open terms
+                }
             }
+
+            Text("Made with AI in San Francisco")
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.CelestialColors.starGhost)
+                .padding(.top, Theme.Spacing.xs)
         }
-        .padding(.top, Theme.Spacing.md)
+        .padding(.top, Theme.Spacing.lg)
     }
 }
 
-// MARK: - Settings Toggle Row
+// MARK: - Profile Edit Sheet
 
-struct SettingsToggleRow: View {
-    let icon: String
-    let iconColor: Color
-    let title: String
-    @Binding var isOn: Bool
+struct ProfileEditSheet: View {
+    @Bindable var viewModel: SettingsViewModel
+    @Binding var avatarImage: UIImage?
+    let onSave: (UIImage) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedImage: UIImage?
+    @State private var editedName: String = ""
+    @State private var editedUsername: String = ""
+    @State private var isSaving = false
+
+    private let gamification = GamificationService.shared
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            ZStack {
-                SwiftUI.Circle()
-                    .fill(iconColor.opacity(0.15))
-                    .frame(width: 36, height: 36)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: Theme.Spacing.xl) {
+                    // Avatar picker
+                    ProfileAvatarPicker(
+                        selectedImage: $selectedImage,
+                        currentImage: avatarImage,
+                        name: viewModel.fullName.isEmpty ? "User" : viewModel.fullName,
+                        level: gamification.currentLevel
+                    ) { image in
+                        selectedImage = image
+                    }
+                    .padding(.top, Theme.Spacing.xl)
 
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(iconColor)
+                    // Name field
+                    VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                        Text("FULL NAME")
+                            .font(Theme.Typography.cosmosSectionHeader)
+                            .foregroundStyle(Theme.CelestialColors.starDim)
+                            .tracking(1.5)
+
+                        TextField("", text: $editedName)
+                            .font(.system(size: 16))
+                            .foregroundStyle(Theme.CelestialColors.starWhite)
+                            .padding()
+                            .background {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Theme.CelestialColors.void)
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Theme.CelestialColors.starGhost, lineWidth: 1)
+                                    }
+                            }
+                    }
+
+                    // Username field
+                    VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                        Text("USERNAME")
+                            .font(Theme.Typography.cosmosSectionHeader)
+                            .foregroundStyle(Theme.CelestialColors.starDim)
+                            .tracking(1.5)
+
+                        HStack {
+                            Text("@")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(Theme.Colors.aiPurple)
+
+                            TextField("", text: $editedUsername)
+                                .font(.system(size: 16))
+                                .foregroundStyle(Theme.CelestialColors.starWhite)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                        }
+                        .padding()
+                        .background {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Theme.CelestialColors.void)
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Theme.CelestialColors.starGhost, lineWidth: 1)
+                                }
+                        }
+                    }
+
+                    Spacer(minLength: Theme.Spacing.xl)
+
+                    // Save button
+                    CosmicButton("Save Changes", style: .primary, isLoading: isSaving) {
+                        saveChanges()
+                    }
+                }
+                .padding(Theme.Spacing.screenPadding)
             }
+            .background {
+                SimpleVoidBackground()
+            }
+            .navigationTitle("Edit Profile")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Edit Profile")
+                        .font(Theme.Typography.cosmosTitle)
+                        .foregroundStyle(Theme.CelestialColors.starWhite)
+                }
 
-            Text(title)
-                .font(Theme.Typography.body)
-                .foregroundStyle(Theme.Colors.textPrimary)
-
-            Spacer()
-
-            Toggle("", isOn: $isOn)
-                .labelsHidden()
-                .tint(Theme.Colors.accent)
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundStyle(Theme.CelestialColors.starDim)
+                }
+            }
         }
-        .padding(.horizontal, Theme.Spacing.md)
-        .padding(.vertical, Theme.Spacing.sm)
+        .onAppear {
+            editedName = viewModel.fullName
+            editedUsername = viewModel.username
+        }
     }
-}
 
-// MARK: - Settings Stepper Row
+    private func saveChanges() {
+        isSaving = true
 
-struct SettingsStepperRow: View {
-    let icon: String
-    let iconColor: Color
-    let title: String
-    @Binding var value: Int
-    let range: ClosedRange<Int>
-    var step: Int = 1
+        Task {
+            // Update name and username
+            viewModel.fullName = editedName
+            viewModel.username = editedUsername
 
-    var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            ZStack {
-                SwiftUI.Circle()
-                    .fill(iconColor.opacity(0.15))
-                    .frame(width: 36, height: 36)
-
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(iconColor)
+            // Save avatar if changed
+            if let image = selectedImage {
+                onSave(image)
             }
 
-            Text(title)
-                .font(Theme.Typography.body)
-                .foregroundStyle(Theme.Colors.textPrimary)
-
-            Spacer()
-
-            HStack(spacing: Theme.Spacing.sm) {
-                Button {
-                    if value > range.lowerBound {
-                        value -= step
-                        HapticsService.shared.selectionFeedback()
-                    }
-                } label: {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundStyle(value > range.lowerBound ? Theme.Colors.accent : Theme.Colors.textTertiary)
-                }
-                .disabled(value <= range.lowerBound)
-
-                Text("\(value)")
-                    .font(.system(size: 18, weight: .semibold, design: .default))
-                    .foregroundStyle(Theme.Colors.textPrimary)
-                    .frame(minWidth: 40)
-
-                Button {
-                    if value < range.upperBound {
-                        value += step
-                        HapticsService.shared.selectionFeedback()
-                    }
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundStyle(value < range.upperBound ? Theme.Colors.accent : Theme.Colors.textTertiary)
-                }
-                .disabled(value >= range.upperBound)
+            // Save to backend
+            do {
+                try await viewModel.saveProfile()
+                HapticsService.shared.taskComplete()
+                dismiss()
+            } catch {
+                viewModel.error = error.localizedDescription
             }
+
+            isSaving = false
         }
-        .padding(.horizontal, Theme.Spacing.md)
-        .padding(.vertical, Theme.Spacing.sm)
     }
 }
 

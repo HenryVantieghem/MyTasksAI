@@ -9,35 +9,11 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - Main Tab
+// MARK: - Main Tab (Legacy Alias)
 
-enum MainTab: String, CaseIterable {
-    case tasks = "Tasks"
-    case calendar = "Calendar"
-    case focus = "Focus"
-    case momentum = "Momentum"
-    case ai = "AI"
-
-    var icon: String {
-        switch self {
-        case .tasks: return "plus.bubble"
-        case .calendar: return "calendar"
-        case .focus: return "timer"
-        case .momentum: return "flame"
-        case .ai: return "sparkles"
-        }
-    }
-
-    var selectedIcon: String {
-        switch self {
-        case .tasks: return "plus.bubble.fill"
-        case .calendar: return "calendar"
-        case .focus: return "timer.circle.fill"
-        case .momentum: return "flame.fill"
-        case .ai: return "sparkles"
-        }
-    }
-}
+/// Legacy type alias for backward compatibility
+/// New code should use AppTab directly
+typealias MainTab = AppTab
 
 // MARK: - Main Container View
 
@@ -45,8 +21,8 @@ struct MainContainerView: View {
     @Environment(AppViewModel.self) private var appViewModel
     @Environment(\.modelContext) private var modelContext
 
-    // Tab state
-    @State private var selectedTab: MainTab = .tasks
+    // Tab state - using AppTab enum for navigation
+    @State private var selectedTab: AppTab = .tasks
 
     // ViewModels
     @State private var tasksViewModel = TasksViewModel()
@@ -133,17 +109,21 @@ struct MainContainerView: View {
                 EnhancedCalendarView(viewModel: calendarViewModel)
                     .tag(MainTab.calendar)
 
-                // Focus Tab - Timer and Focus Sessions
+                // Focus Tab - Timer and App Blocking (Tiimo + Opal style)
                 FocusTabView()
                     .tag(MainTab.focus)
 
-                // Momentum Tab - Gamification Dashboard
-                MomentumTabView()
+                // Circles Tab - Social Accountability
+                CirclesTabView()
+                    .tag(MainTab.circles)
+
+                // Momentum Tab - Gamification Dashboard (Living Universe Redesign)
+                MomentumTabViewRedesign()
                     .tag(MainTab.momentum)
 
-                // AI Tab - Unified AI Hub (Journal + Brain Dump + Chat + Feed)
-                UnifiedAIHubView(tasksViewModel: tasksViewModel)
-                    .tag(MainTab.ai)
+                // Journal Tab - Daily reflections with Brain Dump and Reminders
+                JournalTabView(tasksViewModel: tasksViewModel)
+                    .tag(MainTab.journal)
             }
             .toolbar(.hidden, for: .tabBar)
 
@@ -168,7 +148,7 @@ struct MainContainerView: View {
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .safeAreaInset(edge: .top) {
             UniversalHeaderView(
-                title: selectedTab.rawValue,
+                title: selectedTab.title,
                 showStatsSheet: $showStatsSheet,
                 showSettingsSheet: $showSettingsSheet,
                 userName: appViewModel.currentUser?.fullName,
@@ -449,7 +429,7 @@ struct PremiumFAB: View {
         Button(action: action) {
             ZStack {
                 // Outer glow ring (intensifies when empty)
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         AngularGradient(
                             colors: [
@@ -468,11 +448,11 @@ struct PremiumFAB: View {
                     .scaleEffect(1 + glowPhase * (isEmpty ? 0.15 : 0.08))
 
                 // Glass background
-                Circle()
+                SwiftUI.Circle()
                     .fill(.ultraThinMaterial)
                     .frame(width: 60, height: 60)
                     .overlay(
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(
                                 LinearGradient(
                                     colors: [
@@ -487,7 +467,7 @@ struct PremiumFAB: View {
                     )
 
                 // Gradient fill
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [
@@ -596,7 +576,7 @@ struct AnimatedEmptyStateIcon: View {
     var body: some View {
         ZStack {
             // Background glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -781,13 +761,13 @@ struct TaskRow: View {
                 Button {
                     toggleWithAnimation()
                 } label: {
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(
                             task.isCompleted ? AppColors.accentSuccess : AppColors.textTertiary,
                             lineWidth: 1.5
                         )
                         .background(
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(task.isCompleted ? AppColors.accentSuccess : Color.clear)
                         )
                         .overlay {
@@ -1153,12 +1133,12 @@ struct TodayProgressStat: View {
             // Progress Ring
             ZStack {
                 // Track
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Theme.Colors.textTertiary.opacity(0.2), lineWidth: 3)
                     .frame(width: 36, height: 36)
 
                 // Progress
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: ringProgress)
                     .stroke(
                         isComplete ?
@@ -1527,7 +1507,7 @@ struct CalendarDayCell: View {
                 ZStack {
                     // Glow for today
                     if isToday && !isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Colors.accent.opacity(0.2))
                             .frame(width: 40, height: 40)
                             .blur(radius: 4)
@@ -1535,7 +1515,7 @@ struct CalendarDayCell: View {
                     }
 
                     // Background
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             isSelected ?
                             LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.accentSecondary], startPoint: .topLeading, endPoint: .bottomTrailing) :
@@ -1545,14 +1525,14 @@ struct CalendarDayCell: View {
 
                     // Glass effect for selected
                     if isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(.ultraThinMaterial.opacity(0.3))
                             .frame(width: 36, height: 36)
                     }
 
                     // Today ring
                     if isToday && !isSelected {
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(
                                 LinearGradient(
                                     colors: [Theme.Colors.accent, Theme.Colors.accentSecondary],
@@ -1574,7 +1554,7 @@ struct CalendarDayCell: View {
                 // Event indicator
                 if hasEvents {
                     HStack(spacing: 2) {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(isSelected ? .white : Theme.Colors.accent)
                             .frame(width: 5, height: 5)
                     }
@@ -1791,11 +1771,11 @@ struct GoalRow: View {
                 } else {
                     // Progress ring
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(Theme.Colors.textTertiary.opacity(0.2), lineWidth: 2)
                             .frame(width: 24, height: 24)
 
-                        Circle()
+                        SwiftUI.Circle()
                             .trim(from: 0, to: animatedProgress)
                             .stroke(progressColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                             .frame(width: 24, height: 24)

@@ -277,7 +277,7 @@ struct CompactTimeBlock: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 6) {
-                Circle()
+                SwiftUI.Circle()
                     .fill(color)
                     .frame(width: 8, height: 8)
 

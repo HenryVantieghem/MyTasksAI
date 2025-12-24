@@ -3,7 +3,7 @@
 //  Veloce
 //
 //  AI Service - High-level AI Operations Facade
-//  Coordinates between GeminiService and queue for seamless AI integration
+//  Coordinates between PerplexityService and queue for seamless AI integration
 //
 
 import Foundation
@@ -17,7 +17,7 @@ final class AIService {
     static let shared = AIService()
 
     // MARK: Dependencies
-    private let gemini = GeminiService.shared
+    private let perplexity = PerplexityService.shared
     private let queue = AIProcessingQueue.shared
 
     // MARK: State
@@ -31,14 +31,14 @@ final class AIService {
 
     /// Configure AI service with API key
     func configure(apiKey: String) {
-        gemini.configure(apiKey: apiKey)
-        isConfigured = gemini.isConfigured
+        perplexity.configure(apiKey: apiKey)
+        isConfigured = perplexity.isConfigured
     }
 
     /// Load configuration from storage
     func loadConfiguration() {
-        gemini.loadConfiguration()
-        isConfigured = gemini.isConfigured
+        perplexity.loadConfiguration()
+        isConfigured = perplexity.isConfigured
     }
 
     // MARK: - Task Processing
@@ -56,7 +56,7 @@ final class AIService {
         defer { processingTasks.remove(task.id) }
 
         // Analyze the task
-        let response = try await gemini.analyzeTask(
+        let response = try await perplexity.analyzeTask(
             title: task.title,
             notes: task.notes,
             context: task.contextNotes
@@ -101,7 +101,7 @@ final class AIService {
         guard isConfigured else {
             throw AIServiceError.notConfigured
         }
-        return try await gemini.assessPriority(taskTitle: title)
+        return try await perplexity.assessPriority(taskTitle: title)
     }
 
     /// Get time estimate
@@ -109,7 +109,7 @@ final class AIService {
         guard isConfigured else {
             throw AIServiceError.notConfigured
         }
-        return try await gemini.estimateTime(taskTitle: title, context: context)
+        return try await perplexity.estimateTime(taskTitle: title, context: context)
     }
 
     /// Process brain dump text into tasks
@@ -117,7 +117,7 @@ final class AIService {
         guard isConfigured else {
             throw AIServiceError.notConfigured
         }
-        return try await gemini.processBrainDump(text)
+        return try await perplexity.processBrainDump(text)
     }
 
     // MARK: - Sub-Task Breakdown
@@ -130,7 +130,7 @@ final class AIService {
             throw AIServiceError.notConfigured
         }
 
-        return try await gemini.generateSubTaskBreakdown(
+        return try await perplexity.generateSubTaskBreakdown(
             taskTitle: task.title,
             context: task.contextNotes,
             estimatedMinutes: task.estimatedMinutes
@@ -148,7 +148,7 @@ final class AIService {
             throw AIServiceError.notConfigured
         }
 
-        return try await gemini.findYouTubeResources(
+        return try await perplexity.findYouTubeResources(
             taskTitle: task.title,
             context: task.contextNotes,
             maxResults: maxResults
@@ -161,13 +161,13 @@ final class AIService {
     func suggestSchedule(
         for task: TaskItem,
         freeSlots: [DateInterval],
-        userPatterns: UserProductivityPatterns?
+        userPatterns: UserProductivityProfile?
     ) async throws -> ScheduleSuggestion {
         guard isConfigured else {
             throw AIServiceError.notConfigured
         }
 
-        return try await gemini.generateScheduleSuggestion(
+        return try await perplexity.generateScheduleSuggestion(
             taskTitle: task.title,
             estimatedMinutes: task.estimatedMinutes,
             freeSlots: freeSlots,
@@ -188,7 +188,7 @@ final class AIService {
             throw AIServiceError.notConfigured
         }
 
-        return try await gemini.generateReflectionTips(
+        return try await perplexity.generateReflectionTips(
             taskTitle: task.title,
             difficultyRating: difficultyRating,
             wasEstimateAccurate: wasEstimateAccurate,

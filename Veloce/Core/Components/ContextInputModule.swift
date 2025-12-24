@@ -254,7 +254,7 @@ struct ContextInputModule: View {
         isLoadingSuggestions = true
 
         // Generate context-aware questions based on task title
-        // In production, this would call GeminiService
+        // In production, this would call PerplexityService
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             suggestedQuestions = generateLocalSuggestions()
             isLoadingSuggestions = false

@@ -34,7 +34,7 @@ final class ExpandedTaskViewModel {
     private var calendarAccessGranted = false
 
     // MARK: - Services
-    private var geminiService: GeminiService { GeminiService.shared }
+    private var perplexityService: PerplexityService { PerplexityService.shared }
 
     // MARK: - Initialization
     init() {
@@ -62,7 +62,7 @@ final class ExpandedTaskViewModel {
         errorMessage = nil
 
         do {
-            let analysis = try await geminiService.generateGeniusAnalysis(
+            let analysis = try await perplexityService.generateGeniusAnalysis(
                 title: task.title,
                 notes: task.contextNotes,
                 context: nil
@@ -105,7 +105,7 @@ final class ExpandedTaskViewModel {
             // Fetch calendar events for next 7 days
             let calendarEvents = await fetchUpcomingCalendarEvents()
 
-            let suggestions = try await geminiService.generateScheduleSuggestions(
+            let suggestions = try await perplexityService.generateScheduleSuggestions(
                 task: task,
                 calendar: calendarEvents,
                 userPatterns: nil

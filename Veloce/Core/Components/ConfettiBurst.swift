@@ -357,10 +357,10 @@ struct StreakCelebration: View {
     }
 }
 
-// MARK: - Level Up Celebration
+// MARK: - Simple Level Up Celebration
 
-/// Celebration for leveling up
-struct LevelUpCelebration: View {
+/// Simple celebration for leveling up
+struct SimpleLevelUpCelebration: View {
     let newLevel: Int
     let onDismiss: () -> Void
 
@@ -542,7 +542,7 @@ struct LevelUpCelebration: View {
 }
 
 #Preview("Level Up Celebration") {
-    LevelUpCelebration(newLevel: 10) {
+    SimpleLevelUpCelebration(newLevel: 10) {
         print("Dismissed")
     }
 }

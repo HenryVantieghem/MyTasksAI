@@ -262,7 +262,7 @@ final class CalendarViewModel {
 
     func suggestSchedule(
         for task: TaskItem,
-        userPatterns: UserProductivityPatterns?
+        userPatterns: UserProductivityProfile?
     ) async throws -> ScheduleSuggestion {
         return try await ai.suggestSchedule(
             for: task,

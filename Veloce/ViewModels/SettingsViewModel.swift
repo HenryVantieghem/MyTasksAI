@@ -22,6 +22,7 @@ final class SettingsViewModel {
 
     // MARK: User Settings
     var fullName: String = ""
+    var username: String = ""
     var email: String = ""
     var dailyTaskGoal: Int = 5
     var weeklyTaskGoal: Int = 25
@@ -62,6 +63,7 @@ final class SettingsViewModel {
 
     private func loadFromUser(_ user: User) {
         fullName = user.fullName ?? ""
+        username = user.username ?? ""
         email = user.email ?? ""
         dailyTaskGoal = user.dailyTaskGoal
         weeklyTaskGoal = user.weeklyTaskGoal

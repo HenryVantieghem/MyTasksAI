@@ -3,10 +3,42 @@
 //  Veloce
 //
 //  Gamification Service - Points, Levels, Streaks, Achievements
+//  Complete gamification system with combos, challenges, and power-ups
 //  Handles all gamification logic to keep users engaged
 //
 
 import Foundation
+import UIKit
+
+// MARK: - Combo Tier
+
+enum ComboTierLevel: Int, CaseIterable {
+    case none = 0
+    case x1 = 1
+    case x1_5 = 2
+    case x2 = 3
+    case x3 = 4
+
+    var multiplier: Double {
+        switch self {
+        case .none: return 1.0
+        case .x1: return 1.0
+        case .x1_5: return 1.5
+        case .x2: return 2.0
+        case .x3: return 3.0
+        }
+    }
+
+    static func forCount(_ count: Int) -> ComboTierLevel {
+        switch count {
+        case 0: return .none
+        case 1: return .x1
+        case 2...3: return .x1_5
+        case 4...5: return .x2
+        default: return .x3
+        }
+    }
+}
 
 // MARK: - Gamification Service
 
@@ -19,7 +51,7 @@ final class GamificationService {
     // MARK: Dependencies
     private let haptics = HapticsService.shared
 
-    // MARK: State
+    // MARK: Core State
     private(set) var totalPoints: Int = 0
     private(set) var currentLevel: Int = 1
     private(set) var currentStreak: Int = 0
@@ -30,6 +62,36 @@ final class GamificationService {
     private(set) var weeklyGoal: Int = 25
     private(set) var unlockedAchievements: Set<AchievementType> = []
     private(set) var pendingAchievements: [AchievementType] = []
+
+    // MARK: Combo System
+    private(set) var currentCombo: Int = 0
+    private(set) var comboMultiplier: Double = 1.0
+    private(set) var lastTaskCompletedAt: Date?
+    private(set) var comboDecayTimer: Timer?
+    private let comboDecayInterval: TimeInterval = 30 * 60 // 30 minutes
+
+    /// Current combo tier based on combo count
+    var comboTier: ComboTierLevel {
+        ComboTierLevel.forCount(currentCombo)
+    }
+
+    /// Time remaining until combo decays (nil if no active combo)
+    var comboTimeRemaining: TimeInterval? {
+        guard currentCombo > 0, let lastCompleted = lastTaskCompletedAt else { return nil }
+        let elapsed = Date().timeIntervalSince(lastCompleted)
+        let remaining = comboDecayInterval - elapsed
+        return remaining > 0 ? remaining : nil
+    }
+
+    // MARK: Power-Up State
+    private(set) var hasActiveXPBoost: Bool = false
+    private(set) var hasActiveStreakShield: Bool = false
+    private(set) var hasActiveGoalAccelerator: Bool = false
+    private(set) var hasActiveComboKeeper: Bool = false
+    private(set) var xpBoostExpiresAt: Date?
+    private(set) var streakShieldExpiresAt: Date?
+    private(set) var goalAcceleratorExpiresAt: Date?
+    private(set) var comboKeeperExpiresAt: Date?
 
     // MARK: Extended Stats (for Achievement Arena)
     private(set) var focusMinutesTotal: Int = 0
@@ -46,18 +108,102 @@ final class GamificationService {
     private(set) var latestInsight: String? = "You're 23% more productive in the morning. Schedule important tasks then!"
 
     // MARK: Initialization
-    private init() {}
+    private init() {
+        setupComboDecayCheck()
+    }
+
+    // MARK: - Combo Decay Timer
+
+    private func setupComboDecayCheck() {
+        // Check combo decay every minute
+        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.checkComboDecay()
+                self?.checkPowerUpExpiration()
+            }
+        }
+    }
+
+    private func checkComboDecay() {
+        guard currentCombo > 0, let lastCompleted = lastTaskCompletedAt else { return }
+
+        // Don't decay if combo keeper is active
+        if hasActiveComboKeeper { return }
+
+        let elapsed = Date().timeIntervalSince(lastCompleted)
+        if elapsed >= comboDecayInterval {
+            resetCombo()
+        }
+    }
+
+    private func resetCombo() {
+        currentCombo = 0
+        comboMultiplier = 1.0
+        lastTaskCompletedAt = nil
+    }
+
+    // MARK: - Power-Up Activation
+
+    func activatePowerUp(_ type: PowerUpType) {
+        switch type {
+        case .xpBoost:
+            hasActiveXPBoost = true
+            xpBoostExpiresAt = Date().addingTimeInterval(type.durationSeconds)
+        case .streakShield:
+            hasActiveStreakShield = true
+            streakShieldExpiresAt = Date().addingTimeInterval(type.durationSeconds)
+        case .goalAccelerator:
+            hasActiveGoalAccelerator = true
+            goalAcceleratorExpiresAt = Date().addingTimeInterval(type.durationSeconds)
+        case .focusForceField:
+            // Handled by FocusService
+            break
+        case .comboKeeper:
+            hasActiveComboKeeper = true
+            comboKeeperExpiresAt = Date().addingTimeInterval(type.durationSeconds)
+        }
+
+        haptics.impact(.heavy)
+    }
+
+    private func checkPowerUpExpiration() {
+        let now = Date()
+
+        if hasActiveXPBoost, let expires = xpBoostExpiresAt, now > expires {
+            hasActiveXPBoost = false
+            xpBoostExpiresAt = nil
+        }
+
+        if hasActiveStreakShield, let expires = streakShieldExpiresAt, now > expires {
+            hasActiveStreakShield = false
+            streakShieldExpiresAt = nil
+        }
+
+        if hasActiveGoalAccelerator, let expires = goalAcceleratorExpiresAt, now > expires {
+            hasActiveGoalAccelerator = false
+            goalAcceleratorExpiresAt = nil
+        }
+
+        if hasActiveComboKeeper, let expires = comboKeeperExpiresAt, now > expires {
+            hasActiveComboKeeper = false
+            comboKeeperExpiresAt = nil
+        }
+    }
 
     // MARK: - Point Calculations
 
     /// Base points for completing a task
     private let baseTaskPoints = 10
 
+    /// Goal-linked task bonus multiplier
+    private let goalLinkBonus: Double = 0.5
+
     /// Calculate points for completing a task
     func calculatePoints(
         for task: TaskItem,
         completedOnTime: Bool = true,
-        withStreak: Bool = true
+        withStreak: Bool = true,
+        isGoalLinked: Bool = false
     ) -> Int {
         var points = baseTaskPoints
 
@@ -79,8 +225,26 @@ final class GamificationService {
 
         // Streak multiplier
         if withStreak && currentStreak > 0 {
-            let multiplier = min(1.0 + Double(currentStreak) * 0.1, 2.0)
-            points = Int(Double(points) * multiplier)
+            let streakMultiplier = min(1.0 + Double(currentStreak) * 0.1, 2.0)
+            points = Int(Double(points) * streakMultiplier)
+        }
+
+        // Combo multiplier
+        points = Int(Double(points) * comboTier.multiplier)
+
+        // Goal-linked bonus
+        if isGoalLinked {
+            points = Int(Double(points) * (1.0 + goalLinkBonus))
+
+            // Additional bonus if goal accelerator is active
+            if hasActiveGoalAccelerator {
+                points = Int(Double(points) * 1.5)
+            }
+        }
+
+        // XP Boost power-up (2x)
+        if hasActiveXPBoost {
+            points *= 2
         }
 
         // Estimated time bonus (longer tasks = more points)
@@ -89,6 +253,37 @@ final class GamificationService {
         }
 
         return points
+    }
+
+    /// Increment combo on task completion
+    func incrementCombo() {
+        currentCombo += 1
+        comboMultiplier = comboTier.multiplier
+        lastTaskCompletedAt = Date()
+
+        // Haptic feedback for combo increase
+        if currentCombo >= 4 {
+            haptics.impact(.heavy)
+        } else if currentCombo >= 2 {
+            haptics.impact(.medium)
+        } else {
+            haptics.impact(.light)
+        }
+    }
+
+    /// Get total multiplier including all active bonuses
+    var totalMultiplier: Double {
+        var multiplier = comboTier.multiplier
+
+        if hasActiveXPBoost {
+            multiplier *= 2.0
+        }
+
+        if currentStreak > 0 {
+            multiplier *= min(1.0 + Double(currentStreak) * 0.1, 2.0)
+        }
+
+        return multiplier
     }
 
     /// Award points and check for level up
@@ -154,10 +349,13 @@ final class GamificationService {
 
     // MARK: - Streak System
 
-    /// Update streak on task completion
-    func recordTaskCompletion() {
+    /// Update streak on task completion (enhanced with combo)
+    func recordTaskCompletion(isGoalLinked: Bool = false) {
         tasksCompleted += 1
         tasksCompletedToday += 1
+
+        // Increment combo
+        incrementCombo()
 
         // Check if daily goal met
         if tasksCompletedToday >= dailyGoal {
@@ -166,6 +364,9 @@ final class GamificationService {
 
         // Check achievements
         checkAchievements()
+
+        // Check combo achievements
+        checkComboAchievements()
     }
 
     /// Increment streak
@@ -189,9 +390,34 @@ final class GamificationService {
     }
 
     /// Break streak (called when daily goal not met)
-    func breakStreak() {
+    /// Uses streak shield if available
+    @discardableResult
+    func breakStreak() -> Bool {
+        // Check if streak shield is active
+        if hasActiveStreakShield {
+            hasActiveStreakShield = false
+            streakShieldExpiresAt = nil
+            haptics.impact(.heavy)
+            // Streak protected!
+            return true
+        }
+
         currentStreak = 0
         tasksCompletedToday = 0
+        resetCombo()
+        return false
+    }
+
+    /// Check combo-related achievements
+    private func checkComboAchievements() {
+        // Award bonus points for high combos
+        if currentCombo == 5 {
+            // First x2 combo
+            totalPoints += 25
+        } else if currentCombo == 10 {
+            // Sustained x3 combo
+            totalPoints += 50
+        }
     }
 
     /// Reset daily counter (call at midnight)

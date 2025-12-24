@@ -1121,7 +1121,7 @@ struct PremiumTaskDetailView: View {
         guard !isLoadingAI else { return }
         isLoadingAI = true
 
-        // Simulate AI loading (replace with actual GeminiService call)
+        // Simulate AI loading (replace with actual PerplexityService call)
         try? await Task.sleep(nanoseconds: 1_500_000_000)
 
         // Load sub-tasks
@@ -1171,7 +1171,7 @@ struct PremiumTaskDetailView: View {
     }
 
     private func loadYouTubeResources() {
-        // Placeholder - integrate with GeminiService
+        // Placeholder - integrate with PerplexityService
         youtubeResources = []
     }
 
