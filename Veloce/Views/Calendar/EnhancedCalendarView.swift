@@ -1,9 +1,9 @@
 //
 //  EnhancedCalendarView.swift
-//  MyTasksAI
+//  Veloce
 //
-//  Enhanced Calendar - Container with Timeline & Grid views
-//  Full Apple Calendar integration with premium visual design
+//  Time Stream Calendar - iOS 26 Liquid Glass Design
+//  Revolutionary timeline visualization with drag-to-reschedule
 //
 
 import SwiftUI
@@ -12,17 +12,26 @@ import SwiftData
 // MARK: - Timeline Display Mode
 
 enum TimelineDisplayMode: String, CaseIterable {
-    case timeline = "Timeline"
+    case timeline = "Day"
     case week = "Week"
     case month = "Month"
 
     var icon: String {
         switch self {
-        case .timeline: return "chart.bar.xaxis"
+        case .timeline: return "sun.horizon"
         case .week: return "calendar.day.timeline.left"
         case .month: return "calendar"
         }
     }
+}
+
+// MARK: - Time Stream Metrics
+
+private enum TimeStreamMetrics {
+    static let hourBlockHeight: CGFloat = 72
+    static let nowIndicatorGlow: CGFloat = 20
+    static let cardCornerRadius: CGFloat = 16
+    static let dateCarouselHeight: CGFloat = 88
 }
 
 // MARK: - Enhanced Calendar View
@@ -277,10 +286,10 @@ struct EnhancedCalendarView: View {
         .padding(.vertical, 16)
     }
 
-    // MARK: - View Mode Toggle
+    // MARK: - View Mode Toggle (Liquid Glass)
 
     private var viewModeToggle: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 2) {
             ForEach(TimelineDisplayMode.allCases, id: \.self) { mode in
                 Button {
                     HapticsService.shared.selectionFeedback()
@@ -288,27 +297,30 @@ struct EnhancedCalendarView: View {
                         viewMode = mode
                     }
                 } label: {
-                    Image(systemName: mode.icon)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(viewMode == mode ? .white : .white.opacity(0.4))
-                        .frame(width: 36, height: 36)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(viewMode == mode ? .white.opacity(0.15) : .clear)
-                        )
+                    HStack(spacing: 6) {
+                        Image(systemName: mode.icon)
+                            .font(.system(size: 12, weight: .semibold))
+
+                        if viewMode == mode {
+                            Text(mode.rawValue)
+                                .font(.system(size: 12, weight: .semibold))
+                        }
+                    }
+                    .foregroundStyle(viewMode == mode ? .primary : .secondary)
+                    .padding(.horizontal, viewMode == mode ? 14 : 10)
+                    .padding(.vertical, 10)
+                    .background {
+                        if viewMode == mode {
+                            Capsule()
+                                .fill(Color(hex: "06B6D4").opacity(0.2))
+                        }
+                    }
                 }
                 .buttonStyle(.plain)
             }
         }
         .padding(4)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.white.opacity(0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(.white.opacity(0.1), lineWidth: 1)
-                )
-        )
+        .glassEffect(.regular, in: Capsule())
     }
 
     // MARK: - Date Carousel
@@ -415,7 +427,7 @@ struct EnhancedCalendarView: View {
     }
 }
 
-// MARK: - Date Carousel Item
+// MARK: - Date Carousel Item (Liquid Glass)
 
 struct DateCarouselItem: View {
     let date: Date
@@ -427,72 +439,63 @@ struct DateCarouselItem: View {
         Calendar.current.isDateInToday(date)
     }
 
+    @State private var glowPulse: Bool = false
+
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 6) {
                 // Day of week
                 Text(date.formatted(.dateTime.weekday(.abbreviated)).uppercased())
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                    .foregroundStyle(isSelected ? .primary : .secondary)
                     .tracking(1)
 
                 // Day number
                 Text(date.formatted(.dateTime.day()))
                     .font(.system(size: 20, weight: isSelected ? .bold : .medium))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
+                    .foregroundStyle(isSelected ? .primary : .secondary)
 
-                // Event indicator
-                Circle()
-                    .fill(hasEvents ? eventIndicatorColor : .clear)
-                    .frame(width: 6, height: 6)
-            }
-            .frame(width: 56, height: 72)
-            .background(
+                // Event indicator with glow
                 ZStack {
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 0.545, green: 0.361, blue: 0.965).opacity(0.4),
-                                        Color(red: 0.231, green: 0.510, blue: 0.965).opacity(0.3)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        .white.opacity(0.3),
-                                        .white.opacity(0.1)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1
-                            )
-                    } else if isToday {
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(.white.opacity(0.2), lineWidth: 1)
+                    if hasEvents {
+                        Circle()
+                            .fill(eventIndicatorColor)
+                            .frame(width: 6, height: 6)
+                            .shadow(color: eventIndicatorColor.opacity(0.6), radius: glowPulse ? 4 : 2)
+                    } else {
+                        Circle()
+                            .fill(.clear)
+                            .frame(width: 6, height: 6)
                     }
                 }
-            )
+            }
+            .frame(width: 56, height: 72)
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color(hex: "06B6D4").opacity(0.15))
+                } else if isToday {
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color(hex: "06B6D4").opacity(0.4), lineWidth: 1)
+                }
+            }
         }
         .buttonStyle(.plain)
+        .onAppear {
+            if hasEvents {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    glowPulse = true
+                }
+            }
+        }
     }
 
     private var eventIndicatorColor: Color {
-        if isSelected {
-            return .white
-        }
-        return Color(red: 0.024, green: 0.714, blue: 0.831)
+        isSelected ? .white : Color(hex: "06B6D4")
     }
 }
 
-// MARK: - Scheduled Task Card
+// MARK: - Scheduled Task Card (Liquid Glass)
 
 struct ScheduledTaskCard: View {
     let task: TaskItem
@@ -502,68 +505,74 @@ struct ScheduledTaskCard: View {
 
     private var taskColor: Color {
         switch task.taskType {
-        case .create:
-            return Color(red: 0.545, green: 0.361, blue: 0.965)
-        case .communicate:
-            return Color(red: 0.231, green: 0.510, blue: 0.965)
-        case .consume:
-            return Color(red: 0.024, green: 0.714, blue: 0.831)
-        case .coordinate:
-            return Color(red: 0.961, green: 0.420, blue: 0.420)
+        case .create: return Color(hex: "8B5CF6")
+        case .communicate: return Color(hex: "3B82F6")
+        case .consume: return Color(hex: "06B6D4")
+        case .coordinate: return Color(hex: "F59E0B")
         }
     }
 
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                // Color indicator
+                // Color indicator with glow
                 RoundedRectangle(cornerRadius: 4)
                     .fill(taskColor)
                     .frame(width: 4, height: 40)
+                    .shadow(color: taskColor.opacity(0.5), radius: 4)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(task.title)
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                         .lineLimit(1)
 
                     if let time = task.scheduledTime {
-                        Text(time.formatted(.dateTime.hour().minute()))
-                            .font(.system(size: 12, weight: .medium, design: .monospaced))
-                            .foregroundStyle(.white.opacity(0.5))
+                        HStack(spacing: 4) {
+                            Image(systemName: "clock")
+                                .font(.system(size: 10))
+                            Text(time.formatted(.dateTime.hour().minute()))
+                                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        }
+                        .foregroundStyle(.secondary)
                     }
                 }
 
                 Spacer()
 
+                // Points badge
                 if let minutes = task.estimatedMinutes {
-                    Text("\(minutes)m")
-                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(.white.opacity(0.1))
-                        )
+                    HStack(spacing: 4) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 9))
+                            .foregroundStyle(Color(hex: "F59E0B"))
+                        Text("+\(max(10, minutes / 3))")
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                    }
+                    .foregroundStyle(.primary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color(hex: "F59E0B").opacity(0.15))
+                    )
                 }
             }
-            .padding(12)
-            .frame(width: 200)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.white.opacity(0.06))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(.white.opacity(0.1), lineWidth: 1)
-                    )
-            )
+            .padding(14)
+            .frame(width: 220)
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.97 : 1.0)
+        .scaleEffect(isPressed ? 0.96 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressed)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
-                .onChanged { _ in isPressed = true }
+                .onChanged { _ in
+                    if !isPressed {
+                        HapticsService.shared.impact()
+                        isPressed = true
+                    }
+                }
                 .onEnded { _ in isPressed = false }
         )
     }

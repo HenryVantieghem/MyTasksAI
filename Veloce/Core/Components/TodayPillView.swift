@@ -4,9 +4,25 @@
 //
 //  Unified date navigation pill with iOS 26 Liquid Glass
 //  Swipeable navigation, Today indicator, consistent across all pages
+//  STANDARDIZED: Height 40pt, consistent across ALL main tabs
 //
 
 import SwiftUI
+
+// MARK: - Standardized Dimensions
+
+private enum TodayPillMetrics {
+    /// Standard pill height across all tabs
+    static let pillHeight: CGFloat = 40
+    /// Capsule corner radius (half of height)
+    static let cornerRadius: CGFloat = 20
+    /// Minimum width for date text
+    static let minWidth: CGFloat = 120
+    /// Arrow button size
+    static let arrowSize: CGFloat = 12
+    /// Swipe threshold for day navigation
+    static let swipeThreshold: CGFloat = 50
+}
 
 // MARK: - Today Pill View
 
@@ -17,10 +33,6 @@ struct TodayPillView: View {
     @State private var isAnimating: Bool = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // MARK: Configuration
-    private let swipeThreshold: CGFloat = 50
-    private let arrowSize: CGFloat = 12
-
     var body: some View {
         HStack(spacing: Theme.Spacing.lg) {
             // Left arrow (previous day)
@@ -28,10 +40,11 @@ struct TodayPillView: View {
                 navigateToDate(offset: -1)
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: arrowSize, weight: .semibold))
+                    .font(.system(size: TodayPillMetrics.arrowSize, weight: .semibold))
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
             .buttonStyle(.plain)
+            .frame(width: 32, height: TodayPillMetrics.pillHeight)
             .contentShape(Rectangle())
             .accessibilityLabel("Previous day")
 
@@ -45,14 +58,16 @@ struct TodayPillView: View {
                 navigateToDate(offset: 1)
             } label: {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: arrowSize, weight: .semibold))
+                    .font(.system(size: TodayPillMetrics.arrowSize, weight: .semibold))
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
             .buttonStyle(.plain)
+            .frame(width: 32, height: TodayPillMetrics.pillHeight)
             .contentShape(Rectangle())
             .accessibilityLabel("Next day")
         }
-        .padding(.vertical, Theme.Spacing.sm)
+        // Standardized outer height
+        .frame(height: TodayPillMetrics.pillHeight)
     }
 
     // MARK: - Subviews
@@ -71,8 +86,9 @@ struct TodayPillView: View {
                 .foregroundStyle(Theme.Colors.textPrimary)
         }
         .padding(.horizontal, Theme.Spacing.lg)
-        .padding(.vertical, Theme.Spacing.sm)
-        .frame(minWidth: 120)
+        // Standardized height
+        .frame(height: TodayPillMetrics.pillHeight)
+        .frame(minWidth: TodayPillMetrics.minWidth)
         // iOS 26 Native Liquid Glass effect
         .glassEffect(.regular, in: .capsule)
         .contentShape(Capsule())
@@ -104,10 +120,10 @@ struct TodayPillView: View {
             .onEnded { value in
                 guard !isAnimating else { return }
 
-                if value.translation.width < -swipeThreshold {
+                if value.translation.width < -TodayPillMetrics.swipeThreshold {
                     // Swiped left → next day
                     navigateToDate(offset: 1)
-                } else if value.translation.width > swipeThreshold {
+                } else if value.translation.width > TodayPillMetrics.swipeThreshold {
                     // Swiped right → previous day
                     navigateToDate(offset: -1)
                 }

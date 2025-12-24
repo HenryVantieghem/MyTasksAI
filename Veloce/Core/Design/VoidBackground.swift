@@ -194,7 +194,12 @@ extension VoidBackground {
 
     /// Focus mode background (strong center glow)
     static var focus: VoidBackground {
-        VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiCyan, starCount: VoidDesign.Stars.countSparse)
+        VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiAmber, starCount: VoidDesign.Stars.countSparse)
+    }
+
+    /// AI Hub background (purple/cyan glow)
+    static var ai: VoidBackground {
+        VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiPurple, starCount: VoidDesign.Stars.countStandard)
     }
 
     /// Auth background with hero orb

@@ -1,13 +1,15 @@
 //
 //  MomentumTabView.swift
-//  MyTasksAI
+//  Veloce
 //
-//  Momentum Tab - The emotional center of the app
-//  Giant animated score, level progress, weekly insights
+//  Achievement Arena - Premium Gamification Experience
+//  Central Level Orb, weekly charts, achievements, AI insights
 //
 
 import SwiftUI
 import SwiftData
+
+// MARK: - Momentum Tab View
 
 struct MomentumTabView: View {
     @Environment(\.modelContext) private var modelContext
@@ -16,7 +18,6 @@ struct MomentumTabView: View {
 
     @State private var selectedDate: Date = Date()
     @State private var showShareSheet = false
-    @State private var animateScore = false
 
     // Goal state
     @State private var goalsVM = GoalsViewModel()
@@ -28,25 +29,19 @@ struct MomentumTabView: View {
 
     // MARK: - Goal Computed Properties
 
-    /// The most urgent active goal to spotlight
     private var spotlightGoal: Goal? {
         let activeGoals = goals.filter { !$0.isCompleted }
-        // Prioritize goals due within 7 days that are less than 90% complete
         return activeGoals.first { goal in
             guard let days = goal.daysRemaining else { return false }
             return days <= 7 && goal.progress < 0.9
         } ?? activeGoals.first { $0.isCheckInDue } ?? activeGoals.first
     }
 
-    /// Calculate linked tasks progress for spotlight goal
     private var linkedTasksProgress: Double {
         guard let goal = spotlightGoal else { return 0 }
         return goalsVM.calculateLinkedTasksProgress(for: goal, tasks: tasks)
     }
 
-    // MARK: - Date-Filtered Statistics
-
-    /// Tasks completed on the selected date
     private var tasksCompletedOnDate: Int {
         let calendar = Calendar.current
         return tasks.filter { task in
@@ -55,23 +50,29 @@ struct MomentumTabView: View {
         }.count
     }
 
-    /// Check if viewing today
     private var isViewingToday: Bool {
         Calendar.current.isDateInToday(selectedDate)
     }
 
     var body: some View {
         ZStack {
-            // Background
             VoidBackground.momentum
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 32) {
-                    // Date selector with Liquid Glass
+                VStack(spacing: 28) {
+                    // Date pill
                     TodayPillView(selectedDate: $selectedDate)
-                        .padding(.top, Theme.Spacing.universalHeaderHeight)
+                        .padding(.top, Theme.Spacing.universalHeaderHeight + 16)
 
-                    // Goal Spotlight Section - Most urgent goal
+                    // Central Level Orb - Hero element
+                    LevelProgressOrb(
+                        level: gamification.currentLevel,
+                        progress: gamification.levelProgress,
+                        totalPoints: gamification.totalPoints,
+                        streak: gamification.currentStreak
+                    )
+
+                    // Goal Spotlight
                     GoalSpotlightSection(
                         spotlightGoal: spotlightGoal,
                         linkedTasksProgress: linkedTasksProgress,
@@ -79,25 +80,21 @@ struct MomentumTabView: View {
                             selectedGoal = goal
                             showGoalDetail = true
                         },
-                        onAddGoal: {
-                            showGoalCreation = true
-                        }
+                        onAddGoal: { showGoalCreation = true }
                     )
 
-                    // Giant Momentum Score
-                    MomentumScoreCard(
-                        score: gamification.totalPoints,
-                        level: gamification.currentLevel,
-                        progress: gamification.levelProgress
+                    // Weekly Activity Chart
+                    WeeklyActivityCard(tasks: tasks, centerDate: selectedDate)
+
+                    // Stats Dashboard
+                    StatsDashboard(
+                        tasksCompleted: gamification.totalTasksCompleted,
+                        completionRate: gamification.completionRate,
+                        focusHours: gamification.focusHours,
+                        streak: gamification.currentStreak
                     )
 
-                    // Streak Flame
-                    StreakFlameCard(streak: gamification.currentStreak)
-
-                    // Weekly Insights Chart - centered on selected date
-                    WeeklyInsightsChart(tasks: tasks, centerDate: selectedDate)
-
-                    // Day's Progress - filtered by selected date
+                    // Day Progress
                     DayProgressCard(
                         date: selectedDate,
                         completed: isViewingToday ? gamification.tasksCompletedToday : tasksCompletedOnDate,
@@ -105,17 +102,20 @@ struct MomentumTabView: View {
                         isToday: isViewingToday
                     )
 
-                    // Achievement Showcase
+                    // Achievements
                     AchievementShowcaseCard(achievements: gamification.unlockedAchievements)
 
-                    // Share Week Button
-                    ShareWeekButton {
-                        showShareSheet = true
-                    }
-                    .padding(.bottom, 120)
+                    // AI Insight Card
+                    AIInsightCard(
+                        insight: gamification.latestInsight,
+                        onAction: { }
+                    )
+
+                    // Share Button
+                    ShareWeekButton { showShareSheet = true }
+                        .padding(.bottom, 120)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, Theme.Spacing.universalHeaderHeight)
             }
         }
         .sheet(isPresented: $showShareSheet) {
@@ -149,26 +149,139 @@ struct MomentumTabView: View {
     }
 }
 
-// MARK: - Momentum Score Card
+// MARK: - Level Progress Orb
 
-struct MomentumScoreCard: View {
-    let score: Int
+struct LevelProgressOrb: View {
     let level: Int
     let progress: Double
+    let totalPoints: Int
+    let streak: Int
 
-    @State private var displayedScore: Int = 0
-    @State private var ringProgress: Double = 0
-    @State private var glowPhase: Double = 0
+    @State private var orbBreathScale: CGFloat = 1.0
+    @State private var ringRotation: Double = 0
+    @State private var glowIntensity: Double = 0.5
+    @State private var displayedPoints: Int = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private let orbColors: [Color] = [
+        Color(hex: "8B5CF6"),
+        Color(hex: "6366F1"),
+        Color(hex: "3B82F6"),
+        Color(hex: "06B6D4"),
+        Color(hex: "14B8A6")
+    ]
 
     var body: some View {
         VStack(spacing: 24) {
+            ZStack {
+                // Outer glow rings
+                ForEach(0..<3, id: \.self) { ring in
+                    Circle()
+                        .stroke(
+                            AngularGradient(
+                                colors: orbColors + [orbColors[0]],
+                                center: .center
+                            ),
+                            lineWidth: 2
+                        )
+                        .frame(width: 200 + CGFloat(ring * 30), height: 200 + CGFloat(ring * 30))
+                        .opacity(0.15 - Double(ring) * 0.04)
+                        .rotationEffect(.degrees(ringRotation + Double(ring * 60)))
+                        .blur(radius: CGFloat(ring + 1) * 2)
+                }
+
+                // Main orb container
+                ZStack {
+                    // Outer glow
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    orbColors[1].opacity(glowIntensity * 0.5),
+                                    orbColors[2].opacity(glowIntensity * 0.3),
+                                    Color.clear
+                                ],
+                                center: .center,
+                                startRadius: 40,
+                                endRadius: 100
+                            )
+                        )
+                        .frame(width: 200, height: 200)
+                        .blur(radius: 20)
+
+                    // Progress ring background
+                    Circle()
+                        .stroke(Color.white.opacity(0.1), lineWidth: 6)
+                        .frame(width: 160, height: 160)
+
+                    // Progress ring
+                    Circle()
+                        .trim(from: 0, to: progress)
+                        .stroke(
+                            AngularGradient(
+                                colors: orbColors + [orbColors[0]],
+                                center: .center
+                            ),
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        )
+                        .frame(width: 160, height: 160)
+                        .rotationEffect(.degrees(-90))
+
+                    // Core orb
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Color.white.opacity(0.9),
+                                    orbColors[1].opacity(0.8),
+                                    orbColors[2].opacity(0.6),
+                                    orbColors[3].opacity(0.4)
+                                ],
+                                center: UnitPoint(x: 0.35, y: 0.35),
+                                startRadius: 0,
+                                endRadius: 60
+                            )
+                        )
+                        .frame(width: 100, height: 100)
+                        .scaleEffect(orbBreathScale)
+                        .shadow(color: orbColors[1].opacity(0.5), radius: 20)
+
+                    // Inner content
+                    VStack(spacing: 4) {
+                        Text("\(displayedPoints)")
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .contentTransition(.numericText())
+
+                        Text("XP")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                }
+
+                // Streak ring (when active)
+                if streak > 0 {
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [.orange, .red, .orange],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 3
+                        )
+                        .frame(width: 180, height: 180)
+                        .opacity(min(1.0, Double(streak) / 7.0))
+                        .scaleEffect(orbBreathScale)
+                }
+            }
+
             // Level badge
             HStack(spacing: 8) {
                 Image(systemName: "star.circle.fill")
-                    .font(.system(size: 16))
+                    .font(.system(size: 18))
                 Text("LEVEL \(level)")
-                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
                     .tracking(2)
             }
             .foregroundStyle(
@@ -178,253 +291,61 @@ struct MomentumScoreCard: View {
                     endPoint: .trailing
                 )
             )
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(
-                Capsule()
-                    .fill(Color(hex: "FFD700").opacity(0.15))
-                    .overlay(
-                        Capsule()
-                            .stroke(Color(hex: "FFD700").opacity(0.3), lineWidth: 1)
-                    )
-            )
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .glassEffect(.regular, in: Capsule())
 
-            // Giant score
-            ZStack {
-                // Outer glow ring
-                Circle()
-                    .stroke(
-                        AngularGradient(
-                            colors: [
-                                Color(hex: "8B5CF6"),
-                                Color(hex: "3B82F6"),
-                                Color(hex: "06B6D4"),
-                                Color(hex: "8B5CF6")
-                            ],
-                            center: .center
-                        ),
-                        lineWidth: 4
-                    )
-                    .frame(width: 200, height: 200)
-                    .blur(radius: 8)
-                    .opacity(0.5 + glowPhase * 0.3)
-
-                // Progress ring background
-                Circle()
-                    .stroke(.white.opacity(0.1), lineWidth: 8)
-                    .frame(width: 180, height: 180)
-
-                // Progress ring
-                Circle()
-                    .trim(from: 0, to: ringProgress)
-                    .stroke(
-                        LinearGradient(
-                            colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                    )
-                    .frame(width: 180, height: 180)
-                    .rotationEffect(.degrees(-90))
-
-                // Score number
-                VStack(spacing: 4) {
-                    Text("\(displayedScore)")
-                        .font(.system(size: 64, weight: .ultraLight, design: .rounded))
-                        .foregroundStyle(.white)
-                        .contentTransition(.numericText())
-
-                    Text("MOMENTUM")
-                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                        .tracking(3)
-                        .foregroundStyle(.white.opacity(0.5))
-                }
-            }
-
-            // XP to next level
-            VStack(spacing: 4) {
-                Text("\(Int(progress * 100))% to Level \(level + 1)")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.7))
-            }
+            // Progress text
+            Text("\(Int(progress * 100))% to Level \(level + 1)")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(.secondary)
         }
-        .padding(32)
-        .background(
-            RoundedRectangle(cornerRadius: 24)
-                .fill(.ultraThinMaterial.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(
-                            LinearGradient(
-                                colors: [.white.opacity(0.2), .white.opacity(0.05)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-        )
         .onAppear {
-            if reduceMotion {
-                displayedScore = score
-                ringProgress = progress
+            guard !reduceMotion else {
+                displayedPoints = totalPoints
                 return
             }
 
-            // Animate score counting up
-            animateCount(to: score, duration: 1.5)
+            // Animate points
+            animatePoints()
 
-            // Animate ring
-            withAnimation(.spring(response: 1.0, dampingFraction: 0.7).delay(0.3)) {
-                ringProgress = progress
+            // Breathing animation
+            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                orbBreathScale = 1.05
             }
 
-            // Glow animation
+            // Ring rotation
+            withAnimation(.linear(duration: 30).repeatForever(autoreverses: false)) {
+                ringRotation = 360
+            }
+
+            // Glow pulse
             withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-                glowPhase = 1
+                glowIntensity = 0.8
             }
         }
     }
 
-    private func animateCount(to target: Int, duration: Double) {
-        let steps = 30
-        let interval = duration / Double(steps)
-        let increment = Double(target) / Double(steps)
-
+    private func animatePoints() {
+        let steps = 20
+        let interval = 1.0 / Double(steps)
         for i in 0..<steps {
             DispatchQueue.main.asyncAfter(deadline: .now() + interval * Double(i)) {
-                displayedScore = Int(increment * Double(i + 1))
-            }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-            displayedScore = target
-        }
-    }
-}
-
-// MARK: - Streak Flame Card
-
-struct StreakFlameCard: View {
-    let streak: Int
-
-    @State private var flameIntensity: Double = 0
-    @State private var particlePhase: Double = 0
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var isOnFire: Bool { streak >= 3 }
-
-    var body: some View {
-        HStack(spacing: 20) {
-            // Flame visualization
-            ZStack {
-                if isOnFire && !reduceMotion {
-                    // Animated particles
-                    ForEach(0..<8, id: \.self) { i in
-                        FlameParticle(index: i, phase: particlePhase, intensity: flameIntensity)
-                    }
-                }
-
-                // Main flame
-                Image(systemName: isOnFire ? "flame.fill" : "flame")
-                    .font(.system(size: 48))
-                    .foregroundStyle(
-                        isOnFire ?
-                        LinearGradient(
-                            colors: [Color(hex: "FF6B35"), Color(hex: "F7931E"), Color(hex: "FFD700")],
-                            startPoint: .bottom,
-                            endPoint: .top
-                        ) :
-                        LinearGradient(colors: [.white.opacity(0.3)], startPoint: .bottom, endPoint: .top)
-                    )
-                    .scaleEffect(1 + flameIntensity * 0.1)
-                    .shadow(color: isOnFire ? Color(hex: "FF6B35").opacity(0.6) : .clear, radius: 12)
-            }
-            .frame(width: 80, height: 80)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("\(streak)")
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text(streak == 1 ? "Day Streak" : "Day Streak")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.6))
-
-                if isOnFire {
-                    Text("You're on fire! 🔥")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color(hex: "FF6B35"))
-                }
-            }
-
-            Spacer()
-        }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            isOnFire ?
-                            LinearGradient(colors: [Color(hex: "FF6B35").opacity(0.5), Color(hex: "FFD700").opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing) :
-                            LinearGradient(colors: [.white.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                            lineWidth: 1
-                        )
-                )
-        )
-        .onAppear {
-            guard isOnFire, !reduceMotion else { return }
-
-            withAnimation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
-                flameIntensity = 1
-            }
-
-            withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
-                particlePhase = 1
+                displayedPoints = Int(Double(totalPoints) * Double(i + 1) / Double(steps))
             }
         }
     }
 }
 
-struct FlameParticle: View {
-    let index: Int
-    let phase: Double
-    let intensity: Double
+// MARK: - Weekly Activity Card
 
-    var body: some View {
-        let seed = Double(index)
-        let angle = (seed / 8) * 2 * .pi + phase * 2 * .pi
-        let radius: CGFloat = 20 + CGFloat(sin(seed * 1.7)) * 10
-        let x = cos(angle) * radius * 0.5
-        let y = -abs(sin(angle)) * radius - phase * 30
-
-        Circle()
-            .fill(
-                RadialGradient(
-                    colors: [Color(hex: "FFD700"), Color(hex: "FF6B35").opacity(0.5), .clear],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: 4
-                )
-            )
-            .frame(width: 8, height: 8)
-            .offset(x: x, y: y)
-            .opacity(1 - phase)
-    }
-}
-
-// MARK: - Weekly Insights Chart
-
-struct WeeklyInsightsChart: View {
+struct WeeklyActivityCard: View {
     let tasks: [TaskItem]
     var centerDate: Date = Date()
 
     private var weekData: [(day: String, count: Int, isSelected: Bool)] {
         let calendar = Calendar.current
         var data: [(String, Int, Bool)] = []
-
         for i in (0..<7).reversed() {
             let date = calendar.date(byAdding: .day, value: -i, to: centerDate) ?? centerDate
             let dayName = date.formatted(.dateTime.weekday(.abbreviated))
@@ -435,7 +356,6 @@ struct WeeklyInsightsChart: View {
             let isSelected = calendar.isDate(date, inSameDayAs: centerDate)
             data.append((dayName, count, isSelected))
         }
-
         return data
     }
 
@@ -443,46 +363,36 @@ struct WeeklyInsightsChart: View {
         max(weekData.map { $0.count }.max() ?? 1, 1)
     }
 
-    private var isViewingCurrentWeek: Bool {
-        let calendar = Calendar.current
-        return calendar.isDate(centerDate, equalTo: Date(), toGranularity: .weekOfYear)
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(isViewingCurrentWeek ? "This Week" : "Week of \(centerDate.formatted(.dateTime.month(.abbreviated).day()))")
+            Text("This Week")
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
 
             HStack(alignment: .bottom, spacing: 12) {
                 ForEach(Array(weekData.enumerated()), id: \.offset) { index, data in
-                    WeeklyBar(
+                    ActivityBar(
                         day: data.day,
                         count: data.count,
                         maxCount: maxCount,
-                        isSelected: data.isSelected
+                        isSelected: data.isSelected,
+                        delay: Double(index) * 0.05
                     )
                 }
             }
             .frame(height: 120)
         }
         .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(.white.opacity(0.1), lineWidth: 1)
-                )
-        )
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
     }
 }
 
-struct WeeklyBar: View {
+struct ActivityBar: View {
     let day: String
     let count: Int
     let maxCount: Int
     let isSelected: Bool
+    let delay: Double
 
     @State private var barHeight: CGFloat = 0
 
@@ -490,28 +400,122 @@ struct WeeklyBar: View {
         CGFloat(count) / CGFloat(maxCount) * 80
     }
 
+    private let barGradient = LinearGradient(
+        colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")],
+        startPoint: .bottom,
+        endPoint: .top
+    )
+
     var body: some View {
         VStack(spacing: 8) {
             Text("\(count)")
                 .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
 
             RoundedRectangle(cornerRadius: 6)
-                .fill(
-                    isSelected ?
-                    LinearGradient(colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")], startPoint: .bottom, endPoint: .top) :
-                    LinearGradient(colors: [.white.opacity(0.3)], startPoint: .bottom, endPoint: .top)
-                )
+                .fill(isSelected ? barGradient : LinearGradient(colors: [.white.opacity(0.2)], startPoint: .bottom, endPoint: .top))
                 .frame(width: 32, height: max(barHeight, 8))
 
             Text(day)
                 .font(.system(size: 11, weight: isSelected ? .bold : .medium))
-                .foregroundStyle(isSelected ? .white : .white.opacity(0.5))
+                .foregroundStyle(isSelected ? .primary : .secondary)
         }
         .frame(maxWidth: .infinity)
         .onAppear {
-            withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(Double.random(in: 0...0.3))) {
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(delay)) {
                 barHeight = targetHeight
+            }
+        }
+    }
+}
+
+// MARK: - Stats Dashboard
+
+struct StatsDashboard: View {
+    let tasksCompleted: Int
+    let completionRate: Double
+    let focusHours: Double
+    let streak: Int
+
+    var body: some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4), spacing: 12) {
+            MomentumStatCard(value: "\(tasksCompleted)", label: "Tasks", icon: "checkmark.circle.fill", color: Color(hex: "10B981"))
+            MomentumStatCard(value: "\(Int(completionRate * 100))%", label: "Rate", icon: "chart.line.uptrend.xyaxis", color: Color(hex: "3B82F6"))
+            MomentumStatCard(value: String(format: "%.1f", focusHours), label: "Hours", icon: "clock.fill", color: Color(hex: "8B5CF6"))
+            MomentumStatCard(value: "\(streak)", label: "Streak", icon: "flame.fill", color: Color(hex: "F59E0B"))
+        }
+    }
+}
+
+private struct MomentumStatCard: View {
+    let value: String
+    let label: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundStyle(color)
+
+            Text(value)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
+
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+// MARK: - AI Insight Card
+
+struct AIInsightCard: View {
+    let insight: String?
+    let onAction: () -> Void
+
+    var body: some View {
+        if let insight = insight, !insight.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color(hex: "8B5CF6"))
+
+                    Text("AI Insight")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color(hex: "8B5CF6"))
+                }
+
+                Text(insight)
+                    .font(.system(size: 15))
+                    .foregroundStyle(.primary)
+                    .lineLimit(3)
+
+                Button(action: onAction) {
+                    HStack {
+                        Text("Learn more")
+                            .font(.system(size: 14, weight: .medium))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 12, weight: .bold))
+                    }
+                    .foregroundStyle(Color(hex: "8B5CF6"))
+                }
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(hex: "8B5CF6").opacity(0.08))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color(hex: "8B5CF6").opacity(0.2), lineWidth: 1)
+                    )
             }
         }
     }
@@ -533,22 +537,11 @@ struct DayProgressCard: View {
 
     private var isComplete: Bool { completed >= goal }
 
-    private var dayLabel: String {
-        if isToday {
-            return isComplete ? "Daily goal achieved! 🎉" : "Tasks today"
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d"
-            return "Tasks on \(formatter.string(from: date))"
-        }
-    }
-
     var body: some View {
         HStack(spacing: 20) {
-            // Progress ring
             ZStack {
                 Circle()
-                    .stroke(.white.opacity(0.1), lineWidth: 6)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 6)
                     .frame(width: 60, height: 60)
 
                 Circle()
@@ -572,38 +565,20 @@ struct DayProgressCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(completed)/\(goal)")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
 
-                Text(dayLabel)
+                Text(isToday && isComplete ? "Daily goal achieved!" : "Tasks today")
                     .font(.system(size: 14))
-                    .foregroundStyle(isComplete && isToday ? Color(hex: "10B981") : .white.opacity(0.6))
+                    .foregroundStyle(isComplete && isToday ? Color(hex: "10B981") : .secondary)
             }
 
             Spacer()
         }
         .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            isComplete && isToday ?
-                            LinearGradient(colors: [Color(hex: "10B981").opacity(0.5), .clear], startPoint: .topLeading, endPoint: .bottomTrailing) :
-                            LinearGradient(colors: [.white.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                            lineWidth: 1
-                        )
-                )
-        )
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.2)) {
                 ringProgress = progress
-            }
-        }
-        .onChange(of: completed) { _, newValue in
-            let newProgress = goal > 0 ? min(Double(newValue) / Double(goal), 1.0) : 0
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                ringProgress = newProgress
             }
         }
     }
@@ -619,13 +594,13 @@ struct AchievementShowcaseCard: View {
             HStack {
                 Text("Achievements")
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
 
                 Spacer()
 
                 Text("\(achievements.count) unlocked")
                     .font(.system(size: 13))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
             }
 
             if achievements.isEmpty {
@@ -634,10 +609,10 @@ struct AchievementShowcaseCard: View {
                     VStack(spacing: 8) {
                         Image(systemName: "trophy")
                             .font(.system(size: 32))
-                            .foregroundStyle(.white.opacity(0.3))
+                            .foregroundStyle(.tertiary)
                         Text("Complete tasks to earn achievements")
                             .font(.system(size: 13))
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 20)
                     Spacer()
@@ -653,14 +628,7 @@ struct AchievementShowcaseCard: View {
             }
         }
         .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial.opacity(0.5))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(.white.opacity(0.1), lineWidth: 1)
-                )
-        )
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
     }
 }
 
@@ -682,18 +650,12 @@ struct AchievementBadge: View {
 
                 Image(systemName: achievement.icon)
                     .font(.system(size: 24))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [achievement.color, achievement.color.opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .foregroundStyle(achievement.color)
             }
 
             Text(achievement.title)
                 .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
         .frame(width: 70)
@@ -704,8 +666,6 @@ struct AchievementBadge: View {
 
 struct ShareWeekButton: View {
     let action: () -> Void
-
-    @State private var isPressed = false
 
     var body: some View {
         Button(action: action) {
@@ -726,15 +686,9 @@ struct ShareWeekButton: View {
                 )
             )
             .clipShape(Capsule())
-            .shadow(color: Color(hex: "8B5CF6").opacity(0.4), radius: 12, x: 0, y: 4)
+            .shadow(color: Color(hex: "8B5CF6").opacity(0.4), radius: 12, y: 4)
         }
         .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.95 : 1.0)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in isPressed = true }
-                .onEnded { _ in isPressed = false }
-        )
     }
 }
 
@@ -748,22 +702,20 @@ struct WeekInReviewSheet: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            // Header
             HStack {
                 Text("Week in Review")
                     .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 Spacer()
                 Button { dismiss() } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 28))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(.tertiary)
                 }
             }
             .padding(.horizontal, 24)
             .padding(.top, 24)
 
-            // Stats
             HStack(spacing: 24) {
                 WeekStatItem(value: "\(tasksCompleted)", label: "Tasks Done")
                 WeekStatItem(value: "\(streak)", label: "Day Streak")
@@ -773,10 +725,7 @@ struct WeekInReviewSheet: View {
 
             Spacer()
 
-            // Share button
-            Button {
-                // Share functionality
-            } label: {
+            Button { } label: {
                 HStack {
                     Image(systemName: "square.and.arrow.up")
                     Text("Share")
@@ -797,7 +746,7 @@ struct WeekInReviewSheet: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 24)
         }
-        .background(Color(red: 0.08, green: 0.08, blue: 0.12))
+        .background(Color(UIColor.systemBackground))
     }
 }
 
@@ -809,10 +758,10 @@ struct WeekStatItem: View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             Text(label)
                 .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
     }
@@ -822,4 +771,5 @@ struct WeekStatItem: View {
 
 #Preview {
     MomentumTabView()
+        .preferredColorScheme(.dark)
 }

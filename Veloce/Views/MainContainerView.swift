@@ -14,17 +14,17 @@ import SwiftData
 enum MainTab: String, CaseIterable {
     case tasks = "Tasks"
     case calendar = "Calendar"
+    case focus = "Focus"
     case momentum = "Momentum"
-    case journal = "Journal"
-    case dump = "Dump"
+    case ai = "AI"
 
     var icon: String {
         switch self {
         case .tasks: return "plus.bubble"
         case .calendar: return "calendar"
+        case .focus: return "timer"
         case .momentum: return "flame"
-        case .journal: return "book.pages"
-        case .dump: return "brain.head.profile"
+        case .ai: return "sparkles"
         }
     }
 
@@ -32,9 +32,9 @@ enum MainTab: String, CaseIterable {
         switch self {
         case .tasks: return "plus.bubble.fill"
         case .calendar: return "calendar"
+        case .focus: return "timer.circle.fill"
         case .momentum: return "flame.fill"
-        case .journal: return "book.pages.fill"
-        case .dump: return "brain.head.profile.fill"
+        case .ai: return "sparkles"
         }
     }
 }
@@ -133,17 +133,17 @@ struct MainContainerView: View {
                 EnhancedCalendarView(viewModel: calendarViewModel)
                     .tag(MainTab.calendar)
 
+                // Focus Tab - Timer and Focus Sessions
+                FocusTabView()
+                    .tag(MainTab.focus)
+
                 // Momentum Tab - Gamification Dashboard
                 MomentumTabView()
                     .tag(MainTab.momentum)
 
-                // Journal Tab - Apple Notes-style daily pages
-                DailyNotesView(viewModel: tasksViewModel)
-                    .tag(MainTab.journal)
-
-                // Brain Dump Tab - AI-powered thought processing
-                BrainDumpView()
-                    .tag(MainTab.dump)
+                // AI Tab - Unified AI Hub (Journal + Brain Dump + Chat + Feed)
+                UnifiedAIHubView(tasksViewModel: tasksViewModel)
+                    .tag(MainTab.ai)
             }
             .toolbar(.hidden, for: .tabBar)
 

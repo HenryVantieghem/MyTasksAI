@@ -21,6 +21,7 @@ class JournalViewModel {
     var selectedDate: Date = Date()
     var isLoading: Bool = false
     var errorMessage: String?
+    var currentReflection: String?
 
     // MARK: Editor State
     var richTextViewModel = RichTextEditorViewModel()

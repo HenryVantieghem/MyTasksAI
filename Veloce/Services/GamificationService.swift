@@ -31,6 +31,20 @@ final class GamificationService {
     private(set) var unlockedAchievements: Set<AchievementType> = []
     private(set) var pendingAchievements: [AchievementType] = []
 
+    // MARK: Extended Stats (for Achievement Arena)
+    private(set) var focusMinutesTotal: Int = 0
+    private(set) var weeklyActivityData: [Int] = [0, 0, 0, 0, 0, 0, 0]  // Last 7 days
+    private(set) var previousWeekData: [Int] = [0, 0, 0, 0, 0, 0, 0]    // Week before
+
+    /// Total tasks completed (alias for MomentumTabView)
+    var totalTasksCompleted: Int { tasksCompleted }
+
+    /// Focus hours (converted from minutes)
+    var focusHours: Double { Double(focusMinutesTotal) / 60.0 }
+
+    /// Latest AI-generated productivity insight
+    private(set) var latestInsight: String? = "You're 23% more productive in the morning. Schedule important tasks then!"
+
     // MARK: Initialization
     private init() {}
 
@@ -189,7 +203,33 @@ final class GamificationService {
             breakStreak()
         }
 
+        // Shift weekly data
+        previousWeekData = weeklyActivityData
+        weeklyActivityData = Array(weeklyActivityData.dropFirst()) + [0]
+
         tasksCompletedToday = 0
+    }
+
+    /// Record focus time
+    func recordFocusTime(minutes: Int) {
+        focusMinutesTotal += minutes
+
+        // Check focus achievements
+        if focusMinutesTotal >= 60 && !unlockedAchievements.contains(.focusHour) {
+            unlockAchievement(.focusHour)
+        }
+    }
+
+    /// Update today's activity in weekly data
+    func recordDailyActivity(tasksCompleted count: Int) {
+        if !weeklyActivityData.isEmpty {
+            weeklyActivityData[weeklyActivityData.count - 1] = count
+        }
+    }
+
+    /// Update AI insight
+    func updateInsight(_ insight: String) {
+        latestInsight = insight
     }
 
     // MARK: - Achievement System

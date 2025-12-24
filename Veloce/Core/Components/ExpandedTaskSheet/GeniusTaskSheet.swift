@@ -17,8 +17,7 @@ struct GeniusTaskSheet: View {
     let onEditTapped: () -> Void
 
     @State private var viewModel = GeniusSheetViewModel()
-    @State private var dragOffset: CGFloat = 0
-    @State private var moduleAppearances: [Bool] = Array(repeating: false, count: 7)
+    @State private var moduleAppearances: [Bool] = Array(repeating: false, count: 8)
     @State private var showFocusMode = false
     @State private var showCalendarScheduling = false
 
@@ -38,33 +37,19 @@ struct GeniusTaskSheet: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
-                Spacer()
-
-                sheetContent
-                    .frame(maxHeight: geometry.size.height * 0.85)
-                    .offset(y: dragOffset)
-                    .gesture(dragGesture)
+        sheetContent
+            .task {
+                await viewModel.loadData(for: task)
+                animateModulesIn()
             }
-        }
-        .background(
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-                .onTapGesture { dismiss() }
-        )
-        .task {
-            await viewModel.loadData(for: task)
-            animateModulesIn()
-        }
-        .fullScreenCover(isPresented: $showFocusMode) {
-            FocusMode(task: task)
-        }
-        .sheet(isPresented: $showCalendarScheduling) {
-            CalendarSchedulingSheet(task: task)
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-        }
+            .fullScreenCover(isPresented: $showFocusMode) {
+                FocusMode(task: task)
+            }
+            .sheet(isPresented: $showCalendarScheduling) {
+                CalendarSchedulingSheet(task: task)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+            }
     }
 
     // MARK: - Sheet Content
@@ -106,38 +91,43 @@ struct GeniusTaskSheet: View {
                     .opacity(moduleAppearances[2] ? 1 : 0)
                     .offset(y: moduleAppearances[2] ? 0 : 20)
 
-                    // Module 4: Resources
+                    // Module 4: AI Prompt (Copyable)
+                    AIPromptModule(task: task)
+                        .opacity(moduleAppearances[3] ? 1 : 0)
+                        .offset(y: moduleAppearances[3] ? 0 : 20)
+
+                    // Module 5: Resources
                     ResourcesModule(
                         resources: viewModel.aiResources
                     )
-                    .opacity(moduleAppearances[3] ? 1 : 0)
-                    .offset(y: moduleAppearances[3] ? 0 : 20)
+                    .opacity(moduleAppearances[4] ? 1 : 0)
+                    .offset(y: moduleAppearances[4] ? 0 : 20)
 
-                    // Module 5: Smart Schedule
+                    // Module 6: Smart Schedule
                     SmartScheduleModule(
                         task: task,
                         viewModel: viewModel,
                         onAddToCalendar: { showCalendarScheduling = true }
                     )
-                    .opacity(moduleAppearances[4] ? 1 : 0)
-                    .offset(y: moduleAppearances[4] ? 0 : 20)
+                    .opacity(moduleAppearances[5] ? 1 : 0)
+                    .offset(y: moduleAppearances[5] ? 0 : 20)
 
-                    // Module 6: Work Mode
+                    // Module 7: Work Mode
                     WorkModeModule(
                         task: task,
                         viewModel: viewModel,
                         onStartFocus: { showFocusMode = true }
                     )
-                    .opacity(moduleAppearances[5] ? 1 : 0)
-                    .offset(y: moduleAppearances[5] ? 0 : 20)
+                    .opacity(moduleAppearances[6] ? 1 : 0)
+                    .offset(y: moduleAppearances[6] ? 0 : 20)
 
-                    // Module 7: AI Chat
+                    // Module 8: AI Chat
                     AIChatModule(
                         task: task,
                         viewModel: viewModel
                     )
-                    .opacity(moduleAppearances[6] ? 1 : 0)
-                    .offset(y: moduleAppearances[6] ? 0 : 20)
+                    .opacity(moduleAppearances[7] ? 1 : 0)
+                    .offset(y: moduleAppearances[7] ? 0 : 20)
 
                     // Full Details button
                     fullDetailsButton
@@ -280,35 +270,15 @@ struct GeniusTaskSheet: View {
         }
     }
 
-    // MARK: - Drag Gesture
-
-    private var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged { value in
-                if value.translation.height > 0 {
-                    dragOffset = value.translation.height
-                }
-            }
-            .onEnded { value in
-                if value.translation.height > 100 || value.velocity.height > 500 {
-                    dismiss()
-                } else {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        dragOffset = 0
-                    }
-                }
-            }
-    }
-
     // MARK: - Animation
 
     private func animateModulesIn() {
         guard !reduceMotion else {
-            moduleAppearances = Array(repeating: true, count: 7)
+            moduleAppearances = Array(repeating: true, count: 8)
             return
         }
 
-        for i in 0..<7 {
+        for i in 0..<8 {
             DispatchQueue.main.asyncAfter(
                 deadline: .now() + Theme.GeniusAnimation.moduleStagger * Double(i)
             ) {
@@ -316,12 +286,6 @@ struct GeniusTaskSheet: View {
                     moduleAppearances[i] = true
                 }
             }
-        }
-    }
-
-    private func dismiss() {
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-            isPresented = false
         }
     }
 }

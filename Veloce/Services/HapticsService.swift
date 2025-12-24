@@ -175,6 +175,7 @@ final class HapticsService {
     }
 
     // MARK: - Custom Patterns
+
     /// Double tap pattern
     func doubleTap() {
         guard hapticsEnabled, supportsHaptics else { return }
@@ -226,12 +227,178 @@ final class HapticsService {
         playCustomPattern(.levelUp)
     }
 
+    // MARK: - Enhanced Task Completion Haptics
+
+    /// Task completion with satisfying 3-step pattern: soft → medium → success
+    func taskCompleteEnhanced() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        playCustomPattern(.taskComplete)
+    }
+
+    /// Points earned feedback - intensity scales with amount
+    /// - Parameter amount: Points earned (affects intensity, 0-100 scale)
+    func pointsEarned(amount: Int) {
+        guard hapticsEnabled else { return }
+
+        let normalizedIntensity = min(1.0, Float(amount) / 50.0)
+
+        if supportsHaptics {
+            playDynamicPattern(intensity: normalizedIntensity, sharpness: 0.6)
+        } else {
+            if amount >= 50 {
+                notification(.success)
+            } else if amount >= 25 {
+                impact(.medium)
+            } else {
+                impact(.light)
+            }
+        }
+    }
+
+    /// Tab switch - crisp light feedback
+    func tabSwitch() {
+        guard hapticsEnabled else { return }
+        impact(.light)
+        selection?.selectionChanged()
+    }
+
+    /// Streak milestone celebration - escalating pattern
+    /// - Parameter days: Current streak day count
+    func streakMilestone(days: Int) {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        // Intensity increases with streak length
+        if days >= 30 {
+            playCustomPattern(.streakEpic)
+        } else if days >= 7 {
+            playCustomPattern(.streakWeek)
+        } else {
+            playCustomPattern(.streak)
+        }
+    }
+
+    /// Card press feedback - scale down feel
+    func cardPress() {
+        guard hapticsEnabled else { return }
+        impact(.soft)
+    }
+
+    /// Card release feedback - spring bounce feel
+    func cardRelease() {
+        guard hapticsEnabled else { return }
+        impact(.light)
+    }
+
+    /// Orb glow interaction - soft pulsing feel
+    func orbGlow() {
+        guard hapticsEnabled else { return }
+        impact(.soft)
+    }
+
+    /// Checkbox toggle with satisfying feedback
+    func checkboxToggle(isCompleting: Bool) {
+        guard hapticsEnabled else { return }
+
+        if isCompleting {
+            taskCompleteEnhanced()
+        } else {
+            impact(.light)
+        }
+    }
+
+    /// Send button ready pulse
+    func sendReady() {
+        guard hapticsEnabled else { return }
+        impact(.soft)
+    }
+
+    /// Calendar drag feedback
+    func calendarDrag() {
+        guard hapticsEnabled else { return }
+        impact(.light)
+    }
+
+    /// Calendar drop feedback
+    func calendarDrop() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        playCustomPattern(.calendarDrop)
+    }
+
+    /// Swipe action feedback (complete/delete task)
+    func swipeAction() {
+        guard hapticsEnabled else { return }
+        impact(.medium)
+    }
+
+    /// Pull to refresh start
+    func pullRefreshStart() {
+        guard hapticsEnabled else { return }
+        impact(.soft)
+    }
+
+    /// Pull to refresh threshold reached
+    func pullRefreshTriggered() {
+        guard hapticsEnabled else { return }
+        impact(.medium)
+    }
+
+    /// AI processing started
+    func aiProcessingStart() {
+        guard hapticsEnabled else { return }
+        impact(.soft)
+    }
+
+    /// AI processing complete
+    func aiProcessingComplete() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+
+        playCustomPattern(.aiComplete)
+    }
+
+    // MARK: - Dynamic Pattern Playback
+
+    private func playDynamicPattern(intensity: Float, sharpness: Float) {
+        guard let engine else { return }
+
+        do {
+            let event = CHHapticEvent(eventType: .hapticTransient, parameters: [
+                CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity),
+                CHHapticEventParameter(parameterID: .hapticSharpness, value: sharpness)
+            ], relativeTime: 0)
+
+            let pattern = try CHHapticPattern(events: [event], parameters: [])
+            let player = try engine.makePlayer(with: pattern)
+            try player.start(atTime: 0)
+        } catch {
+            impact(.medium)
+        }
+    }
+
     // MARK: - Custom Pattern Playback
     private enum HapticPattern {
         case celebration
         case streak
+        case streakWeek
+        case streakEpic
         case achievement
         case levelUp
+        case taskComplete
+        case calendarDrop
+        case aiComplete
 
         var events: [CHHapticEvent] {
             switch self {
@@ -293,6 +460,95 @@ final class HapticsService {
                         CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
                         CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
                     ], relativeTime: 0.5)
+                ]
+
+            case .taskComplete:
+                // 3-step satisfying pattern: soft → medium → success
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.1),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0.2)
+                ]
+
+            case .streakWeek:
+                // 7-day streak celebration - rising intensity
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0, duration: 0.15),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.2),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.35)
+                ]
+
+            case .streakEpic:
+                // 30+ day streak - extended celebration sequence
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0, duration: 0.3),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.35),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.5),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+                    ], relativeTime: 0.65),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.7, duration: 0.4)
+                ]
+
+            case .calendarDrop:
+                // Satisfying drop with bounce
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.9),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.12),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0.2)
+                ]
+
+            case .aiComplete:
+                // AI processing complete - smooth rising finish
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0, duration: 0.2),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.25)
                 ]
             }
         }

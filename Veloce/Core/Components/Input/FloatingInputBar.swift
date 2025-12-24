@@ -1,13 +1,24 @@
 //
 //  FloatingInputBar.swift
-//  MyTasksAI
+//  Veloce
 //
-//  Floating Input Bar - Claude Mobile Inspired
-//  Premium glass morphic input with time-aware greetings
-//  Features: Plus menu, animated send, mic placeholder
+//  Premium Floating Input Bar
+//  iOS 26 Liquid Glass with expanding focus, AI toggle, and orb send button
 //
 
 import SwiftUI
+
+// MARK: - Input Bar Metrics
+
+private enum InputBarMetrics {
+    static let baseHeight: CGFloat = 56
+    static let expandedHeight: CGFloat = 76
+    static let horizontalPadding: CGFloat = 16
+    static let cornerRadius: CGFloat = 28
+    static let buttonSize: CGFloat = 40
+    static let orbButtonSize: CGFloat = 44
+    static let iconSize: CGFloat = 18
+}
 
 // MARK: - Floating Input Bar
 
@@ -24,25 +35,44 @@ struct FloatingInputBar: View {
     let onPriority: () -> Void
     let onAI: () -> Void
 
-    @State private var showQuickActions = false
-    @State private var glowPhase: CGFloat = 0
-    @State private var borderRotation: Double = 0
+    // AI processing state
+    @State private var isAIEnabled: Bool = true
+    @State private var isAIProcessing: Bool = false
 
-    @Environment(\.colorScheme) private var colorScheme
+    // Animation states
+    @State private var showQuickActions = false
+    @State private var sendOrbPulse: CGFloat = 1.0
+    @State private var aiSparkleRotation: Double = 0
+    @State private var aiSparkleScale: CGFloat = 1.0
+
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var canSend: Bool {
         !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    // Gradient colors for orb send button
+    private let orbGradient = LinearGradient(
+        colors: [
+            Color(hex: "8B5CF6"),
+            Color(hex: "6366F1"),
+            Color(hex: "3B82F6")
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
     var body: some View {
-        VStack(spacing: DesignTokens.InputBar.greetingSpacing) {
-            // Time-aware greeting
-            TimeAwareGreeting(
-                completedTasksToday: completedTasksToday,
-                currentStreak: currentStreak,
-                isFirstTaskOfDay: isFirstTaskOfDay
-            )
+        VStack(spacing: 12) {
+            // Time-aware greeting (only when not focused)
+            if !isFocused {
+                TimeAwareGreeting(
+                    completedTasksToday: completedTasksToday,
+                    currentStreak: currentStreak,
+                    isFirstTaskOfDay: isFirstTaskOfDay
+                )
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
 
             // Quick actions menu (expandable above input)
             if showQuickActions {
@@ -54,49 +84,74 @@ struct FloatingInputBar: View {
             }
 
             // Main floating input container
-            floatingContainer
+            mainInputContainer
         }
         .padding(.horizontal, Theme.Spacing.lg)
-        .padding(.bottom, DesignTokens.InputBar.bottomMargin)
+        .padding(.bottom, Theme.Spacing.md)
+        .animation(Theme.Animation.spring, value: isFocused)
         .animation(Theme.Animation.springBouncy, value: showQuickActions)
         .onAppear {
             startAnimations()
         }
+        .onChange(of: canSend) { _, hasText in
+            if hasText {
+                startSendOrbPulse()
+            }
+        }
     }
 
-    // MARK: - Floating Container
+    // MARK: - Main Input Container
 
-    private var floatingContainer: some View {
-        HStack(spacing: DesignTokens.InputBar.elementSpacing) {
-            // Plus button
+    private var mainInputContainer: some View {
+        HStack(spacing: 12) {
+            // Plus button (quick actions)
             plusButton
 
-            // Text field
-            textFieldView
+            // Text field with expanding behavior
+            expandingTextField
 
             // Right side controls
-            HStack(spacing: Theme.Spacing.sm) {
-                // Mic button (placeholder)
-                if !canSend {
-                    micButton
-                        .transition(.scale.combined(with: .opacity))
-                }
+            HStack(spacing: 8) {
+                // AI toggle button
+                aiToggleButton
 
-                // Send button
+                // Send orb button
                 if canSend {
-                    sendButton
+                    sendOrbButton
                         .transition(.scale.combined(with: .opacity))
                 }
             }
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: canSend)
         }
-        .padding(.horizontal, DesignTokens.InputBar.horizontalPadding)
-        .padding(.vertical, DesignTokens.InputBar.verticalPadding)
-        .background(containerBackground)
-        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.InputBar.cornerRadius))
-        .overlay(containerBorder)
+        .padding(.horizontal, InputBarMetrics.horizontalPadding)
+        .padding(.vertical, isFocused ? 16 : 10)
+        .frame(minHeight: isFocused ? InputBarMetrics.expandedHeight : InputBarMetrics.baseHeight)
+        .background {
+            // AI processing shimmer
+            if isAIProcessing {
+                aiProcessingBackground
+            }
+        }
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: InputBarMetrics.cornerRadius))
+        .overlay {
+            // Focus glow border
+            if isFocused {
+                RoundedRectangle(cornerRadius: InputBarMetrics.cornerRadius)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color(hex: "8B5CF6").opacity(0.5),
+                                Color(hex: "3B82F6").opacity(0.3),
+                                Color(hex: "06B6D4").opacity(0.2)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+            }
+        }
         .shadow(
-            color: Theme.InputBarColors.sendGlow.opacity(glowPhase * (isFocused ? 0.4 : 0.2)),
+            color: canSend ? Color(hex: "8B5CF6").opacity(0.3) : Color.clear,
             radius: 16,
             y: 4
         )
@@ -114,32 +169,30 @@ struct FloatingInputBar: View {
             ZStack {
                 Circle()
                     .fill(showQuickActions
-                        ? Theme.InputBarColors.plusActive
-                        : Theme.InputBarColors.plusBackground)
-                    .frame(
-                        width: DesignTokens.InputBar.buttonSize,
-                        height: DesignTokens.InputBar.buttonSize
-                    )
+                        ? Color(hex: "8B5CF6").opacity(0.2)
+                        : Color.white.opacity(0.08))
+                    .frame(width: InputBarMetrics.buttonSize, height: InputBarMetrics.buttonSize)
 
                 Image(systemName: "plus")
-                    .font(.system(size: DesignTokens.InputBar.buttonIconSize, weight: .semibold))
+                    .font(.system(size: InputBarMetrics.iconSize, weight: .semibold))
                     .foregroundStyle(showQuickActions
-                        ? Theme.Colors.aiPurple
-                        : Theme.CelestialColors.starDim)
+                        ? Color(hex: "8B5CF6")
+                        : Color.secondary)
                     .rotationEffect(.degrees(showQuickActions ? 45 : 0))
             }
         }
         .buttonStyle(.plain)
+        .contentShape(Circle())
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: showQuickActions)
     }
 
-    // MARK: - Text Field
+    // MARK: - Expanding Text Field
 
-    private var textFieldView: some View {
-        TextField("What needs to be done?", text: $text, axis: .vertical)
-            .font(.system(size: 16))
-            .foregroundStyle(Theme.CelestialColors.starWhite)
-            .lineLimit(1...4)
+    private var expandingTextField: some View {
+        TextField("", text: $text, prompt: placeholderText, axis: .vertical)
+            .font(.system(size: 16, weight: .regular))
+            .foregroundStyle(.primary)
+            .lineLimit(isFocused ? 1...6 : 1...2)
             .focused($isFocused)
             .submitLabel(.send)
             .onSubmit {
@@ -147,202 +200,270 @@ struct FloatingInputBar: View {
                     submitTask()
                 }
             }
-            .tint(Theme.Colors.aiPurple)
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button {
-                        HapticsService.shared.lightImpact()
-                        isFocused = false
-                    } label: {
-                        Image(systemName: "keyboard.chevron.compact.down")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundStyle(Theme.Colors.accent)
-                    }
-                    .accessibilityLabel("Dismiss keyboard")
-                }
-            }
+            .tint(Color(hex: "8B5CF6"))
     }
 
-    // MARK: - Mic Button (Placeholder)
+    private var placeholderText: Text {
+        Text("What's on your mind?")
+            .font(.system(size: 16, weight: .thin))
+            .italic()
+            .foregroundStyle(.secondary.opacity(0.7))
+    }
 
-    private var micButton: some View {
+    // MARK: - AI Toggle Button
+
+    private var aiToggleButton: some View {
         Button {
             HapticsService.shared.selectionFeedback()
-            // Future: Voice input
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                isAIEnabled.toggle()
+            }
+            if isAIEnabled {
+                triggerAISparkle()
+            }
         } label: {
             ZStack {
-                Circle()
-                    .fill(Color.clear)
-                    .frame(
-                        width: DesignTokens.InputBar.buttonSize,
-                        height: DesignTokens.InputBar.buttonSize
-                    )
+                // Background glow when enabled
+                if isAIEnabled {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Color(hex: "8B5CF6").opacity(0.3),
+                                    Color.clear
+                                ],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 24
+                            )
+                        )
+                        .frame(width: 48, height: 48)
+                        .blur(radius: 4)
+                }
 
-                Image(systemName: "mic")
-                    .font(.system(size: DesignTokens.InputBar.buttonIconSize, weight: .medium))
-                    .foregroundStyle(Theme.InputBarColors.micInactive)
+                // Button circle
+                Circle()
+                    .fill(isAIEnabled
+                        ? Color(hex: "8B5CF6").opacity(0.15)
+                        : Color.white.opacity(0.05))
+                    .frame(width: InputBarMetrics.buttonSize, height: InputBarMetrics.buttonSize)
+
+                // Sparkles icon
+                Image(systemName: "sparkles")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(
+                        isAIEnabled
+                            ? LinearGradient(
+                                colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            : LinearGradient(
+                                colors: [Color.secondary.opacity(0.5), Color.secondary.opacity(0.5)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                    )
+                    .rotationEffect(.degrees(aiSparkleRotation))
+                    .scaleEffect(aiSparkleScale)
             }
         }
         .buttonStyle(.plain)
-        .disabled(true) // Placeholder - disabled for now
-        .opacity(0.5)
+        .contentShape(Circle())
+        .accessibilityLabel(isAIEnabled ? "AI enabled" : "AI disabled")
+        .accessibilityHint("Toggle AI task processing")
     }
 
-    // MARK: - Send Button
+    // MARK: - Send Orb Button
 
-    private var sendButton: some View {
+    private var sendOrbButton: some View {
         Button {
             submitTask()
         } label: {
             ZStack {
-                // Glow background
+                // Outer glow
                 Circle()
-                    .fill(Theme.InputBarColors.sendGlow.opacity(0.3))
-                    .frame(width: DesignTokens.InputBar.buttonSize + 8, height: DesignTokens.InputBar.buttonSize + 8)
-                    .blur(radius: 8)
-
-                // Button background
-                Circle()
-                    .fill(Theme.InputBarColors.sendGradient)
-                    .frame(
-                        width: DesignTokens.InputBar.buttonSize,
-                        height: DesignTokens.InputBar.buttonSize
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color(hex: "8B5CF6").opacity(0.4),
+                                Color(hex: "3B82F6").opacity(0.2),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 30
+                        )
                     )
+                    .frame(width: 56, height: 56)
+                    .blur(radius: 6)
+                    .scaleEffect(sendOrbPulse)
+
+                // Main orb
+                Circle()
+                    .fill(orbGradient)
+                    .frame(width: InputBarMetrics.orbButtonSize, height: InputBarMetrics.orbButtonSize)
+                    .overlay {
+                        // Inner highlight
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [
+                                        Color.white.opacity(0.4),
+                                        Color.clear
+                                    ],
+                                    center: UnitPoint(x: 0.3, y: 0.3),
+                                    startRadius: 0,
+                                    endRadius: 20
+                                )
+                            )
+                    }
+                    .scaleEffect(sendOrbPulse)
 
                 // Arrow icon
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(.white)
             }
         }
-        .buttonStyle(SendButtonStyle())
+        .buttonStyle(OrbSendButtonStyle())
+        .accessibilityLabel("Send task")
     }
 
     // MARK: - Quick Actions Menu
 
     private var quickActionsMenu: some View {
-        HStack(spacing: Theme.Spacing.sm) {
-            FloatingQuickActionPill(
+        HStack(spacing: 10) {
+            InputQuickActionChip(
                 icon: "calendar",
                 label: "Schedule",
-                color: Theme.Colors.aiBlue
+                color: Color(hex: "3B82F6")
             ) {
                 HapticsService.shared.selectionFeedback()
                 withAnimation { showQuickActions = false }
                 onSchedule()
             }
 
-            FloatingQuickActionPill(
+            InputQuickActionChip(
                 icon: "bolt.fill",
                 label: "Priority",
-                color: Theme.TaskCardColors.pointsGlow
+                color: Color(hex: "F59E0B")
             ) {
                 HapticsService.shared.selectionFeedback()
                 withAnimation { showQuickActions = false }
                 onPriority()
             }
 
-            FloatingQuickActionPill(
-                icon: "sparkles",
+            InputQuickActionChip(
+                icon: "wand.and.stars",
                 label: "AI Magic",
-                color: Theme.Colors.aiPurple
+                color: Color(hex: "8B5CF6")
             ) {
                 HapticsService.shared.selectionFeedback()
                 withAnimation { showQuickActions = false }
                 onAI()
             }
         }
-        .padding(.horizontal, Theme.Spacing.md)
-        .padding(.vertical, Theme.Spacing.sm)
-        .background(
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.xl)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: Theme.CornerRadius.xl)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .glassEffect(.regular, in: Capsule())
+    }
+
+    // MARK: - AI Processing Background
+
+    private var aiProcessingBackground: some View {
+        RoundedRectangle(cornerRadius: InputBarMetrics.cornerRadius)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color(hex: "8B5CF6").opacity(0.1),
+                        Color(hex: "06B6D4").opacity(0.05),
+                        Color(hex: "8B5CF6").opacity(0.1)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
                 )
-        )
-    }
-
-    // MARK: - Container Background
-
-    private var containerBackground: some View {
-        ZStack {
-            // Frosted glass
-            RoundedRectangle(cornerRadius: DesignTokens.InputBar.cornerRadius)
-                .fill(.ultraThinMaterial)
-
-            // Violet tint when focused
-            if isFocused {
-                RoundedRectangle(cornerRadius: DesignTokens.InputBar.cornerRadius)
-                    .fill(Theme.Colors.aiPurple.opacity(0.05))
-            }
-        }
-    }
-
-    // MARK: - Container Border
-
-    private var containerBorder: some View {
-        RoundedRectangle(cornerRadius: DesignTokens.InputBar.cornerRadius)
-            .stroke(borderGradient, lineWidth: isFocused ? 1.5 : 1)
-    }
-
-    private var borderGradient: LinearGradient {
-        if isFocused {
-            return LinearGradient(
-                colors: [
-                    Theme.Colors.aiPurple.opacity(0.6),
-                    Theme.Colors.aiCyan.opacity(0.3),
-                    Theme.Colors.aiPurple.opacity(0.2)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
             )
-        }
-        return LinearGradient(
-            colors: [
-                Color.white.opacity(0.15),
-                Color.white.opacity(0.05)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+            .blur(radius: 8)
     }
 
     // MARK: - Actions
 
     private func submitTask() {
         guard canSend else { return }
-        HapticsService.shared.impact()
+
+        if isAIEnabled {
+            // Show AI processing animation
+            withAnimation(.easeOut(duration: 0.2)) {
+                isAIProcessing = true
+            }
+            HapticsService.shared.aiProcessingStart()
+        } else {
+            HapticsService.shared.impact()
+        }
+
         onSubmit()
+
+        // Reset AI processing state after brief delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            withAnimation(.easeIn(duration: 0.3)) {
+                isAIProcessing = false
+            }
+        }
     }
 
     // MARK: - Animations
 
     private func startAnimations() {
         guard !reduceMotion else { return }
+        // Animations triggered on demand
+    }
 
-        // Subtle glow pulse
-        withAnimation(.easeInOut(duration: DesignTokens.InputBar.glowDuration).repeatForever(autoreverses: true)) {
-            glowPhase = 1
+    private func startSendOrbPulse() {
+        guard !reduceMotion else { return }
+
+        withAnimation(
+            .easeInOut(duration: 1.2)
+            .repeatForever(autoreverses: true)
+        ) {
+            sendOrbPulse = 1.08
+        }
+    }
+
+    private func triggerAISparkle() {
+        guard !reduceMotion else { return }
+
+        // Rotation animation
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.5)) {
+            aiSparkleRotation += 180
+        }
+
+        // Scale bounce
+        withAnimation(.spring(response: 0.2, dampingFraction: 0.4)) {
+            aiSparkleScale = 1.3
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                aiSparkleScale = 1.0
+            }
         }
     }
 }
 
-// MARK: - Send Button Style
+// MARK: - Orb Send Button Style
 
-private struct SendButtonStyle: ButtonStyle {
+private struct OrbSendButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.9 : 1)
+            .scaleEffect(configuration.isPressed ? 0.88 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 
-// MARK: - Quick Action Pill
+// MARK: - Input Quick Action Chip
 
-fileprivate struct FloatingQuickActionPill: View {
+private struct InputQuickActionChip: View {
     let icon: String
     let label: String
     let color: Color
@@ -360,24 +481,26 @@ fileprivate struct FloatingQuickActionPill: View {
                     .font(.system(size: 12, weight: .medium))
             }
             .foregroundStyle(color)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .background(
+            .background {
                 Capsule()
-                    .fill(color.opacity(0.15))
+                    .fill(color.opacity(0.12))
                     .overlay(
                         Capsule()
-                            .stroke(color.opacity(0.3), lineWidth: 0.5)
+                            .stroke(color.opacity(0.25), lineWidth: 0.5)
                     )
-            )
-            .scaleEffect(isPressed ? 0.95 : 1)
+            }
+            .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(.plain)
+        .contentShape(Capsule())
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in isPressed = true }
                 .onEnded { _ in isPressed = false }
         )
+        .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPressed)
     }
 }
 
@@ -389,108 +512,153 @@ fileprivate struct FloatingQuickActionPill: View {
         @FocusState private var isFocused: Bool
 
         var body: some View {
-            VStack {
-                Spacer()
+            ZStack {
+                Color.black.ignoresSafeArea()
 
-                FloatingInputBar(
-                    text: $text,
-                    isFocused: $isFocused,
-                    completedTasksToday: 5,
-                    currentStreak: 7,
-                    isFirstTaskOfDay: false,
-                    onSubmit: { print("Submit: \(text)"); text = "" },
-                    onSchedule: { print("Schedule") },
-                    onPriority: { print("Priority") },
-                    onAI: { print("AI Magic") }
-                )
+                VStack {
+                    Spacer()
+
+                    FloatingInputBar(
+                        text: $text,
+                        isFocused: $isFocused,
+                        completedTasksToday: 5,
+                        currentStreak: 7,
+                        isFirstTaskOfDay: false,
+                        onSubmit: { print("Submit: \(text)"); text = "" },
+                        onSchedule: { print("Schedule") },
+                        onPriority: { print("Priority") },
+                        onAI: { print("AI Magic") }
+                    )
+                }
             }
-            .background(Theme.CelestialColors.void)
         }
     }
 
     return PreviewWrapper()
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Input Bar - Focused") {
+    struct PreviewWrapper: View {
+        @State private var text = "Write quarterly report for Q4 review"
+        @FocusState private var isFocused: Bool
+
+        var body: some View {
+            ZStack {
+                Color.black.ignoresSafeArea()
+
+                VStack {
+                    Spacer()
+
+                    FloatingInputBar(
+                        text: $text,
+                        isFocused: $isFocused,
+                        completedTasksToday: 3,
+                        currentStreak: 14,
+                        isFirstTaskOfDay: false,
+                        onSubmit: { },
+                        onSchedule: { },
+                        onPriority: { },
+                        onAI: { }
+                    )
+                }
+            }
+            .onAppear { isFocused = true }
+        }
+    }
+
+    return PreviewWrapper()
+        .preferredColorScheme(.dark)
 }
 
 #Preview("Input Bar States") {
-    VStack(spacing: 32) {
-        Text("Input Bar States")
-            .font(.headline)
-            .foregroundStyle(.white)
-
+    VStack(spacing: 40) {
         // Empty state
-        VStack(spacing: 8) {
-            Text("Empty")
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Empty State")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            StaticInputPreview(text: "", isFocused: false)
+            InputBarPreview(text: "", showSend: false)
         }
 
         // With text
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("With Text")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            StaticInputPreview(text: "Write quarterly report", isFocused: true)
+            InputBarPreview(text: "Write quarterly report", showSend: true)
         }
     }
     .padding(32)
-    .background(Theme.CelestialColors.void)
+    .background(Color.black)
+    .preferredColorScheme(.dark)
 }
 
 // Static preview helper
-private struct StaticInputPreview: View {
+private struct InputBarPreview: View {
     let text: String
-    let isFocused: Bool
+    let showSend: Bool
+
+    private let orbGradient = LinearGradient(
+        colors: [Color(hex: "8B5CF6"), Color(hex: "6366F1"), Color(hex: "3B82F6")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 
     var body: some View {
         HStack(spacing: 12) {
             // Plus
             Circle()
                 .fill(Color.white.opacity(0.08))
-                .frame(width: 36, height: 36)
+                .frame(width: 40, height: 40)
                 .overlay(
                     Image(systemName: "plus")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .foregroundStyle(.secondary)
                 )
 
             // Text
-            Text(text.isEmpty ? "What needs to be done?" : text)
-                .font(.system(size: 16))
-                .foregroundStyle(text.isEmpty ? Theme.CelestialColors.starGhost : .white)
+            Text(text.isEmpty ? "What's on your mind?" : text)
+                .font(text.isEmpty
+                    ? .system(size: 16, weight: .thin).italic()
+                    : .system(size: 16, weight: .regular))
+                .foregroundStyle(text.isEmpty ? Color.secondary.opacity(0.7) : Color.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            // Send or Mic
-            if !text.isEmpty {
+            // AI toggle
+            Circle()
+                .fill(Color(hex: "8B5CF6").opacity(0.15))
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                )
+
+            // Send
+            if showSend {
                 Circle()
-                    .fill(Theme.InputBarColors.sendGradient)
-                    .frame(width: 36, height: 36)
+                    .fill(orbGradient)
+                    .frame(width: 44, height: 44)
                     .overlay(
                         Image(systemName: "arrow.up")
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.system(size: 18, weight: .bold))
                             .foregroundStyle(.white)
                     )
-            } else {
-                Image(systemName: "mic")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(Theme.InputBarColors.micInactive)
-                    .opacity(0.5)
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
+        .frame(height: 56)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
-        .overlay(
-            RoundedRectangle(cornerRadius: 24)
-                .stroke(
-                    isFocused
-                        ? Theme.Colors.aiPurple.opacity(0.5)
-                        : Color.white.opacity(0.1),
-                    lineWidth: isFocused ? 1.5 : 1
-                )
-        )
+        .clipShape(RoundedRectangle(cornerRadius: 28))
     }
 }

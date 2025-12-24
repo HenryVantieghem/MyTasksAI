@@ -1,223 +1,48 @@
 //
 //  LogoVariants.swift
-//  MyTasksAI
+//  Veloce
 //
 //  Logo Variants - Static and specialized versions
-//  For different contexts and states
+//  Now using pure spherical orb design throughout
 //
 
 import SwiftUI
 
-// MARK: - Static Logo
+// MARK: - Static Logo (Now uses StaticOrbLogo)
 
 /// Non-animated logo for performance-sensitive contexts
+/// Delegates to the new StaticOrbLogo implementation
 struct StaticLogoView: View {
     let size: LogoSize
     var tintColor: Color? = nil
 
     var body: some View {
-        Canvas { context, canvasSize in
-            let center = CGPoint(x: canvasSize.width / 2, y: canvasSize.height / 2)
-            let radius = min(canvasSize.width, canvasSize.height) * 0.35
-            let strokeWidth = radius * 0.18
-
-            // Create the infinity-orbital path (static)
-            let path = createStaticOrbitalPath(center: center, radius: radius)
-
-            // Gradient colors
-            let gradient = Gradient(colors: [
-                tintColor ?? Color(hex: "8B5CF6"),
-                Color(hex: "3B82F6"),
-                Color(hex: "06B6D4"),
-                Color(hex: "3B82F6"),
-                tintColor ?? Color(hex: "8B5CF6")
-            ])
-
-            let shading = GraphicsContext.Shading.conicGradient(
-                gradient,
-                center: center,
-                angle: .degrees(0)
-            )
-
-            // Main stroke
-            context.stroke(
-                path,
-                with: shading,
-                style: StrokeStyle(
-                    lineWidth: strokeWidth,
-                    lineCap: .round,
-                    lineJoin: .round
-                )
-            )
-        }
-        .frame(width: size.dimension, height: size.dimension)
-    }
-
-    private func createStaticOrbitalPath(center: CGPoint, radius: CGFloat) -> Path {
-        var path = Path()
-        let segments = 100
-
-        for i in 0...segments {
-            let t = Double(i) / Double(segments) * 2 * .pi
-            let a = 1.0
-            let denominator = 1 + pow(sin(t), 2)
-            let x = a * cos(t) / denominator
-            let y = a * sin(t) * cos(t) / denominator
-
-            let point = CGPoint(
-                x: center.x + x * radius,
-                y: center.y + y * radius
-            )
-
-            if i == 0 {
-                path.move(to: point)
-            } else {
-                path.addLine(to: point)
-            }
-        }
-
-        path.closeSubpath()
-        return path
+        StaticOrbLogo(size: size, intensity: tintColor != nil ? 0.8 : 1.0)
     }
 }
 
-// MARK: - Loading Logo
+// MARK: - Loading Logo (Now uses LoadingOrbLogo)
 
 /// Logo with pulsing animation for loading states
 struct LoadingLogoView: View {
     let size: LogoSize
-    @State private var pulsePhase: Double = 0
 
     var body: some View {
-        ZStack {
-            // Pulsing glow
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Color(hex: "8B5CF6").opacity(0.3 * pulsePhase),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: size.dimension * 0.6
-                    )
-                )
-                .frame(width: size.dimension * 1.5, height: size.dimension * 1.5)
-                .blur(radius: size.dimension * 0.1)
-                .scaleEffect(0.8 + pulsePhase * 0.2)
-
-            AppLogoView(size: size, isAnimating: true)
-        }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                pulsePhase = 1
-            }
-        }
+        LoadingOrbLogo(size: size)
     }
 }
 
-// MARK: - Success Logo Burst
+// MARK: - Success Logo Burst (Now uses SuccessOrbBurst)
 
 /// Logo that bursts into particles on success
+/// Delegates to the new SuccessOrbBurst implementation
 struct SuccessLogoBurst: View {
     let size: LogoSize
     @Binding var shouldBurst: Bool
 
-    @State private var burstProgress: Double = 0
-    @State private var particleOffsets: [CGPoint] = []
-    @State private var particleOpacities: [Double] = []
-
-    private let particleCount = 20
-
     var body: some View {
-        ZStack {
-            // Original logo (fades out during burst)
-            AppLogoView(size: size, isAnimating: !shouldBurst)
-                .opacity(shouldBurst ? 1 - burstProgress : 1)
-                .scaleEffect(shouldBurst ? 1 + burstProgress * 0.3 : 1)
-
-            // Burst particles
-            if shouldBurst {
-                ForEach(0..<particleCount, id: \.self) { index in
-                    BurstParticle(
-                        index: index,
-                        progress: burstProgress,
-                        baseSize: size.dimension
-                    )
-                }
-            }
-        }
-        .onChange(of: shouldBurst) { _, newValue in
-            if newValue {
-                triggerBurst()
-            }
-        }
+        SuccessOrbBurst(size: size, shouldBurst: $shouldBurst)
     }
-
-    private func triggerBurst() {
-        withAnimation(.easeOut(duration: 1.2)) {
-            burstProgress = 1
-        }
-
-        // Reset after burst completes
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            burstProgress = 0
-            shouldBurst = false
-        }
-    }
-}
-
-struct BurstParticle: View {
-    let index: Int
-    let progress: Double
-    let baseSize: CGFloat
-
-    private var config: BurstConfig {
-        let seed = Double(index)
-        let angle = (seed / 20) * 2 * .pi + seed * 0.5
-        let distance = baseSize * (0.8 + sin(seed * 1.7) * 0.4)
-        let particleSize = baseSize * (0.05 + sin(seed * 2.3) * 0.02)
-
-        return BurstConfig(
-            angle: angle,
-            distance: distance,
-            particleSize: particleSize,
-            color: index % 3 == 0 ? Color(hex: "8B5CF6") :
-                   index % 3 == 1 ? Color(hex: "3B82F6") : Color(hex: "06B6D4")
-        )
-    }
-
-    var body: some View {
-        let cfg = config
-        let x = cos(cfg.angle) * cfg.distance * progress
-        let y = sin(cfg.angle) * cfg.distance * progress
-
-        Circle()
-            .fill(
-                RadialGradient(
-                    colors: [
-                        cfg.color,
-                        cfg.color.opacity(0.5),
-                        Color.clear
-                    ],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: cfg.particleSize
-                )
-            )
-            .frame(width: cfg.particleSize * 2, height: cfg.particleSize * 2)
-            .offset(x: x, y: y)
-            .opacity(1 - progress * 0.8)
-            .blur(radius: cfg.particleSize * 0.2 * progress)
-    }
-}
-
-struct BurstConfig {
-    let angle: Double
-    let distance: CGFloat
-    let particleSize: CGFloat
-    let color: Color
 }
 
 // MARK: - Monochrome Logo
@@ -228,12 +53,69 @@ struct MonochromeLogo: View {
     let color: Color
 
     var body: some View {
-        StaticLogoView(size: size, tintColor: color)
-            .opacity(0.8)
+        ZStack {
+            // Glow in specified color
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            color.opacity(0.3),
+                            color.opacity(0.1),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size.dimension * 0.6
+                    )
+                )
+                .frame(width: size.dimension * 1.2, height: size.dimension * 1.2)
+                .blur(radius: size.dimension * 0.1)
+
+            // Core orb in specified color
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            color,
+                            color.opacity(0.7),
+                            color.opacity(0.3)
+                        ],
+                        center: UnitPoint(x: 0.35, y: 0.35),
+                        startRadius: 0,
+                        endRadius: size.dimension * 0.25
+                    )
+                )
+                .frame(width: size.dimension * 0.5, height: size.dimension * 0.5)
+
+            // White hot center
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.white.opacity(0.8),
+                            Color.white.opacity(0.3),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size.dimension * 0.12
+                    )
+                )
+                .frame(width: size.dimension * 0.25, height: size.dimension * 0.25)
+
+            // Top highlight
+            Ellipse()
+                .fill(Color.white.opacity(0.4))
+                .frame(width: size.dimension * 0.1, height: size.dimension * 0.05)
+                .offset(x: -size.dimension * 0.05, y: -size.dimension * 0.08)
+                .blur(radius: 1)
+        }
+        .frame(width: size.dimension, height: size.dimension)
+        .opacity(0.8)
     }
 }
 
-// MARK: - Logo with Text
+// MARK: - Logo with Text (Now uses OrbLogoWithText internally)
 
 struct LogoWithText: View {
     let size: LogoSize
@@ -245,6 +127,7 @@ struct LogoWithText: View {
             AppLogoView(size: size, isAnimating: isAnimating)
 
             VStack(spacing: 4) {
+                // Editorial thin typography from Auth design
                 Text("MyTasksAI")
                     .font(titleFont)
                     .foregroundStyle(
@@ -274,12 +157,13 @@ struct LogoWithText: View {
         }
     }
 
+    // Updated to use thin weight like Auth screen
     private var titleFont: Font {
         switch size {
-        case .tiny, .small: return .system(size: 14, weight: .medium, design: .rounded)
-        case .medium: return .system(size: 20, weight: .light, design: .rounded)
-        case .large: return .system(size: 28, weight: .light, design: .rounded)
-        case .hero: return .system(size: 36, weight: .light, design: .rounded)
+        case .tiny, .small: return .system(size: 14, weight: .thin, design: .default)
+        case .medium: return .system(size: 20, weight: .thin, design: .default)
+        case .large: return .system(size: 28, weight: .thin, design: .default)
+        case .hero: return .system(size: 42, weight: .thin, design: .default)
         }
     }
 
@@ -303,9 +187,18 @@ struct LogoWithText: View {
 
 // MARK: - App Icon Generator View
 
-/// For generating app icon assets
+/// For generating app icon assets - uses static orb
 struct AppIconView: View {
     let iconSize: CGFloat
+
+    private let gradientColors: [Color] = [
+        Color(hex: "8B5CF6"),
+        Color(hex: "6366F1"),
+        Color(hex: "3B82F6"),
+        Color(hex: "0EA5E9"),
+        Color(hex: "06B6D4"),
+        Color(hex: "14B8A6"),
+    ]
 
     var body: some View {
         ZStack {
@@ -320,11 +213,11 @@ struct AppIconView: View {
                 endPoint: .bottomTrailing
             )
 
-            // Subtle radial glow
+            // Atmospheric glow
             RadialGradient(
                 colors: [
-                    Color(hex: "8B5CF6").opacity(0.3),
-                    Color(hex: "3B82F6").opacity(0.15),
+                    gradientColors[0].opacity(0.4),
+                    gradientColors[2].opacity(0.2),
                     Color.clear
                 ],
                 center: .center,
@@ -332,10 +225,50 @@ struct AppIconView: View {
                 endRadius: iconSize * 0.5
             )
 
-            // Static logo (no animation for icon)
-            StaticLogoView(
-                size: .custom(dimension: iconSize * 0.55)
-            )
+            // Main orb
+            Circle()
+                .fill(
+                    AngularGradient(
+                        colors: gradientColors + [gradientColors[0]],
+                        center: .center
+                    )
+                )
+                .frame(width: iconSize * 0.35, height: iconSize * 0.35)
+
+            // Inner core
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.white.opacity(0.9),
+                            Color.white.opacity(0.4),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: iconSize * 0.12
+                    )
+                )
+                .frame(width: iconSize * 0.25, height: iconSize * 0.25)
+
+            // Top highlight
+            Ellipse()
+                .fill(Color.white.opacity(0.5))
+                .frame(width: iconSize * 0.08, height: iconSize * 0.04)
+                .offset(x: -iconSize * 0.04, y: -iconSize * 0.08)
+                .blur(radius: 2)
+
+            // Outer glow ring
+            Circle()
+                .stroke(
+                    AngularGradient(
+                        colors: gradientColors.map { $0.opacity(0.4) } + [gradientColors[0].opacity(0.4)],
+                        center: .center
+                    ),
+                    lineWidth: iconSize * 0.015
+                )
+                .frame(width: iconSize * 0.45, height: iconSize * 0.45)
+                .blur(radius: iconSize * 0.02)
         }
         .frame(width: iconSize, height: iconSize)
     }
@@ -355,7 +288,7 @@ extension LogoSize {
 
 // MARK: - Previews
 
-#Preview {
+#Preview("Logo Variants") {
     ZStack {
         Color.black.ignoresSafeArea()
 
@@ -367,6 +300,19 @@ extension LogoSize {
                 StaticLogoView(size: .small)
                 StaticLogoView(size: .tiny)
             }
+
+            MonochromeLogo(size: .medium, color: .green)
         }
     }
+}
+
+#Preview("Logo With Text") {
+    ZStack {
+        Color.black.ignoresSafeArea()
+        LogoWithText(size: .hero)
+    }
+}
+
+#Preview("App Icon") {
+    AppIconView(iconSize: 200)
 }

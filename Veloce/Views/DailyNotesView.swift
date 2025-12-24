@@ -94,20 +94,6 @@ struct DailyNotesView: View {
                 }
             }
 
-            // Genius Task Sheet overlay
-            if showGeniusSheet, let task = selectedTaskForGenius {
-                GeniusTaskSheet(
-                    task: task,
-                    isPresented: $showGeniusSheet,
-                    onEditTapped: {
-                        showGeniusSheet = false
-                        selectedTaskForDetail = task
-                    }
-                )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .zIndex(1)
-            }
-
             // AI Creation Animation overlay
             if showAICreationAnimation {
                 AITaskCreationAnimation {
@@ -126,6 +112,20 @@ struct DailyNotesView: View {
         }
         .sheet(item: $selectedTaskForDetail) { task in
             taskDetailSheet(for: task)
+        }
+        .sheet(item: $selectedTaskForGenius) { task in
+            GeniusTaskSheet(
+                task: task,
+                isPresented: $showGeniusSheet,
+                onEditTapped: {
+                    showGeniusSheet = false
+                    selectedTaskForGenius = nil
+                    selectedTaskForDetail = task
+                }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(.ultraThinMaterial)
         }
     }
 
@@ -297,9 +297,6 @@ struct DailyNotesView: View {
            let existingTask = viewModel.tasks.first(where: { $0.id == taskId }) {
             // Show Genius Sheet for existing task
             selectedTaskForGenius = existingTask
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                showGeniusSheet = true
-            }
         } else {
             // Create new task from line with AI animation
             createTaskFromLine(line)
@@ -338,9 +335,6 @@ struct DailyNotesView: View {
             // After AI processing, show Genius Sheet
             await MainActor.run {
                 selectedTaskForGenius = task
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    showGeniusSheet = true
-                }
             }
         }
 

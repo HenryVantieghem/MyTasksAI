@@ -45,50 +45,12 @@ struct ModuleCard<Content: View>: View {
             content
         }
         .padding(Theme.Spacing.md)
-        .background(moduleBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(moduleBorder)
-    }
-
-    // MARK: - Background
-
-    private var moduleBackground: some View {
-        ZStack {
-            // Base glass
+        .background {
+            // Subtle accent tint behind the glass
             RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-                .opacity(0.5)
-
-            // Subtle accent gradient
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            accentColor.opacity(0.03),
-                            .clear
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(accentColor.opacity(0.05))
         }
-    }
-
-    // MARK: - Border
-
-    private var moduleBorder: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .stroke(
-                LinearGradient(
-                    colors: [
-                        accentColor.opacity(0.2),
-                        Color.white.opacity(0.05)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                lineWidth: 1
-            )
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

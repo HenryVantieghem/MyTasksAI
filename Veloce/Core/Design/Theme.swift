@@ -323,6 +323,8 @@ enum Theme {
         static let aiGold = Color(red: 0.98, green: 0.82, blue: 0.35)
         /// Sunset orange for warmth
         static let aiOrange = Color(red: 0.98, green: 0.58, blue: 0.22)
+        /// Focus amber for timer/focus mode
+        static let aiAmber = Color(red: 0.96, green: 0.62, blue: 0.14)
         /// Fresh green for vitality
         static let aiGreen = Color(red: 0.22, green: 0.88, blue: 0.58)
 
@@ -429,23 +431,43 @@ enum Theme {
 
     // MARK: - Typography
     enum Typography {
-        // MARK: Display
+        // MARK: Display (Editorial Thin - Auth Style)
+        /// Hero display text - ultra thin for premium feel
+        static let displayHero = Font.system(size: 42, weight: .thin, design: .default)
+        /// Large display text
+        static let displayLarge = Font.system(size: 36, weight: .thin, design: .default)
+        /// Medium display text
+        static let displayMedium = Font.system(size: 28, weight: .thin, design: .default)
+        /// Small display text
+        static let displaySmall = Font.system(size: 24, weight: .thin, design: .default)
+
+        // MARK: Display (Standard weights)
         static let largeTitle = Font.system(.largeTitle, design: .default, weight: .bold)
         static let title = Font.system(.title, design: .default, weight: .semibold)
         static let title1 = Font.system(.title, design: .default, weight: .bold)
         static let title2 = Font.system(.title2, design: .default, weight: .semibold)
         static let title3 = Font.system(.title3, design: .default, weight: .medium)
 
+        // MARK: Title Light Variants (Auth-inspired)
+        /// Light weight title for elegant headers
+        static let titleLight = Font.system(.title, design: .default, weight: .light)
+        static let title2Light = Font.system(.title2, design: .default, weight: .light)
+        static let title3Light = Font.system(.title3, design: .default, weight: .light)
+
         // MARK: Body
         static let headline = Font.system(.headline, design: .default, weight: .semibold)
         static let body = Font.system(.body, design: .default)
         static let bodyBold = Font.system(.body, design: .default, weight: .semibold)
+        static let bodyLight = Font.system(.body, design: .default, weight: .light)
         static let callout = Font.system(.callout, design: .default)
+        static let calloutLight = Font.system(.callout, design: .default, weight: .light)
 
         // MARK: Supporting
         static let subheadline = Font.system(.subheadline, design: .default)
         static let subheadlineMedium = Font.system(.subheadline, design: .default, weight: .medium)
+        static let subheadlineLight = Font.system(.subheadline, design: .default, weight: .light)
         static let footnote = Font.system(.footnote, design: .default)
+        static let footnoteLight = Font.system(.footnote, design: .default, weight: .light)
         static let caption = Font.system(.caption, design: .default)
         static let caption1 = Font.system(.caption, design: .default)  // Alias for caption
         static let caption1Medium = Font.system(.caption, design: .default, weight: .medium)
@@ -453,13 +475,29 @@ enum Theme {
 
         // MARK: AI Fonts
         static let aiWhisper = Font.system(.footnote, design: .default).italic()
+        /// AI insight text - thin and ethereal
+        static let aiInsight = Font.system(.callout, design: .default, weight: .light).italic()
 
         // MARK: Pill/Button Text
         static let pillText = Font.system(.subheadline, design: .default, weight: .medium)
+        /// Thin pill text for elegant buttons
+        static let pillTextLight = Font.system(.subheadline, design: .default, weight: .light)
+
+        // MARK: Points/Stats Display
+        /// Large points display
+        static let pointsLarge = Font.system(size: 32, weight: .light, design: .default)
+        /// Medium points display
+        static let pointsMedium = Font.system(size: 24, weight: .light, design: .default)
+        /// Small points display
+        static let pointsSmall = Font.system(size: 18, weight: .medium, design: .default)
 
         // MARK: Monospace
         static let code = Font.system(.body, design: .monospaced)
         static let codeSmall = Font.system(.footnote, design: .monospaced)
+
+        // MARK: Tab Bar
+        static let tabLabel = Font.system(size: 12, weight: .semibold, design: .default)
+        static let tabLabelLight = Font.system(size: 12, weight: .medium, design: .default)
     }
 
     // MARK: - Spacing
