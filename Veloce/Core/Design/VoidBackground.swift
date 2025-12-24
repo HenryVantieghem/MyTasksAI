@@ -172,9 +172,14 @@ extension VoidBackground {
         VoidBackground(glowPosition: .topTrailing, glowColor: Theme.Colors.aiBlue)
     }
 
-    /// Momentum tab background (golden glow)
+    /// Momentum tab background (unified purple glow)
     static var momentum: VoidBackground {
-        VoidBackground(glowPosition: .center, glowColor: Color(hex: "FFD700"), starCount: VoidDesign.Stars.countDense)
+        VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiPurple, starCount: VoidDesign.Stars.countDense)
+    }
+
+    /// Journal page background (unified purple glow with standard stars)
+    static var journal: VoidBackground {
+        VoidBackground(glowPosition: .bottom, glowColor: Theme.Colors.aiPurple, starCount: VoidDesign.Stars.countStandard)
     }
 
     /// Brain dump background (glow at bottom leading)

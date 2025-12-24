@@ -64,6 +64,10 @@ struct MainContainerView: View {
     @State private var showSchedulePicker = false
     @State private var showPriorityPicker = false
 
+    // Task card state (managed at container level to overlay everything)
+    @State private var selectedTask: TaskItem?
+    @State private var showCelestialCard = false
+
     // Computed property for greeting context
     private var completedTasksToday: Int {
         let calendar = Calendar.current
@@ -80,7 +84,21 @@ struct MainContainerView: View {
             TabView(selection: $selectedTab) {
                 // Tasks Tab - with embedded input bar
                 NavigationStack {
-                    ChatTasksView(viewModel: chatTasksViewModel)
+                    ChatTasksView(
+                        viewModel: chatTasksViewModel,
+                        onTaskSelected: { task in
+                            // Dismiss keyboard first if active
+                            if isTaskInputFocused {
+                                isTaskInputFocused = false
+                                // Small delay to allow keyboard animation to complete
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    presentTaskCard(task)
+                                }
+                            } else {
+                                presentTaskCard(task)
+                            }
+                        }
+                    )
                         .safeAreaInset(edge: .bottom, spacing: 0) {
                             // Input bar positioned above tab bar area
                             VStack(spacing: 0) {
@@ -129,11 +147,22 @@ struct MainContainerView: View {
             }
             .toolbar(.hidden, for: .tabBar)
 
-            // Custom Celestial Tab Bar - floats at bottom independently
+            // Custom Celestial Tab Bar - floats at bottom with safe area respect
             VStack {
                 Spacer()
                 CelestialTabBar(selectedTab: $selectedTab)
-                    .padding(.bottom, 8)
+            }
+            .safeAreaPadding(.bottom)
+
+            // Unified Celestial Task Card overlay - at container level to cover everything
+            if showCelestialCard, let task = selectedTask {
+                CelestialTaskCard(
+                    task: task,
+                    delegate: chatTasksViewModel,
+                    isPresented: $showCelestialCard
+                )
+                .transition(.opacity)
+                .zIndex(100)
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -198,6 +227,16 @@ struct MainContainerView: View {
             if let scheduledTime = scheduledTime, let lastTask = chatTasksViewModel.tasks.last {
                 chatTasksViewModel.updateTask(lastTask, scheduledTime: scheduledTime)
             }
+        }
+    }
+
+    // MARK: - Task Card Presentation
+
+    private func presentTaskCard(_ task: TaskItem) {
+        selectedTask = task
+        HapticsService.shared.selectionFeedback()
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            showCelestialCard = true
         }
     }
 

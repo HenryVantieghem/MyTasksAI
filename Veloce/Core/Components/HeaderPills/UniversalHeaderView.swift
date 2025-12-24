@@ -25,38 +25,38 @@ struct UniversalHeaderView: View {
     @State private var showContent = false
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
-            // Stats pill (left) - transparent, inherits glass from parent
+        HStack(spacing: Theme.Spacing.md) {
+            // Stats pill (left) - own liquid glass
             GamificationPill(
                 streak: gamification.currentStreak,
                 points: gamification.totalPoints,
                 level: gamification.currentLevel,
-                transparent: true
+                transparent: false
             ) {
                 showStatsSheet = true
             }
 
-            // Title (center) - part of unified pill
+            Spacer()
+
+            // Title (center) - plain text, no pill background
             Text(title)
                 .font(AppTypography.title)
                 .foregroundStyle(AppColors.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                .frame(maxWidth: .infinity)
 
-            // Settings pill (right) - transparent, inherits glass from parent
+            Spacer()
+
+            // Settings pill (right) - own liquid glass
             SettingsPillView(
                 avatarUrl: avatarUrl,
                 userName: userName,
-                transparent: true
+                transparent: false
             ) {
                 HapticsService.shared.selectionFeedback()
                 showSettingsSheet = true
             }
         }
-        .padding(.horizontal, Theme.Spacing.md)
-        .padding(.vertical, Theme.Spacing.sm)
-        .liquidGlass(cornerRadius: Theme.Radius.pill)  // Single unified glass container
         .padding(.horizontal, Theme.Spacing.screenPadding)
         .opacity(showContent ? 1 : 0)
         .scaleEffect(showContent ? 1 : 0.95)

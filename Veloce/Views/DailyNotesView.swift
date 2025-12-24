@@ -116,7 +116,7 @@ struct DailyNotesView: View {
                 .zIndex(2)
             }
         }
-        .background(AppColors.backgroundPrimary.ignoresSafeArea())
+        .background { VoidBackground.journal }
         .preferredColorScheme(.dark)
         .onChange(of: selectedDate) { _, newDate in
             loadLinesForDate(newDate)
@@ -134,7 +134,7 @@ struct DailyNotesView: View {
     private var headerSection: some View {
         VStack(spacing: Theme.Spacing.xs) {
             // Date pill only - stats now shown in universal header
-            DatePillView(selectedDate: $selectedDate)
+            TodayPillView(selectedDate: $selectedDate)
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
         .padding(.top, Theme.Spacing.universalHeaderHeight)

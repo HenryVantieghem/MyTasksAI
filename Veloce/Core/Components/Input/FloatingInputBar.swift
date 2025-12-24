@@ -148,6 +148,20 @@ struct FloatingInputBar: View {
                 }
             }
             .tint(Theme.Colors.aiPurple)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button {
+                        HapticsService.shared.lightImpact()
+                        isFocused = false
+                    } label: {
+                        Image(systemName: "keyboard.chevron.compact.down")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(Theme.Colors.accent)
+                    }
+                    .accessibilityLabel("Dismiss keyboard")
+                }
+            }
     }
 
     // MARK: - Mic Button (Placeholder)

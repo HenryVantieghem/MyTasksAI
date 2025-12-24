@@ -159,6 +159,26 @@ final class CalendarService {
         try eventStore.remove(event, span: .thisEvent)
     }
 
+    /// Update calendar event time
+    func updateEventTime(eventId: String, newTime: Date) async throws {
+        guard isAuthorized else {
+            throw CalendarError.notAuthorized
+        }
+
+        guard let event = eventStore.event(withIdentifier: eventId) else {
+            throw CalendarError.eventNotFound
+        }
+
+        // Calculate the duration from the original event
+        let duration = event.endDate.timeIntervalSince(event.startDate)
+
+        // Update to new time while preserving duration
+        event.startDate = newTime
+        event.endDate = newTime.addingTimeInterval(duration)
+
+        try eventStore.save(event, span: .thisEvent)
+    }
+
     // MARK: - Free Slot Detection
 
     /// Find free time slots for scheduling

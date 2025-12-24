@@ -13,10 +13,11 @@ import SwiftUI
 struct ChatTasksView: View {
     @Bindable var viewModel: ChatTasksViewModel
 
-    // Sheet state
-    @State private var selectedTask: TaskItem?
-    @State private var showGeniusSheet = false
-    @State private var showTaskDetailSheet = false
+    // Task selection callback - handled by parent for full-screen overlay
+    var onTaskSelected: ((TaskItem) -> Void)?
+
+    // Date selection - same as Brain Dump
+    @State private var selectedDate: Date = Date()
 
     // Animation state
     @State private var showConfetti = false
@@ -26,6 +27,38 @@ struct ChatTasksView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
+    // MARK: - Filtered Tasks by Date
+
+    /// Tasks filtered to the selected date (by scheduled time or creation date)
+    private var filteredTasks: [TaskItem] {
+        let calendar = Calendar.current
+        return viewModel.sortedTasks.filter { task in
+            // Check if task is scheduled for the selected date
+            if let scheduledTime = task.scheduledTime {
+                return calendar.isDate(scheduledTime, inSameDayAs: selectedDate)
+            }
+            // For unscheduled tasks, show on the day they were created
+            return calendar.isDate(task.createdAt, inSameDayAs: selectedDate)
+        }
+    }
+
+    /// Recently completed tasks filtered to the selected date
+    private var filteredRecentlyCompleted: [TaskItem] {
+        let calendar = Calendar.current
+        return viewModel.recentlyCompleted.filter { task in
+            // Check completion date first
+            if let completedAt = task.completedAt {
+                return calendar.isDate(completedAt, inSameDayAs: selectedDate)
+            }
+            // Fallback to scheduled time
+            if let scheduledTime = task.scheduledTime {
+                return calendar.isDate(scheduledTime, inSameDayAs: selectedDate)
+            }
+            // Fallback to creation date
+            return calendar.isDate(task.createdAt, inSameDayAs: selectedDate)
+        }
+    }
+
     var body: some View {
         ZStack {
             // Background - Void design system
@@ -33,13 +66,17 @@ struct ChatTasksView: View {
 
             // Main content
             VStack(spacing: 0) {
+                // Date selector with Liquid Glass
+                TodayPillView(selectedDate: $selectedDate)
+                    .padding(.top, 24)
+
                 // Task feed or empty state
-                if viewModel.sortedTasks.isEmpty && viewModel.recentlyCompleted.isEmpty {
+                if filteredTasks.isEmpty && filteredRecentlyCompleted.isEmpty {
                     EmptyTasksView {
                         // Input bar is now managed at container level
                         // User can tap the input bar directly
                     }
-                    .padding(.top, Theme.Spacing.universalHeaderHeight)
+                    .padding(.top, Theme.Spacing.universalHeaderHeight - 60)
                 } else {
                     taskFeed
                 }
@@ -59,31 +96,12 @@ struct ChatTasksView: View {
             // Points animations
             PointsAnimationContainer(animations: $pointsAnimations)
 
-            // Genius Task Sheet overlay
-            if showGeniusSheet, let task = selectedTask {
-                GeniusTaskSheet(
-                    task: task,
-                    isPresented: $showGeniusSheet,
-                    onEditTapped: {
-                        showGeniusSheet = false
-                        showTaskDetailSheet = true
-                    }
-                )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .zIndex(1)
-            }
-
             // AI Creation Animation overlay
             if showAICreationAnimation {
                 AITaskCreationAnimation {
                     showAICreationAnimation = false
                 }
                 .zIndex(2)
-            }
-        }
-        .fullScreenCover(isPresented: $showTaskDetailSheet) {
-            if let task = selectedTask {
-                PremiumTaskDetailView(task: task, viewModel: viewModel)
             }
         }
     }
@@ -94,18 +112,17 @@ struct ChatTasksView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: Theme.Spacing.md) {
-                    // Recently completed section
-                    if !viewModel.recentlyCompleted.isEmpty {
+                    // Recently completed section (filtered by date)
+                    if !filteredRecentlyCompleted.isEmpty {
                         completedSection
                     }
 
                     // Active tasks - Using TaskCardV2 with Energy Core and AI Whisper
-                    ForEach(viewModel.sortedTasks) { task in
+                    ForEach(filteredTasks) { task in
                         TaskCardV2(
                             task: task,
                             onTap: {
-                                selectedTask = task
-                                showGeniusSheet = true
+                                onTaskSelected?(task)
                             },
                             onToggleComplete: {
                                 completeTask(task)
@@ -123,9 +140,9 @@ struct ChatTasksView: View {
                         .id("bottom")
                 }
                 .padding(.horizontal, Theme.Spacing.screenPadding)
-                .padding(.top, Theme.Spacing.universalHeaderHeight)
+                .padding(.top, Theme.Spacing.md)
             }
-            .onChange(of: viewModel.sortedTasks.count) { _, _ in
+            .onChange(of: filteredTasks.count) { _, _ in
                 withAnimation {
                     proxy.scrollTo("bottom", anchor: .bottom)
                 }
@@ -142,7 +159,7 @@ struct ChatTasksView: View {
                 .foregroundStyle(Theme.Colors.textTertiary)
                 .padding(.horizontal, Theme.Spacing.sm)
 
-            ForEach(viewModel.recentlyCompleted) { task in
+            ForEach(filteredRecentlyCompleted) { task in
                 CompletedTaskRow(task: task) {
                     viewModel.uncompleteTask(task)
                 }

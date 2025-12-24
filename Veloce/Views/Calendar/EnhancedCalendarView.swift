@@ -13,11 +13,13 @@ import SwiftData
 
 enum TimelineDisplayMode: String, CaseIterable {
     case timeline = "Timeline"
+    case week = "Week"
     case month = "Month"
 
     var icon: String {
         switch self {
         case .timeline: return "chart.bar.xaxis"
+        case .week: return "calendar.day.timeline.left"
         case .month: return "calendar"
         }
     }
@@ -35,6 +37,9 @@ struct EnhancedCalendarView: View {
     @State private var selectedTask: TaskItem?
     @State private var showTaskDetail = false
     @State private var showDatePicker = false
+    @State private var showRescheduleConfirmation = false
+    @State private var rescheduleTask: TaskItem?
+    @State private var rescheduleNewTime: Date?
 
     private var tasksForSelectedDate: [TaskItem] {
         let calendar = Calendar.current
@@ -148,6 +153,30 @@ struct EnhancedCalendarView: View {
                         removal: .move(edge: .leading).combined(with: .opacity)
                     ))
 
+                case .week:
+                    WeekViewTimeline(
+                        centerDate: selectedDate,
+                        tasks: allTasks,
+                        onTaskTap: { task in
+                            selectedTask = task
+                            showTaskDetail = true
+                        },
+                        onSlotTap: { date in
+                            // Handle quick add at time slot
+                            selectedDate = date
+                            HapticsService.shared.selectionFeedback()
+                        },
+                        onReschedule: { task, newTime in
+                            rescheduleTask = task
+                            rescheduleNewTime = newTime
+                            showRescheduleConfirmation = true
+                        }
+                    )
+                    .transition(.asymmetric(
+                        insertion: .scale.combined(with: .opacity),
+                        removal: .scale.combined(with: .opacity)
+                    ))
+
                 case .month:
                     MonthGridView(
                         selectedDate: $selectedDate,
@@ -181,6 +210,40 @@ struct EnhancedCalendarView: View {
             CalendarDatePickerSheet(selectedDate: $selectedDate)
                 .presentationDetents([.height(400)])
                 .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showRescheduleConfirmation) {
+            if let task = rescheduleTask, let newTime = rescheduleNewTime {
+                RescheduleConfirmationSheet(
+                    task: task,
+                    originalTime: task.scheduledTime,
+                    newTime: newTime,
+                    onConfirm: { updateCalendarEvent in
+                        performReschedule(task: task, to: newTime, updateCalendar: updateCalendarEvent)
+                        showRescheduleConfirmation = false
+                        rescheduleTask = nil
+                        rescheduleNewTime = nil
+                    },
+                    onCancel: {
+                        showRescheduleConfirmation = false
+                        rescheduleTask = nil
+                        rescheduleNewTime = nil
+                    }
+                )
+            }
+        }
+    }
+
+    // MARK: - Reschedule Action
+
+    private func performReschedule(task: TaskItem, to newTime: Date, updateCalendar: Bool) {
+        task.scheduledTime = newTime
+        try? modelContext.save()
+
+        // Update calendar event if requested
+        if updateCalendar, let eventId = task.calendarEventId {
+            Task {
+                await viewModel.updateCalendarEvent(eventId: eventId, newTime: newTime)
+            }
         }
     }
 

@@ -248,6 +248,16 @@ final class CalendarViewModel {
         haptics.impact()
     }
 
+    func updateCalendarEvent(eventId: String, newTime: Date) async {
+        do {
+            try await calendar.updateEventTime(eventId: eventId, newTime: newTime)
+            await loadData()
+            haptics.success()
+        } catch {
+            self.error = "Failed to update calendar event: \(error.localizedDescription)"
+        }
+    }
+
     // MARK: - AI Scheduling
 
     func suggestSchedule(

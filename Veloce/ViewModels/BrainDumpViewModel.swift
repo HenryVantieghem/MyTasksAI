@@ -39,6 +39,11 @@ final class BrainDumpViewModel {
 
     // MARK: - Process Brain Dump
 
+    /// Maximum retry attempts for transient errors
+    private let maxRetries = 2
+    /// Delay between retries in seconds
+    private let retryDelay: UInt64 = 1_500_000_000  // 1.5 seconds
+
     func processBrainDump() async {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
@@ -50,24 +55,44 @@ final class BrainDumpViewModel {
         state = .processing
         haptics.impact()
 
-        do {
-            let response = try await extractTasksFromText(text)
-            extractedTasks = response.tasks
-            overallMood = response.overallMood
-            gentleObservation = response.gentleObservation
-            detectedThemes = response.detectedThemes ?? []
+        var lastError: Error?
+        var attempts = 0
 
-            // Mark all as selected by default
-            for i in extractedTasks.indices {
-                extractedTasks[i].isSelected = true
+        while attempts <= maxRetries {
+            do {
+                let response = try await extractTasksFromText(text)
+                extractedTasks = response.tasks
+                overallMood = response.overallMood
+                gentleObservation = response.gentleObservation
+                detectedThemes = response.detectedThemes ?? []
+
+                // Mark all as selected by default
+                for i in extractedTasks.indices {
+                    extractedTasks[i].isSelected = true
+                }
+
+                haptics.taskComplete()
+                state = .results
+                return  // Success - exit the retry loop
+            } catch {
+                lastError = error
+                attempts += 1
+
+                // Check if error is retryable
+                if let geminiError = error as? GeminiError, geminiError.isRetryable, attempts <= maxRetries {
+                    print("[BrainDump] Retrying (\(attempts)/\(maxRetries)) after error: \(error.localizedDescription)")
+                    try? await Task.sleep(nanoseconds: retryDelay)
+                    continue
+                } else {
+                    break  // Non-retryable error
+                }
             }
-
-            haptics.taskComplete()
-            state = .results
-        } catch {
-            haptics.error()
-            state = .error("Failed to process: \(error.localizedDescription)")
         }
+
+        // All retries exhausted
+        haptics.error()
+        let errorMessage = lastError?.localizedDescription ?? "Unknown error occurred"
+        state = .error(errorMessage)
     }
 
     // MARK: - Extract Tasks

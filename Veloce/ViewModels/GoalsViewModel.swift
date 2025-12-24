@@ -209,6 +209,33 @@ final class GoalsViewModel {
 
     // MARK: - AI Features
 
+    /// Generate all AI content for a goal (refinement + roadmap)
+    /// Call this when user taps "Generate AI Analysis" CTA
+    func generateAllAIContent(for goal: Goal, context: ModelContext) async {
+        guard gemini.isReady else {
+            error = "AI service not available. Please check your settings."
+            return
+        }
+
+        // First, refine the goal with SMART analysis
+        await refineGoalWithAI(goal, context: context)
+
+        // Then generate the roadmap if refinement succeeded
+        if goal.aiRefinedTitle != nil {
+            await generateRoadmap(for: goal, context: context)
+        }
+    }
+
+    /// Check if a goal has AI content generated
+    func hasAIContent(_ goal: Goal) -> Bool {
+        goal.aiRefinedTitle != nil || goal.hasRoadmap
+    }
+
+    /// Check if AI service is available
+    var isAIAvailable: Bool {
+        gemini.isReady
+    }
+
     /// Refine goal with AI SMART analysis
     func refineGoalWithAI(_ goal: Goal, context: ModelContext) async {
         guard gemini.isReady else { return }

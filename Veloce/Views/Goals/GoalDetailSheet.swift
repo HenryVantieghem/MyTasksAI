@@ -35,6 +35,11 @@ struct GoalDetailSheet: View {
                         // Tab selector
                         tabSelector
 
+                        // AI Generation Banner (show if no AI content)
+                        if !goalsVM.hasAIContent(goal) && goalsVM.isAIAvailable {
+                            aiGenerationBanner
+                        }
+
                         // Tab content
                         tabContent
                             .padding(.bottom, 100)
@@ -246,6 +251,83 @@ struct GoalDetailSheet: View {
         case .insights:
             GoalInsightsSection(goal: goal)
         }
+    }
+
+    // MARK: - AI Generation Banner
+
+    private var aiGenerationBanner: some View {
+        VStack(spacing: 16) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(Theme.Colors.aiPurple.opacity(0.2))
+                    .frame(width: 60, height: 60)
+
+                if goalsVM.isRefiningGoal || goalsVM.isGeneratingRoadmap {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Theme.Colors.aiPurple))
+                        .scaleEffect(1.2)
+                } else {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 24))
+                        .foregroundStyle(Theme.Colors.aiPurple)
+                }
+            }
+
+            // Text
+            VStack(spacing: 6) {
+                Text(goalsVM.isRefiningGoal || goalsVM.isGeneratingRoadmap ?
+                     "Analyzing Your Goal..." : "Unlock AI Insights")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                Text(goalsVM.isRefiningGoal || goalsVM.isGeneratingRoadmap ?
+                     "Creating your personalized roadmap" :
+                     "Get SMART analysis, milestones, and personalized guidance")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .multilineTextAlignment(.center)
+            }
+
+            // CTA Button
+            if !goalsVM.isRefiningGoal && !goalsVM.isGeneratingRoadmap {
+                Button {
+                    Task {
+                        await goalsVM.generateAllAIContent(for: goal, context: modelContext)
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 15, weight: .semibold))
+                        Text("Generate AI Analysis")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 14)
+                    .background(
+                        LinearGradient(
+                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiPurple.opacity(0.7)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(Capsule())
+                    .shadow(color: Theme.Colors.aiPurple.opacity(0.4), radius: 12, y: 4)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial.opacity(0.6))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Theme.Colors.aiPurple.opacity(0.3), lineWidth: 1)
+                )
+        )
     }
 
     // MARK: - Actions

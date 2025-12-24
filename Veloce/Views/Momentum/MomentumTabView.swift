@@ -67,8 +67,8 @@ struct MomentumTabView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 32) {
-                    // Date selector
-                    TodayDateSelector(selectedDate: $selectedDate)
+                    // Date selector with Liquid Glass
+                    TodayPillView(selectedDate: $selectedDate)
                         .padding(.top, Theme.Spacing.universalHeaderHeight)
 
                     // Goal Spotlight Section - Most urgent goal

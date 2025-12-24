@@ -287,27 +287,48 @@ final class GeminiService {
         body: T
     ) async throws -> R {
         guard let apiKey else {
+            logError("API key not configured")
             throw GeminiError.notConfigured
         }
 
         guard let url = URL(string: "\(baseURL)/\(endpoint)?key=\(apiKey)") else {
+            logError("Invalid URL: \(baseURL)/\(endpoint)")
             throw GeminiError.invalidURL
         }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 30  // 30 second timeout
 
         let encoder = JSONEncoder()
         request.httpBody = try encoder.encode(body)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        logDebug("Making request to: \(endpoint)")
+
+        let data: Data
+        let response: URLResponse
+
+        do {
+            (data, response) = try await URLSession.shared.data(for: request)
+        } catch {
+            logError("Network error: \(error.localizedDescription)")
+            throw GeminiError.networkError(error)
+        }
 
         guard let httpResponse = response as? HTTPURLResponse else {
+            logError("Invalid response type")
             throw GeminiError.networkError(NSError(domain: "Invalid response", code: -1))
         }
 
+        logDebug("Response status: \(httpResponse.statusCode)")
+
         if httpResponse.statusCode != 200 {
+            // Log response body for debugging
+            if let responseBody = String(data: data, encoding: .utf8) {
+                logError("Error response (\(httpResponse.statusCode)): \(responseBody.prefix(500))")
+            }
+
             // Try to parse error message
             if let errorResponse = try? JSONDecoder().decode(GeminiResponse.self, from: data),
                let errorMessage = errorResponse.error?.message {
@@ -317,7 +338,27 @@ final class GeminiService {
         }
 
         let decoder = JSONDecoder()
-        return try decoder.decode(R.self, from: data)
+        do {
+            return try decoder.decode(R.self, from: data)
+        } catch {
+            if let responseBody = String(data: data, encoding: .utf8) {
+                logError("Parse error. Response: \(responseBody.prefix(500))")
+            }
+            throw GeminiError.parsingFailed
+        }
+    }
+
+    // MARK: - Logging Helpers
+
+    private func logDebug(_ message: String) {
+        #if DEBUG
+        print("[GeminiService] \(message)")
+        #endif
+    }
+
+    private func logError(_ message: String) {
+        print("[GeminiService ERROR] \(message)")
+        lastError = message
     }
 
     private func enforceRateLimit() async {
@@ -407,25 +448,98 @@ enum GeminiError: Error, LocalizedError {
     case emptyResponse
     case parsingFailed
     case rateLimited
+    case timeout
 
     var errorDescription: String? {
         switch self {
         case .notConfigured:
-            return "Gemini API is not configured. Please add your API key."
+            return "AI not configured. Please add your API key in Settings."
         case .invalidURL:
-            return "Invalid API URL"
+            return "Invalid API configuration. Please contact support."
         case .networkError(let error):
-            return "Network error: \(error.localizedDescription)"
+            return networkErrorMessage(error)
         case .httpError(let code):
-            return "HTTP error: \(code)"
+            return httpErrorMessage(code)
         case .apiError(let message):
-            return "API error: \(message)"
+            return userFriendlyAPIError(message)
         case .emptyResponse:
-            return "Empty response from AI"
+            return "AI returned no response. Please try again."
         case .parsingFailed:
-            return "Failed to parse AI response"
+            return "Couldn't understand AI response. Please try rephrasing."
         case .rateLimited:
-            return "Rate limited. Please try again in a moment."
+            return "Too many requests. Please wait a moment and try again."
+        case .timeout:
+            return "Request timed out. Check your connection and try again."
+        }
+    }
+
+    /// User-friendly HTTP error messages
+    private func httpErrorMessage(_ code: Int) -> String {
+        switch code {
+        case 400:
+            return "Invalid request. Please try rephrasing your input."
+        case 401:
+            return "API key is invalid or expired. Please check your settings."
+        case 403:
+            return "Access denied. Your API key may not have proper permissions."
+        case 404:
+            return "AI service not found. Please try again later."
+        case 429:
+            return "Too many requests. Please wait a moment and try again."
+        case 500...599:
+            return "AI service is temporarily unavailable. Please try again later."
+        default:
+            return "Connection error (code \(code)). Please try again."
+        }
+    }
+
+    /// User-friendly network error messages
+    private func networkErrorMessage(_ error: Error) -> String {
+        let nsError = error as NSError
+
+        switch nsError.code {
+        case NSURLErrorNotConnectedToInternet:
+            return "No internet connection. Please check your network."
+        case NSURLErrorTimedOut:
+            return "Request timed out. Check your connection and try again."
+        case NSURLErrorNetworkConnectionLost:
+            return "Connection lost. Please try again."
+        case NSURLErrorCannotFindHost, NSURLErrorCannotConnectToHost:
+            return "Cannot reach AI service. Please check your connection."
+        case NSURLErrorSecureConnectionFailed:
+            return "Secure connection failed. Please try again."
+        default:
+            return "Network error. Please check your connection."
+        }
+    }
+
+    /// User-friendly API error messages
+    private func userFriendlyAPIError(_ message: String) -> String {
+        let lowercased = message.lowercased()
+
+        if lowercased.contains("quota") || lowercased.contains("limit") {
+            return "API quota exceeded. Please try again later."
+        } else if lowercased.contains("invalid") && lowercased.contains("key") {
+            return "Invalid API key. Please check your settings."
+        } else if lowercased.contains("safety") || lowercased.contains("blocked") {
+            return "Content was filtered. Please try different input."
+        } else if lowercased.contains("model") && lowercased.contains("not found") {
+            return "AI model unavailable. Please try again later."
+        } else {
+            // Return a cleaned version of the message
+            return "AI error: \(message.prefix(100))"
+        }
+    }
+
+    /// Indicates if the error is retryable
+    var isRetryable: Bool {
+        switch self {
+        case .networkError, .httpError(500...599), .rateLimited, .timeout, .emptyResponse:
+            return true
+        case .httpError(429):
+            return true
+        default:
+            return false
         }
     }
 }
@@ -667,6 +781,163 @@ extension GeminiService {
     func storeAPIKey(_ key: String) {
         UserDefaults.standard.set(key, forKey: "gemini_api_key")
         configure(apiKey: key)
+    }
+}
+
+// MARK: - Celestial Task Card AI Methods
+
+extension GeminiService {
+
+    /// Generate comprehensive strategy for CelestialTaskCard
+    /// Returns rich AI guidance with overview, key points, actionable steps, and obstacles
+    func generateCelestialStrategy(task: TaskItem) async throws -> CelestialAIStrategy {
+        let notesSection = task.notes.map { "Notes: \($0)" } ?? ""
+        let dueDateSection = task.scheduledTime.map {
+            "Due: \($0.formatted(date: .abbreviated, time: .omitted))"
+        } ?? ""
+        let prioritySection = "Priority: \(task.priorityStars)"
+
+        let prompt = """
+        You are a world-class productivity mentor and task execution expert. Provide comprehensive, actionable guidance for completing this task.
+
+        TASK: "\(task.title)"
+        TYPE: \(task.taskType.displayName) (create/communicate/consume/coordinate)
+        \(prioritySection)
+        \(notesSection)
+        \(dueDateSection)
+
+        Provide:
+        1. An overview (2-3 sentences) explaining your strategic approach to this task
+        2. 3-5 key strategy points as bullet points
+        3. 3-5 specific actionable steps (FIRST step must take < 2 minutes to build momentum)
+        4. 2-3 potential obstacles or blockers to watch out for
+        5. Realistic time estimate in minutes
+        6. Your thought process explaining your reasoning
+
+        Respond in this exact JSON format:
+        {
+            "overview": "Strategic approach to this task (2-3 sentences)...",
+            "key_points": [
+                "Key strategy point 1",
+                "Key strategy point 2",
+                "Key strategy point 3"
+            ],
+            "actionable_steps": [
+                "First tiny step (<2 min) to build momentum",
+                "Second step...",
+                "Third step..."
+            ],
+            "potential_obstacles": [
+                "Potential blocker 1",
+                "Potential blocker 2"
+            ],
+            "estimated_minutes": 45,
+            "thought_process": "My reasoning for this approach..."
+        }
+
+        IMPORTANT GUIDELINES:
+        - Be specific and personalized to THIS task, not generic advice
+        - First actionable step must be tiny and immediate (open app, write first line, etc.)
+        - Consider task type when structuring advice:
+          * CREATE tasks: need deep focus blocks, minimize distractions
+          * COMMUNICATE tasks: clarity and preparation are key
+          * CONSUME tasks: active engagement beats passive reading
+          * COORDINATE tasks: batch similar tasks, set time limits
+        - Keep language concise but actionable
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.6)
+
+        guard let data = jsonResponse.data(using: .utf8) else {
+            throw GeminiError.parsingFailed
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        do {
+            let response = try decoder.decode(CelestialStrategyResponse.self, from: data)
+
+            return CelestialAIStrategy(
+                taskId: task.id,
+                overview: response.overview,
+                keyPoints: response.keyPoints,
+                actionableSteps: response.actionableSteps,
+                potentialObstacles: response.potentialObstacles,
+                estimatedMinutes: response.estimatedMinutes,
+                thoughtProcess: response.thoughtProcess,
+                generatedAt: Date(),
+                expiresAt: Date().addingTimeInterval(4 * 60 * 60) // 4 hours
+            )
+        } catch {
+            // Return fallback strategy on parsing failure
+            return CelestialAIStrategy.fallback(for: task)
+        }
+    }
+
+    /// Estimate task duration with confidence level and reasoning
+    /// Returns detailed estimate for CelestialTaskCard header
+    func estimateDuration(task: TaskItem) async throws -> (minutes: Int, confidence: String, reasoning: String) {
+        let notesSection = task.notes.map { "Notes: \($0)" } ?? ""
+
+        let prompt = """
+        Estimate how long this task will take for an average person.
+
+        TASK: "\(task.title)"
+        TYPE: \(task.taskType.displayName)
+        \(notesSection)
+
+        Consider:
+        - Task complexity and scope
+        - Typical time for similar tasks
+        - Required preparation and follow-up
+
+        Respond in this exact JSON format:
+        {
+            "minutes": 45,
+            "confidence": "high|medium|low",
+            "reasoning": "Brief explanation of your estimate (1-2 sentences)"
+        }
+
+        GUIDELINES:
+        - high confidence: Clear, well-defined task (e.g., "reply to email")
+        - medium confidence: Some unknowns but reasonable scope
+        - low confidence: Vague or complex task with many unknowns
+        - Be realistic - most tasks take longer than expected
+        - Round to sensible numbers (5, 10, 15, 20, 30, 45, 60, 90, 120)
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.4)
+
+        guard let data = jsonResponse.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            // Fallback based on task type
+            return estimateDurationFallback(for: task)
+        }
+
+        let minutes = json["minutes"] as? Int ?? 30
+        let confidence = json["confidence"] as? String ?? "medium"
+        let reasoning = json["reasoning"] as? String ?? "Estimated based on task type and complexity."
+
+        return (
+            minutes: min(max(minutes, 5), 480),  // Clamp 5 min to 8 hours
+            confidence: confidence,
+            reasoning: reasoning
+        )
+    }
+
+    /// Fallback duration estimate based on task type
+    private func estimateDurationFallback(for task: TaskItem) -> (minutes: Int, confidence: String, reasoning: String) {
+        switch task.taskType {
+        case .create:
+            return (90, "medium", "Creative tasks typically need 60-120 minutes of focused time")
+        case .communicate:
+            return (30, "medium", "Communication tasks usually take 15-45 minutes with preparation")
+        case .consume:
+            return (45, "medium", "Learning tasks work well in 30-60 minute focused sessions")
+        case .coordinate:
+            return (15, "high", "Administrative tasks are typically quick, 10-20 minutes")
+        }
     }
 }
 

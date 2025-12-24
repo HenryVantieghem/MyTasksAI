@@ -170,9 +170,81 @@ extension GeminiService {
         return try await generateText(prompt: prompt)
     }
 
-    // MARK: - YouTube Learning Resources
+    // MARK: - YouTube Search Queries (Smart Hybrid Approach)
 
-    /// Finds relevant YouTube tutorials for a task
+    /// Generate smart YouTube search queries for CelestialTaskCard
+    /// Uses AI to create relevant search queries that deep-link to YouTube search results
+    func generateYouTubeSearchQueries(
+        taskTitle: String,
+        context: String? = nil,
+        maxQueries: Int = 3
+    ) async throws -> [YouTubeSearchResource] {
+        let contextSection = context.map { "Additional context: \($0)" } ?? ""
+
+        let prompt = """
+        Generate \(maxQueries) YouTube search queries that would help someone complete this task.
+
+        TASK: "\(taskTitle)"
+        \(contextSection)
+
+        For each search query:
+        1. Create a specific, well-crafted YouTube search query (what someone would type)
+        2. A short display title for the UI (2-4 words)
+        3. Brief reasoning for why this search would help
+        4. Relevance score 0.0-1.0
+
+        Respond in this exact JSON format:
+        {
+            "queries": [
+                {
+                    "search_query": "how to write project proposal step by step tutorial",
+                    "display_title": "Proposal Writing",
+                    "reasoning": "Covers structure and key components",
+                    "relevance_score": 0.9
+                }
+            ]
+        }
+
+        IMPORTANT:
+        - Search queries should be specific and actionable
+        - Include tutorial-style terms (how to, guide, tips, tutorial)
+        - Order by relevance (most helpful first)
+        - Focus on skill-building, not entertainment
+        - Think about what a beginner would need to learn
+        """
+
+        let jsonResponse = try await generateJSON(prompt: prompt, temperature: 0.5)
+
+        guard let data = jsonResponse.data(using: .utf8) else {
+            // Fallback to pattern-based resources
+            return YouTubeSearchResource.fallbacks(for: taskTitle)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        do {
+            let response = try decoder.decode(YouTubeSearchQueryResponse.self, from: data)
+
+            return response.queries.prefix(maxQueries).map { item in
+                YouTubeSearchResource(
+                    searchQuery: item.searchQuery,
+                    displayTitle: item.displayTitle,
+                    reasoning: item.reasoning,
+                    relevanceScore: item.relevanceScore,
+                    createdAt: Date()
+                )
+            }
+        } catch {
+            // Fallback to pattern-based resources
+            return YouTubeSearchResource.fallbacks(for: taskTitle)
+        }
+    }
+
+    // MARK: - YouTube Learning Resources (Legacy)
+
+    /// Finds relevant YouTube tutorials for a task (legacy method)
+    @available(*, deprecated, message: "Use generateYouTubeSearchQueries instead")
     func findYouTubeResources(
         taskTitle: String,
         context: String? = nil,

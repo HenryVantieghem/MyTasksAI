@@ -32,8 +32,8 @@ struct BrainDumpInputView: View {
                     }
 
                 VStack(spacing: 0) {
-                    // Date selector for consistency
-                    TodayDateSelector(selectedDate: $selectedDate)
+                    // Date selector with Liquid Glass
+                    TodayPillView(selectedDate: $selectedDate)
                         .padding(.top, 24)
 
                     Spacer()
@@ -53,12 +53,12 @@ struct BrainDumpInputView: View {
                     if !viewModel.inputText.isEmpty {
                         processButton
                             .transition(.scale.combined(with: .opacity))
-                            .padding(.bottom, Theme.Spacing.xl)
+                            .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
                     }
                 }
             }
         }
-        .background(voidBackground)
+        .background { VoidBackground.brainDump }
         .onAppear {
             startAnimations()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -90,6 +90,20 @@ struct BrainDumpInputView: View {
                         withAnimation(.easeOut(duration: 0.3).delay(1)) {
                             showHint = true
                         }
+                    }
+                }
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button {
+                            HapticsService.shared.lightImpact()
+                            isFocused = false
+                        } label: {
+                            Image(systemName: "keyboard.chevron.compact.down")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(Theme.Colors.accent)
+                        }
+                        .accessibilityLabel("Dismiss keyboard")
                     }
                 }
         }
@@ -165,54 +179,6 @@ struct BrainDumpInputView: View {
                         .stroke(Color.white.opacity(0.2), lineWidth: 1)
                 )
         }
-    }
-
-    // MARK: - Void Background
-
-    private var voidBackground: some View {
-        ZStack {
-            // Deep black/dark gradient
-            LinearGradient(
-                colors: [
-                    Color(white: 0.02),
-                    Color(white: 0.05),
-                    Color(white: 0.03)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-
-            // Subtle ambient glow at bottom
-            RadialGradient(
-                colors: [
-                    Theme.Colors.aiPurple.opacity(0.15),
-                    Color.clear
-                ],
-                center: .bottom,
-                startRadius: 0,
-                endRadius: 400
-            )
-
-            // Very subtle stars/particles
-            GeometryReader { geo in
-                ForEach(0..<20, id: \.self) { index in
-                    Circle()
-                        .fill(Color.white.opacity(Double.random(in: 0.02...0.08)))
-                        .frame(width: CGFloat.random(in: 1...3))
-                        .position(
-                            x: CGFloat.random(in: 0...geo.size.width),
-                            y: CGFloat.random(in: 0...geo.size.height)
-                        )
-                        .animation(
-                            .easeInOut(duration: Double.random(in: 2...4))
-                                .repeatForever(autoreverses: true)
-                                .delay(Double.random(in: 0...2)),
-                            value: cursorOpacity
-                        )
-                }
-            }
-        }
-        .ignoresSafeArea()
     }
 
     // MARK: - Animations

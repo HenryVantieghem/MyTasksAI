@@ -13,7 +13,7 @@ import SwiftData
 
 @MainActor
 @Observable
-final class ChatTasksViewModel {
+final class ChatTasksViewModel: TaskActionDelegate {
     // MARK: State
     private(set) var tasks: [TaskItem] = []
     private(set) var isLoading: Bool = false
@@ -278,6 +278,32 @@ final class ChatTasksViewModel {
             try context.save()
         } catch {
             print("Failed to snooze task: \(error)")
+        }
+    }
+
+    // MARK: - TaskActionDelegate Conformance
+
+    nonisolated func taskDidComplete(_ task: TaskItem) {
+        Task { @MainActor in
+            _ = completeTask(task)
+        }
+    }
+
+    nonisolated func taskDidDelete(_ task: TaskItem) {
+        Task { @MainActor in
+            deleteTask(task)
+        }
+    }
+
+    nonisolated func taskDidDuplicate(_ task: TaskItem) {
+        Task { @MainActor in
+            duplicateTask(task)
+        }
+    }
+
+    nonisolated func taskDidSnooze(_ task: TaskItem) {
+        Task { @MainActor in
+            snoozeTask(task)
         }
     }
 }

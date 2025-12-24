@@ -20,51 +20,41 @@ struct SettingsPillView: View {
 
     var body: some View {
         Button(action: onTap) {
-            ZStack {
-                // Background circle (only when not transparent)
-                if !transparent {
-                    Circle()
-                        .fill(.ultraThinMaterial)
-                        .overlay(
-                            Circle()
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [
-                                            .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
-                                            .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 0.5
-                                )
-                        )
-                        .frame(width: 36, height: 36)
-                }
-
-                // Content
-                if let url = avatarUrl, let imageUrl = URL(string: url) {
-                    AsyncImage(url: imageUrl) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 32, height: 32)
-                                .clipShape(Circle())
-                        case .failure, .empty:
-                            fallbackContent
-                        @unknown default:
-                            fallbackContent
-                        }
-                    }
-                } else {
-                    fallbackContent
-                }
-            }
-            .frame(width: 36, height: 36)  // Consistent size whether transparent or not
+            pillContent
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var pillContent: some View {
+        let content = ZStack {
+            // Content
+            if let url = avatarUrl, let imageUrl = URL(string: url) {
+                AsyncImage(url: imageUrl) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    case .failure, .empty:
+                        fallbackContent
+                    @unknown default:
+                        fallbackContent
+                    }
+                }
+            } else {
+                fallbackContent
+            }
+        }
+        .frame(width: 40, height: 40)
+
+        if transparent {
+            content
+        } else {
+            content.liquidGlass(cornerRadius: 20)  // Circular liquid glass pill
+        }
     }
 
     // MARK: - Fallback Content

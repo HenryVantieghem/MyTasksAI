@@ -482,6 +482,9 @@ enum Theme {
 
         // Header
         static let universalHeaderHeight: CGFloat = 60
+
+        // Floating Tab Bar
+        static let floatingTabBarClearance: CGFloat = 100
     }
 
     // MARK: - Corner Radius

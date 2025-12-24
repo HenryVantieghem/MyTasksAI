@@ -98,6 +98,10 @@ struct AuthView: View {
                     .padding(.horizontal, Aurora.Layout.screenPadding)
                 }
             }
+            // Tap anywhere to dismiss keyboard
+            .onTapGesture {
+                focusedField = nil
+            }
         }
         .onAppear {
             withAnimation(Aurora.Animation.spring.delay(0.3)) {

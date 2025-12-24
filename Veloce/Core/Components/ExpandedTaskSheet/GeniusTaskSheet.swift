@@ -486,11 +486,13 @@ enum Emotion: String, CaseIterable {
 enum WorkMode: String, CaseIterable {
     case deepWork = "Deep Work"
     case pomodoro = "Pomodoro"
+    case flowState = "Flow State"
 
     var icon: String {
         switch self {
         case .deepWork: return "brain.head.profile"
         case .pomodoro: return "timer"
+        case .flowState: return "waveform.path.ecg"
         }
     }
 
@@ -498,6 +500,7 @@ enum WorkMode: String, CaseIterable {
         switch self {
         case .deepWork: return "90 min"
         case .pomodoro: return "25 min"
+        case .flowState: return "No limit"
         }
     }
 }
