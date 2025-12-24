@@ -49,6 +49,9 @@ final class AppViewModel {
     private let supabase = SupabaseService.shared
     private let gamification = GamificationService.shared
     private let sync = SyncService.shared
+    private let syncEngine = SyncEngine.shared
+    private let localStore = LocalDataStore.shared
+    private let offlineManager = OfflineManager.shared
     private let ai = AIService.shared
     private let haptics = HapticsService.shared
 
@@ -80,6 +83,12 @@ final class AppViewModel {
 
         // Configure AI service
         ai.loadConfiguration()
+
+        // Initialize local-first data store and sync engine
+        if let context = modelContext {
+            localStore.initialize(context: context)
+            syncEngine.initialize(context: context)
+        }
 
         // Configure subscription service
         Task {
@@ -163,11 +172,9 @@ final class AppViewModel {
             #endif
             appState = .authenticated
 
-            // Start background sync
-            if let context = modelContext {
-                Task {
-                    await sync.performFullSync(context: context)
-                }
+            // Start background sync with new sync engine
+            Task {
+                await syncEngine.performFullSync()
             }
         } catch {
             #if DEBUG

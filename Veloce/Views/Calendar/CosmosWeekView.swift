@@ -96,7 +96,7 @@ struct CosmosWeekView: View {
             Spacer()
                 .frame(width: 36)
 
-            ForEach(weekDays, id: \.self) { date in
+            ForEach(Array(weekDays.enumerated()), id: \.offset) { _, date in
                 VStack(spacing: 2) {
                     // Day name
                     Text(dayName(for: date))

@@ -29,6 +29,8 @@ struct VeloceApp: App {
             Achievement.self,
             TaskTemplate.self,
             NotesLine.self,
+            JournalEntry.self,
+            DailyChallenge.self,
             // Focus/App Blocking models
             FocusSessionRecord.self,
             FocusBlockList.self,
@@ -110,6 +112,7 @@ struct RootView: View {
 
             case .authenticated:
                 MainContainerView()
+                    .withOfflineOverlay()
             }
         }
         .animation(Theme.Animation.standard, value: appViewModel.appState)
