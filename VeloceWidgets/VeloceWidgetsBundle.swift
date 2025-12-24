@@ -2,8 +2,9 @@
 //  VeloceWidgetsBundle.swift
 //  VeloceWidgets
 //
-//  Widget Bundle - Multiple widgets for home screen
-//  Includes Tasks, Stats, Streak, and Quick Add widgets
+//  Widget Bundle - Living Cosmos Design System
+//  Complete widget suite for home screen experience
+//  Includes Tasks, Focus, XP, Calendar, Streak, Quick Add & more
 //
 
 import WidgetKit
@@ -12,19 +13,41 @@ import SwiftUI
 @main
 struct VeloceWidgetsBundle: WidgetBundle {
     var body: some Widget {
-        // Task list widget
+        // MARK: - Core Widgets
+
+        // Task list widget (Small, Medium, Large)
         VeloceTasksWidget()
 
-        // Daily progress ring widget
-        VeloceProgressWidget()
+        // Focus timer widget (Small)
+        VeloceFocusWidget()
 
-        // Streak flame widget
+        // XP/Level progress widget (Small, Medium)
+        VeloceXPWidget()
+
+        // Calendar widget (Small, Medium, Large)
+        VeloceCalendarWidget()
+
+        // MARK: - Gamification Widgets
+
+        // Streak flame widget (Small, Medium)
         VeloceStreakWidget()
 
-        // AI motivation quote widget
+        // Daily progress ring widget (Small + Lock Screen)
+        VeloceProgressWidget()
+
+        // MARK: - Quick Actions
+
+        // Quick add task widget (Small + Lock Screen)
+        VeloceQuickAddWidget()
+
+        // MARK: - Motivation
+
+        // AI motivation quote widget (Medium, Large)
         VeloceMotivationWidget()
 
-        // Live Activity for Pomodoro
+        // MARK: - Live Activities
+
+        // Live Activity for Focus Timer
         if #available(iOS 16.2, *) {
             PomodoroLiveActivity()
         }

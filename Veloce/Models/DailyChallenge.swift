@@ -10,9 +10,9 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-// MARK: - Challenge Type
+// MARK: - Daily Challenge Type
 
-enum ChallengeType: String, Codable, CaseIterable {
+enum DailyChallengeType: String, Codable, CaseIterable {
     case goalSprint = "goal_sprint"        // Make progress on a specific goal
     case focusPower = "focus_power"        // Complete X minutes of focused work
     case momentumBuilder = "momentum"      // Complete X tasks before noon
@@ -96,7 +96,7 @@ final class DailyChallenge {
     init(
         id: UUID = UUID(),
         userId: UUID? = nil,
-        type: ChallengeType,
+        type: DailyChallengeType,
         title: String,
         description: String,
         targetValue: Int,
@@ -121,8 +121,8 @@ final class DailyChallenge {
 
     // MARK: Computed Properties
 
-    var challengeType: ChallengeType {
-        ChallengeType(rawValue: type) ?? .taskMaster
+    var challengeType: DailyChallengeType {
+        DailyChallengeType(rawValue: type) ?? .taskMaster
     }
 
     var progress: Double {

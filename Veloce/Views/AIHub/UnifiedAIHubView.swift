@@ -140,7 +140,7 @@ struct JournalModeView: View {
                     .padding(.horizontal, Theme.Spacing.screenPadding)
 
                 // Journal entry area
-                JournalEntryCard(viewModel: viewModel, date: selectedDate)
+                AIHubJournalCard(viewModel: viewModel, date: selectedDate)
                     .padding(.horizontal, Theme.Spacing.screenPadding)
 
                 // AI Reflection (if available)
@@ -156,7 +156,7 @@ struct JournalModeView: View {
 
 // MARK: - Journal Entry Card
 
-struct JournalEntryCard: View {
+struct AIHubJournalCard: View {
     @Bindable var viewModel: JournalViewModel
     let date: Date
     @State private var entryText: String = ""

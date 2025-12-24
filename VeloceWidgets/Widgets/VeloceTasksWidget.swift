@@ -2,9 +2,9 @@
 //  VeloceTasksWidget.swift
 //  VeloceWidgets
 //
-//  Tasks Widget - Aurora Design System
+//  Tasks Widget - Living Cosmos Design
 //  Ethereal cosmic aesthetic with crystalline glass cards
-//  Shows upcoming tasks on home screen
+//  Shows upcoming tasks with priority stars and XP badge
 //
 
 import WidgetKit
@@ -19,7 +19,11 @@ struct VeloceTasksWidget: Widget {
         StaticConfiguration(kind: kind, provider: TasksTimelineProvider()) { entry in
             TasksWidgetView(entry: entry)
                 .containerBackground(for: .widget) {
-                    WidgetCosmicBackground(showStars: true, showAurora: true, auroraIntensity: 0.35)
+                    WidgetCosmicBackground(
+                        showStars: true,
+                        showAurora: true,
+                        auroraIntensity: entry.progress >= 1.0 ? 0.5 : 0.35
+                    )
                 }
         }
         .configurationDisplayName("Today's Tasks")
@@ -84,10 +88,25 @@ struct TasksEntry: TimelineEntry {
     let tasks: [WidgetTaskItem]
     let completedCount: Int
     let totalCount: Int
+    let xpEarned: Int
+    let streak: Int
+
+    init(date: Date, tasks: [WidgetTaskItem], completedCount: Int, totalCount: Int, xpEarned: Int = 0, streak: Int = 0) {
+        self.date = date
+        self.tasks = tasks
+        self.completedCount = completedCount
+        self.totalCount = totalCount
+        self.xpEarned = xpEarned
+        self.streak = streak
+    }
 
     var progress: Double {
         guard totalCount > 0 else { return 0 }
         return Double(completedCount) / Double(totalCount)
+    }
+
+    var isAllComplete: Bool {
+        totalCount > 0 && completedCount >= totalCount
     }
 }
 
@@ -98,6 +117,17 @@ struct WidgetTaskItem: Codable, Identifiable {
     let title: String
     let isCompleted: Bool
     let priority: String
+    let scheduledTime: String?
+    let starRating: Int?
+
+    init(id: UUID, title: String, isCompleted: Bool, priority: String, scheduledTime: String? = nil, starRating: Int? = nil) {
+        self.id = id
+        self.title = title
+        self.isCompleted = isCompleted
+        self.priority = priority
+        self.scheduledTime = scheduledTime
+        self.starRating = starRating
+    }
 
     var priorityColor: Color {
         switch priority.lowercased() {
@@ -115,6 +145,10 @@ struct WidgetTaskItem: Codable, Identifiable {
         case "low": return WidgetAurora.Colors.emerald.opacity(0.3)
         default: return Color.clear
         }
+    }
+
+    var starCount: Int {
+        starRating ?? (priority.lowercased() == "high" ? 3 : priority.lowercased() == "medium" ? 2 : 1)
     }
 }
 
@@ -140,184 +174,244 @@ struct TasksWidgetView: View {
     // MARK: - Small Widget
 
     private var smallWidget: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Header with aurora accent
-            HStack(spacing: 6) {
-                ZStack {
-                    Circle()
-                        .fill(WidgetAurora.Colors.violet.opacity(0.2))
-                        .frame(width: 24, height: 24)
+        Link(destination: URL(string: "veloce://tasks")!) {
+            VStack(alignment: .leading, spacing: 10) {
+                // Header with star icon
+                HStack(spacing: 6) {
+                    ZStack {
+                        Circle()
+                            .fill(WidgetAurora.Colors.gold.opacity(0.2))
+                            .frame(width: 24, height: 24)
 
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(WidgetAurora.Colors.violet)
-                }
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(WidgetAurora.Colors.gold)
+                    }
 
-                Text("Tasks")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                    Text("Tasks")
+                        .font(WidgetAurora.Typography.caption)
+                        .foregroundStyle(WidgetAurora.Colors.textSecondary)
 
-                Spacer()
-            }
+                    Spacer()
 
-            Spacer()
-
-            // Progress with aurora ring mini
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(entry.completedCount)")
-                        .font(WidgetAurora.Typography.largeNumber)
-                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
-
-                    Text("/ \(entry.totalCount)")
-                        .font(WidgetAurora.Typography.subheadline)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
-                }
-
-                // Aurora progress bar
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        // Track
-                        Capsule()
-                            .fill(WidgetAurora.Colors.glassBorder)
-                            .frame(height: 6)
-
-                        // Progress with glow
-                        Capsule()
-                            .fill(WidgetAurora.Gradients.aurora)
-                            .frame(width: max(6, geo.size.width * entry.progress), height: 6)
-                            .shadow(color: WidgetAurora.Colors.violet.opacity(0.5), radius: 4)
+                    // XP earned badge
+                    if entry.xpEarned > 0 {
+                        HStack(spacing: 2) {
+                            Image(systemName: "sparkle")
+                                .font(.system(size: 8))
+                            Text("+\(entry.xpEarned)")
+                                .font(WidgetAurora.Typography.micro)
+                        }
+                        .foregroundStyle(WidgetAurora.Colors.electric)
                     }
                 }
-                .frame(height: 6)
-            }
 
-            // Next task preview
-            if let nextTask = entry.tasks.first {
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(nextTask.priorityColor)
-                        .frame(width: 6, height: 6)
-                        .shadow(color: nextTask.priorityGlow, radius: 3)
+                Spacer()
 
-                    Text(nextTask.title)
-                        .font(WidgetAurora.Typography.micro)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
-                        .lineLimit(1)
+                // Progress display
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text("\(entry.completedCount)")
+                            .font(WidgetAurora.Typography.largeNumber)
+                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+
+                        Text("today")
+                            .font(WidgetAurora.Typography.caption)
+                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    }
+
+                    // Aurora progress bar
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(WidgetAurora.Colors.glassBorder)
+                                .frame(height: 6)
+
+                            Capsule()
+                                .fill(entry.isAllComplete ? WidgetAurora.Colors.success : WidgetAurora.Gradients.aurora)
+                                .frame(width: max(6, geo.size.width * entry.progress), height: 6)
+                                .shadow(color: (entry.isAllComplete ? WidgetAurora.Colors.success : WidgetAurora.Colors.violet).opacity(0.5), radius: 4)
+                        }
+                    }
+                    .frame(height: 6)
+                }
+
+                // Next task with star rating
+                if let nextTask = entry.tasks.first {
+                    HStack(spacing: 6) {
+                        // Star rating
+                        HStack(spacing: 2) {
+                            ForEach(0..<nextTask.starCount, id: \.self) { _ in
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 6))
+                                    .foregroundStyle(nextTask.priorityColor)
+                            }
+                        }
+
+                        Text(nextTask.title)
+                            .font(WidgetAurora.Typography.micro)
+                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .lineLimit(1)
+                    }
+                } else if entry.isAllComplete {
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.system(size: 10))
+                        Text("All done!")
+                            .font(WidgetAurora.Typography.micro)
+                    }
+                    .foregroundStyle(WidgetAurora.Colors.success)
                 }
             }
+            .padding(14)
         }
-        .padding(14)
     }
 
     // MARK: - Medium Widget
 
     private var mediumWidget: some View {
-        HStack(spacing: 16) {
-            // Left: Aurora progress ring
-            VStack(spacing: 8) {
-                ZStack {
-                    AuroraProgressRing(progress: entry.progress, size: 72, lineWidth: 7)
+        Link(destination: URL(string: "veloce://tasks")!) {
+            HStack(spacing: 16) {
+                // Left: Aurora progress ring with XP badge
+                VStack(spacing: 8) {
+                    ZStack {
+                        AuroraProgressRing(progress: entry.progress, size: 72, lineWidth: 7)
 
-                    VStack(spacing: 0) {
-                        Text("\(entry.completedCount)")
-                            .font(WidgetAurora.Typography.mediumNumber)
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                        VStack(spacing: 0) {
+                            Text("\(entry.completedCount)")
+                                .font(WidgetAurora.Typography.mediumNumber)
+                                .foregroundStyle(WidgetAurora.Colors.textPrimary)
 
-                        Text("of \(entry.totalCount)")
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
-                    }
-                }
-
-                Text("Today")
-                    .font(WidgetAurora.Typography.micro)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
-            }
-
-            // Divider with aurora gradient
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            WidgetAurora.Colors.glassBorder.opacity(0),
-                            WidgetAurora.Colors.glassBorder,
-                            WidgetAurora.Colors.glassBorder.opacity(0)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .frame(width: 1)
-                .padding(.vertical, 8)
-
-            // Right: Task list with glass cards
-            VStack(alignment: .leading, spacing: 6) {
-                ForEach(entry.tasks.prefix(3)) { task in
-                    HStack(spacing: 8) {
-                        // Priority indicator with glow
-                        ZStack {
-                            Circle()
-                                .fill(task.priorityGlow)
-                                .frame(width: 14, height: 14)
-                                .blur(radius: 3)
-
-                            Circle()
-                                .fill(task.priorityColor)
-                                .frame(width: 8, height: 8)
+                            Text("of \(entry.totalCount)")
+                                .font(WidgetAurora.Typography.micro)
+                                .foregroundStyle(WidgetAurora.Colors.textQuaternary)
                         }
-
-                        Text(task.title)
-                            .font(WidgetAurora.Typography.body)
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
-                            .lineLimit(1)
-
-                        Spacer()
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(WidgetAurora.Colors.glassBase)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(WidgetAurora.Colors.glassBorder, lineWidth: 0.5)
-                            )
-                    )
-                }
 
-                if entry.tasks.count > 3 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 10))
-                        Text("\(entry.tasks.count - 3) more")
+                    // XP earned badge
+                    if entry.xpEarned > 0 {
+                        WidgetStatPill(
+                            icon: "sparkle",
+                            value: "+\(entry.xpEarned) XP",
+                            color: WidgetAurora.Colors.electric
+                        )
+                    } else {
+                        Text("Today")
                             .font(WidgetAurora.Typography.micro)
+                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
                     }
-                    .foregroundStyle(WidgetAurora.Colors.electric)
-                    .padding(.leading, 4)
                 }
 
-                Spacer()
+                // Divider with aurora gradient
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                WidgetAurora.Colors.glassBorder.opacity(0),
+                                WidgetAurora.Colors.violet.opacity(0.3),
+                                WidgetAurora.Colors.glassBorder.opacity(0)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 1)
+                    .padding(.vertical, 8)
+
+                // Right: Task list with star ratings
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(entry.tasks.prefix(3)) { task in
+                        Link(destination: URL(string: "veloce://task/\(task.id.uuidString)")!) {
+                            HStack(spacing: 8) {
+                                // Star rating indicator
+                                HStack(spacing: 2) {
+                                    ForEach(0..<task.starCount, id: \.self) { _ in
+                                        Image(systemName: "star.fill")
+                                            .font(.system(size: 7))
+                                            .foregroundStyle(task.priorityColor)
+                                    }
+                                }
+                                .frame(width: 28, alignment: .leading)
+
+                                Text(task.title)
+                                    .font(WidgetAurora.Typography.body)
+                                    .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                                    .lineLimit(1)
+
+                                Spacer()
+
+                                // Time if scheduled
+                                if let time = task.scheduledTime {
+                                    Text(time)
+                                        .font(WidgetAurora.Typography.micro)
+                                        .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(WidgetAurora.Colors.glassBase)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(task.priorityColor.opacity(0.15), lineWidth: 0.5)
+                                    )
+                            )
+                        }
+                    }
+
+                    if entry.tasks.count > 3 {
+                        HStack(spacing: 4) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 10))
+                            Text("\(entry.tasks.count - 3) more")
+                                .font(WidgetAurora.Typography.micro)
+                        }
+                        .foregroundStyle(WidgetAurora.Colors.cyan)
+                        .padding(.leading, 4)
+                    } else if entry.isAllComplete {
+                        HStack(spacing: 4) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 10))
+                            Text("All tasks complete!")
+                                .font(WidgetAurora.Typography.micro)
+                        }
+                        .foregroundStyle(WidgetAurora.Colors.success)
+                        .padding(.leading, 4)
+                    }
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
         }
-        .padding(16)
     }
 
     // MARK: - Large Widget
 
     private var largeWidget: some View {
         VStack(alignment: .leading, spacing: 14) {
-            // Header with aurora orb
+            // Header with aurora orb and XP
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Today's Tasks")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(WidgetAurora.Colors.textPrimary)
 
-                    Text("\(entry.completedCount) of \(entry.totalCount) completed")
-                        .font(WidgetAurora.Typography.caption)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    HStack(spacing: 8) {
+                        Text("\(entry.completedCount) of \(entry.totalCount) completed")
+                            .font(WidgetAurora.Typography.caption)
+                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                        if entry.xpEarned > 0 {
+                            WidgetStatPill(
+                                icon: "sparkle",
+                                value: "+\(entry.xpEarned)",
+                                color: WidgetAurora.Colors.electric
+                            )
+                        }
+                    }
                 }
 
                 Spacer()
@@ -326,9 +420,15 @@ struct TasksWidgetView: View {
                 ZStack {
                     AuroraProgressRing(progress: entry.progress, size: 44, lineWidth: 4, showGlow: false)
 
-                    Text("\(Int(entry.progress * 100))%")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                    if entry.isAllComplete {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(WidgetAurora.Colors.success)
+                    } else {
+                        Text("\(Int(entry.progress * 100))%")
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                    }
                 }
             }
 
@@ -347,64 +447,88 @@ struct TasksWidgetView: View {
                 )
                 .frame(height: 1)
 
-            // Task list with glass styling
+            // Task list with glass styling and star ratings
             VStack(spacing: 8) {
-                ForEach(entry.tasks) { task in
-                    HStack(spacing: 12) {
-                        // Checkbox with aurora styling
-                        ZStack {
-                            Circle()
-                                .stroke(task.priorityColor.opacity(0.5), lineWidth: 1.5)
-                                .frame(width: 22, height: 22)
-
-                            if task.isCompleted {
+                ForEach(entry.tasks.prefix(6)) { task in
+                    Link(destination: URL(string: "veloce://task/\(task.id.uuidString)")!) {
+                        HStack(spacing: 12) {
+                            // Star rating with checkbox
+                            ZStack {
                                 Circle()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [task.priorityColor, task.priorityColor.opacity(0.7)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
+                                    .stroke(task.priorityColor.opacity(0.5), lineWidth: 1.5)
                                     .frame(width: 22, height: 22)
-                                    .shadow(color: task.priorityGlow, radius: 4)
 
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundStyle(.white)
+                                if task.isCompleted {
+                                    Circle()
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [task.priorityColor, task.priorityColor.opacity(0.7)],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .frame(width: 22, height: 22)
+                                        .shadow(color: task.priorityGlow, radius: 4)
+
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white)
+                                }
+                            }
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(task.title)
+                                    .font(WidgetAurora.Typography.subheadline)
+                                    .strikethrough(task.isCompleted, color: WidgetAurora.Colors.textQuaternary)
+                                    .foregroundStyle(task.isCompleted ? WidgetAurora.Colors.textQuaternary : WidgetAurora.Colors.textPrimary)
+                                    .lineLimit(1)
+
+                                // Star rating row
+                                HStack(spacing: 3) {
+                                    ForEach(0..<task.starCount, id: \.self) { _ in
+                                        Image(systemName: "star.fill")
+                                            .font(.system(size: 7))
+                                            .foregroundStyle(task.priorityColor.opacity(task.isCompleted ? 0.4 : 1))
+                                    }
+
+                                    if let time = task.scheduledTime {
+                                        Text("•")
+                                            .font(.system(size: 8))
+                                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                        Text(time)
+                                            .font(WidgetAurora.Typography.micro)
+                                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                    }
+                                }
+                            }
+
+                            Spacer()
+
+                            // Points earned if completed
+                            if task.isCompleted {
+                                Text("+10")
+                                    .font(WidgetAurora.Typography.micro)
+                                    .foregroundStyle(WidgetAurora.Colors.success)
                             }
                         }
-
-                        Text(task.title)
-                            .font(WidgetAurora.Typography.subheadline)
-                            .strikethrough(task.isCompleted, color: WidgetAurora.Colors.textQuaternary)
-                            .foregroundStyle(task.isCompleted ? WidgetAurora.Colors.textQuaternary : WidgetAurora.Colors.textPrimary)
-
-                        Spacer()
-
-                        // Priority pill
-                        Circle()
-                            .fill(task.priorityColor)
-                            .frame(width: 8, height: 8)
-                            .shadow(color: task.priorityGlow, radius: 3)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(WidgetAurora.Colors.glassBase)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(task.priorityColor.opacity(0.1), lineWidth: 0.5)
+                                )
+                        )
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(WidgetAurora.Colors.glassBase)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(WidgetAurora.Colors.glassBorder, lineWidth: 0.5)
-                            )
-                    )
                 }
             }
 
             Spacer()
 
-            // Open app button with aurora gradient
-            WidgetAuroraButton("Open MyTasksAI", icon: "arrow.right", url: URL(string: "veloce://tasks")!)
+            // Quick add button
+            WidgetAuroraButton("Add Task", icon: "plus", url: URL(string: "veloce://add-task")!)
         }
         .padding(16)
     }

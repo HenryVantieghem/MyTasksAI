@@ -646,12 +646,12 @@ struct PlasmaEnergyCore: View {
                     if !isCompleted && !reduceMotion {
                         SwiftUI.Circle()
                             .strokeBorder(
-                                coreColor.opacity(0.3 + (attentionRingPhase * 0.2)),
+                                coreColor.opacity(0.3 + Double(attentionRingPhase) * 0.2),
                                 lineWidth: 2
                             )
                             .frame(width: size * 1.5, height: size * 1.5)
                             .scaleEffect(1.0 + (attentionRingPhase * 0.15))
-                            .opacity(1 - (attentionRingPhase * 0.5))
+                            .opacity(1.0 - Double(attentionRingPhase) * 0.5)
                     }
 
                     // Outer glow ring
@@ -729,7 +729,7 @@ struct PlasmaEnergyCore: View {
                 Text("tap")
                     .font(.system(size: 9, weight: .medium))
                     .foregroundStyle(Theme.CelestialColors.starGhost)
-                    .opacity(reduceMotion ? 0.6 : 0.4 + (attentionRingPhase * 0.2))
+                    .opacity(reduceMotion ? 0.6 : 0.4 + Double(attentionRingPhase) * 0.2)
             }
         }
         .onAppear {

@@ -500,27 +500,622 @@ struct WidgetAuroraButton: View {
     }
 }
 
+// MARK: - Focus Timer Ring
+
+struct FocusTimerRing: View {
+    let progress: Double
+    let state: FocusTimerState
+    let size: CGFloat
+    let lineWidth: CGFloat
+
+    enum FocusTimerState {
+        case idle, active, paused, breakTime
+
+        var primaryColor: Color {
+            switch self {
+            case .idle: return WidgetAurora.Colors.textQuaternary
+            case .active: return Color(red: 1.0, green: 0.55, blue: 0.20) // Amber/Orange
+            case .paused: return WidgetAurora.Colors.gold
+            case .breakTime: return WidgetAurora.Colors.emerald
+            }
+        }
+
+        var secondaryColor: Color {
+            switch self {
+            case .idle: return WidgetAurora.Colors.glassBorder
+            case .active: return Color(red: 1.0, green: 0.35, blue: 0.15) // Deep orange
+            case .paused: return WidgetAurora.Colors.flameInner
+            case .breakTime: return WidgetAurora.Colors.cyan
+            }
+        }
+
+        var glowColor: Color {
+            switch self {
+            case .idle: return .clear
+            case .active: return Color(red: 1.0, green: 0.55, blue: 0.20).opacity(0.4)
+            case .paused: return WidgetAurora.Colors.gold.opacity(0.3)
+            case .breakTime: return WidgetAurora.Colors.emerald.opacity(0.3)
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .idle: return "play.fill"
+            case .active: return "timer"
+            case .paused: return "pause.fill"
+            case .breakTime: return "cup.and.saucer.fill"
+            }
+        }
+    }
+
+    init(progress: Double, state: FocusTimerState = .active, size: CGFloat = 80, lineWidth: CGFloat = 8) {
+        self.progress = progress
+        self.state = state
+        self.size = size
+        self.lineWidth = lineWidth
+    }
+
+    var body: some View {
+        ZStack {
+            // Ambient glow
+            if state != .idle {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [state.glowColor, state.glowColor.opacity(0.1), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: size * 0.8
+                        )
+                    )
+                    .frame(width: size * 1.6, height: size * 1.6)
+                    .blur(radius: 10)
+            }
+
+            // Background ring
+            Circle()
+                .stroke(WidgetAurora.Colors.glassBorder, lineWidth: lineWidth)
+                .frame(width: size, height: size)
+
+            // Progress ring with gradient
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(
+                    AngularGradient(
+                        colors: [state.primaryColor, state.secondaryColor, state.primaryColor],
+                        center: .center
+                    ),
+                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                )
+                .frame(width: size, height: size)
+                .rotationEffect(.degrees(-90))
+                .shadow(color: state.glowColor, radius: 6)
+
+            // End cap glow
+            if progress > 0.02 && state != .idle {
+                Circle()
+                    .fill(state.primaryColor)
+                    .frame(width: lineWidth * 0.8, height: lineWidth * 0.8)
+                    .offset(y: -size / 2)
+                    .rotationEffect(.degrees(360 * progress - 90))
+                    .shadow(color: state.primaryColor.opacity(0.8), radius: 4)
+            }
+        }
+    }
+}
+
+// MARK: - Level Badge
+
+struct LevelBadge: View {
+    let level: Int
+    let size: LevelBadgeSize
+
+    enum LevelBadgeSize {
+        case small, medium, large
+
+        var dimension: CGFloat {
+            switch self {
+            case .small: return 32
+            case .medium: return 44
+            case .large: return 56
+            }
+        }
+
+        var fontSize: CGFloat {
+            switch self {
+            case .small: return 12
+            case .medium: return 16
+            case .large: return 20
+            }
+        }
+
+        var iconSize: CGFloat {
+            switch self {
+            case .small: return 8
+            case .medium: return 10
+            case .large: return 12
+            }
+        }
+    }
+
+    private var tierColors: (primary: Color, secondary: Color) {
+        switch level {
+        case 1...9: return (WidgetAurora.Colors.emerald, WidgetAurora.Colors.cyan)
+        case 10...24: return (WidgetAurora.Colors.electric, WidgetAurora.Colors.violet)
+        case 25...49: return (WidgetAurora.Colors.gold, WidgetAurora.Colors.flameInner)
+        case 50...99: return (WidgetAurora.Colors.rose, WidgetAurora.Colors.violet)
+        default: return (WidgetAurora.Colors.violet, Color.white) // Diamond tier
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            // Outer glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [tierColors.primary.opacity(0.4), .clear],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size.dimension * 0.8
+                    )
+                )
+                .frame(width: size.dimension * 1.4, height: size.dimension * 1.4)
+                .blur(radius: 6)
+
+            // Badge background
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [tierColors.primary, tierColors.secondary],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: size.dimension, height: size.dimension)
+                .overlay(
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.4), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                )
+                .shadow(color: tierColors.primary.opacity(0.5), radius: 4)
+
+            // Star icon at top
+            Image(systemName: "star.fill")
+                .font(.system(size: size.iconSize, weight: .bold))
+                .foregroundStyle(.white.opacity(0.9))
+                .offset(y: -size.dimension * 0.28)
+
+            // Level number
+            Text("\(level)")
+                .font(.system(size: size.fontSize, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .offset(y: 2)
+        }
+    }
+}
+
+// MARK: - XP Progress Bar
+
+struct XPProgressBar: View {
+    let currentXP: Int
+    let requiredXP: Int
+    let height: CGFloat
+
+    private var progress: Double {
+        guard requiredXP > 0 else { return 0 }
+        return min(1.0, Double(currentXP) / Double(requiredXP))
+    }
+
+    init(currentXP: Int, requiredXP: Int, height: CGFloat = 8) {
+        self.currentXP = currentXP
+        self.requiredXP = requiredXP
+        self.height = height
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                // Track with subtle gradient
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                WidgetAurora.Colors.glassBorder.opacity(0.5),
+                                WidgetAurora.Colors.glassBorder
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(height: height)
+
+                // Progress fill with gold gradient
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                WidgetAurora.Colors.gold,
+                                WidgetAurora.Colors.flameInner,
+                                WidgetAurora.Colors.gold
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: max(height, geo.size.width * progress), height: height)
+                    .shadow(color: WidgetAurora.Colors.gold.opacity(0.5), radius: 4)
+
+                // Shimmer highlight
+                if progress > 0.1 {
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, .white.opacity(0.3), .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: min(30, geo.size.width * progress * 0.4), height: height * 0.4)
+                        .offset(x: geo.size.width * progress * 0.3, y: -height * 0.15)
+                }
+            }
+        }
+        .frame(height: height)
+    }
+}
+
+// MARK: - Quick Add Button
+
+struct QuickAddButton: View {
+    let size: CGFloat
+
+    init(size: CGFloat = 60) {
+        self.size = size
+    }
+
+    var body: some View {
+        ZStack {
+            // Outer pulsing glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            WidgetAurora.Colors.cyan.opacity(0.3),
+                            WidgetAurora.Colors.violet.opacity(0.2),
+                            .clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size * 0.9
+                    )
+                )
+                .frame(width: size * 1.6, height: size * 1.6)
+                .blur(radius: 12)
+
+            // Button background with gradient
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            WidgetAurora.Colors.violet,
+                            WidgetAurora.Colors.electric,
+                            WidgetAurora.Colors.cyan
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: size, height: size)
+                .overlay(
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.4), .white.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
+                )
+                .shadow(color: WidgetAurora.Colors.violet.opacity(0.4), radius: 8, y: 2)
+
+            // Plus icon
+            Image(systemName: "plus")
+                .font(.system(size: size * 0.4, weight: .semibold))
+                .foregroundStyle(.white)
+        }
+    }
+}
+
+// MARK: - Calendar Date Display
+
+struct CalendarDateDisplay: View {
+    let date: Date
+    let size: CalendarDisplaySize
+
+    enum CalendarDisplaySize {
+        case compact, full
+    }
+
+    private var dayNumber: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter.string(from: date)
+    }
+
+    private var dayName: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter.string(from: date).uppercased()
+    }
+
+    private var monthName: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM"
+        return formatter.string(from: date).uppercased()
+    }
+
+    var body: some View {
+        VStack(spacing: size == .compact ? 2 : 4) {
+            // Day name
+            Text(dayName)
+                .font(.system(size: size == .compact ? 10 : 12, weight: .semibold))
+                .foregroundStyle(WidgetAurora.Colors.cyan)
+
+            // Day number with dramatic styling
+            Text(dayNumber)
+                .font(.system(size: size == .compact ? 32 : 42, weight: .thin, design: .rounded))
+                .foregroundStyle(WidgetAurora.Colors.textPrimary)
+
+            // Month
+            Text(monthName)
+                .font(.system(size: size == .compact ? 9 : 11, weight: .medium))
+                .foregroundStyle(WidgetAurora.Colors.textTertiary)
+        }
+    }
+}
+
+// MARK: - Event Card (for Calendar Widget)
+
+struct WidgetEventCard: View {
+    let title: String
+    let time: String
+    let color: Color
+    let isTask: Bool
+
+    var body: some View {
+        HStack(spacing: 8) {
+            // Color indicator bar
+            RoundedRectangle(cornerRadius: 2)
+                .fill(color)
+                .frame(width: 3)
+                .shadow(color: color.opacity(0.5), radius: 2)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(WidgetAurora.Typography.body)
+                    .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                    .lineLimit(1)
+
+                HStack(spacing: 4) {
+                    Image(systemName: isTask ? "checkmark.circle" : "calendar")
+                        .font(.system(size: 9))
+                    Text(time)
+                        .font(WidgetAurora.Typography.micro)
+                }
+                .foregroundStyle(WidgetAurora.Colors.textTertiary)
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(WidgetAurora.Colors.glassBase)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(color.opacity(0.2), lineWidth: 0.5)
+                )
+        )
+    }
+}
+
+// MARK: - Cosmic Orb (for visual flair)
+
+struct CosmicOrb: View {
+    let size: CGFloat
+    let primaryColor: Color
+    let secondaryColor: Color
+
+    init(size: CGFloat = 40, primaryColor: Color = WidgetAurora.Colors.violet, secondaryColor: Color = WidgetAurora.Colors.electric) {
+        self.size = size
+        self.primaryColor = primaryColor
+        self.secondaryColor = secondaryColor
+    }
+
+    var body: some View {
+        ZStack {
+            // Outer glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [primaryColor.opacity(0.4), secondaryColor.opacity(0.2), .clear],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: size
+                    )
+                )
+                .frame(width: size * 2, height: size * 2)
+                .blur(radius: 8)
+
+            // Main orb
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [primaryColor, secondaryColor],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: size, height: size)
+                .overlay(
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.4), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .center
+                            ),
+                            lineWidth: 1
+                        )
+                )
+                .shadow(color: primaryColor.opacity(0.5), radius: 6)
+
+            // Inner highlight
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [.white.opacity(0.3), .clear],
+                        center: UnitPoint(x: 0.3, y: 0.3),
+                        startRadius: 0,
+                        endRadius: size * 0.4
+                    )
+                )
+                .frame(width: size * 0.6, height: size * 0.6)
+                .offset(x: -size * 0.15, y: -size * 0.15)
+        }
+    }
+}
+
 // MARK: - Preview
 
 #Preview("Design System") {
-    VStack(spacing: 20) {
-        // Progress Ring
-        AuroraProgressRing(progress: 0.7, size: 100, lineWidth: 10)
+    ScrollView {
+        VStack(spacing: 24) {
+            // Aurora Progress Ring
+            VStack(spacing: 8) {
+                Text("Progress Rings")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
 
-        // Flame
-        HStack(spacing: 20) {
-            AuroraFlame(intensity: .spark, size: 30)
-            AuroraFlame(intensity: .flame, size: 40)
-            AuroraFlame(intensity: .inferno, size: 50)
-        }
+                HStack(spacing: 20) {
+                    AuroraProgressRing(progress: 0.3, size: 60, lineWidth: 6)
+                    AuroraProgressRing(progress: 0.7, size: 80, lineWidth: 8)
+                    FocusTimerRing(progress: 0.5, state: .active, size: 60, lineWidth: 6)
+                }
+            }
 
-        // Stat Pills
-        HStack(spacing: 8) {
-            WidgetStatPill(icon: "checkmark.circle.fill", value: "5", color: WidgetAurora.Colors.success)
-            WidgetStatPill(icon: "flame.fill", value: "7", color: WidgetAurora.Colors.flameInner)
-            WidgetStatPill(icon: "star.fill", value: "12", color: WidgetAurora.Colors.gold)
+            // Flames
+            VStack(spacing: 8) {
+                Text("Flame Intensities")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                HStack(spacing: 16) {
+                    AuroraFlame(intensity: .spark, size: 28)
+                    AuroraFlame(intensity: .kindle, size: 32)
+                    AuroraFlame(intensity: .flame, size: 36)
+                    AuroraFlame(intensity: .blaze, size: 40)
+                    AuroraFlame(intensity: .inferno, size: 44)
+                }
+            }
+
+            // Level Badges
+            VStack(spacing: 8) {
+                Text("Level Badges")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                HStack(spacing: 16) {
+                    LevelBadge(level: 5, size: .small)
+                    LevelBadge(level: 15, size: .medium)
+                    LevelBadge(level: 35, size: .medium)
+                    LevelBadge(level: 100, size: .large)
+                }
+            }
+
+            // XP Progress Bar
+            VStack(spacing: 8) {
+                Text("XP Progress")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                XPProgressBar(currentXP: 750, requiredXP: 1000, height: 10)
+                    .frame(width: 200)
+            }
+
+            // Stat Pills
+            VStack(spacing: 8) {
+                Text("Stat Pills")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                HStack(spacing: 8) {
+                    WidgetStatPill(icon: "checkmark.circle.fill", value: "5", color: WidgetAurora.Colors.success)
+                    WidgetStatPill(icon: "flame.fill", value: "7", color: WidgetAurora.Colors.flameInner)
+                    WidgetStatPill(icon: "star.fill", value: "Lv 12", color: WidgetAurora.Colors.gold)
+                }
+            }
+
+            // Quick Add Button
+            VStack(spacing: 8) {
+                Text("Quick Add")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                QuickAddButton(size: 50)
+            }
+
+            // Calendar Display
+            VStack(spacing: 8) {
+                Text("Date Display")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                CalendarDateDisplay(date: Date(), size: .full)
+            }
+
+            // Event Card
+            VStack(spacing: 8) {
+                Text("Event Cards")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                WidgetEventCard(
+                    title: "Team standup",
+                    time: "9:00 AM",
+                    color: WidgetAurora.Colors.electric,
+                    isTask: false
+                )
+                .frame(width: 200)
+
+                WidgetEventCard(
+                    title: "Complete project",
+                    time: "2:00 PM",
+                    color: WidgetAurora.Colors.violet,
+                    isTask: true
+                )
+                .frame(width: 200)
+            }
+
+            // Cosmic Orb
+            VStack(spacing: 8) {
+                Text("Cosmic Orb")
+                    .font(WidgetAurora.Typography.caption)
+                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+
+                CosmicOrb(size: 40)
+            }
         }
+        .padding(20)
     }
-    .padding()
-    .background(WidgetCosmicBackground())
+    .background(WidgetCosmicBackground(starCount: 25))
 }

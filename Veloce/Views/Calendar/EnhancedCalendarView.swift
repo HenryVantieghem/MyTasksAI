@@ -2,8 +2,9 @@
 //  EnhancedCalendarView.swift
 //  Veloce
 //
-//  Time Stream Calendar - iOS 26 Tiimo-Style Visual Planner
-//  Vertical timeline with drag-to-reschedule and Apple Calendar integration
+//  Living Cosmos Calendar - Visual Planner
+//  Cosmic timeline with plasma effects, drag-to-reschedule,
+//  and Apple Calendar integration
 //
 
 import SwiftUI
@@ -11,12 +12,12 @@ import SwiftData
 
 // MARK: - Enhanced Calendar View
 
-/// Main calendar entry point - delegates to TiimoCalendarView
+/// Main calendar entry point - delegates to CosmosCalendarView
 struct EnhancedCalendarView: View {
     @Bindable var viewModel: CalendarViewModel
 
     var body: some View {
-        TiimoCalendarView(viewModel: viewModel)
+        CosmosCalendarView(viewModel: viewModel)
     }
 }
 

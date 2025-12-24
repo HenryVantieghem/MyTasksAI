@@ -2,9 +2,10 @@
 //  VeloceStreakWidget.swift
 //  VeloceWidgets
 //
-//  Streak Widget - Aurora Design System
+//  Streak Widget - Living Cosmos Design
 //  Ethereal flame with cosmic aurora glow
 //  Shows productivity streak with gamification
+//  "Don't break the chain!" motivation
 //
 
 import WidgetKit
@@ -22,13 +23,13 @@ struct VeloceStreakWidget: Widget {
                     WidgetCosmicBackground(
                         showStars: true,
                         showAurora: true,
-                        auroraIntensity: entry.streak > 7 ? 0.45 : 0.35
+                        auroraIntensity: entry.streak > 7 ? 0.5 : 0.35
                     )
                 }
         }
         .configurationDisplayName("Streak Flame")
         .description("Keep your productivity streak alive!")
-        .supportedFamilies([.systemSmall, .accessoryCircular])
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular])
     }
 }
 
@@ -77,6 +78,18 @@ struct StreakEntry: TimelineEntry {
     let longestStreak: Int
     let level: Int
     let xp: Int
+    let tasksCompletedToday: Int
+    let dailyGoalMet: Bool
+
+    init(date: Date, streak: Int, longestStreak: Int, level: Int, xp: Int, tasksCompletedToday: Int = 0, dailyGoalMet: Bool = false) {
+        self.date = date
+        self.streak = streak
+        self.longestStreak = longestStreak
+        self.level = level
+        self.xp = xp
+        self.tasksCompletedToday = tasksCompletedToday
+        self.dailyGoalMet = dailyGoalMet
+    }
 
     var flameIntensity: AuroraFlame.FlameIntensity {
         switch streak {
@@ -100,6 +113,11 @@ struct StreakEntry: TimelineEntry {
         }
     }
 
+    var streakWarning: String? {
+        guard streak > 0 && !dailyGoalMet else { return nil }
+        return "Complete today's goal!"
+    }
+
     var accentColor: Color {
         switch streak {
         case 0: return WidgetAurora.Colors.textQuaternary
@@ -108,6 +126,22 @@ struct StreakEntry: TimelineEntry {
         case 14...29: return WidgetAurora.Colors.rose
         default: return WidgetAurora.Colors.violet
         }
+    }
+
+    var streakTierName: String {
+        switch streak {
+        case 0: return "No Streak"
+        case 1...2: return "Spark"
+        case 3...6: return "Kindling"
+        case 7...13: return "Flame"
+        case 14...29: return "Blaze"
+        case 30...99: return "Inferno"
+        default: return "Phoenix"
+        }
+    }
+
+    var isPersonalBest: Bool {
+        streak > 0 && streak >= longestStreak
     }
 }
 
@@ -121,6 +155,8 @@ struct StreakWidgetView: View {
         switch family {
         case .systemSmall:
             smallWidget
+        case .systemMedium:
+            mediumWidget
         case .accessoryCircular:
             circularAccessory
         default:
@@ -131,49 +167,176 @@ struct StreakWidgetView: View {
     // MARK: - Small Widget
 
     private var smallWidget: some View {
-        VStack(spacing: 8) {
-            // Aurora flame with glow
-            AuroraFlame(intensity: entry.flameIntensity, size: 48)
+        Link(destination: URL(string: "veloce://momentum")!) {
+            VStack(spacing: 8) {
+                // Aurora flame with glow
+                AuroraFlame(intensity: entry.flameIntensity, size: 48)
 
-            // Streak count with aurora styling
-            VStack(spacing: 4) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(entry.streak)")
-                        .font(WidgetAurora.Typography.largeNumber)
-                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                // Streak count with aurora styling
+                VStack(spacing: 4) {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text("\(entry.streak)")
+                            .font(WidgetAurora.Typography.largeNumber)
+                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
 
-                    Text(entry.streak == 1 ? "day" : "days")
-                        .font(WidgetAurora.Typography.caption)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                        Text(entry.streak == 1 ? "day" : "days")
+                            .font(WidgetAurora.Typography.caption)
+                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    }
+
+                    // Motivation text with glow
+                    Text(entry.motivationText)
+                        .font(WidgetAurora.Typography.micro)
+                        .foregroundStyle(entry.accentColor)
+                        .shadow(color: entry.accentColor.opacity(0.4), radius: 3)
                 }
 
-                // Motivation text with glow
-                Text(entry.motivationText)
-                    .font(WidgetAurora.Typography.micro)
-                    .foregroundStyle(entry.accentColor)
-                    .shadow(color: entry.accentColor.opacity(0.4), radius: 3)
-            }
+                // Warning or stats
+                if let warning = entry.streakWarning {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 10))
+                        Text(warning)
+                            .font(WidgetAurora.Typography.micro)
+                    }
+                    .foregroundStyle(WidgetAurora.Colors.warning)
+                } else if entry.streak > 0 {
+                    HStack(spacing: 12) {
+                        WidgetStatPill(
+                            icon: "star.fill",
+                            value: "Lv \(entry.level)",
+                            color: WidgetAurora.Colors.gold
+                        )
 
-            // Level badge with aurora styling
-            if entry.streak > 0 {
-                HStack(spacing: 12) {
-                    // Level
-                    WidgetStatPill(
-                        icon: "star.fill",
-                        value: "Lv \(entry.level)",
-                        color: WidgetAurora.Colors.gold
-                    )
-
-                    // XP
-                    WidgetStatPill(
-                        icon: "sparkle",
-                        value: formatXP(entry.xp),
-                        color: WidgetAurora.Colors.electric
-                    )
+                        WidgetStatPill(
+                            icon: "sparkle",
+                            value: formatXP(entry.xp),
+                            color: WidgetAurora.Colors.electric
+                        )
+                    }
                 }
             }
+            .padding(14)
         }
-        .padding(14)
+    }
+
+    // MARK: - Medium Widget
+
+    private var mediumWidget: some View {
+        Link(destination: URL(string: "veloce://momentum")!) {
+            HStack(spacing: 20) {
+                // Left: Large flame with tier info
+                VStack(spacing: 8) {
+                    AuroraFlame(intensity: entry.flameIntensity, size: 60)
+
+                    VStack(spacing: 2) {
+                        Text(entry.streakTierName)
+                            .font(WidgetAurora.Typography.caption)
+                            .foregroundStyle(entry.accentColor)
+
+                        if entry.isPersonalBest && entry.streak > 0 {
+                            HStack(spacing: 3) {
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 9))
+                                Text("Personal Best!")
+                                    .font(WidgetAurora.Typography.micro)
+                            }
+                            .foregroundStyle(WidgetAurora.Colors.gold)
+                        }
+                    }
+                }
+                .frame(width: 90)
+
+                // Divider with flame gradient
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                WidgetAurora.Colors.glassBorder.opacity(0),
+                                entry.accentColor.opacity(0.4),
+                                WidgetAurora.Colors.glassBorder.opacity(0)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 1)
+                    .padding(.vertical, 8)
+
+                // Right: Stats and motivation
+                VStack(alignment: .leading, spacing: 10) {
+                    // Main streak count
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text("\(entry.streak)")
+                            .font(WidgetAurora.Typography.heroNumber)
+                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(entry.streak == 1 ? "day" : "days")
+                                .font(WidgetAurora.Typography.subheadline)
+                                .foregroundStyle(WidgetAurora.Colors.textSecondary)
+
+                            Text("streak")
+                                .font(WidgetAurora.Typography.micro)
+                                .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                        }
+                    }
+
+                    // Motivation or warning
+                    if let warning = entry.streakWarning {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 12))
+
+                            Text("Don't break the chain!")
+                                .font(WidgetAurora.Typography.body)
+                        }
+                        .foregroundStyle(WidgetAurora.Colors.warning)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(WidgetAurora.Colors.warning.opacity(0.15))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(WidgetAurora.Colors.warning.opacity(0.3), lineWidth: 0.5)
+                                )
+                        )
+                    } else {
+                        Text(entry.motivationText)
+                            .font(WidgetAurora.Typography.body)
+                            .foregroundStyle(entry.accentColor)
+                            .shadow(color: entry.accentColor.opacity(0.3), radius: 2)
+                    }
+
+                    // Stats row
+                    HStack(spacing: 10) {
+                        WidgetStatPill(
+                            icon: "star.fill",
+                            value: "Lv \(entry.level)",
+                            color: WidgetAurora.Colors.gold
+                        )
+
+                        WidgetStatPill(
+                            icon: "sparkle",
+                            value: formatXP(entry.xp),
+                            color: WidgetAurora.Colors.electric
+                        )
+
+                        if entry.longestStreak > 0 {
+                            WidgetStatPill(
+                                icon: "trophy.fill",
+                                value: "\(entry.longestStreak)",
+                                color: WidgetAurora.Colors.cyan
+                            )
+                        }
+                    }
+                }
+
+                Spacer()
+            }
+            .padding(16)
+        }
     }
 
     // MARK: - Circular Accessory
@@ -208,29 +371,47 @@ struct StreakWidgetView: View {
 #Preview("Small - Starting", as: .systemSmall) {
     VeloceStreakWidget()
 } timeline: {
-    StreakEntry(date: Date(), streak: 1, longestStreak: 1, level: 2, xp: 150)
+    StreakEntry(date: Date(), streak: 1, longestStreak: 1, level: 2, xp: 150, tasksCompletedToday: 2, dailyGoalMet: true)
 }
 
-#Preview("Small - Active", as: .systemSmall) {
+#Preview("Small - Warning", as: .systemSmall) {
     VeloceStreakWidget()
 } timeline: {
-    StreakEntry(date: Date(), streak: 7, longestStreak: 14, level: 12, xp: 2450)
+    StreakEntry(date: Date(), streak: 7, longestStreak: 14, level: 12, xp: 2450, tasksCompletedToday: 2, dailyGoalMet: false)
 }
 
 #Preview("Small - Blazing", as: .systemSmall) {
     VeloceStreakWidget()
 } timeline: {
-    StreakEntry(date: Date(), streak: 21, longestStreak: 21, level: 25, xp: 8500)
+    StreakEntry(date: Date(), streak: 21, longestStreak: 21, level: 25, xp: 8500, tasksCompletedToday: 6, dailyGoalMet: true)
 }
 
-#Preview("Small - Legendary", as: .systemSmall) {
+#Preview("Medium - Active", as: .systemMedium) {
     VeloceStreakWidget()
 } timeline: {
-    StreakEntry(date: Date(), streak: 45, longestStreak: 45, level: 42, xp: 25000)
+    StreakEntry(date: Date(), streak: 7, longestStreak: 14, level: 12, xp: 2450, tasksCompletedToday: 5, dailyGoalMet: true)
+}
+
+#Preview("Medium - Personal Best", as: .systemMedium) {
+    VeloceStreakWidget()
+} timeline: {
+    StreakEntry(date: Date(), streak: 21, longestStreak: 21, level: 25, xp: 8500, tasksCompletedToday: 8, dailyGoalMet: true)
+}
+
+#Preview("Medium - Warning", as: .systemMedium) {
+    VeloceStreakWidget()
+} timeline: {
+    StreakEntry(date: Date(), streak: 14, longestStreak: 30, level: 18, xp: 5200, tasksCompletedToday: 2, dailyGoalMet: false)
+}
+
+#Preview("Medium - Legendary", as: .systemMedium) {
+    VeloceStreakWidget()
+} timeline: {
+    StreakEntry(date: Date(), streak: 100, longestStreak: 100, level: 50, xp: 35000, tasksCompletedToday: 10, dailyGoalMet: true)
 }
 
 #Preview("Circular", as: .accessoryCircular) {
     VeloceStreakWidget()
 } timeline: {
-    StreakEntry(date: Date(), streak: 7, longestStreak: 14, level: 12, xp: 2450)
+    StreakEntry(date: Date(), streak: 7, longestStreak: 14, level: 12, xp: 2450, tasksCompletedToday: 5, dailyGoalMet: true)
 }
