@@ -20,7 +20,6 @@ struct TaskCardView: View {
     @State private var showParticles = false
     @State private var isPressed = false
     @State private var glowOpacity: Double = 0.2
-    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -200,8 +199,8 @@ struct TaskCardView: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.15 : 0.08),
-                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.05 : 0.02)
+                            Theme.Colors.glassBackground.opacity(0.15),
+                            Theme.Colors.glassBackground.opacity(0.05)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -217,8 +216,8 @@ struct TaskCardView: View {
             .stroke(
                 LinearGradient(
                     colors: [
-                        .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
-                        .white.opacity(colorScheme == .dark ? 0.05 : 0.1),
+                        .white.opacity(0.2),
+                        .white.opacity(0.05),
                         task.hasAIProcessing ? taskTypeColor.opacity(glowOpacity) : Color.clear
                     ],
                     startPoint: .topLeading,
@@ -232,9 +231,9 @@ struct TaskCardView: View {
 
     private var cardShadowColor: Color {
         if task.hasAIProcessing {
-            return taskTypeColor.opacity(colorScheme == .dark ? 0.2 : 0.1)
+            return taskTypeColor.opacity(0.2)
         }
-        return Color.black.opacity(colorScheme == .dark ? 0.3 : 0.08)
+        return Color.black.opacity(0.3)
     }
 
     // MARK: - Completion Glow

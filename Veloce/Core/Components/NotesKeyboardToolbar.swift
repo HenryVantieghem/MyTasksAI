@@ -17,8 +17,6 @@ struct NotesKeyboardToolbar: View {
     let onStarsToggle: () -> Void
     let onDismiss: () -> Void
 
-    @Environment(\.colorScheme) private var colorScheme
-
     // MARK: Configuration
     private let toolbarHeight: CGFloat = 44
     private let buttonSize: CGFloat = 36
@@ -114,9 +112,7 @@ struct NotesKeyboardToolbar: View {
                 .frame(height: 0.5)
 
             Rectangle()
-                .fill(colorScheme == .dark
-                      ? Theme.Colors.backgroundSecondary
-                      : Theme.Colors.background)
+                .fill(Theme.Colors.backgroundSecondary)
         }
     }
 

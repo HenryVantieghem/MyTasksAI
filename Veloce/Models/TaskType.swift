@@ -30,6 +30,16 @@ enum TaskType: String, Codable, Sendable, CaseIterable {
         }
     }
 
+    /// Short label for compact displays (keyboard accessory, etc.)
+    var shortLabel: String {
+        switch self {
+        case .create: return "Create"
+        case .communicate: return "Chat"
+        case .consume: return "Learn"
+        case .coordinate: return "Admin"
+        }
+    }
+
     var icon: String {
         switch self {
         case .create: return "paintbrush.pointed"

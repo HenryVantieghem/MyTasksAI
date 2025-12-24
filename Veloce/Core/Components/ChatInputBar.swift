@@ -20,7 +20,6 @@ struct ChatInputBar: View {
 
     @State private var showQuickActions = false
     @State private var glowOpacity: Double = 0.3
-    @Environment(\.colorScheme) private var colorScheme
 
     private var canSend: Bool {
         !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -204,8 +203,8 @@ struct ChatInputBar: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.3 : 0.1),
-                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.15 : 0.05)
+                            Theme.Colors.glassBackground.opacity(0.3),
+                            Theme.Colors.glassBackground.opacity(0.15)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
@@ -219,8 +218,8 @@ struct ChatInputBar: View {
     private var inputBorderGradient: some ShapeStyle {
         LinearGradient(
             colors: [
-                Theme.Colors.glassBorder.opacity(colorScheme == .dark ? 0.4 : 0.3),
-                Theme.Colors.glassBorder.opacity(colorScheme == .dark ? 0.15 : 0.1),
+                Theme.Colors.glassBorder.opacity(0.4),
+                Theme.Colors.glassBorder.opacity(0.15),
                 Theme.Colors.aiPurple.opacity(isFocused ? 0.3 : 0.1)
             ],
             startPoint: .topLeading,

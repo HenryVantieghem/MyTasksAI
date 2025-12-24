@@ -76,6 +76,7 @@ struct VeloceApp: App {
             RootView()
                 .environment(appViewModel)
                 .modelContainer(modelContainer)
+                .preferredColorScheme(.dark)
                 .task {
                     await appViewModel.initialize(context: modelContainer.mainContext)
                 }

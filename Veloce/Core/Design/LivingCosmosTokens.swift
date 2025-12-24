@@ -248,29 +248,61 @@ enum LivingCosmos {
     // MARK: - Calendar Tokens
 
     enum Calendar {
-        /// Hour height in day view
+        /// Hour height in day view (cosmic-scaled for readability)
         static let hourHeight: CGFloat = 80
 
         /// Compact hour height for week view
         static let compactHourHeight: CGFloat = 50
 
-        /// Time gutter width
-        static let timeGutterWidth: CGFloat = 50
+        /// Time gutter width (for "NOW" label and times)
+        static let timeGutterWidth: CGFloat = 54
 
-        /// Task block corner radius
-        static let blockCornerRadius: CGFloat = 12
+        /// Task block corner radius (softer for plasma feel)
+        static let blockCornerRadius: CGFloat = 14
 
-        /// Minimum block height
-        static let minBlockHeight: CGFloat = 44
+        /// Minimum block height for tasks
+        static let minBlockHeight: CGFloat = 48
 
         /// Day cell size for month view
         static let dayCellSize: CGFloat = 44
 
-        /// Now indicator dot size
-        static let nowDotSize: CGFloat = 10
+        /// Now indicator dot size (plasma core)
+        static let nowDotSize: CGFloat = 12
 
         /// View switcher height
         static let viewSwitcherHeight: CGFloat = 44
+
+        /// Start hour for day timeline
+        static let startHour: Int = 6
+
+        /// End hour for day timeline
+        static let endHour: Int = 24
+
+        /// Week day column calculated width
+        static var weekDayColumnWidth: CGFloat {
+            (UIScreen.main.bounds.width - timeGutterWidth - 32) / 7
+        }
+
+        /// Month grid cell size
+        static let monthCellSize: CGFloat = (UIScreen.main.bounds.width - 48) / 7
+
+        /// Event block opacity (secondary to tasks)
+        static let eventOpacity: Double = 0.75
+
+        /// Header height with date carousel
+        static let headerHeight: CGFloat = 100
+
+        /// Snap interval for drag-to-reschedule (minutes)
+        static let snapInterval: Int = 15
+
+        /// Quick-add portal animation duration
+        static let portalDuration: Double = 0.4
+
+        /// Task block inner padding
+        static let blockPadding: CGFloat = 12
+
+        /// Max task indicator dots in month view
+        static let maxIndicatorDots: Int = 3
     }
 }
 

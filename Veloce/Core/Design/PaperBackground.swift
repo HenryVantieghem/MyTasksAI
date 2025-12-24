@@ -10,8 +10,6 @@ import SwiftUI
 
 // MARK: - Paper Background
 struct PaperBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
         ZStack {
             // Base color
@@ -26,9 +24,8 @@ struct PaperBackground: View {
                         let y = CGFloat.random(in: 0...size.height)
                         let opacity = Double.random(in: 0.01...0.03)
 
-                        let color = colorScheme == .dark ?
-                            Color.white.opacity(opacity) :
-                            Color.black.opacity(opacity)
+                        // Always use white for dark mode
+                        let color = Color.white.opacity(opacity)
 
                         context.fill(
                             Path(ellipseIn: CGRect(x: x, y: y, width: 1, height: 1)),
@@ -44,8 +41,6 @@ struct PaperBackground: View {
 
 // MARK: - Lined Paper Background
 struct LinedPaperBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     let lineSpacing: CGFloat
     let marginLine: Bool
 
@@ -60,7 +55,7 @@ struct LinedPaperBackground: View {
                 // Paper base
                 Theme.Colors.background
 
-                // Horizontal lines
+                // Horizontal lines (dark mode styling)
                 Path { path in
                     var y: CGFloat = lineSpacing
                     while y < geometry.size.height {
@@ -70,9 +65,7 @@ struct LinedPaperBackground: View {
                     }
                 }
                 .stroke(
-                    colorScheme == .dark ?
-                        Color.gray.opacity(0.15) :
-                        Color.blue.opacity(0.1),
+                    Color.gray.opacity(0.15),
                     lineWidth: 0.5
                 )
 
@@ -95,8 +88,6 @@ struct LinedPaperBackground: View {
 
 // MARK: - Grid Paper Background
 struct GridPaperBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     let gridSize: CGFloat
 
     init(gridSize: CGFloat = 20) {
@@ -108,7 +99,7 @@ struct GridPaperBackground: View {
             ZStack {
                 Theme.Colors.background
 
-                // Grid pattern
+                // Grid pattern (dark mode styling)
                 Path { path in
                     // Vertical lines
                     var x: CGFloat = gridSize
@@ -127,9 +118,7 @@ struct GridPaperBackground: View {
                     }
                 }
                 .stroke(
-                    colorScheme == .dark ?
-                        Color.gray.opacity(0.1) :
-                        Color.gray.opacity(0.15),
+                    Color.gray.opacity(0.1),
                     lineWidth: 0.5
                 )
             }
@@ -140,8 +129,6 @@ struct GridPaperBackground: View {
 
 // MARK: - Dot Grid Background
 struct DotGridBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     let spacing: CGFloat
     let dotSize: CGFloat
 
@@ -156,9 +143,8 @@ struct DotGridBackground: View {
                 Theme.Colors.background
 
                 Canvas { context, size in
-                    let color = colorScheme == .dark ?
-                        Color.gray.opacity(0.2) :
-                        Color.gray.opacity(0.3)
+                    // Dark mode styling
+                    let color = Color.gray.opacity(0.2)
 
                     var x: CGFloat = spacing
                     while x < size.width {
@@ -186,8 +172,6 @@ struct DotGridBackground: View {
 
 // MARK: - Gradient Background
 struct GradientBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     let style: GradientStyle
 
     enum GradientStyle {

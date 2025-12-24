@@ -237,8 +237,6 @@ enum VoidDesign {
 
 /// Void-styled card modifier for dark cosmic aesthetic
 struct VoidCardModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     let borderColor: Color
     let borderOpacity: Double
     let glowColor: Color?

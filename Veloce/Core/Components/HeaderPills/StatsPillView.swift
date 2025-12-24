@@ -17,7 +17,6 @@ struct StatsPillView: View {
     let onTap: () -> Void
 
     @State private var glowPulse: Bool = false
-    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Button(action: onTap) {
@@ -79,8 +78,8 @@ struct StatsPillView: View {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                                .white.opacity(0.2),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing

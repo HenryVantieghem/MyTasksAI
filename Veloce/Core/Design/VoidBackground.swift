@@ -518,8 +518,6 @@ struct SimpleVoidBackground: View {
 
 /// Background for bottom sheets with void styling
 struct VoidSheetBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
         ZStack {
             // Base material

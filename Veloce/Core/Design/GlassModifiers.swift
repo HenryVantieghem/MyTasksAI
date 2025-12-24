@@ -8,38 +8,17 @@
 
 import SwiftUI
 
-// MARK: - Dark Mode Aware Modifier
-/// Applies different values based on color scheme for polished dark mode
-struct DarkModeAwareModifier<Light: View, Dark: View>: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let lightView: () -> Light
-    let darkView: () -> Dark
-
-    func body(content: Content) -> some View {
-        if colorScheme == .dark {
-            darkView()
-        } else {
-            lightView()
-        }
-    }
-}
+// MARK: - Living Cosmos Dark Theme Only
+// All adaptive modifiers now use dark mode values directly since
+// the app enforces .preferredColorScheme(.dark) universally
 
 extension View {
-    /// Apply different views based on color scheme
-    func darkModeAware<Light: View, Dark: View>(
-        light: @escaping () -> Light,
-        dark: @escaping () -> Dark
-    ) -> some View {
-        modifier(DarkModeAwareModifier(lightView: light, darkView: dark))
-    }
-
-    /// Apply different opacity based on color scheme
+    /// Apply opacity (uses dark mode value directly)
     func adaptiveOpacity(light: Double, dark: Double) -> some View {
-        modifier(AdaptiveOpacityModifier(lightOpacity: light, darkOpacity: dark))
+        self.opacity(dark)
     }
 
-    /// Apply different shadow based on color scheme
+    /// Apply shadow (uses dark mode values directly)
     func adaptiveShadow(
         lightColor: Color = .black.opacity(0.1),
         darkColor: Color = .black.opacity(0.3),
@@ -47,42 +26,9 @@ extension View {
         x: CGFloat = 0,
         y: CGFloat = 4
     ) -> some View {
-        modifier(AdaptiveShadowModifier(
-            lightColor: lightColor,
-            darkColor: darkColor,
-            radius: radius,
-            x: x,
-            y: y
-        ))
-    }
-}
-
-// MARK: - Adaptive Opacity Modifier
-struct AdaptiveOpacityModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let lightOpacity: Double
-    let darkOpacity: Double
-
-    func body(content: Content) -> some View {
-        content.opacity(colorScheme == .dark ? darkOpacity : lightOpacity)
-    }
-}
-
-// MARK: - Adaptive Shadow Modifier
-struct AdaptiveShadowModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let lightColor: Color
-    let darkColor: Color
-    let radius: CGFloat
-    let x: CGFloat
-    let y: CGFloat
-
-    func body(content: Content) -> some View {
-        content.shadow(
-            color: colorScheme == .dark ? darkColor : lightColor,
-            radius: colorScheme == .dark ? radius * 1.5 : radius,  // Larger blur in dark mode
+        self.shadow(
+            color: darkColor,
+            radius: radius * 1.5,
             x: x,
             y: y
         )
@@ -91,8 +37,6 @@ struct AdaptiveShadowModifier: ViewModifier {
 
 // MARK: - Glass Effect Modifier
 struct GlassEffectModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     let cornerRadius: CGFloat
     let opacity: Double
     let borderWidth: CGFloat
@@ -106,8 +50,8 @@ struct GlassEffectModifier: ViewModifier {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                                .white.opacity(0.2),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -120,8 +64,6 @@ struct GlassEffectModifier: ViewModifier {
 
 // MARK: - Glass Card Modifier
 struct GlassCardModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     let padding: CGFloat
     let cornerRadius: CGFloat
 
@@ -136,8 +78,8 @@ struct GlassCardModifier: ViewModifier {
                             .stroke(
                                 LinearGradient(
                                     colors: [
-                                        .white.opacity(colorScheme == .dark ? 0.2 : 0.5),
-                                        .white.opacity(colorScheme == .dark ? 0.05 : 0.2)
+                                        .white.opacity(0.2),
+                                        .white.opacity(0.05)
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -146,13 +88,12 @@ struct GlassCardModifier: ViewModifier {
                             )
                     )
             }
-            .themeShadow(Theme.Shadow.sm)
+            .themeShadow(Theme.Shadow.smDark)
     }
 }
 
 // MARK: - Glass Button Modifier
 struct GlassButtonModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
     let isPressed: Bool
     let cornerRadius: CGFloat
 
@@ -166,8 +107,8 @@ struct GlassButtonModifier: ViewModifier {
                             .stroke(
                                 LinearGradient(
                                     colors: [
-                                        .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
-                                        .white.opacity(colorScheme == .dark ? 0.05 : 0.15)
+                                        .white.opacity(0.2),
+                                        .white.opacity(0.05)
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -177,8 +118,8 @@ struct GlassButtonModifier: ViewModifier {
                     )
             }
             .shadow(
-                color: .black.opacity(colorScheme == .dark ? 0.3 : 0.1),
-                radius: colorScheme == .dark ? 6 : 4,
+                color: .black.opacity(0.3),
+                radius: 6,
                 x: 0,
                 y: 2
             )
@@ -189,8 +130,6 @@ struct GlassButtonModifier: ViewModifier {
 
 // MARK: - Glass TextField Style
 struct GlassTextFieldStyle: TextFieldStyle {
-    @Environment(\.colorScheme) private var colorScheme
-
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding(Theme.Spacing.md)
@@ -201,8 +140,8 @@ struct GlassTextFieldStyle: TextFieldStyle {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.15 : 0.25),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                                .white.opacity(0.15),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -211,8 +150,8 @@ struct GlassTextFieldStyle: TextFieldStyle {
                     )
             )
             .shadow(
-                color: .black.opacity(colorScheme == .dark ? 0.2 : 0.05),
-                radius: colorScheme == .dark ? 3 : 2,
+                color: .black.opacity(0.2),
+                radius: 3,
                 x: 0,
                 y: 1
             )
@@ -221,7 +160,6 @@ struct GlassTextFieldStyle: TextFieldStyle {
 
 // MARK: - Floating Glass Modifier
 struct FloatingGlassModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
     @State private var isHovering = false
 
     let elevation: CGFloat
@@ -235,8 +173,8 @@ struct FloatingGlassModifier: ViewModifier {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.15 : 0.25),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                                .white.opacity(0.15),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -245,10 +183,10 @@ struct FloatingGlassModifier: ViewModifier {
                     )
             )
             .shadow(
-                color: .black.opacity(colorScheme == .dark ? 0.4 : 0.15),
-                radius: colorScheme == .dark ? elevation * 1.5 : elevation,
+                color: .black.opacity(0.4),
+                radius: elevation * 1.5,
                 x: 0,
-                y: colorScheme == .dark ? elevation * 0.75 : elevation / 2
+                y: elevation * 0.75
             )
     }
 }
@@ -298,8 +236,6 @@ extension View {
 
 // MARK: - Glass Pill Button Style
 struct GlassPillButtonStyle: ButtonStyle {
-    @Environment(\.colorScheme) private var colorScheme
-
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(Theme.Typography.subheadline)
@@ -312,8 +248,8 @@ struct GlassPillButtonStyle: ButtonStyle {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                                .white.opacity(0.2),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -322,8 +258,8 @@ struct GlassPillButtonStyle: ButtonStyle {
                     )
             )
             .shadow(
-                color: .black.opacity(colorScheme == .dark ? 0.25 : 0.08),
-                radius: colorScheme == .dark ? 4 : 2,
+                color: .black.opacity(0.25),
+                radius: 4,
                 x: 0,
                 y: 1
             )
@@ -354,8 +290,6 @@ extension View {
 
 // MARK: - Glass Sheet Background
 struct GlassSheetBackground: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
         ZStack {
             // Base blur
@@ -379,7 +313,7 @@ struct GlassSheetBackground: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.1 : 0.3),
+                                .white.opacity(0.1),
                                 .clear
                             ],
                             startPoint: .top,
@@ -419,8 +353,6 @@ extension View {
 
 // MARK: - Liquid Glass Modifier (iOS 26 Style)
 struct LiquidGlassModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     let cornerRadius: CGFloat
     let tint: Color?
 
@@ -441,8 +373,8 @@ struct LiquidGlassModifier: ViewModifier {
                     .strokeBorder(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.15 : 0.4),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.15)
+                                .white.opacity(0.15),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -450,7 +382,7 @@ struct LiquidGlassModifier: ViewModifier {
                         lineWidth: 0.5
                     )
             }
-            .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
     }
 }
 
@@ -467,7 +399,6 @@ extension View {
 // MARK: - Premium Glass Card Modifier
 /// Enhanced glass effect with deeper blur, iridescent border, and stronger shadows
 struct PremiumGlassCardModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
     @State private var borderPhase: CGFloat = 0
 
     let cornerRadius: CGFloat
@@ -487,8 +418,8 @@ struct PremiumGlassCardModifier: ViewModifier {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    (tint ?? Theme.Colors.aiPurple).opacity(colorScheme == .dark ? 0.08 : 0.04),
-                                    (tint ?? Theme.Colors.aiBlue).opacity(colorScheme == .dark ? 0.04 : 0.02),
+                                    (tint ?? Theme.Colors.aiPurple).opacity(0.08),
+                                    (tint ?? Theme.Colors.aiBlue).opacity(0.04),
                                     Color.clear
                                 ],
                                 startPoint: .topLeading,
@@ -501,7 +432,7 @@ struct PremiumGlassCardModifier: ViewModifier {
                         .stroke(
                             LinearGradient(
                                 colors: [
-                                    .white.opacity(colorScheme == .dark ? 0.08 : 0.15),
+                                    .white.opacity(0.08),
                                     .clear
                                 ],
                                 startPoint: .top,
@@ -533,8 +464,8 @@ struct PremiumGlassCardModifier: ViewModifier {
                         AnyShapeStyle(
                             LinearGradient(
                                 colors: [
-                                    .white.opacity(colorScheme == .dark ? 0.25 : 0.5),
-                                    .white.opacity(colorScheme == .dark ? 0.08 : 0.2),
+                                    .white.opacity(0.25),
+                                    .white.opacity(0.08),
                                     (tint ?? Theme.Colors.aiPurple).opacity(0.2)
                                 ],
                                 startPoint: .topLeading,
@@ -546,7 +477,7 @@ struct PremiumGlassCardModifier: ViewModifier {
             }
             // Multi-layer shadow for depth
             .shadow(color: (tint ?? Theme.Colors.aiPurple).opacity(0.15), radius: 20, x: 0, y: 8)
-            .shadow(color: .black.opacity(colorScheme == .dark ? 0.4 : 0.1), radius: 12, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.4), radius: 12, x: 0, y: 4)
             .onAppear {
                 if animateBorder {
                     withAnimation(.linear(duration: 6).repeatForever(autoreverses: false)) {
@@ -575,8 +506,6 @@ extension View {
 // MARK: - Frosted Glass Modifier
 /// Deep frosted glass effect with subtle inner glow
 struct FrostedGlassModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     let cornerRadius: CGFloat
     let intensity: FrostedGlassIntensity
 
@@ -593,9 +522,9 @@ struct FrostedGlassModifier: ViewModifier {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    .white.opacity(colorScheme == .dark ? 0.03 : 0.08),
+                                    .white.opacity(0.03),
                                     .clear,
-                                    .white.opacity(colorScheme == .dark ? 0.02 : 0.05)
+                                    .white.opacity(0.02)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -608,8 +537,8 @@ struct FrostedGlassModifier: ViewModifier {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.2 : 0.4),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.15)
+                                .white.opacity(0.2),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -618,10 +547,10 @@ struct FrostedGlassModifier: ViewModifier {
                     )
             }
             .shadow(
-                color: .black.opacity(colorScheme == .dark ? 0.35 : 0.12),
-                radius: colorScheme == .dark ? 16 : 10,
+                color: .black.opacity(0.35),
+                radius: 16,
                 x: 0,
-                y: colorScheme == .dark ? 8 : 5
+                y: 8
             )
     }
 }
@@ -653,7 +582,6 @@ extension View {
 // MARK: - Glass Glow Modifier
 /// Glass effect with colored glow halo
 struct GlassGlowModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
     @State private var glowPulse: CGFloat = 1.0
 
     let cornerRadius: CGFloat
@@ -686,7 +614,7 @@ struct GlassGlowModifier: ViewModifier {
                             colors: [
                                 glowColor.opacity(0.5),
                                 glowColor.opacity(0.2),
-                                .white.opacity(colorScheme == .dark ? 0.1 : 0.2)
+                                .white.opacity(0.1)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -695,7 +623,7 @@ struct GlassGlowModifier: ViewModifier {
                     )
             }
             .shadow(color: glowColor.opacity(0.3), radius: 16, x: 0, y: 6)
-            .shadow(color: .black.opacity(colorScheme == .dark ? 0.3 : 0.08), radius: 8, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
             .onAppear {
                 if animated {
                     withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
@@ -966,7 +894,6 @@ extension ButtonStyle where Self == CelestialGlassButtonStyle {
 // MARK: - Morphic Glass Modifier
 /// Glass container that subtly morphs on interaction with organic breathing
 struct MorphicGlassModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let cornerRadius: CGFloat

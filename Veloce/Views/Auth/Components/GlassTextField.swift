@@ -20,7 +20,6 @@ struct GlassTextField: View {
 
     @FocusState private var isFocused: Bool
     @State private var glowOpacity: Double = 0
-    @Environment(\.colorScheme) private var colorScheme
 
     init(
         text: Binding<String>,
@@ -130,7 +129,7 @@ struct GlassTextField: View {
             .fill(.ultraThinMaterial)
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Radius.lg)
-                    .fill(Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.15 : 0.1))
+                    .fill(Theme.Colors.glassBackground.opacity(0.15))
             )
     }
 

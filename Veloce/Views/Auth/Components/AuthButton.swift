@@ -28,7 +28,6 @@ struct AuthButton: View {
     @State private var isPressed: Bool = false
     @State private var showSuccess: Bool = false
     @State private var glowPhase: Double = 0
-    @Environment(\.colorScheme) private var colorScheme
 
     init(
         _ title: String,

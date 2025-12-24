@@ -9,6 +9,90 @@
 
 import SwiftUI
 
+// MARK: - Kanban Section
+
+/// Kanban workflow sections for task organization
+enum KanbanSection: String, CaseIterable {
+    case toDo = "To Do"
+    case inProgress = "In Progress"
+    case done = "Done"
+
+    var icon: String {
+        switch self {
+        case .toDo: return "circle"
+        case .inProgress: return "arrow.triangle.2.circlepath"
+        case .done: return "checkmark.circle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .toDo: return Theme.CelestialColors.nebulaCore
+        case .inProgress: return Theme.Colors.aiAmber
+        case .done: return Theme.CelestialColors.auroraGreen
+        }
+    }
+}
+
+// MARK: - Kanban Section Header
+
+struct KanbanSectionHeader: View {
+    let section: KanbanSection
+    let count: Int
+
+    @State private var glowPulse: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            // Glowing orb indicator
+            ZStack {
+                // Outer glow
+                SwiftUI.Circle()
+                    .fill(section.color.opacity(0.3))
+                    .frame(width: 16, height: 16)
+                    .blur(radius: 4 + (glowPulse * 2))
+
+                // Core dot
+                SwiftUI.Circle()
+                    .fill(section.color)
+                    .frame(width: 8, height: 8)
+            }
+
+            // Section title
+            Text(section.rawValue.uppercased())
+                .font(Theme.Typography.cosmosSectionHeader)
+                .foregroundStyle(Theme.CelestialColors.starDim)
+                .tracking(1.5)
+
+            // Count badge
+            Text("\(count)")
+                .font(Theme.Typography.cosmosMetaSmall)
+                .foregroundStyle(section.color)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background {
+                    Capsule()
+                        .fill(section.color.opacity(0.15))
+                        .overlay {
+                            Capsule()
+                                .strokeBorder(section.color.opacity(0.3), lineWidth: 0.5)
+                        }
+                }
+
+            Spacer()
+        }
+        .padding(.horizontal, Theme.Spacing.sm)
+        .padding(.vertical, Theme.Spacing.xs)
+        .onAppear {
+            guard !reduceMotion, section == .inProgress else { return }
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                glowPulse = 1
+            }
+        }
+    }
+}
+
 // MARK: - Chat Tasks View (Living Cosmos Edition)
 
 struct ChatTasksView: View {
@@ -16,6 +100,9 @@ struct ChatTasksView: View {
 
     // Task selection callback - handled by parent for full-screen overlay
     var onTaskSelected: ((TaskItem) -> Void)?
+
+    // Timer start callback - navigate to Focus tab with task context
+    var onStartTimer: ((TaskItem) -> Void)?
 
     // Date selection
     @State private var selectedDate: Date = Date()
@@ -30,7 +117,6 @@ struct ChatTasksView: View {
     @State private var visibleTaskIds: Set<UUID> = []
     @State private var hasInitiallyLoaded = false
 
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     // MARK: - Filtered Tasks by Date
@@ -56,6 +142,36 @@ struct ChatTasksView: View {
             }
             return calendar.isDate(task.createdAt, inSameDayAs: selectedDate)
         }
+    }
+
+    // MARK: - Kanban Section Filters
+
+    /// Tasks currently in progress (high priority or scheduled for now/soon)
+    private var inProgressTasks: [TaskItem] {
+        let now = Date()
+
+        return filteredTasks.filter { task in
+            // High priority (3 stars) tasks are always "in progress"
+            if task.starRating == 3 {
+                return true
+            }
+
+            // Tasks scheduled within the next 2 hours are "in progress"
+            if let scheduledTime = task.scheduledTime {
+                let hoursUntil = scheduledTime.timeIntervalSince(now) / 3600
+                if hoursUntil <= 2 && hoursUntil >= -1 {  // Include slightly overdue
+                    return true
+                }
+            }
+
+            return false
+        }
+    }
+
+    /// Tasks to be done (not in progress, not completed)
+    private var toDoTasks: [TaskItem] {
+        let inProgressIds = Set(inProgressTasks.map(\.id))
+        return filteredTasks.filter { !inProgressIds.contains($0.id) }
     }
 
     // Productivity level (0-1) for nebula intensity
@@ -108,9 +224,9 @@ struct ChatTasksView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: Theme.Spacing.md + 4) {
-                    // Constellation completed section
-                    if !filteredRecentlyCompleted.isEmpty {
-                        constellationCompletedSection
+                    // In Progress section (high priority, urgent tasks)
+                    if !inProgressTasks.isEmpty {
+                        inProgressSection
                             .staggeredReveal(
                                 isVisible: hasInitiallyLoaded,
                                 delay: 0,
@@ -118,29 +234,24 @@ struct ChatTasksView: View {
                             )
                     }
 
-                    // Active tasks with depth stacking
-                    ForEach(Array(filteredTasks.enumerated()), id: \.element.id) { index, task in
-                        TaskCardV2(
-                            task: task,
-                            onTap: {
-                                HapticsService.shared.selectionFeedback()
-                                onTaskSelected?(task)
-                            },
-                            onToggleComplete: {
-                                completeTask(task)
-                            }
-                        )
-                        .id(task.id)
-                        // Depth stacking: recent tasks are "closer"
-                        .scaleEffect(depthScale(for: index))
-                        .zIndex(Double(filteredTasks.count - index))
-                        // Staggered entry animation
-                        .staggeredReveal(
-                            isVisible: hasInitiallyLoaded,
-                            delay: Theme.Animation.staggerDelay * Double(index + 1),
-                            direction: .fromBottom
-                        )
-                        .transition(cosmicTransition)
+                    // To Do section (remaining tasks)
+                    if !toDoTasks.isEmpty {
+                        toDoSection
+                            .staggeredReveal(
+                                isVisible: hasInitiallyLoaded,
+                                delay: Theme.Animation.staggerDelay * Double(inProgressTasks.count + 1),
+                                direction: .fromBottom
+                            )
+                    }
+
+                    // Done section (completed tasks - constellation style)
+                    if !filteredRecentlyCompleted.isEmpty {
+                        doneSection
+                            .staggeredReveal(
+                                isVisible: hasInitiallyLoaded,
+                                delay: Theme.Animation.staggerDelay * Double(filteredTasks.count + 1),
+                                direction: .fromBottom
+                            )
                     }
 
                     // Bottom spacer
@@ -186,7 +297,98 @@ struct ChatTasksView: View {
         )
     }
 
-    // MARK: - Constellation Completed Section
+    // MARK: - In Progress Section
+
+    private var inProgressSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            KanbanSectionHeader(section: .inProgress, count: inProgressTasks.count)
+
+            ForEach(Array(inProgressTasks.enumerated()), id: \.element.id) { index, task in
+                TaskCardV2(
+                    task: task,
+                    onTap: {
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onToggleComplete: {
+                        completeTask(task)
+                    },
+                    onStartTimer: onStartTimer
+                )
+                .id(task.id)
+                .scaleEffect(depthScale(for: index))
+                .zIndex(Double(inProgressTasks.count - index))
+                .transition(cosmicTransition)
+            }
+        }
+        .padding(.bottom, Theme.Spacing.sm)
+        // Amber energy glow for in-progress section
+        .background {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Theme.Colors.aiAmber.opacity(0.03))
+                .blur(radius: 20)
+                .offset(y: 10)
+        }
+    }
+
+    // MARK: - To Do Section
+
+    private var toDoSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            KanbanSectionHeader(section: .toDo, count: toDoTasks.count)
+
+            ForEach(Array(toDoTasks.enumerated()), id: \.element.id) { index, task in
+                TaskCardV2(
+                    task: task,
+                    onTap: {
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onToggleComplete: {
+                        completeTask(task)
+                    },
+                    onStartTimer: onStartTimer
+                )
+                .id(task.id)
+                .scaleEffect(depthScale(for: index + inProgressTasks.count))
+                .zIndex(Double(toDoTasks.count - index))
+                .transition(cosmicTransition)
+            }
+        }
+        .padding(.bottom, Theme.Spacing.sm)
+        // Nebula glow for to-do section
+        .background {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Theme.CelestialColors.nebulaCore.opacity(0.02))
+                .blur(radius: 20)
+                .offset(y: 10)
+        }
+    }
+
+    // MARK: - Done Section
+
+    private var doneSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            KanbanSectionHeader(section: .done, count: filteredRecentlyCompleted.count)
+
+            // Completed task rows (constellation style)
+            ForEach(filteredRecentlyCompleted) { task in
+                ConstellationTaskRow(task: task) {
+                    viewModel.uncompleteTask(task)
+                }
+            }
+        }
+        .padding(.bottom, Theme.Spacing.md)
+        // Achievement aurora glow
+        .background {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Theme.CelestialColors.auroraGreen.opacity(0.03))
+                .blur(radius: 20)
+                .offset(y: 10)
+        }
+    }
+
+    // MARK: - Constellation Completed Section (Legacy)
 
     private var constellationCompletedSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {

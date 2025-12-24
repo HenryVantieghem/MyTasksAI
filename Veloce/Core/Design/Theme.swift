@@ -701,16 +701,14 @@ enum AdaptiveShadowSize {
     case sm, md, lg, glow, aiGlow
 }
 
-/// Modifier for adaptive shadows based on color scheme
+/// Modifier for shadows (always uses dark mode values)
 struct AdaptiveThemeShadowModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     let lightShadow: ShadowStyle
     let darkShadow: ShadowStyle
 
     func body(content: Content) -> some View {
-        let shadow = colorScheme == .dark ? darkShadow : lightShadow
-        content.shadow(color: shadow.color, radius: shadow.radius, x: shadow.x, y: shadow.y)
+        // Always use dark shadow since app enforces dark mode
+        content.shadow(color: darkShadow.color, radius: darkShadow.radius, x: darkShadow.x, y: darkShadow.y)
     }
 }
 
@@ -732,28 +730,24 @@ extension View {
     }
 }
 
-/// Card style modifier with adaptive shadows
+/// Card style modifier (uses dark mode styling)
 struct CardStyleModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     func body(content: Content) -> some View {
         content
             .padding(Theme.Spacing.cardPadding)
             .background(Theme.Colors.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: Theme.CornerRadius.card))
             .shadow(
-                color: .black.opacity(colorScheme == .dark ? 0.2 : 0.05),
-                radius: colorScheme == .dark ? 6 : 4,
+                color: .black.opacity(0.2),
+                radius: 6,
                 x: 0,
-                y: colorScheme == .dark ? 3 : 2
+                y: 3
             )
     }
 }
 
-/// Glass card style modifier with adaptive dark mode
+/// Glass card style modifier (uses dark mode styling)
 struct GlassCardStyleModifier: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
-
     func body(content: Content) -> some View {
         content
             .padding(Theme.Spacing.cardPadding)
@@ -764,8 +758,8 @@ struct GlassCardStyleModifier: ViewModifier {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                .white.opacity(colorScheme == .dark ? 0.15 : 0.25),
-                                .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+                                .white.opacity(0.15),
+                                .white.opacity(0.05)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -774,10 +768,10 @@ struct GlassCardStyleModifier: ViewModifier {
                     )
             )
             .shadow(
-                color: .black.opacity(colorScheme == .dark ? 0.25 : 0.08),
-                radius: colorScheme == .dark ? 8 : 4,
+                color: .black.opacity(0.25),
+                radius: 8,
                 x: 0,
-                y: colorScheme == .dark ? 4 : 2
+                y: 4
             )
     }
 }

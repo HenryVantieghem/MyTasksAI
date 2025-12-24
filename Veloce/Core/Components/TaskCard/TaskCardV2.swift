@@ -15,6 +15,7 @@ struct TaskCardV2: View {
     let task: TaskItem
     let onTap: () -> Void
     let onToggleComplete: () -> Void
+    var onStartTimer: ((TaskItem) -> Void)?
 
     // Interaction states
     @State private var isPressed: Bool = false
@@ -111,48 +112,60 @@ struct TaskCardV2: View {
 
     private var cardContent: some View {
         ZStack {
-            // Parallax container with 3 depth layers
-            parallaxLayers
-
-            // Main content
-            VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-                // Top row: Plasma Core + Title + Points Badge
-                topRow
-
-                // AI Guidance Whisper (collapsible)
-                if shouldShowWhisper {
-                    aiWhisperSection
-                }
-
-                // Metadata row
-                metadataRow
-
-                // Living Energy Bar
-                LivingEnergyBar(
-                    energyLevel: energyLevel,
+            // Cosmic amber glow behind the card
+            if !task.isCompleted {
+                CosmicAmberGlow(
                     taskTypeColor: taskTypeColor,
-                    isCompleted: task.isCompleted
+                    isHighPriority: isHighPriority
                 )
-                .padding(.top, 4)
+                .allowsHitTesting(false)
             }
-            .padding(Theme.Spacing.md + 2)
-            .parallax(depth: 0.6)  // Content floats in middle layer
+
+            // Main card with glass effect
+            ZStack {
+                // Parallax container with 3 depth layers
+                parallaxLayers
+
+                // Main content
+                VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                    // Top row: Plasma Core + Title + Points Badge
+                    topRow
+
+                    // AI Guidance Whisper (collapsible)
+                    if shouldShowWhisper {
+                        aiWhisperSection
+                    }
+
+                    // Metadata row
+                    metadataRow
+
+                    // Living Energy Bar
+                    LivingEnergyBar(
+                        energyLevel: energyLevel,
+                        taskTypeColor: taskTypeColor,
+                        isCompleted: task.isCompleted
+                    )
+                    .padding(.top, 4)
+                }
+                .padding(Theme.Spacing.md + 2)
+                .parallax(depth: 0.6)  // Content floats in middle layer
+            }
+            // Morphic glass container
+            .morphicGlass(
+                cornerRadius: 20,
+                taskTypeColor: taskTypeColor,
+                isPressed: isPressed,
+                isHighPriority: isHighPriority
+            )
+            // Urgency glow for time-sensitive tasks
+            .urgencyGlow(level: urgencyLevel, isAnimated: !reduceMotion)
+            // Supernova burst on completion
+            .supernovaBurst(
+                isTriggered: showCompletionBurst,
+                color: Theme.CelestialColors.auroraGreen,
+                particleCount: 32
+            )
         }
-        // Morphic glass container
-        .morphicGlass(
-            cornerRadius: 20,
-            taskTypeColor: taskTypeColor,
-            isPressed: isPressed,
-            isHighPriority: isHighPriority
-        )
-        // Urgency glow for time-sensitive tasks
-        .urgencyGlow(level: urgencyLevel, isAnimated: !reduceMotion)
-        // Supernova burst on completion
-        .supernovaBurst(
-            isTriggered: showCompletionBurst,
-            color: Theme.CelestialColors.auroraGreen,
-            particleCount: 32
-        )
         // Entry animation
         .scaleEffect(entryScale)
         .opacity(entryOpacity)
@@ -241,6 +254,12 @@ struct TaskCardV2: View {
             }
 
             Spacer()
+
+            // Play timer button (only for incomplete tasks)
+            if !task.isCompleted, let onStartTimer = onStartTimer {
+                PlayTimerButton(task: task, onStartTimer: onStartTimer)
+                    .transition(.scale.combined(with: .opacity))
+            }
 
             // Points Badge with cosmic styling
             CosmicPointsBadge(
@@ -416,9 +435,174 @@ struct TaskCardV2: View {
     }
 }
 
+// MARK: - Cosmic Amber Glow
+
+/// Radial gradient glow that sits behind task cards
+/// Creates a living, pulsing nebula effect
+struct CosmicAmberGlow: View {
+    let taskTypeColor: Color
+    let isHighPriority: Bool
+
+    @State private var pulsePhase: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var primaryGlowColor: Color {
+        // Blend task type color with cosmic amber for warmth
+        Theme.Colors.aiAmber
+    }
+
+    private var glowIntensity: Double {
+        isHighPriority ? 0.5 : 0.35
+    }
+
+    var body: some View {
+        ZStack {
+            // Outer soft nebula glow
+            Ellipse()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            primaryGlowColor.opacity(glowIntensity),
+                            primaryGlowColor.opacity(glowIntensity * 0.4),
+                            taskTypeColor.opacity(0.1),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 200
+                    )
+                )
+                .scaleEffect(x: 1.4, y: 1.2)
+                .scaleEffect(reduceMotion ? 1.0 : 1.0 + (pulsePhase * 0.06))
+                .blur(radius: 40)
+
+            // Inner bright core
+            Ellipse()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            primaryGlowColor.opacity(glowIntensity * 0.8),
+                            primaryGlowColor.opacity(glowIntensity * 0.3),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 80
+                    )
+                )
+                .scaleEffect(0.6)
+                .blur(radius: 20)
+
+            // Secondary accent from task type
+            Ellipse()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            taskTypeColor.opacity(0.15),
+                            Color.clear
+                        ],
+                        center: UnitPoint(x: 0.7, y: 0.3),
+                        startRadius: 0,
+                        endRadius: 100
+                    )
+                )
+                .scaleEffect(0.8)
+                .blur(radius: 25)
+        }
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+                pulsePhase = 1
+            }
+        }
+    }
+}
+
+// MARK: - Play Timer Button
+
+/// Amber play button that starts focus timer for a task
+struct PlayTimerButton: View {
+    let task: TaskItem
+    let onStartTimer: (TaskItem) -> Void
+
+    @State private var isPressed = false
+    @State private var glowPulse: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Button {
+            HapticsService.shared.impact()
+            onStartTimer(task)
+        } label: {
+            ZStack {
+                // Outer glow ring
+                SwiftUI.Circle()
+                    .fill(Theme.Colors.aiAmber.opacity(0.2))
+                    .frame(width: 40, height: 40)
+                    .blur(radius: 8 + (glowPulse * 4))
+                    .scaleEffect(reduceMotion ? 1.0 : 1.0 + (glowPulse * 0.1))
+
+                // Background circle
+                SwiftUI.Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Theme.Colors.aiAmber.opacity(0.25),
+                                Theme.Colors.aiAmber.opacity(0.1)
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 18
+                        )
+                    )
+                    .frame(width: 36, height: 36)
+
+                // Border
+                SwiftUI.Circle()
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                Theme.Colors.aiAmber.opacity(0.6),
+                                Theme.Colors.aiAmber.opacity(0.3)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+                    .frame(width: 36, height: 36)
+
+                // Play icon
+                Image(systemName: "play.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.Colors.aiAmber)
+                    .offset(x: 1)  // Optical centering for play icon
+            }
+        }
+        .buttonStyle(PlayTimerButtonStyle())
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                glowPulse = 1
+            }
+        }
+    }
+}
+
+/// Button style for play timer button
+private struct PlayTimerButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .brightness(configuration.isPressed ? 0.1 : 0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+    }
+}
+
 // MARK: - Plasma Energy Core
 
 /// Living energy core with plasma pulse animation
+/// Enhanced with attention ring and tap hint for clarity
 struct PlasmaEnergyCore: View {
     let energyState: EnergyState
     let potentialPoints: Int
@@ -429,6 +613,9 @@ struct PlasmaEnergyCore: View {
 
     @State private var pulsePhase: CGFloat = 0
     @State private var rotationAngle: Double = 0
+    @State private var attentionRingPhase: CGFloat = 0
+    @State private var completionScale: CGFloat = 1.0
+    @State private var showCompletionFlash: Bool = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var coreColor: Color {
@@ -448,74 +635,113 @@ struct PlasmaEnergyCore: View {
     }
 
     var body: some View {
-        Button {
-            HapticsService.shared.impact()
-            onTap()
-        } label: {
-            ZStack {
-                // Outer glow ring
-                SwiftUI.Circle()
-                    .fill(coreColor.opacity(0.2 + (Double(pulsePhase) * 0.15)))
-                    .blur(radius: 8 + (pulsePhase * 4))
-                    .frame(width: size * 1.8, height: size * 1.8)
+        VStack(spacing: 4) {
+            Button {
+                HapticsService.shared.impact()
+                triggerCompletionAnimation()
+                onTap()
+            } label: {
+                ZStack {
+                    // Attention ring (pulsing border to draw eye)
+                    if !isCompleted && !reduceMotion {
+                        SwiftUI.Circle()
+                            .strokeBorder(
+                                coreColor.opacity(0.3 + (attentionRingPhase * 0.2)),
+                                lineWidth: 2
+                            )
+                            .frame(width: size * 1.5, height: size * 1.5)
+                            .scaleEffect(1.0 + (attentionRingPhase * 0.15))
+                            .opacity(1 - (attentionRingPhase * 0.5))
+                    }
 
-                // Plasma tendrils (for high energy)
-                if energyState == .max && !reduceMotion {
-                    ForEach(0..<3, id: \.self) { i in
-                        PlasmaRendril(
-                            color: coreColor,
-                            angle: rotationAngle + Double(i) * 120,
-                            size: size
+                    // Outer glow ring
+                    SwiftUI.Circle()
+                        .fill(coreColor.opacity(0.2 + (Double(pulsePhase) * 0.15)))
+                        .blur(radius: 8 + (pulsePhase * 4))
+                        .frame(width: size * 1.8, height: size * 1.8)
+
+                    // Plasma tendrils (for high energy)
+                    if energyState == .max && !reduceMotion {
+                        ForEach(0..<3, id: \.self) { i in
+                            PlasmaRendril(
+                                color: coreColor,
+                                angle: rotationAngle + Double(i) * 120,
+                                size: size
+                            )
+                        }
+                    }
+
+                    // Inner glow
+                    SwiftUI.Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    coreColor.opacity(0.8),
+                                    coreColor.opacity(0.4),
+                                    Color.clear
+                                ],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: size * 0.6
+                            )
                         )
+                        .frame(width: size * 1.2, height: size * 1.2)
+                        .blur(radius: 4)
+
+                    // Core orb
+                    SwiftUI.Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    .white.opacity(0.9),
+                                    coreColor.opacity(0.9),
+                                    coreColor.opacity(0.6)
+                                ],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: size * 0.5
+                            )
+                        )
+                        .frame(width: size, height: size)
+
+                    // Completion flash overlay
+                    if showCompletionFlash {
+                        SwiftUI.Circle()
+                            .fill(.white)
+                            .frame(width: size * 1.5, height: size * 1.5)
+                            .blur(radius: 4)
+                    }
+
+                    // Completed checkmark
+                    if isCompleted {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: size * 0.5, weight: .bold))
+                            .foregroundStyle(.white)
+                            .scaleEffect(completionScale)
                     }
                 }
+            }
+            .buttonStyle(.plain)
+            .scaleEffect(completionScale)
 
-                // Inner glow
-                SwiftUI.Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                coreColor.opacity(0.8),
-                                coreColor.opacity(0.4),
-                                Color.clear
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: size * 0.6
-                        )
-                    )
-                    .frame(width: size * 1.2, height: size * 1.2)
-                    .blur(radius: 4)
-
-                // Core orb
-                SwiftUI.Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                .white.opacity(0.9),
-                                coreColor.opacity(0.9),
-                                coreColor.opacity(0.6)
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: size * 0.5
-                        )
-                    )
-                    .frame(width: size, height: size)
-
-                // Completed checkmark
-                if isCompleted {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: size * 0.5, weight: .bold))
-                        .foregroundStyle(.white)
-                }
+            // Tap hint (only for incomplete tasks)
+            if !isCompleted {
+                Text("tap")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(Theme.CelestialColors.starGhost)
+                    .opacity(reduceMotion ? 0.6 : 0.4 + (attentionRingPhase * 0.2))
             }
         }
-        .buttonStyle(.plain)
         .onAppear {
             if !reduceMotion {
+                // Core pulse animation
                 withAnimation(Theme.Animation.plasmaPulse) {
                     pulsePhase = 1
+                }
+
+                // Attention ring animation (slower, draws eye to completion)
+                withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
+                    attentionRingPhase = 1
                 }
 
                 if energyState == .max {
@@ -523,6 +749,24 @@ struct PlasmaEnergyCore: View {
                         rotationAngle = 360
                     }
                 }
+            }
+        }
+    }
+
+    private func triggerCompletionAnimation() {
+        guard !isCompleted else { return }
+
+        // Flash and scale burst
+        withAnimation(.easeOut(duration: 0.15)) {
+            showCompletionFlash = true
+            completionScale = 1.3
+        }
+
+        // Settle back
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                showCompletionFlash = false
+                completionScale = 1.0
             }
         }
     }
@@ -813,7 +1057,8 @@ private struct LivingCosmosCardButtonStyle: ButtonStyle {
                     return task
                 }(),
                 onTap: {},
-                onToggleComplete: {}
+                onToggleComplete: {},
+                onStartTimer: { _ in print("Start timer") }
             )
 
             // Medium priority

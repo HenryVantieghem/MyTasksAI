@@ -8,23 +8,77 @@
 
 import SwiftUI
 
+// MARK: - Quick Due Date Options
+enum QuickDueDate: CaseIterable {
+    case today
+    case tomorrow
+    case pickDate
+
+    var label: String {
+        switch self {
+        case .today: return "Today"
+        case .tomorrow: return "Tomorrow"
+        case .pickDate: return "Pick"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .today: return "sun.max"
+        case .tomorrow: return "sunrise"
+        case .pickDate: return "calendar"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .today: return Theme.Colors.aiAmber
+        case .tomorrow: return Theme.Colors.aiBlue
+        case .pickDate: return Theme.Colors.accent
+        }
+    }
+}
+
 // MARK: - Keyboard Accessory Bar
 struct KeyboardAccessoryBar: View {
     @Binding var taskTitle: String
     var onAddChecklist: () -> Void = {}
     var onSetPriority: ((TaskPriorityLevel) -> Void)?
+    var onSetDueDate: ((Date?) -> Void)?
+    var onSetCategory: ((TaskType) -> Void)?
     var onSchedule: () -> Void = {}
     var onAISuggestion: () -> Void = {}
     var onDismissKeyboard: () -> Void = {}
 
     @State private var showPriorityPicker = false
+    @State private var showDueDatePicker = false
+    @State private var showCategoryPicker = false
     @State private var selectedPriority: TaskPriorityLevel = .none
+    @State private var selectedCategory: TaskType?
 
     var body: some View {
         VStack(spacing: 0) {
             // Priority picker (expands from the bar)
             if showPriorityPicker {
                 priorityPicker
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .bottom).combined(with: .opacity),
+                        removal: .opacity
+                    ))
+            }
+
+            // Due date picker
+            if showDueDatePicker {
+                dueDatePicker
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .bottom).combined(with: .opacity),
+                        removal: .opacity
+                    ))
+            }
+
+            // Category picker
+            if showCategoryPicker {
+                categoryPicker
                     .transition(.asymmetric(
                         insertion: .move(edge: .bottom).combined(with: .opacity),
                         removal: .opacity
@@ -53,17 +107,38 @@ struct KeyboardAccessoryBar: View {
                     ) {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             showPriorityPicker.toggle()
+                            showDueDatePicker = false
+                            showCategoryPicker = false
                         }
                         HapticsService.shared.selectionFeedback()
                     }
 
-                    // Schedule button
+                    // Due date button
                     AccessoryButton(
-                        icon: "calendar",
-                        label: "Schedule",
-                        color: Theme.Colors.accent
+                        icon: "calendar.badge.clock",
+                        label: "Due",
+                        color: Theme.Colors.aiAmber
                     ) {
-                        onSchedule()
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            showDueDatePicker.toggle()
+                            showPriorityPicker = false
+                            showCategoryPicker = false
+                        }
+                        HapticsService.shared.selectionFeedback()
+                    }
+
+                    // Category button
+                    AccessoryButton(
+                        icon: categoryIcon,
+                        label: "Type",
+                        color: categoryColor,
+                        isActive: selectedCategory != nil
+                    ) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            showCategoryPicker.toggle()
+                            showPriorityPicker = false
+                            showDueDatePicker = false
+                        }
                         HapticsService.shared.selectionFeedback()
                     }
 
@@ -78,27 +153,6 @@ struct KeyboardAccessoryBar: View {
                         .fill(Theme.Colors.divider)
                         .frame(width: 1, height: 24)
                         .padding(.horizontal, Theme.Spacing.xs)
-
-                    // Format buttons
-                    AccessoryButton(
-                        icon: "bold",
-                        label: nil,
-                        color: Theme.Colors.textSecondary
-                    ) {
-                        // Bold formatting placeholder
-                        HapticsService.shared.selectionFeedback()
-                    }
-
-                    AccessoryButton(
-                        icon: "underline",
-                        label: nil,
-                        color: Theme.Colors.textSecondary
-                    ) {
-                        // Underline formatting placeholder
-                        HapticsService.shared.selectionFeedback()
-                    }
-
-                    Spacer(minLength: 20)
 
                     // Dismiss keyboard button
                     Button {
@@ -195,6 +249,118 @@ struct KeyboardAccessoryBar: View {
 
     private var priorityColor: Color {
         selectedPriority.color
+    }
+
+    // MARK: - Due Date Picker
+    private var dueDatePicker: some View {
+        HStack(spacing: Theme.Spacing.md) {
+            ForEach(QuickDueDate.allCases, id: \.self) { dueOption in
+                Button {
+                    withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                        showDueDatePicker = false
+                    }
+
+                    let date: Date?
+                    switch dueOption {
+                    case .today:
+                        date = Date()
+                    case .tomorrow:
+                        date = Calendar.current.date(byAdding: .day, value: 1, to: Date())
+                    case .pickDate:
+                        date = nil  // Parent should show date picker
+                        onSchedule()
+                        return
+                    }
+
+                    onSetDueDate?(date)
+                    HapticsService.shared.selectionFeedback()
+                } label: {
+                    VStack(spacing: 4) {
+                        ZStack {
+                            SwiftUI.Circle()
+                                .fill(dueOption.color.opacity(0.15))
+                                .frame(width: 36, height: 36)
+
+                            Image(systemName: dueOption.icon)
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(dueOption.color)
+                        }
+
+                        Text(dueOption.label)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, Theme.Spacing.lg)
+        .padding(.vertical, Theme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: Theme.Radius.card)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.1), radius: 10, y: -5)
+        )
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.bottom, Theme.Spacing.xs)
+    }
+
+    // MARK: - Category Picker
+    private var categoryPicker: some View {
+        HStack(spacing: Theme.Spacing.sm) {
+            ForEach(TaskType.allCases, id: \.self) { taskType in
+                Button {
+                    withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) {
+                        selectedCategory = taskType
+                        showCategoryPicker = false
+                    }
+                    onSetCategory?(taskType)
+                    HapticsService.shared.selectionFeedback()
+                } label: {
+                    VStack(spacing: 4) {
+                        ZStack {
+                            SwiftUI.Circle()
+                                .fill(taskType.color.opacity(0.15))
+                                .frame(width: 32, height: 32)
+                                .overlay {
+                                    if selectedCategory == taskType {
+                                        SwiftUI.Circle()
+                                            .strokeBorder(taskType.color, lineWidth: 2)
+                                    }
+                                }
+
+                            Image(systemName: taskType.icon)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(taskType.color)
+                        }
+
+                        Text(taskType.shortLabel)
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .lineLimit(1)
+                    }
+                    .frame(width: 50)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: Theme.Radius.card)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.1), radius: 10, y: -5)
+        )
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.bottom, Theme.Spacing.xs)
+    }
+
+    private var categoryIcon: String {
+        selectedCategory?.icon ?? "tag"
+    }
+
+    private var categoryColor: Color {
+        selectedCategory?.color ?? Theme.Colors.textTertiary
     }
 }
 
@@ -359,6 +525,8 @@ struct KeyboardAccessoryModifier: ViewModifier {
     @Binding var text: String
     @FocusState.Binding var isFocused: Bool
     var onPrioritySet: ((TaskPriorityLevel) -> Void)?
+    var onSetDueDate: ((Date?) -> Void)?
+    var onSetCategory: ((TaskType) -> Void)?
     var onSchedule: () -> Void
     var onAISuggestion: () -> Void
 
@@ -369,6 +537,8 @@ struct KeyboardAccessoryModifier: ViewModifier {
                     KeyboardAccessoryBar(
                         taskTitle: $text,
                         onSetPriority: onPrioritySet,
+                        onSetDueDate: onSetDueDate,
+                        onSetCategory: onSetCategory,
                         onSchedule: onSchedule,
                         onAISuggestion: onAISuggestion,
                         onDismissKeyboard: {
@@ -385,6 +555,8 @@ extension View {
         text: Binding<String>,
         isFocused: FocusState<Bool>.Binding,
         onPrioritySet: ((TaskPriorityLevel) -> Void)? = nil,
+        onSetDueDate: ((Date?) -> Void)? = nil,
+        onSetCategory: ((TaskType) -> Void)? = nil,
         onSchedule: @escaping () -> Void = {},
         onAISuggestion: @escaping () -> Void = {}
     ) -> some View {
@@ -392,6 +564,8 @@ extension View {
             text: text,
             isFocused: isFocused,
             onPrioritySet: onPrioritySet,
+            onSetDueDate: onSetDueDate,
+            onSetCategory: onSetCategory,
             onSchedule: onSchedule,
             onAISuggestion: onAISuggestion
         ))
