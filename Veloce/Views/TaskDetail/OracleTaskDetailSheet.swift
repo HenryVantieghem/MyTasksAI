@@ -536,7 +536,7 @@ struct OracleAmbientParticles: View {
     var body: some View {
         GeometryReader { geometry in
             ForEach(particles) { particle in
-                Circle()
+                SwiftUI.Circle()
                     .fill(particle.color)
                     .frame(width: particle.size, height: particle.size)
                     .position(particle.position)
@@ -961,7 +961,7 @@ struct AIInsightOracle: View {
     private var oracleOrb: some View {
         ZStack {
             // Outer glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -978,7 +978,7 @@ struct AIInsightOracle: View {
                 .blur(radius: 4)
 
             // Inner orb with swirl
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     AngularGradient(
                         colors: [
@@ -1003,7 +1003,7 @@ struct AIInsightOracle: View {
     private var thinkingIndicator: some View {
         HStack(spacing: 8) {
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.CelestialColors.nebulaCore)
                     .frame(width: 8, height: 8)
                     .opacity(isThinking ? 1 : 0.3)
@@ -1094,7 +1094,7 @@ struct StrategyCrystal: View {
                     HStack(alignment: .top, spacing: 12) {
                         // Step indicator
                         ZStack {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.CelestialColors.nebulaCore.opacity(0.2))
                                 .frame(width: 24, height: 24)
 
@@ -1151,7 +1151,7 @@ struct StrategyCrystal: View {
                     if expandedBlockers {
                         ForEach(blockers, id: \.self) { blocker in
                             HStack(alignment: .top, spacing: 8) {
-                                Circle()
+                                SwiftUI.Circle()
                                     .fill(Theme.Colors.aiAmber.opacity(0.5))
                                     .frame(width: 4, height: 4)
                                     .padding(.top, 6)
@@ -1249,11 +1249,11 @@ struct SubTaskConstellations: View {
 
                     // Mini progress ring
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(Theme.CelestialColors.starDim.opacity(0.3), lineWidth: 2)
                             .frame(width: 18, height: 18)
 
-                        Circle()
+                        SwiftUI.Circle()
                             .trim(from: 0, to: progress)
                             .stroke(
                                 Theme.CelestialColors.auroraGreen,
@@ -1368,7 +1368,7 @@ struct SubTaskConstellations: View {
                 onToggleSubTask(subTask)
             } label: {
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .strokeBorder(
                             subTask.status == .completed
                                 ? Theme.CelestialColors.auroraGreen
@@ -2153,7 +2153,7 @@ struct OracleChatSection: View {
     private var thinkingIndicator: some View {
         HStack(spacing: 4) {
             ForEach(0..<3, id: \.self) { index in
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.CelestialColors.nebulaCore)
                     .frame(width: 6, height: 6)
             }
@@ -2204,7 +2204,7 @@ struct FocusModeRecommendation: View {
             HStack {
                 ZStack {
                     // Pulsing background
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Theme.Colors.aiAmber.opacity(0.2))
                         .frame(width: 32, height: 32)
                         .scaleEffect(reduceMotion ? 1.0 : 1 + pulsePhase * 0.15)
@@ -2331,13 +2331,13 @@ struct OracleActionBar: View {
                 VStack(spacing: 4) {
                     ZStack {
                         // Pulse effect
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.CelestialColors.auroraGreen.opacity(0.3))
                             .frame(width: 48, height: 48)
                             .scaleEffect(reduceMotion ? 1.0 : 1 + completePulse * 0.2)
                             .opacity(1 - completePulse * 0.5)
 
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.CelestialColors.auroraGreen)
                             .frame(width: 44, height: 44)
 
@@ -2359,7 +2359,7 @@ struct OracleActionBar: View {
                 HapticsService.shared.selectionFeedback()
             } label: {
                 VStack(spacing: 4) {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Color.white.opacity(0.1))
                         .frame(width: 44, height: 44)
                         .overlay {
@@ -2381,7 +2381,7 @@ struct OracleActionBar: View {
                 HapticsService.shared.selectionFeedback()
             } label: {
                 VStack(spacing: 4) {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Color.white.opacity(0.1))
                         .frame(width: 44, height: 44)
                         .overlay {
@@ -2403,7 +2403,7 @@ struct OracleActionBar: View {
                 HapticsService.shared.impact()
             } label: {
                 VStack(spacing: 4) {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(Color.red.opacity(0.15))
                         .frame(width: 44, height: 44)
                         .overlay {

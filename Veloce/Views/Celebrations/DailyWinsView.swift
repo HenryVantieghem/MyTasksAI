@@ -464,7 +464,7 @@ struct DailyWinRow: View {
 
 // MARK: - Void Background
 
-struct VoidBackground: View {
+private struct DailyWinsVoidBackground: View {
     var body: some View {
         ZStack {
             Color(red: 0.02, green: 0.02, blue: 0.04)

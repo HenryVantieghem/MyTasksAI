@@ -38,7 +38,7 @@ struct OfflineBanner: View {
             } label: {
                 HStack(spacing: 10) {
                     // Pulsing indicator
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(statusColor)
                         .frame(width: 8, height: 8)
                         .opacity(pulseOpacity)
@@ -280,7 +280,7 @@ struct OfflineDot: View {
 
     var body: some View {
         if !offlineManager.isOnline {
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.CelestialColors.urgencyNear)
                 .frame(width: 6, height: 6)
                 .scaleEffect(pulse)

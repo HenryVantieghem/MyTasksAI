@@ -301,10 +301,10 @@ final class ToneSynthesizer {
             let decayStart = duration * 0.7
 
             if time < attackTime {
-                sample *= Float(time / attackTime)
+                sample *= time / attackTime
             } else if time > decayStart {
                 let decayProgress = (time - decayStart) / (duration - decayStart)
-                sample *= Float(1.0 - decayProgress)
+                sample *= 1.0 - decayProgress
             }
 
             data[i] = Float(sample) * volume

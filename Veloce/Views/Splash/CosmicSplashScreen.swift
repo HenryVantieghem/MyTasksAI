@@ -128,7 +128,7 @@ struct CosmicSplashScreen: View {
                 let opacity = starOpacity * star.baseOpacity * (starsCoalescing ? 0.3 : 1.0)
 
                 context.fill(
-                    SwiftUI.Circle().path(in: rect),
+                    SwiftUI.SwiftUI.Circle().path(in: rect),
                     with: .color(Color.white.opacity(opacity))
                 )
 
@@ -141,7 +141,7 @@ struct CosmicSplashScreen: View {
                         height: star.size * 2
                     )
                     context.fill(
-                        SwiftUI.Circle().path(in: glowRect),
+                        SwiftUI.SwiftUI.Circle().path(in: glowRect),
                         with: .color(Color.white.opacity(opacity * 0.3))
                     )
                 }
@@ -155,7 +155,7 @@ struct CosmicSplashScreen: View {
         let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height * 0.42)
 
         return ForEach(coalescingStars) { star in
-            Circle()
+            SwiftUI.Circle()
                 .fill(star.color)
                 .frame(width: star.size, height: star.size)
                 .blur(radius: star.size > 3 ? 1 : 0)
@@ -171,7 +171,7 @@ struct CosmicSplashScreen: View {
 
         return ZStack {
             // Outer glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -188,7 +188,7 @@ struct CosmicSplashScreen: View {
                 .blur(radius: 20)
 
             // Core star
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -215,7 +215,7 @@ struct CosmicSplashScreen: View {
             // App Icon/Logo
             ZStack {
                 // Amber glow behind logo
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -234,7 +234,7 @@ struct CosmicSplashScreen: View {
                 // Logo placeholder - orbital design
                 ZStack {
                     // Outer ring
-                    Circle()
+                    SwiftUI.Circle()
                         .stroke(
                             LinearGradient(
                                 colors: [
@@ -250,7 +250,7 @@ struct CosmicSplashScreen: View {
                         .frame(width: 80, height: 80)
 
                     // Inner filled circle
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -265,7 +265,7 @@ struct CosmicSplashScreen: View {
                         .frame(width: 50, height: 50)
 
                     // Orbital dot
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(.white)
                         .frame(width: 10, height: 10)
                         .offset(x: 40, y: 0)
@@ -479,7 +479,7 @@ struct SplashParticleBurst: View {
     var body: some View {
         ZStack {
             // Central flash
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -499,7 +499,7 @@ struct SplashParticleBurst: View {
 
             // Particles
             ForEach(particles) { particle in
-                Circle()
+                SwiftUI.Circle()
                     .fill(particle.color)
                     .frame(width: particle.size, height: particle.size)
                     .position(particle.position)

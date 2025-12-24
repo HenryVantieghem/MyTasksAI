@@ -38,7 +38,7 @@ struct MomentumIndicator: View {
                 }
 
                 // Flame
-                FlameShape(phase: flamePhase, intensity: state.flameIntensity)
+                StreakFlameShape(phase: flamePhase, intensity: state.flameIntensity)
                     .fill(
                         LinearGradient(
                             colors: flameColors,
@@ -148,7 +148,7 @@ struct MomentumIndicator: View {
 
 // MARK: - Flame Shape
 
-struct FlameShape: Shape {
+struct StreakFlameShape: Shape {
     var phase: CGFloat
     var intensity: Double
 

@@ -138,13 +138,13 @@ struct CosmosTimeBlock: View {
     private var plasmaCore: some View {
         ZStack {
             // Outer glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(taskColor.opacity(0.2))
                 .frame(width: 28 + (isHighPriority ? plasmaPhase * 4 : 0))
                 .blur(radius: 4)
 
             // Core background
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -372,7 +372,7 @@ struct CosmosCompactTimeBlock: View {
         Button(action: onTap) {
             HStack(spacing: 6) {
                 // Color dot
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [taskColor, taskColor.opacity(0.6)],

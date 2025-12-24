@@ -10,7 +10,7 @@ import SwiftUI
 
 // MARK: - Shareable Card Type
 
-enum ShareableCardType {
+enum WinCardType {
     case dailySummary(tasks: Int, xp: Int, date: Date)
     case milestone(title: String, value: Int, description: String)
     case personalBest(type: PersonalBestType, value: Int, previousValue: Int)
@@ -22,7 +22,7 @@ enum ShareableCardType {
 // MARK: - Shareable Win Card
 
 struct ShareableWinCard: View {
-    let cardType: ShareableCardType
+    let cardType: WinCardType
 
     // Card dimensions for social sharing (Instagram story ratio)
     private let cardWidth: CGFloat = 350
@@ -478,7 +478,7 @@ struct ShareableWinCard: View {
 @MainActor
 struct ShareCardGenerator {
     /// Generate a shareable image from a card type
-    static func generateImage(for cardType: ShareableCardType) -> UIImage? {
+    static func generateImage(for cardType: WinCardType) -> UIImage? {
         let view = ShareableWinCard(cardType: cardType)
 
         let renderer = ImageRenderer(content: view)
@@ -488,7 +488,7 @@ struct ShareCardGenerator {
     }
 
     /// Share a card using the system share sheet
-    static func share(cardType: ShareableCardType, from viewController: UIViewController? = nil) {
+    static func share(cardType: WinCardType, from viewController: UIViewController? = nil) {
         guard let image = generateImage(for: cardType) else { return }
 
         let activityVC = UIActivityViewController(
@@ -506,7 +506,7 @@ struct ShareCardGenerator {
 // MARK: - Share Button
 
 struct ShareWinButton: View {
-    let cardType: ShareableCardType
+    let cardType: WinCardType
     @State private var isGenerating = false
 
     var body: some View {

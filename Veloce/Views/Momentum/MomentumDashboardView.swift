@@ -189,7 +189,7 @@ struct MomentumDashboardView: View {
 
                     // Mystical orb hints
                     ForEach(0..<3, id: \.self) { i in
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.CelestialColors.nebulaCore.opacity(0.05))
                             .frame(width: 150, height: 150)
                             .blur(radius: 40)

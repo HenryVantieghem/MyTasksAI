@@ -74,7 +74,7 @@ struct NowHorizonIndicator: View {
     private var plasmaCore: some View {
         ZStack {
             // Outer glow ring (breathing)
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.CelestialColors.plasmaCore.opacity(0.15))
                 .frame(
                     width: 20 + (pulsePhase * 8),
@@ -83,7 +83,7 @@ struct NowHorizonIndicator: View {
                 .blur(radius: 6)
 
             // Middle glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.CelestialColors.plasmaCore.opacity(0.3))
                 .frame(
                     width: 14 + (pulsePhase * 4),
@@ -92,7 +92,7 @@ struct NowHorizonIndicator: View {
                 .blur(radius: 3)
 
             // Core dot with radial gradient
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [

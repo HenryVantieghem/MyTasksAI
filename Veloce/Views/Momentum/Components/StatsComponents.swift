@@ -33,7 +33,7 @@ struct ProductivityScoreRing: View {
         VStack(spacing: 16) {
             ZStack {
                 // Outer glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -50,12 +50,12 @@ struct ProductivityScoreRing: View {
                     .blur(radius: 20)
 
                 // Background ring
-                Circle()
+                SwiftUI.Circle()
                     .stroke(Color.white.opacity(0.08), lineWidth: 14)
                     .frame(width: 200, height: 200)
 
                 // Progress ring
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: animatedProgress)
                     .stroke(
                         AngularGradient(
@@ -71,7 +71,7 @@ struct ProductivityScoreRing: View {
                     .shadow(color: score.color.opacity(0.5), radius: 10)
 
                 // Rotating accent ring
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: 0.15)
                     .stroke(
                         LinearGradient(
@@ -195,11 +195,11 @@ struct ScoreBreakdownDot: View {
     var body: some View {
         VStack(spacing: 4) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(breakdown.color.opacity(0.2))
                     .frame(width: 36, height: 36)
 
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: breakdown.percentage)
                     .stroke(breakdown.color, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                     .frame(width: 30, height: 30)
@@ -277,7 +277,7 @@ struct QuickStatItem: View {
     var body: some View {
         VStack(spacing: 8) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(color.opacity(0.15))
                     .frame(width: 40, height: 40)
 
@@ -723,7 +723,7 @@ struct PersonalBestsCard: View {
                 ForEach(bests, id: \.title) { best in
                     HStack {
                         ZStack {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(best.color.opacity(0.15))
                                 .frame(width: 36, height: 36)
 

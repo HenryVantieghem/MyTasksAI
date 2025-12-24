@@ -34,7 +34,7 @@ struct SyncStatusIndicator: View {
         Button(action: { onTap?() }) {
             ZStack {
                 // Outer glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(glowColor.opacity(0.2 * glowIntensity))
                     .frame(width: 44, height: 44)
                     .blur(radius: 8)
@@ -45,11 +45,11 @@ struct SyncStatusIndicator: View {
                 }
 
                 // Main indicator
-                Circle()
+                SwiftUI.Circle()
                     .fill(backgroundGradient)
                     .frame(width: 32, height: 32)
                     .overlay(
-                        Circle()
+                        SwiftUI.Circle()
                             .stroke(borderGradient, lineWidth: 1)
                     )
                     .scaleEffect(pulse)
@@ -74,7 +74,7 @@ struct SyncStatusIndicator: View {
     private var orbitalRing: some View {
         ZStack {
             // Outer orbit
-            Circle()
+            SwiftUI.Circle()
                 .stroke(
                     AngularGradient(
                         colors: [
@@ -91,7 +91,7 @@ struct SyncStatusIndicator: View {
                 .rotationEffect(.degrees(orbitalRotation))
 
             // Orbiting particle
-            Circle()
+            SwiftUI.Circle()
                 .fill(Theme.CelestialColors.plasmaCore)
                 .frame(width: 4, height: 4)
                 .offset(x: 20)
@@ -113,7 +113,7 @@ struct SyncStatusIndicator: View {
         case .syncing(let progress):
             if progress > 0 {
                 // Progress ring
-                Circle()
+                SwiftUI.Circle()
                     .trim(from: 0, to: progress)
                     .stroke(Theme.CelestialColors.plasmaCore, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                     .frame(width: 16, height: 16)
@@ -278,7 +278,7 @@ struct SyncStatusView: View {
         VStack(alignment: .leading, spacing: 8) {
             // Status text
             HStack(spacing: 6) {
-                Circle()
+                SwiftUI.Circle()
                     .fill(statusColor)
                     .frame(width: 6, height: 6)
 

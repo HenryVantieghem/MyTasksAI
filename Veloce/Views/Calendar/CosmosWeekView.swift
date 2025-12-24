@@ -106,7 +106,7 @@ struct CosmosWeekView: View {
                     // Day number with highlight for today
                     ZStack {
                         if Calendar.current.isDateInToday(date) {
-                            Circle()
+                            SwiftUI.Circle()
                                 .fill(Theme.CelestialColors.plasmaCore)
                                 .frame(width: 28, height: 28)
                         }
