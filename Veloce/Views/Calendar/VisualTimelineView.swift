@@ -15,6 +15,7 @@ struct VisualTimelineView: View {
     let date: Date
     let tasks: [TaskItem]
     let onTaskTap: (TaskItem) -> Void
+    var onTaskReschedule: ((TaskItem, Date) -> Void)? = nil
 
     @State private var scrollPosition: CGFloat = 0
     @State private var zoomScale: CGFloat = 1.0
@@ -162,7 +163,11 @@ struct VisualTimelineView: View {
                             task: task,
                             hourWidth: hourWidth,
                             blockHeight: blockHeight,
-                            onTap: { onTaskTap(task) }
+                            onTap: { onTaskTap(task) },
+                            onReschedule: { newTime in
+                                onTaskReschedule?(task, newTime)
+                            },
+                            startHour: startHour
                         )
                         .offset(
                             x: taskXOffset(for: task),

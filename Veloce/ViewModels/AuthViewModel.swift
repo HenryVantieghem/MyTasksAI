@@ -83,10 +83,14 @@ final class AuthViewModel {
     }
     var confirmPassword: String = ""
     var fullName: String = ""
+    var username: String = "" {
+        didSet { validateUsernameRealTime() }
+    }
     var showPassword: Bool = false
 
     // MARK: Validation State
     private(set) var emailValidation: ValidationState = .idle
+    private(set) var usernameValidation: ValidationState = .idle
     private(set) var passwordStrength: PasswordStrength = .weak
 
     // MARK: Services
@@ -116,6 +120,38 @@ final class AuthViewModel {
             emailValidation = .valid
         } else {
             emailValidation = .invalid("Please enter a valid email")
+        }
+    }
+
+    // MARK: - Username Validation
+
+    /// Validate username format in real-time
+    /// Rules: 3-20 characters, alphanumeric + underscore only
+    func validateUsernameRealTime() {
+        guard !username.isEmpty else {
+            usernameValidation = .idle
+            return
+        }
+
+        usernameValidation = .validating
+
+        // Check length first
+        guard username.count >= 3 else {
+            usernameValidation = .invalid("At least 3 characters")
+            return
+        }
+
+        guard username.count <= 20 else {
+            usernameValidation = .invalid("Max 20 characters")
+            return
+        }
+
+        // Check format: alphanumeric + underscore only
+        let usernameRegex = "^[a-zA-Z0-9_]+$"
+        if username.range(of: usernameRegex, options: .regularExpression) != nil {
+            usernameValidation = .valid
+        } else {
+            usernameValidation = .invalid("Letters, numbers, and underscore only")
         }
     }
 
@@ -198,6 +234,12 @@ final class AuthViewModel {
             return
         }
 
+        guard usernameValidation.isValid else {
+            authState = .error("Please enter a valid username")
+            haptics.error()
+            return
+        }
+
         guard password.count >= 8 else {
             authState = .error("Password must be at least 8 characters")
             haptics.error()
@@ -223,10 +265,17 @@ final class AuthViewModel {
 
         do {
             let client = try supabase.getClient()
+
+            // Build user metadata
+            var userData: [String: AnyJSON] = ["username": .string(username)]
+            if !fullName.isEmpty {
+                userData["full_name"] = .string(fullName)
+            }
+
             try await client.auth.signUp(
                 email: email,
                 password: password,
-                data: fullName.isEmpty ? nil : ["full_name": .string(fullName)]
+                data: userData
             )
 
             authState = .success
@@ -299,7 +348,7 @@ final class AuthViewModel {
 
     /// Check if form is valid for sign up
     var canSignUp: Bool {
-        emailValidation.isValid && password.count >= 8 && password == confirmPassword
+        emailValidation.isValid && usernameValidation.isValid && password.count >= 8 && password == confirmPassword
     }
 
     /// Check if password meets minimum requirements

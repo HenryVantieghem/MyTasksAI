@@ -52,12 +52,10 @@ struct CelestialTaskCard: View {
                     .ignoresSafeArea()
                     .onTapGesture { dismissCard() }
 
-                // Main sheet
+                // Main sheet - Full page expansion
                 VStack(spacing: 0) {
-                    Spacer()
-
                     sheetContent
-                        .frame(maxHeight: geometry.size.height * 0.9)
+                        .frame(maxHeight: geometry.size.height)
                         .offset(y: dragOffset)
                         .gesture(dragGesture)
                 }
@@ -136,6 +134,14 @@ struct CelestialTaskCard: View {
                     // Focus Section
                     CelestialSectionDivider.focus()
                     CelestialFocusSection(viewModel: viewModel)
+
+                    // App Blocking Section
+                    AppBlockingModule(
+                        task: task,
+                        enableBlocking: $viewModel.enableAppBlocking
+                    ) { _ in
+                        viewModel.hasUnsavedChanges = true
+                    }
 
                     // Quick Actions (Always visible)
                     CelestialQuickActions(

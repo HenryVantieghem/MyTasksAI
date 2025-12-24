@@ -83,7 +83,8 @@ struct GlowingOrbLogo: View {
             specularHighlight
         }
         .frame(width: size.dimension * 1.8, height: size.dimension * 1.8)
-        .offset(y: -floatPhase * size.dimension * 0.05) // Floating offset
+        .offset(y: -floatPhase * size.dimension * 0.08) // Enhanced floating offset (60% more)
+        .shadow(color: auroraColors[0].opacity(0.3 * intensity), radius: 30 + floatPhase * 10, y: 15 + floatPhase * 5) // Dynamic shadow
         .onAppear {
             guard isAnimating && !reduceMotion else { return }
             startAnimations()
@@ -115,42 +116,42 @@ struct GlowingOrbLogo: View {
 
     private var auroraNebula: some View {
         ZStack {
-            // Primary aurora sweep
-            ForEach(0..<3, id: \.self) { layer in
+            // Primary aurora sweep - enhanced intensity
+            ForEach(0..<4, id: \.self) { layer in
                 Circle()
                     .fill(
                         AngularGradient(
                             colors: rotatedColors(by: layer * 2),
                             center: .center,
-                            angle: .degrees(auroraRotation + Double(layer) * 60)
+                            angle: .degrees(auroraRotation + Double(layer) * 45)
                         )
                     )
                     .frame(
-                        width: size.dimension * (1.4 - Double(layer) * 0.15),
-                        height: size.dimension * (1.4 - Double(layer) * 0.15)
+                        width: size.dimension * (1.5 - Double(layer) * 0.12),
+                        height: size.dimension * (1.5 - Double(layer) * 0.12)
                     )
-                    .blur(radius: size.dimension * (0.25 - Double(layer) * 0.05))
-                    .opacity((0.3 - Double(layer) * 0.08) * intensity * (0.8 + glowPulsePhase * 0.2))
+                    .blur(radius: size.dimension * (0.28 - Double(layer) * 0.04))
+                    .opacity((0.4 - Double(layer) * 0.08) * intensity * (0.75 + glowPulsePhase * 0.25))
             }
 
-            // Radial atmosphere
+            // Radial atmosphere - enhanced glow
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            auroraColors[0].opacity(0.35 * intensity),
-                            auroraColors[2].opacity(0.2 * intensity),
-                            auroraColors[4].opacity(0.1 * intensity),
+                            auroraColors[0].opacity(0.45 * intensity),
+                            auroraColors[2].opacity(0.28 * intensity),
+                            auroraColors[4].opacity(0.15 * intensity),
                             Color.clear
                         ],
                         center: .center,
-                        startRadius: size.dimension * 0.15,
-                        endRadius: size.dimension * 0.75
+                        startRadius: size.dimension * 0.12,
+                        endRadius: size.dimension * 0.85
                     )
                 )
-                .frame(width: size.dimension * 1.5, height: size.dimension * 1.5)
-                .blur(radius: size.dimension * 0.15)
-                .scaleEffect(1.0 + breathePhase * 0.08)
+                .frame(width: size.dimension * 1.7, height: size.dimension * 1.7)
+                .blur(radius: size.dimension * 0.18)
+                .scaleEffect(1.0 + breathePhase * 0.1)
         }
     }
 
@@ -409,38 +410,38 @@ struct GlowingOrbLogo: View {
     // MARK: - Animations
 
     private func startAnimations() {
-        // Floating levitation (2.5s gentle bounce)
-        withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+        // Floating levitation (3s enhanced bounce - more pronounced)
+        withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
             floatPhase = 1.0
         }
 
-        // Breathing scale (3s subtle pulse)
-        withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+        // Breathing scale (3.5s subtle pulse)
+        withAnimation(.easeInOut(duration: 3.5).repeatForever(autoreverses: true)) {
             breathePhase = 1.0
         }
 
-        // Aurora rotation (12s smooth spin)
-        withAnimation(.linear(duration: 12.0).repeatForever(autoreverses: false)) {
+        // Aurora rotation (10s smooth spin - slightly faster)
+        withAnimation(.linear(duration: 10.0).repeatForever(autoreverses: false)) {
             auroraRotation = 360
         }
 
-        // Core energy pulse (1.2s fast pulse)
-        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+        // Core energy pulse (1.0s fast pulse - more dynamic)
+        withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
             coreEnergyPhase = 1.0
         }
 
-        // Particle orbit (15s continuous)
-        withAnimation(.linear(duration: 15.0).repeatForever(autoreverses: false)) {
+        // Particle orbit (12s continuous - faster)
+        withAnimation(.linear(duration: 12.0).repeatForever(autoreverses: false)) {
             particleOrbitPhase = 1.0
         }
 
-        // Glow ring expansion (3s wave)
-        withAnimation(.linear(duration: 3.0).repeatForever(autoreverses: false)) {
+        // Glow ring expansion (2.5s wave - more noticeable)
+        withAnimation(.linear(duration: 2.5).repeatForever(autoreverses: false)) {
             glowPulsePhase = 1.0
         }
 
-        // Surface shimmer (2s sparkle)
-        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+        // Surface shimmer (1.8s sparkle - more frequent)
+        withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
             shimmerPhase = 1.0
         }
     }

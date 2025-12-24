@@ -68,6 +68,10 @@ final class TaskItem {
     var recurringParentId: UUID?  // Links recurring instances to parent task
     var lastRecurrenceDate: Date?  // When the last recurring instance was created
 
+    // MARK: App Blocking
+    var enableAppBlocking: Bool  // Whether to block apps during this task
+    var blockedAppsData: Data?   // FamilyActivitySelection encoded data
+
     // MARK: Initialization
     init(
         id: UUID = UUID(),
@@ -102,7 +106,9 @@ final class TaskItem {
         recurringDays: [Int]? = nil,
         recurringEndDate: Date? = nil,
         recurringParentId: UUID? = nil,
-        lastRecurrenceDate: Date? = nil
+        lastRecurrenceDate: Date? = nil,
+        enableAppBlocking: Bool = false,
+        blockedAppsData: Data? = nil
     ) {
         self.id = id
         self.title = title
@@ -137,6 +143,8 @@ final class TaskItem {
         self.recurringEndDate = recurringEndDate
         self.recurringParentId = recurringParentId
         self.lastRecurrenceDate = lastRecurrenceDate
+        self.enableAppBlocking = enableAppBlocking
+        self.blockedAppsData = blockedAppsData
     }
 }
 

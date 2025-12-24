@@ -15,10 +15,15 @@ struct TimeBlockView: View {
     let hourWidth: CGFloat
     let blockHeight: CGFloat
     let onTap: () -> Void
+    var onReschedule: ((Date) -> Void)? = nil
+    var startHour: Int = 6
 
     @State private var isPressed = false
+    @State private var isDragging = false
+    @State private var dragOffset: CGSize = .zero
     @State private var glowPhase: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.modelContext) private var modelContext
 
     // Calculate block width based on duration
     private var blockWidth: CGFloat {
@@ -50,26 +55,89 @@ struct TimeBlockView: View {
     }
 
     var body: some View {
-        Button(action: onTap) {
-            ZStack(alignment: .leading) {
-                // Glow background
-                glowBackground
+        ZStack(alignment: .leading) {
+            // Glow background
+            glowBackground
 
-                // Main block
-                mainBlock
+            // Main block
+            mainBlock
+                .overlay {
+                    if isDragging {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(taskColor, lineWidth: 2)
+                            .shadow(color: taskColor.opacity(0.6), radius: 8)
+                    }
+                }
 
-                // Content
-                blockContent
+            // Content
+            blockContent
+
+            // Drag handle indicator when dragging
+            if isDragging {
+                HStack {
+                    dragHandleIndicator
+                    Spacer()
+                    dragHandleIndicator
+                }
+                .padding(.horizontal, 4)
             }
-            .frame(width: max(blockWidth, 60), height: blockHeight)
         }
-        .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.97 : 1.0)
+        .frame(width: max(blockWidth, 60), height: blockHeight)
+        .offset(dragOffset)
+        .scaleEffect(isDragging ? 1.02 : (isPressed ? 0.97 : 1.0))
+        .shadow(color: isDragging ? taskColor.opacity(0.5) : .clear, radius: 12, y: 4)
         .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPressed)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isDragging)
+        .gesture(
+            LongPressGesture(minimumDuration: 0.3)
+                .sequenced(before: DragGesture())
+                .onChanged { value in
+                    switch value {
+                    case .first(true):
+                        // Long press started
+                        HapticsService.shared.selectionFeedback()
+                    case .second(true, let drag):
+                        // Dragging
+                        if !isDragging {
+                            isDragging = true
+                            HapticsService.shared.impact()
+                        }
+                        if let drag = drag {
+                            dragOffset = drag.translation
+                        }
+                    default:
+                        break
+                    }
+                }
+                .onEnded { value in
+                    if case .second(true, let drag) = value, let drag = drag {
+                        // Calculate new time from drag offset
+                        let hoursMoved = drag.translation.width / hourWidth
+                        let minutesMoved = Int(hoursMoved * 60)
+
+                        if abs(minutesMoved) >= 15, let currentTime = task.scheduledTime {
+                            // Snap to 15-minute increments
+                            let snappedMinutes = (minutesMoved / 15) * 15
+                            if let newTime = Calendar.current.date(byAdding: .minute, value: snappedMinutes, to: currentTime) {
+                                HapticsService.shared.success()
+                                onReschedule?(newTime)
+                            }
+                        }
+                    }
+
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        isDragging = false
+                        dragOffset = .zero
+                    }
+                }
+        )
         .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in isPressed = true }
-                .onEnded { _ in isPressed = false }
+            TapGesture()
+                .onEnded { _ in
+                    if !isDragging {
+                        onTap()
+                    }
+                }
         )
         .onAppear {
             guard !reduceMotion else { return }
@@ -78,7 +146,19 @@ struct TimeBlockView: View {
             }
         }
         .accessibilityLabel("\(task.title), \(task.taskType.rawValue) task")
-        .accessibilityHint("Double tap to view details")
+        .accessibilityHint("Long press and drag to reschedule, or double tap to view details")
+    }
+
+    // MARK: - Drag Handle Indicator
+
+    private var dragHandleIndicator: some View {
+        VStack(spacing: 2) {
+            ForEach(0..<3, id: \.self) { _ in
+                Capsule()
+                    .fill(.white.opacity(0.6))
+                    .frame(width: 3, height: 3)
+            }
+        }
     }
 
     // MARK: - Glow Background

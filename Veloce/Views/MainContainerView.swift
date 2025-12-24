@@ -147,10 +147,10 @@ struct MainContainerView: View {
             }
             .toolbar(.hidden, for: .tabBar)
 
-            // Custom Celestial Tab Bar - floats at bottom with safe area respect
+            // iOS 26 Liquid Glass Tab Bar - floats at bottom with safe area respect
             VStack {
                 Spacer()
-                CelestialTabBar(selectedTab: $selectedTab)
+                LiquidGlassTabBar(selectedTab: $selectedTab)
             }
             .safeAreaPadding(.bottom)
 

@@ -164,6 +164,16 @@ struct TaskCardView: View {
         task.starRating > 0 || task.scheduledTime != nil || task.aiProcessedAt != nil || (task.estimatedMinutes ?? 0) > 0
     }
 
+    // Task type color for consistency with TaskCardV2
+    private var taskTypeColor: Color {
+        switch task.taskType {
+        case .create: return Theme.TaskCardColors.create
+        case .communicate: return Theme.TaskCardColors.communicate
+        case .consume: return Theme.TaskCardColors.consume
+        case .coordinate: return Theme.TaskCardColors.coordinate
+        }
+    }
+
     // MARK: - Card Background
 
     private var cardBackground: some View {
@@ -172,13 +182,26 @@ struct TaskCardView: View {
             RoundedRectangle(cornerRadius: Theme.CornerRadius.xl)
                 .fill(.ultraThinMaterial)
 
+            // Task type tint gradient (consistent with TaskCardV2)
+            RoundedRectangle(cornerRadius: Theme.CornerRadius.xl)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            taskTypeColor.opacity(task.isCompleted ? 0.02 : 0.06),
+                            .clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
             // Gradient overlay for depth
             RoundedRectangle(cornerRadius: Theme.CornerRadius.xl)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.25 : 0.1),
-                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.1 : 0.03)
+                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.15 : 0.08),
+                            Theme.Colors.glassBackground.opacity(colorScheme == .dark ? 0.05 : 0.02)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -196,12 +219,12 @@ struct TaskCardView: View {
                     colors: [
                         .white.opacity(colorScheme == .dark ? 0.2 : 0.3),
                         .white.opacity(colorScheme == .dark ? 0.05 : 0.1),
-                        task.hasAIProcessing ? Theme.CelestialColors.nebulaCore.opacity(glowOpacity) : Color.clear
+                        task.hasAIProcessing ? taskTypeColor.opacity(glowOpacity) : Color.clear
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ),
-                lineWidth: 1
+                lineWidth: task.hasAIProcessing ? 1.5 : 1
             )
     }
 
@@ -209,7 +232,7 @@ struct TaskCardView: View {
 
     private var cardShadowColor: Color {
         if task.hasAIProcessing {
-            return Theme.CelestialColors.nebulaCore.opacity(colorScheme == .dark ? 0.15 : 0.08)
+            return taskTypeColor.opacity(colorScheme == .dark ? 0.2 : 0.1)
         }
         return Color.black.opacity(colorScheme == .dark ? 0.3 : 0.08)
     }

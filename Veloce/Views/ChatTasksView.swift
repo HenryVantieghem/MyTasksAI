@@ -66,9 +66,9 @@ struct ChatTasksView: View {
 
             // Main content
             VStack(spacing: 0) {
-                // Date selector with Liquid Glass
+                // Date selector with Liquid Glass - positioned lower for visual balance
                 TodayPillView(selectedDate: $selectedDate)
-                    .padding(.top, 24)
+                    .padding(.top, 48)
 
                 // Task feed or empty state
                 if filteredTasks.isEmpty && filteredRecentlyCompleted.isEmpty {

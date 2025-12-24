@@ -17,6 +17,7 @@ final class User {
     var id: UUID
     var email: String?
     var fullName: String?
+    var username: String?
     var avatarUrl: String?
 
     // MARK: Gamification
@@ -47,6 +48,7 @@ final class User {
         id: UUID = UUID(),
         email: String? = nil,
         fullName: String? = nil,
+        username: String? = nil,
         avatarUrl: String? = nil,
         totalPoints: Int = 0,
         currentLevel: Int = 1,
@@ -67,6 +69,7 @@ final class User {
         self.id = id
         self.email = email
         self.fullName = fullName
+        self.username = username
         self.avatarUrl = avatarUrl
         self.totalPoints = totalPoints
         self.currentLevel = currentLevel
@@ -88,9 +91,9 @@ final class User {
 
 // MARK: - Computed Properties
 extension User {
-    /// Display name (full name or email)
+    /// Display name (full name, username, or email)
     var displayName: String {
-        fullName ?? email ?? "User"
+        fullName ?? username ?? email ?? "User"
     }
 
     /// First name only
@@ -206,6 +209,7 @@ extension User {
     func update(from supabaseUser: SupabaseUser) {
         email = supabaseUser.email
         fullName = supabaseUser.fullName
+        username = supabaseUser.username
         avatarUrl = supabaseUser.avatarUrl
         totalPoints = supabaseUser.totalPoints ?? 0
         currentLevel = supabaseUser.currentLevel ?? 1
@@ -229,6 +233,7 @@ extension User {
             id: supabaseUser.id,
             email: supabaseUser.email,
             fullName: supabaseUser.fullName,
+            username: supabaseUser.username,
             avatarUrl: supabaseUser.avatarUrl,
             totalPoints: supabaseUser.totalPoints ?? 0,
             currentLevel: supabaseUser.currentLevel ?? 1,
@@ -259,6 +264,7 @@ struct SupabaseUser: Codable, Sendable {
     let id: UUID
     var email: String?
     var fullName: String?
+    var username: String?
     var avatarUrl: String?
     var totalPoints: Int?
     var currentLevel: Int?
@@ -280,6 +286,7 @@ struct SupabaseUser: Codable, Sendable {
         self.id = user.id
         self.email = user.email
         self.fullName = user.fullName
+        self.username = user.username
         self.avatarUrl = user.avatarUrl
         self.totalPoints = user.totalPoints
         self.currentLevel = user.currentLevel
@@ -302,6 +309,7 @@ struct SupabaseUser: Codable, Sendable {
         case id
         case email
         case fullName = "full_name"
+        case username
         case avatarUrl = "avatar_url"
         case totalPoints = "total_points"
         case currentLevel = "current_level"

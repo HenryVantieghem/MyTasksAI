@@ -134,6 +134,10 @@ final class CelestialTaskCardViewModel {
     var hasUnsavedChanges: Bool = false
     var isInitialLoadComplete: Bool = false
 
+    // MARK: - App Blocking State
+
+    var enableAppBlocking: Bool
+
     // MARK: - Sheet States
 
     var showFocusMode: Bool = false
@@ -201,6 +205,9 @@ final class CelestialTaskCardViewModel {
 
         // Set emotional check-in flag
         self.showEmotionalCheckIn = (task.timesRescheduled ?? 0) >= 2
+
+        // Initialize app blocking state
+        self.enableAppBlocking = task.enableAppBlocking
 
         // Set work mode recommendation based on task type
         configureWorkModeRecommendation()
@@ -624,6 +631,7 @@ final class CelestialTaskCardViewModel {
             customDays: editedRecurringDays.isEmpty ? nil : editedRecurringDays,
             endDate: editedRecurringEndDate
         )
+        task.enableAppBlocking = enableAppBlocking
         task.updatedAt = Date()
 
         hasUnsavedChanges = false

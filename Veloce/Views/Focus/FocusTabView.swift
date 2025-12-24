@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import FamilyControls
 
 // MARK: - Focus Timer Mode
 
@@ -62,7 +63,12 @@ struct FocusTabView: View {
     @State private var totalSeconds: Int = 25 * 60
     @State private var showModeSelector = false
     @State private var showBlockingSheet = false
+    @State private var showAppBlockingPicker = false
     @State private var timer: Timer?
+
+    // App Blocking
+    @State private var enableAppBlocking = false
+    private let blockingService = FocusBlockingService.shared
 
     // Animation states
     @State private var timerRingProgress: Double = 1.0
@@ -90,6 +96,9 @@ struct FocusTabView: View {
                 // Mode Selector
                 modeSelectorView
 
+                // App Blocking Toggle
+                appBlockingToggle
+
                 // Action Buttons
                 actionButtons
 
@@ -111,9 +120,16 @@ struct FocusTabView: View {
                 .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showBlockingSheet) {
-            AppBlockingSheet()
+            FocusAppBlockingConfigSheet(enableBlocking: $enableAppBlocking)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+        }
+        .familyActivityPicker(
+            isPresented: $showAppBlockingPicker,
+            selection: Bindable(blockingService).selectedAppsToBlock
+        )
+        .onChange(of: blockingService.selectedAppsToBlock) { _, _ in
+            blockingService.saveSelection()
         }
         .onAppear {
             resetTimer()
@@ -223,6 +239,95 @@ struct FocusTabView: View {
             .padding(.horizontal, Theme.Spacing.screenPadding)
         }
         .padding(.horizontal, -Theme.Spacing.screenPadding)
+    }
+
+    // MARK: - App Blocking Toggle
+
+    private var appBlockingToggle: some View {
+        VStack(spacing: Theme.Spacing.sm) {
+            HStack {
+                HStack(spacing: 8) {
+                    Image(systemName: "shield.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(enableAppBlocking ? Theme.Colors.aiAmber : .secondary)
+
+                    Text("App Blocking")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(enableAppBlocking ? .primary : .secondary)
+                }
+
+                Spacer()
+
+                Toggle("", isOn: $enableAppBlocking)
+                    .toggleStyle(SwitchToggleStyle(tint: Theme.Colors.aiAmber))
+                    .labelsHidden()
+            }
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, 12)
+            .background {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.ultraThinMaterial)
+            }
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+
+            if enableAppBlocking {
+                HStack(spacing: Theme.Spacing.sm) {
+                    if blockingService.isAuthorized {
+                        if blockingService.hasAppsSelected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.Colors.success)
+
+                            Text(blockingService.selectionSummary)
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.Colors.warning)
+
+                            Text("No apps selected")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer()
+
+                        Button {
+                            showAppBlockingPicker = true
+                            HapticsService.shared.selectionFeedback()
+                        } label: {
+                            Text(blockingService.hasAppsSelected ? "Edit" : "Select Apps")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(Theme.Colors.aiAmber)
+                        }
+                    } else {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.Colors.warning)
+
+                        Text("Screen Time access required")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+
+                        Spacer()
+
+                        Button {
+                            Task {
+                                try? await blockingService.requestAuthorizationIfNeeded()
+                            }
+                        } label: {
+                            Text("Enable")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(Theme.Colors.aiAmber)
+                        }
+                    }
+                }
+                .padding(.horizontal, Theme.Spacing.md)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: enableAppBlocking)
     }
 
     // MARK: - Action Buttons
@@ -353,6 +458,22 @@ struct FocusTabView: View {
         isSessionActive = true
         HapticsService.shared.success()
 
+        // Start app blocking if enabled
+        if enableAppBlocking && blockingService.hasAppsSelected {
+            Task {
+                do {
+                    try await blockingService.startSession(
+                        title: selectedMode.rawValue,
+                        duration: totalSeconds,
+                        isDeepFocus: selectedMode == .deepWork
+                    )
+                } catch {
+                    // Continue without blocking if it fails
+                    print("App blocking failed: \(error.localizedDescription)")
+                }
+            }
+        }
+
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if remainingSeconds > 0 {
                 remainingSeconds -= 1
@@ -374,6 +495,13 @@ struct FocusTabView: View {
         isSessionActive = false
         timer?.invalidate()
         timer = nil
+
+        // End app blocking on pause
+        if blockingService.isBlocking {
+            Task {
+                await blockingService.endSession(completed: false)
+            }
+        }
     }
 
     private func resetTimer() {
@@ -390,8 +518,17 @@ struct FocusTabView: View {
     }
 
     private func completeSession() {
-        pauseTimer()
+        timer?.invalidate()
+        timer = nil
+        isSessionActive = false
         HapticsService.shared.success()
+
+        // End app blocking on completion
+        if blockingService.isBlocking {
+            Task {
+                await blockingService.endSession(completed: true)
+            }
+        }
 
         // Show completion feedback
         withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
@@ -526,41 +663,172 @@ struct FocusTimerModePickerSheet: View {
     }
 }
 
-// MARK: - App Blocking Sheet
+// MARK: - Focus App Blocking Config Sheet
 
-struct AppBlockingSheet: View {
+struct FocusAppBlockingConfigSheet: View {
+    @Binding var enableBlocking: Bool
+    @State private var showAppPicker = false
     @Environment(\.dismiss) private var dismiss
+
+    private let blockingService = FocusBlockingService.shared
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: Theme.Spacing.lg) {
-                Image(systemName: "lock.shield")
-                    .font(.system(size: 64, weight: .thin))
-                    .foregroundStyle(Theme.Colors.aiAmber)
+            VStack(spacing: Theme.Spacing.xl) {
+                // Hero Icon
+                ZStack {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Theme.Colors.aiAmber.opacity(0.3),
+                                    Theme.Colors.aiAmber.opacity(0.1),
+                                    Color.clear
+                                ],
+                                center: .center,
+                                startRadius: 20,
+                                endRadius: 80
+                            )
+                        )
+                        .frame(width: 160, height: 160)
 
-                Text("App Blocking")
-                    .font(.title2.bold())
+                    Image(systemName: "shield.lefthalf.filled")
+                        .font(.system(size: 64, weight: .thin))
+                        .foregroundStyle(Theme.Colors.aiAmber)
+                }
+                .padding(.top, Theme.Spacing.lg)
 
-                Text("Block distracting apps during your focus sessions. Requires Screen Time permissions.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                // Title & Description
+                VStack(spacing: Theme.Spacing.sm) {
+                    Text("Focus Shield")
+                        .font(.title.bold())
+
+                    Text("Block distracting apps during focus sessions to stay in the zone.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, Theme.Spacing.lg)
+                }
+
+                // Current Selection Summary
+                if blockingService.isAuthorized {
+                    VStack(spacing: Theme.Spacing.md) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Apps to Block")
+                                    .font(.headline)
+
+                                Text(blockingService.hasAppsSelected ? blockingService.selectionSummary : "None selected")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            if blockingService.hasAppsSelected {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundStyle(Theme.Colors.success)
+                            }
+                        }
+                        .padding(Theme.Spacing.md)
+                        .background {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(.ultraThinMaterial)
+                        }
+                        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+
+                        Button {
+                            showAppPicker = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "plus.app")
+                                Text(blockingService.hasAppsSelected ? "Edit Blocked Apps" : "Select Apps to Block")
+                            }
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Theme.Colors.aiAmber)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, Theme.Spacing.lg)
+                } else {
+                    // Authorization needed
+                    VStack(spacing: Theme.Spacing.md) {
+                        HStack(spacing: Theme.Spacing.sm) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(Theme.Colors.warning)
+
+                            Text("Screen Time access is required to block apps")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(Theme.Spacing.md)
+                        .frame(maxWidth: .infinity)
+                        .background {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Theme.Colors.warning.opacity(0.1))
+                        }
+
+                        Button {
+                            Task {
+                                try? await blockingService.requestAuthorizationIfNeeded()
+                            }
+                        } label: {
+                            Text("Enable Screen Time Access")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Theme.Colors.aiAmber)
+                                }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, Theme.Spacing.lg)
+                }
 
                 Spacer()
 
-                Button("Enable App Blocking") {
-                    // Will integrate with FamilyActivityPicker
+                // Enable Toggle
+                Toggle(isOn: $enableBlocking) {
+                    HStack {
+                        Image(systemName: "shield.fill")
+                            .foregroundStyle(enableBlocking ? Theme.Colors.aiAmber : .secondary)
+                        Text("Enable for Focus Sessions")
+                            .font(.headline)
+                    }
                 }
-                .buttonStyle(.glassProminent)
+                .toggleStyle(SwitchToggleStyle(tint: Theme.Colors.aiAmber))
+                .padding(Theme.Spacing.md)
+                .background {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.ultraThinMaterial)
+                }
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, Theme.Spacing.lg)
+                .padding(.bottom, Theme.Spacing.lg)
             }
-            .padding()
             .navigationTitle("App Blocking")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
                 }
+            }
+            .familyActivityPicker(
+                isPresented: $showAppPicker,
+                selection: Bindable(blockingService).selectedAppsToBlock
+            )
+            .onChange(of: blockingService.selectedAppsToBlock) { _, _ in
+                blockingService.saveSelection()
             }
         }
     }
