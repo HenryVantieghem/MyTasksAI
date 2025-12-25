@@ -147,7 +147,7 @@ struct MilestoneOverlay: View {
         ZStack {
             // Expanding rings
             ForEach(0..<3, id: \.self) { i in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         Theme.Celebration.plasmaCore.opacity(0.3 - Double(i) * 0.1),
                         lineWidth: 2
@@ -157,7 +157,7 @@ struct MilestoneOverlay: View {
             }
 
             // Central glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -175,15 +175,17 @@ struct MilestoneOverlay: View {
                 .scaleEffect(0.5 + glowPulse * 0.3)
                 .blur(radius: 40)
 
-            // Particle burst
-            ParticleEmitterView(
-                type: .supernova,
-                at: CGPoint(
-                    x: UIScreen.main.bounds.width / 2,
-                    y: UIScreen.main.bounds.height / 2
-                ),
-                particleCount: 100
-            )
+            // Particle burst (centered in view)
+            GeometryReader { geometry in
+                ParticleEmitterView(
+                    type: .supernova,
+                    at: CGPoint(
+                        x: geometry.size.width / 2,
+                        y: geometry.size.height / 2
+                    ),
+                    particleCount: 100
+                )
+            }
         }
     }
 
@@ -193,7 +195,7 @@ struct MilestoneOverlay: View {
         VStack(spacing: 20) {
             // Icon with glow
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -406,7 +408,7 @@ struct LevelUpOverlay: View {
                     // Level badge with glow
                     ZStack {
                         // Glow
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(
                                 RadialGradient(
                                     colors: [
@@ -422,7 +424,7 @@ struct LevelUpOverlay: View {
                             .scaleEffect(1.0 + glowIntensity * 0.2)
 
                         // Ring
-                        Circle()
+                        SwiftUI.Circle()
                             .strokeBorder(
                                 AngularGradient(
                                     colors: [
@@ -570,7 +572,7 @@ struct AchievementBannerOverlay: View {
                 HStack(spacing: 16) {
                     // Icon
                     ZStack {
-                        Circle()
+                        SwiftUI.Circle()
                             .fill(Theme.Celebration.starGold.opacity(0.2))
                             .frame(width: 48, height: 48)
 

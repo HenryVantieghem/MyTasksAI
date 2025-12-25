@@ -18,8 +18,8 @@ final class CircleService {
     static let shared = CircleService()
 
     // MARK: State
-    var circles: [Circle] = []
-    var currentCircle: Circle?
+    var circles: [SocialCircle] = []
+    var currentCircle: SocialCircle?
     var isLoading = false
     var error: String?
 
@@ -62,7 +62,7 @@ final class CircleService {
             }
 
             // Fetch circles with members
-            let response: [Circle] = try await client
+            let response: [SocialCircle] = try await client
                 .from("circles")
                 .select("""
                     *,
@@ -88,7 +88,7 @@ final class CircleService {
     // MARK: - Create Circle
 
     /// Create a new circle
-    func createCircle(name: String, description: String? = nil, maxMembers: Int = 5) async throws -> Circle {
+    func createCircle(name: String, description: String? = nil, maxMembers: Int = 5) async throws -> SocialCircle {
         guard supabase.isConfigured else {
             throw CircleServiceError.notConfigured
         }
@@ -112,7 +112,7 @@ final class CircleService {
                 maxMembers: maxMembers
             )
 
-            let newCircle: Circle = try await client
+            let newCircle: SocialCircle = try await client
                 .from("circles")
                 .insert(request)
                 .select()
@@ -155,7 +155,7 @@ final class CircleService {
     // MARK: - Join by Invite Code
 
     /// Join a circle using an invite code
-    func joinByInviteCode(_ code: String) async throws -> Circle {
+    func joinByInviteCode(_ code: String) async throws -> SocialCircle {
         guard supabase.isConfigured else {
             throw CircleServiceError.notConfigured
         }
@@ -173,7 +173,7 @@ final class CircleService {
 
             // Find circle by invite code
             let normalizedCode = code.lowercased().trimmingCharacters(in: .whitespaces)
-            let circles: [Circle] = try await client
+            let circles: [SocialCircle] = try await client
                 .from("circles")
                 .select("*, members:circle_members(*)")
                 .eq("invite_code", value: normalizedCode)

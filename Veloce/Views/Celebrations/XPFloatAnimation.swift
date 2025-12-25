@@ -243,7 +243,7 @@ struct XPEarnedBanner: View {
             HStack(spacing: 16) {
                 // Star icon with glow
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [

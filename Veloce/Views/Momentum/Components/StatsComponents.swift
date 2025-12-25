@@ -577,8 +577,7 @@ struct CompletionTrendChart: View {
         for i in (0..<30).reversed() {
             let date = calendar.date(byAdding: .day, value: -i, to: Date()) ?? Date()
             let dayTasks = tasks.filter { task in
-                guard let created = task.createdAt else { return false }
-                return calendar.isDate(created, inSameDayAs: date)
+                calendar.isDate(task.createdAt, inSameDayAs: date)
             }
             let completed = dayTasks.filter { $0.isCompleted }.count
             let rate = dayTasks.isEmpty ? 0.5 : Double(completed) / Double(dayTasks.count)

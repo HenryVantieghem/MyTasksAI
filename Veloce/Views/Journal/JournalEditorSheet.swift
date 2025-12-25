@@ -738,20 +738,22 @@ struct DrawingPreviewView: View {
     let onEdit: () -> Void
     let onDelete: () -> Void
 
+    private var drawingImage: UIImage {
+        drawing.image(from: drawing.bounds, scale: 1.0)
+    }
+
     var body: some View {
         ZStack(alignment: .topTrailing) {
             // Drawing image
-            if let image = drawing.image(from: drawing.bounds, scale: 1.0) {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxHeight: 200)
-                    .background(.white.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .onTapGesture {
-                        onEdit()
-                    }
-            }
+            Image(uiImage: drawingImage)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxHeight: 200)
+                .background(.white.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .onTapGesture {
+                    onEdit()
+                }
 
             // Delete button
             Button(action: onDelete) {

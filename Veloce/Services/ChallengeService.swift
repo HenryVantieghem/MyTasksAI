@@ -350,27 +350,27 @@ final class ChallengeService {
 
         realtimeChannel = supabase.realtimeV2.channel("challenges")
 
-        await realtimeChannel?.onPostgresChange(
+        _ = await realtimeChannel?.onPostgresChange(
             AnyAction.self,
             schema: "public",
             table: "challenge_participants"
-        ) { [weak self] change in
+        ) { [weak self] _ in
             Task {
                 try? await self?.loadChallenges()
             }
         }
 
-        await realtimeChannel?.onPostgresChange(
+        _ = await realtimeChannel?.onPostgresChange(
             AnyAction.self,
             schema: "public",
             table: "challenges"
-        ) { [weak self] change in
+        ) { [weak self] _ in
             Task {
                 try? await self?.loadChallenges()
             }
         }
 
-        await realtimeChannel?.subscribe()
+        try? await realtimeChannel?.subscribeWithError()
     }
 
     /// Unsubscribe from realtime updates

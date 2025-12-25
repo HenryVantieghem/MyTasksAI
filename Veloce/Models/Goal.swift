@@ -165,7 +165,7 @@ extension Goal {
     }
 
     /// Decoded AI roadmap
-    nonisolated var decodedRoadmap: GoalRoadmap? {
+    var decodedRoadmap: GoalRoadmap? {
         guard let data = aiRoadmap else { return nil }
         return try? JSONDecoder().decode(GoalRoadmap.self, from: data)
     }
@@ -294,8 +294,8 @@ extension Goal {
         updatedAt = .now
     }
 
-    /// Helper to encode roadmap in nonisolated context
-    nonisolated private static func encodeRoadmap(_ roadmap: GoalRoadmap) throws -> Data {
+    /// Helper to encode roadmap
+    private static func encodeRoadmap(_ roadmap: GoalRoadmap) throws -> Data {
         try JSONEncoder().encode(roadmap)
     }
 

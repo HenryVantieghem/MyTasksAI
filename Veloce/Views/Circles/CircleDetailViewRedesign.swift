@@ -11,7 +11,7 @@ import SwiftUI
 // MARK: - Circle Detail View Redesign
 
 struct CircleDetailViewRedesign: View {
-    let circle: Circle
+    let circle: SocialCircle
 
     @Environment(\.dismiss) private var dismiss
     @State private var circleService = CircleService.shared
@@ -664,7 +664,7 @@ struct CircleActivityRow: View {
 // MARK: - Circle Invite Sheet
 
 struct CircleInviteSheet: View {
-    let circle: Circle
+    let circle: SocialCircle
     @Environment(\.dismiss) private var dismiss
 
     @State private var copied = false
@@ -767,7 +767,7 @@ extension CircleActivityType {
 
 #Preview {
     CircleDetailViewRedesign(
-        circle: Circle(
+        circle: SocialCircle(
             id: UUID(),
             name: "Productivity Squad",
             description: "Stay focused and accountable together",

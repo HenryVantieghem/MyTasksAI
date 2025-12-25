@@ -22,7 +22,7 @@ struct DailyWinItem: Identifiable {
         self.id = task.id
         self.title = task.title
         self.completedAt = task.completedAt ?? .now
-        self.xpEarned = task.pointsEarned ?? 10
+        self.xpEarned = task.pointsEarned
         self.category = task.category
         self.wasImportant = task.priorityEnum == .high
     }
@@ -116,7 +116,7 @@ struct DailyWinsView: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(.secondary)
                         .padding(12)
-                        .background(Circle().fill(.ultraThinMaterial))
+                        .background(SwiftUI.Circle().fill(.ultraThinMaterial))
                 }
 
                 Spacer()
@@ -128,7 +128,7 @@ struct DailyWinsView: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(Theme.Celebration.plasmaCore)
                         .padding(12)
-                        .background(Circle().fill(.ultraThinMaterial))
+                        .background(SwiftUI.Circle().fill(.ultraThinMaterial))
                 }
             }
             .padding(.horizontal, 20)
@@ -189,7 +189,7 @@ struct DailyWinsView: View {
         VStack(spacing: 20) {
             // Trophy
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -375,11 +375,11 @@ struct DailyWinRow: View {
         HStack(spacing: 16) {
             // Checkmark
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Celebration.successGlow.opacity(0.2))
                     .frame(width: 44, height: 44)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Celebration.successGlow)
                     .frame(width: 44, height: 44)
                     .scaleEffect(isChecked ? 1.0 : 0)
@@ -471,7 +471,7 @@ private struct DailyWinsVoidBackground: View {
                 .ignoresSafeArea()
 
             // Subtle nebula glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -488,8 +488,8 @@ private struct DailyWinsVoidBackground: View {
                 .blur(radius: 60)
 
             // Stars
-            ForEach(0..<30, id: \.self) { i in
-                Circle()
+            ForEach(0..<30, id: \.self) { _ in
+                SwiftUI.Circle()
                     .fill(Color.white.opacity(Double.random(in: 0.2...0.6)))
                     .frame(width: CGFloat.random(in: 1...3))
                     .position(

@@ -83,6 +83,22 @@ struct FriendProfile: Codable, Identifiable, Sendable, Hashable {
         username.map { "@\($0)" }
     }
 
+    /// Convenience alias for tasksCompletedToday
+    var todayTasksCompleted: Int? {
+        tasksCompletedToday
+    }
+
+    /// Whether user was recently active (stub - would need real data)
+    var isActiveNow: Bool {
+        // In a real app, this would check last activity timestamp
+        false
+    }
+
+    /// Focus minutes today (stub - would need real data)
+    var todayFocusMinutes: Int? {
+        nil
+    }
+
     enum CodingKeys: String, CodingKey {
         case id
         case username

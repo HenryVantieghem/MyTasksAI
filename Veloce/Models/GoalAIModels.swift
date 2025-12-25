@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SwiftUI
+@preconcurrency import SwiftUI
 
 // MARK: - Goal Refinement (SMART Analysis)
 /// Result of AI refining a vague goal into a SMART goal

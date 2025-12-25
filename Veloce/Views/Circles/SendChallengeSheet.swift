@@ -710,7 +710,7 @@ struct FriendSelectionRow: View {
 // MARK: - Circle Selection Pill
 
 struct CircleSelectionPill: View {
-    let circle: Circle
+    let circle: SocialCircle
 
     var body: some View {
         HStack(spacing: 8) {

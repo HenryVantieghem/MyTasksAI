@@ -17,7 +17,7 @@ struct CirclesTabView: View {
     @State private var showAddFriend = false
     @State private var showCreateCircle = false
     @State private var showJoinCircle = false
-    @State private var selectedCircle: Circle?
+    @State private var selectedCircle: SocialCircle?
     @State private var isRefreshing = false
 
     var body: some View {
@@ -351,7 +351,7 @@ struct CirclesTabView: View {
 // MARK: - Circle Card View
 
 struct CircleCardView: View {
-    let circle: Circle
+    let circle: SocialCircle
 
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {

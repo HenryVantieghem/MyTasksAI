@@ -148,11 +148,20 @@ final class AIService {
             throw AIServiceError.notConfigured
         }
 
-        return try await perplexity.findYouTubeResources(
+        let searchResources = try await perplexity.generateYouTubeSearchQueries(
             taskTitle: task.title,
             context: task.contextNotes,
-            maxResults: maxResults
+            maxQueries: maxResults
         )
+        // Convert YouTubeSearchResource to YouTubeResource format
+        return searchResources.prefix(maxResults).map { resource in
+            YouTubeResource(
+                videoId: resource.searchQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? resource.searchQuery,
+                title: resource.displayTitle,
+                channelName: "YouTube Search",
+                relevanceScore: resource.relevanceScore
+            )
+        }
     }
 
     // MARK: - Schedule Suggestions

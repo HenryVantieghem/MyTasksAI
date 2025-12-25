@@ -278,13 +278,14 @@ enum LivingCosmos {
         /// End hour for day timeline
         static let endHour: Int = 24
 
-        /// Week day column calculated width
+        /// Week day column calculated width (uses estimated screen width)
         static var weekDayColumnWidth: CGFloat {
-            (UIScreen.main.bounds.width - timeGutterWidth - 32) / 7
+            // Use a safe default width, actual width should be calculated in views with GeometryReader
+            (390 - timeGutterWidth - 32) / 7
         }
 
-        /// Month grid cell size
-        static let monthCellSize: CGFloat = (UIScreen.main.bounds.width - 48) / 7
+        /// Month grid cell size (uses estimated screen width)
+        static let monthCellSize: CGFloat = (390 - 48) / 7
 
         /// Event block opacity (secondary to tasks)
         static let eventOpacity: Double = 0.75

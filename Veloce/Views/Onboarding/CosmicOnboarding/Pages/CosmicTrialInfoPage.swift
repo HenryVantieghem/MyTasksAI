@@ -72,7 +72,7 @@ struct CosmicTrialInfoPage: View {
         ZStack {
             // Outer glow rings
             ForEach(0..<3) { ring in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         Theme.CelestialColors.solarFlare.opacity(0.12 - Double(ring) * 0.03),
                         lineWidth: 1.5
@@ -85,7 +85,7 @@ struct CosmicTrialInfoPage: View {
             }
 
             // Ambient glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -121,7 +121,7 @@ struct CosmicTrialInfoPage: View {
             // Main crown container
             ZStack {
                 // Background circle
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -137,12 +137,12 @@ struct CosmicTrialInfoPage: View {
                     .frame(width: 130, height: 130)
 
                 // Glass overlay
-                Circle()
+                SwiftUI.Circle()
                     .fill(.ultraThinMaterial)
                     .frame(width: 110, height: 110)
 
                 // Border
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         LinearGradient(
                             colors: [
@@ -413,7 +413,7 @@ struct TrialFeatureRow: View {
         HStack(spacing: Theme.Spacing.md) {
             // Icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         LinearGradient(
                             colors: [

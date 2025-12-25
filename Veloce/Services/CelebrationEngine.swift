@@ -425,7 +425,7 @@ final class CelebrationEngine {
 
         // Check for level up
         let currentLevel = gamification.currentLevel
-        let points = gamification.totalPoints + (task.pointsEarned ?? 0)
+        let points = gamification.totalPoints + task.pointsEarned
         let newLevel = gamification.calculateLevel(for: points)
         if newLevel > currentLevel {
             return "Level \(newLevel) Reached!"
@@ -456,7 +456,8 @@ final class CelebrationEngine {
 
     private func setupDecayTimer() {
         decayCheckTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            guard let self else { return }
+            Task { @MainActor [weak self] in
                 self?.checkMomentumDecay()
             }
         }

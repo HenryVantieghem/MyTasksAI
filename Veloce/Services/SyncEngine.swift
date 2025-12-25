@@ -469,7 +469,7 @@ final class SyncEngine {
         let descriptor = FetchDescriptor<TaskItem>()
         let localTasks = try context.fetch(descriptor)
 
-        let remoteById = Dictionary(uniqueKeysWithValues: remoteTasks.map { ($0.id, $0) })
+        _ = Dictionary(uniqueKeysWithValues: remoteTasks.map { ($0.id, $0) })  // remoteById for future use
         let localById = Dictionary(uniqueKeysWithValues: localTasks.map { ($0.id, $0) })
 
         // Download remote tasks (if newer)
@@ -495,7 +495,7 @@ final class SyncEngine {
         let descriptor = FetchDescriptor<Goal>()
         let localGoals = try context.fetch(descriptor)
 
-        let remoteById = Dictionary(uniqueKeysWithValues: remoteGoals.map { ($0.id, $0) })
+        _ = Dictionary(uniqueKeysWithValues: remoteGoals.map { ($0.id, $0) })  // remoteById for future use
         let localById = Dictionary(uniqueKeysWithValues: localGoals.map { ($0.id, $0) })
 
         for remoteGoal in remoteGoals {

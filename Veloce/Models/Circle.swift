@@ -110,8 +110,8 @@ enum CircleActivityType: String, Codable, Sendable, CaseIterable {
     }
 }
 
-// MARK: - Circle Model
-struct Circle: Codable, Identifiable, Sendable, Hashable {
+// MARK: - Circle Model (renamed to avoid SwiftUI.Circle conflict)
+struct SocialCircle: Codable, Identifiable, Sendable, Hashable {
     let id: UUID
     var name: String
     var description: String?
@@ -162,7 +162,7 @@ struct Circle: Codable, Identifiable, Sendable, Hashable {
         hasher.combine(id)
     }
 
-    static func == (lhs: Circle, rhs: Circle) -> Bool {
+    static func == (lhs: SocialCircle, rhs: SocialCircle) -> Bool {
         lhs.id == rhs.id
     }
 }

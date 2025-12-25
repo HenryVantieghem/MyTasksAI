@@ -133,7 +133,7 @@ final class VoiceRecordingService: NSObject {
         isRecording = false
 
         // Get duration
-        let asset = AVAsset(url: url)
+        let asset = AVURLAsset(url: url)
         let duration = try await asset.load(.duration).seconds
 
         // Create recording object
@@ -218,7 +218,7 @@ final class VoiceRecordingService: NSObject {
     // MARK: Playback
 
     func playRecording(at path: String) async throws {
-        let url = URL(fileURLWithPath: path)
+        _ = URL(fileURLWithPath: path)  // url for future playback implementation
 
         // Configure audio session for playback
         let session = AVAudioSession.sharedInstance()
@@ -234,14 +234,16 @@ final class VoiceRecordingService: NSObject {
     private func startTimers() {
         // Recording time timer
         recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            guard let self else { return }
+            Task { @MainActor [weak self] in
                 self?.recordingTime += 0.1
             }
         }
 
         // Audio level timer
         levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            guard let self else { return }
+            Task { @MainActor [weak self] in
                 self?.updateAudioLevel()
             }
         }

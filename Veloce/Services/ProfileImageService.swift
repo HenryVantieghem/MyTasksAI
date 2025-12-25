@@ -67,7 +67,7 @@ final class ProfileImageService: ObservableObject {
         // Upload to Supabase Storage
         do {
             // First, try to remove existing file (ignore errors if file doesn't exist)
-            try? await SupabaseService.shared.supabase.storage
+            _ = try? await SupabaseService.shared.supabase.storage
                 .from(bucketName)
                 .remove(paths: [filePath])
 

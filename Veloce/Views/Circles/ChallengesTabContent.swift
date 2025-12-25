@@ -99,7 +99,7 @@ struct Challenge: Identifiable {
 
     var isIncoming: Bool {
         // Challenge sent to current user that's pending
-        status == .pending && participants.contains { $0.userId != creatorId && $0.status == .pending }
+        status == .pending && participants.contains { $0.userId != creatorId && $0.status == "pending" }
     }
 
     var isActive: Bool {

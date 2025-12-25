@@ -175,9 +175,9 @@ struct NowHorizonIndicator: View {
             glowIntensity = 0.6
         }
 
-        // Traveling shimmer
+        // Traveling shimmer (use a reasonable max width that works on all devices)
         withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
-            shimmerOffset = UIScreen.main.bounds.width
+            shimmerOffset = 500
         }
     }
 }

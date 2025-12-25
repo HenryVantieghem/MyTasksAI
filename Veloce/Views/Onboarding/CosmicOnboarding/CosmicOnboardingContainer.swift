@@ -267,13 +267,13 @@ struct CosmicOnboardingContainer: View {
         return ZStack {
             if isCurrent {
                 // Glow
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Colors.aiPurple.opacity(0.5))
                     .frame(width: 16, height: 16)
                     .blur(radius: 4)
             }
 
-            Circle()
+            SwiftUI.Circle()
                 .fill(dotColor(isComplete: isComplete, isCurrent: isCurrent))
                 .frame(width: isCurrent ? 10 : 6, height: isCurrent ? 10 : 6)
 
@@ -422,7 +422,7 @@ struct CosmicOnboardingBackground: View {
                 }
 
                 context.fill(
-                    Circle().path(in: rect),
+                    SwiftUI.Circle().path(in: rect),
                     with: .color(starColor)
                 )
 
@@ -434,7 +434,7 @@ struct CosmicOnboardingBackground: View {
                         height: star.size * 2
                     )
                     context.fill(
-                        Circle().path(in: glowRect),
+                        SwiftUI.Circle().path(in: glowRect),
                         with: .color(starColor.opacity(0.2))
                     )
                 }
@@ -443,7 +443,8 @@ struct CosmicOnboardingBackground: View {
     }
 
     private func regenerateStars() {
-        let size = UIScreen.main.bounds.size
+        // Use a reasonable default size for star field
+        let size = CGSize(width: 400, height: 800)
         stars = CosmicStar.generateField(count: 40, in: size)
     }
 

@@ -83,119 +83,141 @@ struct FriendProfileSheet: View {
 
     private var profileHeader: some View {
         VStack(spacing: 16) {
-            // Orbital avatar
-            ZStack {
-                // Orbital rings
-                if !reduceMotion {
-                    ForEach(0..<3) { i in
-                        SwiftUI.Circle()
-                            .stroke(
-                                Theme.Colors.aiPurple.opacity(0.1 + Double(i) * 0.05),
-                                lineWidth: 1
-                            )
-                            .frame(width: CGFloat(110 + i * 20), height: CGFloat(110 + i * 20))
-                            .rotationEffect(.degrees(orbitPhase * (i % 2 == 0 ? 1 : -1) * 360))
-                    }
-                }
+            orbitalAvatarView
+            nameAndUsernameView
+            levelBadgeView
+            statusView
+        }
+    }
 
-                // Level progress ring
-                SwiftUI.Circle()
-                    .stroke(Color.white.opacity(0.1), lineWidth: 4)
-                    .frame(width: 100, height: 100)
+    private var orbitalAvatarView: some View {
+        ZStack {
+            orbitalRingsView
+            levelProgressRingView
+            avatarCircleView
+            onlineIndicatorView
+        }
+    }
 
+    @ViewBuilder
+    private var orbitalRingsView: some View {
+        if !reduceMotion {
+            ForEach(0..<3, id: \.self) { i in
                 SwiftUI.Circle()
-                    .trim(from: 0, to: levelProgress)
                     .stroke(
-                        LinearGradient(
-                            colors: [Theme.Colors.aiPurple, Theme.CelestialColors.plasmaCore],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                        Theme.Colors.aiPurple.opacity(0.1 + Double(i) * 0.05),
+                        lineWidth: 1
                     )
-                    .frame(width: 100, height: 100)
-                    .rotationEffect(.degrees(-90))
-
-                // Avatar
-                ZStack {
-                    SwiftUI.Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Theme.Colors.aiPurple.opacity(0.3), Theme.CelestialColors.plasmaCore.opacity(0.2)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 88, height: 88)
-
-                    Text(friend.displayName.prefix(1).uppercased())
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
-                        .foregroundStyle(Theme.CelestialColors.starWhite)
-                }
-
-                // Online indicator
-                if friend.isActiveNow {
-                    ZStack {
-                        SwiftUI.Circle()
-                            .fill(Theme.CelestialColors.auroraGreen)
-                            .frame(width: 18, height: 18)
-
-                        if !reduceMotion {
-                            SwiftUI.Circle()
-                                .fill(Theme.CelestialColors.auroraGreen.opacity(0.3 * glowPhase))
-                                .frame(width: 24, height: 24)
-                                .blur(radius: 4)
-                        }
-                    }
-                    .overlay {
-                        SwiftUI.Circle()
-                            .stroke(Theme.CelestialColors.void, lineWidth: 3)
-                    }
-                    .offset(x: 38, y: 38)
-                }
+                    .frame(width: CGFloat(110 + i * 20), height: CGFloat(110 + i * 20))
+                    .rotationEffect(.degrees(Double(orbitPhase) * Double(i % 2 == 0 ? 1 : -1) * 360))
             }
+        }
+    }
 
-            // Name and username
-            VStack(spacing: 4) {
-                Text(friend.displayName)
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(Theme.CelestialColors.starWhite)
+    private var levelProgressRingView: some View {
+        ZStack {
+            SwiftUI.Circle()
+                .stroke(Color.white.opacity(0.1), lineWidth: 4)
+                .frame(width: 100, height: 100)
 
-                if let username = friend.atUsername {
-                    Text(username)
-                        .font(.system(size: 14))
-                        .foregroundStyle(Theme.CelestialColors.starGhost)
-                }
-            }
+            SwiftUI.Circle()
+                .trim(from: 0, to: levelProgress)
+                .stroke(
+                    LinearGradient(
+                        colors: [Theme.Colors.aiPurple, Theme.CelestialColors.plasmaCore],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                )
+                .frame(width: 100, height: 100)
+                .rotationEffect(.degrees(-90))
+        }
+    }
 
-            // Level badge
-            HStack(spacing: 6) {
-                Image(systemName: "star.fill")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.Colors.xp)
+    private var avatarCircleView: some View {
+        ZStack {
+            SwiftUI.Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [Theme.Colors.aiPurple.opacity(0.3), Theme.CelestialColors.plasmaCore.opacity(0.2)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 88, height: 88)
 
-                Text("Level \(friend.currentLevel ?? 1)")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Theme.CelestialColors.starWhite)
+            Text(friend.displayName.prefix(1).uppercased())
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundStyle(Theme.CelestialColors.starWhite)
+        }
+    }
 
-                Text("•")
-                    .foregroundStyle(Theme.CelestialColors.starGhost)
-
-                Text("\(friend.totalPoints ?? 0) XP")
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundStyle(Theme.CelestialColors.starDim)
-            }
-
-            // Status
-            HStack(spacing: 6) {
+    @ViewBuilder
+    private var onlineIndicatorView: some View {
+        if friend.isActiveNow {
+            ZStack {
                 SwiftUI.Circle()
-                    .fill(friend.isActiveNow ? Theme.CelestialColors.auroraGreen : Theme.CelestialColors.starGhost)
-                    .frame(width: 8, height: 8)
+                    .fill(Theme.CelestialColors.auroraGreen)
+                    .frame(width: 18, height: 18)
 
-                Text(friend.isActiveNow ? "Active now" : "Last active \(friend.formattedLastActive)")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.CelestialColors.starDim)
+                if !reduceMotion {
+                    SwiftUI.Circle()
+                        .fill(Theme.CelestialColors.auroraGreen.opacity(0.3 * glowPhase))
+                        .frame(width: 24, height: 24)
+                        .blur(radius: 4)
+                }
             }
+            .overlay {
+                SwiftUI.Circle()
+                    .stroke(Theme.CelestialColors.void, lineWidth: 3)
+            }
+            .offset(x: 38, y: 38)
+        }
+    }
+
+    private var nameAndUsernameView: some View {
+        VStack(spacing: 4) {
+            Text(friend.displayName)
+                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .foregroundStyle(Theme.CelestialColors.starWhite)
+
+            if let username = friend.atUsername {
+                Text(username)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.CelestialColors.starGhost)
+            }
+        }
+    }
+
+    private var levelBadgeView: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "star.fill")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.Colors.xp)
+
+            Text("Level \(friend.currentLevel ?? 1)")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(Theme.CelestialColors.starWhite)
+
+            Text("•")
+                .foregroundStyle(Theme.CelestialColors.starGhost)
+
+            Text("\(friend.totalPoints ?? 0) XP")
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(Theme.CelestialColors.starDim)
+        }
+    }
+
+    private var statusView: some View {
+        HStack(spacing: 6) {
+            SwiftUI.Circle()
+                .fill(friend.isActiveNow ? Theme.CelestialColors.auroraGreen : Theme.CelestialColors.starGhost)
+                .frame(width: 8, height: 8)
+
+            Text(friend.isActiveNow ? "Active now" : "Last active \(friend.formattedLastActive)")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.CelestialColors.starDim)
         }
     }
 

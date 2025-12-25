@@ -418,11 +418,10 @@ struct OracleTaskDetailSheet: View {
     private func addSubTask(title: String) {
         let newSubTask = SubTask(
             id: UUID(),
-            taskId: task.id,
             title: title,
             status: .pending,
             orderIndex: subTasks.count,
-            isAIGenerated: false
+            taskId: task.id
         )
         subTasks.append(newSubTask)
         updateSubTaskProgress()
@@ -635,7 +634,7 @@ struct OracleHeader: View {
         .padding(20)
         .background {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.6))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.6))
                 .overlay {
                     RoundedRectangle(cornerRadius: 20)
                         .strokeBorder(
@@ -833,7 +832,7 @@ struct OracleNotesSection: View {
         .padding(16)
         .background {
             RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.4))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.4))
         }
         .onAppear {
             isExpanded = !notes.isEmpty
@@ -917,7 +916,7 @@ struct AIInsightOracle: View {
                     LinearGradient(
                         colors: [
                             Theme.CelestialColors.nebulaCore.opacity(0.15),
-                            Theme.CelestialColors.voidMedium.opacity(0.6)
+                            Theme.CelestialColors.voidDeep.opacity(0.6)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -1168,7 +1167,7 @@ struct StrategyCrystal: View {
         .padding(20)
         .background {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.5))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.5))
                 .overlay {
                     // Shimmer effect
                     if !reduceMotion {
@@ -1332,7 +1331,7 @@ struct SubTaskConstellations: View {
         .padding(20)
         .background {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.5))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.5))
                 .overlay {
                     RoundedRectangle(cornerRadius: 20)
                         .strokeBorder(Theme.CelestialColors.auroraGreen.opacity(0.2), lineWidth: 1)
@@ -1540,7 +1539,7 @@ struct AIPromptGenerator: View {
         .padding(16)
         .background {
             RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.4))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.4))
                 .overlay {
                     RoundedRectangle(cornerRadius: 16)
                         .strokeBorder(Theme.Colors.aiPurple.opacity(0.2), lineWidth: 1)
@@ -1619,7 +1618,7 @@ struct KnowledgeStars: View {
         .padding(20)
         .background {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.5))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.5))
                 .overlay {
                     RoundedRectangle(cornerRadius: 20)
                         .strokeBorder(Theme.Colors.aiBlue.opacity(0.2), lineWidth: 1)
@@ -1803,7 +1802,7 @@ struct TimeOrbit: View {
         .padding(20)
         .background {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.5))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.5))
                 .overlay {
                     RoundedRectangle(cornerRadius: 20)
                         .strokeBorder(Theme.Colors.aiAmber.opacity(0.2), lineWidth: 1)
@@ -2095,7 +2094,7 @@ struct OracleChatSection: View {
         .padding(16)
         .background {
             RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.CelestialColors.voidMedium.opacity(0.4))
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.4))
                 .overlay {
                     RoundedRectangle(cornerRadius: 16)
                         .strokeBorder(Theme.CelestialColors.nebulaCore.opacity(0.15), lineWidth: 1)
@@ -2262,7 +2261,7 @@ struct FocusModeRecommendation: View {
                     LinearGradient(
                         colors: [
                             Theme.Colors.aiAmber.opacity(0.1),
-                            Theme.CelestialColors.voidMedium.opacity(0.5)
+                            Theme.CelestialColors.voidDeep.opacity(0.5)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -2323,101 +2322,10 @@ struct OracleActionBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            // Complete (Primary)
-            Button {
-                onComplete()
-                HapticsService.shared.successFeedback()
-            } label: {
-                VStack(spacing: 4) {
-                    ZStack {
-                        // Pulse effect
-                        SwiftUI.Circle()
-                            .fill(Theme.CelestialColors.auroraGreen.opacity(0.3))
-                            .frame(width: 48, height: 48)
-                            .scaleEffect(reduceMotion ? 1.0 : 1 + completePulse * 0.2)
-                            .opacity(1 - completePulse * 0.5)
-
-                        SwiftUI.Circle()
-                            .fill(Theme.CelestialColors.auroraGreen)
-                            .frame(width: 44, height: 44)
-
-                        Image(systemName: task.status == .completed ? "checkmark.circle.fill" : "checkmark")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundStyle(.black)
-                    }
-
-                    Text("Complete")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.auroraGreen)
-                }
-            }
-            .frame(maxWidth: .infinity)
-
-            // Duplicate
-            Button {
-                onDuplicate()
-                HapticsService.shared.selectionFeedback()
-            } label: {
-                VStack(spacing: 4) {
-                    SwiftUI.Circle()
-                        .fill(Color.white.opacity(0.1))
-                        .frame(width: 44, height: 44)
-                        .overlay {
-                            Image(systemName: "doc.on.doc")
-                                .font(.system(size: 16))
-                                .foregroundStyle(.white)
-                        }
-
-                    Text("Duplicate")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
-                }
-            }
-            .frame(maxWidth: .infinity)
-
-            // Snooze
-            Button {
-                showSnoozeOptions = true
-                HapticsService.shared.selectionFeedback()
-            } label: {
-                VStack(spacing: 4) {
-                    SwiftUI.Circle()
-                        .fill(Color.white.opacity(0.1))
-                        .frame(width: 44, height: 44)
-                        .overlay {
-                            Image(systemName: "clock.arrow.circlepath")
-                                .font(.system(size: 16))
-                                .foregroundStyle(.white)
-                        }
-
-                    Text("Snooze")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
-                }
-            }
-            .frame(maxWidth: .infinity)
-
-            // Delete
-            Button {
-                showDeleteConfirm = true
-                HapticsService.shared.impact()
-            } label: {
-                VStack(spacing: 4) {
-                    SwiftUI.Circle()
-                        .fill(Color.red.opacity(0.15))
-                        .frame(width: 44, height: 44)
-                        .overlay {
-                            Image(systemName: "trash")
-                                .font(.system(size: 16))
-                                .foregroundStyle(.red.opacity(0.8))
-                        }
-
-                    Text("Delete")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.red.opacity(0.7))
-                }
-            }
-            .frame(maxWidth: .infinity)
+            completeButton
+            duplicateButton
+            snoozeButton
+            deleteButton
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
@@ -2465,6 +2373,109 @@ struct OracleActionBar: View {
             Text("This action cannot be undone.")
         }
     }
+
+    // MARK: - Button Views
+
+    private var completeButton: some View {
+        Button {
+            onComplete()
+            HapticsService.shared.successFeedback()
+        } label: {
+            VStack(spacing: 4) {
+                ZStack {
+                    SwiftUI.Circle()
+                        .fill(Theme.CelestialColors.auroraGreen.opacity(0.3))
+                        .frame(width: 48, height: 48)
+                        .scaleEffect(reduceMotion ? 1.0 : 1 + completePulse * 0.2)
+                        .opacity(Double(1.0 - completePulse * 0.5))
+
+                    SwiftUI.Circle()
+                        .fill(Theme.CelestialColors.auroraGreen)
+                        .frame(width: 44, height: 44)
+
+                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "checkmark")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.black)
+                }
+
+                Text("Complete")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var duplicateButton: some View {
+        Button {
+            onDuplicate()
+            HapticsService.shared.selectionFeedback()
+        } label: {
+            VStack(spacing: 4) {
+                SwiftUI.Circle()
+                    .fill(Color.white.opacity(0.1))
+                    .frame(width: 44, height: 44)
+                    .overlay {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 16))
+                            .foregroundStyle(.white)
+                    }
+
+                Text("Duplicate")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Theme.CelestialColors.starDim)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var snoozeButton: some View {
+        Button {
+            showSnoozeOptions = true
+            HapticsService.shared.selectionFeedback()
+        } label: {
+            VStack(spacing: 4) {
+                SwiftUI.Circle()
+                    .fill(Color.white.opacity(0.1))
+                    .frame(width: 44, height: 44)
+                    .overlay {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 16))
+                            .foregroundStyle(.white)
+                    }
+
+                Text("Snooze")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Theme.CelestialColors.starDim)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var deleteButton: some View {
+        Button {
+            showDeleteConfirm = true
+            HapticsService.shared.impact()
+        } label: {
+            VStack(spacing: 4) {
+                SwiftUI.Circle()
+                    .fill(Color.red.opacity(0.15))
+                    .frame(width: 44, height: 44)
+                    .overlay {
+                        Image(systemName: "trash")
+                            .font(.system(size: 16))
+                            .foregroundStyle(.red.opacity(0.8))
+                    }
+
+                Text("Delete")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.red.opacity(0.7))
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Snooze Actions
 
     private func snoozeFor(hours: Int) {
         let snoozeDate = Calendar.current.date(byAdding: .hour, value: hours, to: Date())!

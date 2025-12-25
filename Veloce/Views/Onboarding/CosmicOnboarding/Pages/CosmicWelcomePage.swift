@@ -66,7 +66,7 @@ struct CosmicWelcomePage: View {
         ZStack {
             // Outer glow rings
             ForEach(0..<3) { ring in
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         Theme.CelestialColors.solarFlare.opacity(0.1 - Double(ring) * 0.03),
                         lineWidth: 1
@@ -79,7 +79,7 @@ struct CosmicWelcomePage: View {
             }
 
             // Ambient glow
-            Circle()
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
@@ -97,7 +97,7 @@ struct CosmicWelcomePage: View {
             // Logo icon - cosmic orbital design
             ZStack {
                 // Outer orbital ring
-                Circle()
+                SwiftUI.Circle()
                     .stroke(
                         LinearGradient(
                             colors: [
@@ -114,7 +114,7 @@ struct CosmicWelcomePage: View {
                     .rotationEffect(.degrees(logoRotation))
 
                 // Inner cosmic core
-                Circle()
+                SwiftUI.Circle()
                     .fill(
                         RadialGradient(
                             colors: [
@@ -131,7 +131,7 @@ struct CosmicWelcomePage: View {
                     .shadow(color: Theme.CelestialColors.solarFlare.opacity(0.5), radius: 15)
 
                 // Orbital particle
-                Circle()
+                SwiftUI.Circle()
                     .fill(.white)
                     .frame(width: 12, height: 12)
                     .shadow(color: .white.opacity(0.8), radius: 6)
@@ -349,11 +349,11 @@ struct CosmicWelcomeFeatureRow: View {
         HStack(spacing: Theme.Spacing.md) {
             // Icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.15))
                     .frame(width: 50, height: 50)
 
-                Circle()
+                SwiftUI.Circle()
                     .fill(iconColor.opacity(0.1))
                     .frame(width: 50, height: 50)
                     .blur(radius: 8)

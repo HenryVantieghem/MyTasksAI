@@ -284,26 +284,38 @@ final class ChatTasksViewModel: TaskActionDelegate {
     // MARK: - TaskActionDelegate Conformance
 
     nonisolated func taskDidComplete(_ task: TaskItem) {
+        let taskId = task.persistentModelID
         Task { @MainActor in
-            _ = completeTask(task)
+            guard let context = self.modelContext,
+                  let fetchedTask = context.model(for: taskId) as? TaskItem else { return }
+            _ = completeTask(fetchedTask)
         }
     }
 
     nonisolated func taskDidDelete(_ task: TaskItem) {
+        let taskId = task.persistentModelID
         Task { @MainActor in
-            deleteTask(task)
+            guard let context = self.modelContext,
+                  let fetchedTask = context.model(for: taskId) as? TaskItem else { return }
+            deleteTask(fetchedTask)
         }
     }
 
     nonisolated func taskDidDuplicate(_ task: TaskItem) {
+        let taskId = task.persistentModelID
         Task { @MainActor in
-            duplicateTask(task)
+            guard let context = self.modelContext,
+                  let fetchedTask = context.model(for: taskId) as? TaskItem else { return }
+            duplicateTask(fetchedTask)
         }
     }
 
     nonisolated func taskDidSnooze(_ task: TaskItem) {
+        let taskId = task.persistentModelID
         Task { @MainActor in
-            snoozeTask(task)
+            guard let context = self.modelContext,
+                  let fetchedTask = context.model(for: taskId) as? TaskItem else { return }
+            snoozeTask(fetchedTask)
         }
     }
 }

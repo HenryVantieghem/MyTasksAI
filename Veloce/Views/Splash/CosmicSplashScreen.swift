@@ -128,7 +128,7 @@ struct CosmicSplashScreen: View {
                 let opacity = starOpacity * star.baseOpacity * (starsCoalescing ? 0.3 : 1.0)
 
                 context.fill(
-                    SwiftUI.SwiftUI.Circle().path(in: rect),
+                    SwiftUI.Circle().path(in: rect),
                     with: .color(Color.white.opacity(opacity))
                 )
 
@@ -141,7 +141,7 @@ struct CosmicSplashScreen: View {
                         height: star.size * 2
                     )
                     context.fill(
-                        SwiftUI.SwiftUI.Circle().path(in: glowRect),
+                        SwiftUI.Circle().path(in: glowRect),
                         with: .color(Color.white.opacity(opacity * 0.3))
                     )
                 }
@@ -530,8 +530,8 @@ struct SplashParticleBurst: View {
             let angle = (Double(i) / 24.0) * 2 * .pi + Double.random(in: -0.2...0.2)
             let distance = CGFloat.random(in: 80...180)
             let targetPosition = CGPoint(
-                x: center.x + cos(angle) * distance,
-                y: center.y + sin(angle) * distance
+                x: center.x + CGFloat(Darwin.cos(angle)) * distance,
+                y: center.y + CGFloat(Darwin.sin(angle)) * distance
             )
 
             var particle = SplashBurstParticle(

@@ -120,7 +120,7 @@ final class AISchedulingService {
             return "- \(task.title) (duration: \(duration)min, priority: \(priority)/3)"
         }.joined(separator: "\n")
 
-        let prompt = """
+        _ = """
         Schedule these tasks optimally for \(date.formatted(date: .complete, time: .omitted)):
 
         Tasks:

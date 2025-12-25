@@ -197,7 +197,7 @@ struct SupernovaParticleBurst: View {
             let speed = CGFloat.random(in: 3...8)
             let distance = CGFloat.random(in: 60...150)
 
-            var particle = CosmicParticle(
+            let particle = CosmicParticle(
                 id: UUID(),
                 position: centerPosition,
                 velocity: CGSize(

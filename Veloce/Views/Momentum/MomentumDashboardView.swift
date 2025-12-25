@@ -424,7 +424,7 @@ struct DateNavigatorPill: View {
                 withAnimation(.spring(response: 0.3)) {
                     selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
                 }
-                HapticsService.shared.lightFeedback()
+                HapticsService.shared.impact(.light)
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 10, weight: .bold))
@@ -439,7 +439,7 @@ struct DateNavigatorPill: View {
                 withAnimation(.spring(response: 0.3)) {
                     selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
                 }
-                HapticsService.shared.lightFeedback()
+                HapticsService.shared.impact(.light)
             } label: {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 10, weight: .bold))

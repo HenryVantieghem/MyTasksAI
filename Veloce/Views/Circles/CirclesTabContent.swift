@@ -12,7 +12,7 @@ import SwiftUI
 
 struct CirclesTabContent: View {
     let circleService: CircleService
-    var onCircleSelected: (Circle) -> Void
+    var onCircleSelected: (SocialCircle) -> Void
     var onCreateCircle: () -> Void
     var onJoinCircle: () -> Void
 
@@ -92,7 +92,7 @@ struct CirclesTabContent: View {
         .padding(.horizontal, 20)
     }
 
-    private var filteredCircles: [Circle] {
+    private var filteredCircles: [SocialCircle] {
         switch selectedFilter {
         case .all:
             return circleService.circles
@@ -103,7 +103,7 @@ struct CirclesTabContent: View {
         }
     }
 
-    private func isOwner(of circle: Circle) -> Bool {
+    private func isOwner(of circle: SocialCircle) -> Bool {
         // Would check if current user is owner
         circle.members?.contains { $0.role == .owner } ?? false
     }
@@ -201,7 +201,7 @@ enum CirclesContentFilter: String, CaseIterable, Identifiable {
 // MARK: - Enhanced Circle Card
 
 struct EnhancedCircleCard: View {
-    let circle: Circle
+    let circle: SocialCircle
 
     @State private var glowPhase: CGFloat = 0.5
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

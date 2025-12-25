@@ -223,7 +223,7 @@ final class PatternLearningService {
         guard let pattern = currentPattern else { return 1.0 }
 
         let typeAcceptance = pattern.suggestionAcceptanceByType[type] ?? 0.5
-        let overallAcceptance = pattern.suggestionAcceptanceRate
+        _ = pattern.suggestionAcceptanceRate  // Overall rate available for future use
 
         // If user generally accepts this type more, boost confidence
         // If they reject it, lower confidence

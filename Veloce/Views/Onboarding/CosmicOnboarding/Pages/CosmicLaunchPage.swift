@@ -439,7 +439,7 @@ struct LaunchStarBurst: View {
                     )
                 )
                 .frame(width: 800 * progress, height: 800 * progress)
-                .opacity(1 - progress * 0.3)
+                .opacity(Double(1.0) - Double(progress) * 0.3)
 
             // Radiating lines
             ForEach(0..<12, id: \.self) { i in

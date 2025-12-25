@@ -144,98 +144,114 @@ struct CosmicPermissionPage: View {
     private var illustrationSection: some View {
         ZStack {
             // Outer glow rings
-            ForEach(0..<3) { ring in
-                Circle()
-                    .stroke(
-                        type.color.opacity(0.15 - Double(ring) * 0.04),
-                        lineWidth: 2
-                    )
-                    .frame(
-                        width: 160 + CGFloat(ring) * 50,
-                        height: 160 + CGFloat(ring) * 50
-                    )
-                    .scaleEffect(1 + orbPulse * 0.03 * CGFloat(ring + 1))
-            }
+            outerGlowRings
 
             // Ambient glow
-            Circle()
+            ambientGlow
+
+            // Orbiting particles
+            orbitingParticles
+
+            // Main icon container
+            mainIconContainer
+        }
+        .scaleEffect(illustrationScale)
+        .opacity(showContent ? 1 : 0)
+    }
+
+    private var outerGlowRings: some View {
+        ForEach(0..<3) { ring in
+            SwiftUI.Circle()
+                .stroke(
+                    type.color.opacity(0.15 - Double(ring) * 0.04),
+                    lineWidth: 2
+                )
+                .frame(
+                    width: 160 + CGFloat(ring) * 50,
+                    height: 160 + CGFloat(ring) * 50
+                )
+                .scaleEffect(1 + orbPulse * 0.03 * CGFloat(ring + 1))
+        }
+    }
+
+    private var ambientGlow: some View {
+        SwiftUI.Circle()
+            .fill(
+                RadialGradient(
+                    colors: [
+                        type.color.opacity(0.3),
+                        type.color.opacity(0.1),
+                        Color.clear
+                    ],
+                    center: .center,
+                    startRadius: 40,
+                    endRadius: 140
+                )
+            )
+            .frame(width: 280, height: 280)
+    }
+
+    private var orbitingParticles: some View {
+        ForEach(0..<5) { i in
+            SwiftUI.Circle()
+                .fill(type.color.opacity(0.6))
+                .frame(width: CGFloat.random(in: 4...8), height: CGFloat.random(in: 4...8))
+                .offset(x: 90 + CGFloat(i) * 15)
+                .rotationEffect(.degrees(orbRotation + Double(i) * 72))
+        }
+    }
+
+    private var mainIconContainer: some View {
+        ZStack {
+            // Background circle
+            SwiftUI.Circle()
                 .fill(
                     RadialGradient(
                         colors: [
                             type.color.opacity(0.3),
-                            type.color.opacity(0.1),
-                            Color.clear
+                            type.color.opacity(0.15),
+                            Theme.CelestialColors.void.opacity(0.5)
                         ],
                         center: .center,
-                        startRadius: 40,
-                        endRadius: 140
+                        startRadius: 0,
+                        endRadius: 80
                     )
                 )
-                .frame(width: 280, height: 280)
+                .frame(width: 160, height: 160)
 
-            // Orbiting particles
-            ForEach(0..<5) { i in
-                Circle()
-                    .fill(type.color.opacity(0.6))
-                    .frame(width: CGFloat.random(in: 4...8), height: CGFloat.random(in: 4...8))
-                    .offset(x: 90 + CGFloat(i) * 15)
-                    .rotationEffect(.degrees(orbRotation + Double(i) * 72))
-            }
+            // Glass overlay
+            SwiftUI.Circle()
+                .fill(.ultraThinMaterial)
+                .frame(width: 140, height: 140)
 
-            // Main icon container
-            ZStack {
-                // Background circle
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                type.color.opacity(0.3),
-                                type.color.opacity(0.15),
-                                Theme.CelestialColors.void.opacity(0.5)
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 80
-                        )
-                    )
-                    .frame(width: 160, height: 160)
+            // Border
+            SwiftUI.Circle()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.3),
+                            type.color.opacity(0.4),
+                            Color.white.opacity(0.1)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
+                .frame(width: 140, height: 140)
 
-                // Glass overlay
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 140, height: 140)
-
-                // Border
-                Circle()
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.3),
-                                type.color.opacity(0.4),
-                                Color.white.opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 2
-                    )
-                    .frame(width: 140, height: 140)
-
-                // Icon
-                if showSuccess || isGranted {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 56, weight: .light))
-                        .foregroundStyle(Theme.CelestialColors.auroraGreen)
-                        .transition(.scale.combined(with: .opacity))
-                } else {
-                    Image(systemName: type.icon)
-                        .font(.system(size: 52, weight: .light))
-                        .foregroundStyle(type.color)
-                }
+            // Icon
+            if showSuccess || isGranted {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 56, weight: .light))
+                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                    .transition(.scale.combined(with: .opacity))
+            } else {
+                Image(systemName: type.icon)
+                    .font(.system(size: 52, weight: .light))
+                    .foregroundStyle(type.color)
             }
         }
-        .scaleEffect(illustrationScale)
-        .opacity(showContent ? 1 : 0)
     }
 
     // MARK: - Title Section
@@ -458,7 +474,7 @@ struct PermissionBenefitRow: View {
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(color.opacity(0.15))
                     .frame(width: 40, height: 40)
 

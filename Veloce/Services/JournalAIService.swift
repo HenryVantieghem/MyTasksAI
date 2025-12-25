@@ -239,7 +239,6 @@ final class JournalAIService {
         tagger.string = text
 
         var sentences: [String] = []
-        var currentSentence = ""
 
         tagger.enumerateTags(in: text.startIndex..<text.endIndex, unit: .sentence, scheme: .lexicalClass) { _, range in
             let sentence = String(text[range]).trimmingCharacters(in: .whitespacesAndNewlines)

@@ -272,83 +272,99 @@ struct SupernovaCelebrationBackground: View {
     @State private var particleOpacity: Double = 1
 
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             ZStack {
-                // Base still shows through
-                Color(red: 0.01, green: 0.01, blue: 0.02)
-
-                // Explosion rings
-                ForEach(0..<5) { i in
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0.96, green: 0.62, blue: 0.14),
-                                    Color(red: 0.18, green: 0.82, blue: 0.92),
-                                    Color(red: 0.58, green: 0.25, blue: 0.98)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 3 - CGFloat(i) * 0.5
-                        )
-                        .frame(
-                            width: 50 + ringExpansion * CGFloat(1 + i * 0.3),
-                            height: 50 + ringExpansion * CGFloat(1 + i * 0.3)
-                        )
-                        .opacity(particleOpacity * (1 - Double(i) * 0.15))
-                }
-
-                // Central flash
-                RadialGradient(
-                    colors: [
-                        Color.white.opacity(particleOpacity * 0.8),
-                        Color(red: 0.96, green: 0.62, blue: 0.14).opacity(particleOpacity * 0.5),
-                        Color.clear
-                    ],
-                    center: .center,
-                    startRadius: 0,
-                    endRadius: 100 + ringExpansion * 0.3
-                )
-
-                // Particle burst
-                Canvas { context, size in
-                    let center = CGPoint(x: size.width / 2, y: size.height / 2)
-
-                    for i in 0..<40 {
-                        let angle = Double(i) / 40 * .pi * 2
-                        let distance = ringExpansion * CGFloat.random(in: 0.3...1.0)
-
-                        let x = center.x + cos(angle) * distance
-                        let y = center.y + sin(angle) * distance
-
-                        let particleSize: CGFloat = CGFloat.random(in: 2...6)
-
-                        let particlePath = Path(ellipseIn: CGRect(
-                            x: x - particleSize / 2,
-                            y: y - particleSize / 2,
-                            width: particleSize,
-                            height: particleSize
-                        ))
-
-                        let colors: [Color] = [
-                            .white,
-                            Color(red: 0.96, green: 0.62, blue: 0.14),
-                            Color(red: 0.18, green: 0.82, blue: 0.92),
-                            Color(red: 0.98, green: 0.82, blue: 0.35)
-                        ]
-
-                        context.fill(
-                            particlePath,
-                            with: .color(colors[i % colors.count].opacity(particleOpacity))
-                        )
-                    }
-                }
+                baseColor
+                explosionRingsView
+                centralFlashView
+                particleBurstCanvas
             }
         }
         .ignoresSafeArea()
         .onAppear {
             triggerSupernova()
+        }
+    }
+
+    private var baseColor: some View {
+        Color(red: 0.01, green: 0.01, blue: 0.02)
+    }
+
+    private var explosionRingsView: some View {
+        ForEach(0..<5, id: \.self) { i in
+            explosionRing(index: i)
+        }
+    }
+
+    private func explosionRing(index i: Int) -> some View {
+        SwiftUI.Circle()
+            .stroke(
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.96, green: 0.62, blue: 0.14),
+                        Color(red: 0.18, green: 0.82, blue: 0.92),
+                        Color(red: 0.58, green: 0.25, blue: 0.98)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                lineWidth: 3 - CGFloat(i) * 0.5
+            )
+            .frame(
+                width: 50 + ringExpansion * CGFloat(1.0 + Double(i) * 0.3),
+                height: 50 + ringExpansion * CGFloat(1.0 + Double(i) * 0.3)
+            )
+            .opacity(particleOpacity * (1 - Double(i) * 0.15))
+    }
+
+    private var centralFlashView: some View {
+        RadialGradient(
+            colors: [
+                Color.white.opacity(particleOpacity * 0.8),
+                Color(red: 0.96, green: 0.62, blue: 0.14).opacity(particleOpacity * 0.5),
+                Color.clear
+            ],
+            center: .center,
+            startRadius: 0,
+            endRadius: 100 + ringExpansion * 0.3
+        )
+    }
+
+    private var particleBurstCanvas: some View {
+        Canvas { context, size in
+            let center = CGPoint(x: size.width / 2, y: size.height / 2)
+            drawParticles(context: context, center: center)
+        }
+    }
+
+    private func drawParticles(context: GraphicsContext, center: CGPoint) {
+        let colors: [Color] = [
+            .white,
+            Color(red: 0.96, green: 0.62, blue: 0.14),
+            Color(red: 0.18, green: 0.82, blue: 0.92),
+            Color(red: 0.98, green: 0.82, blue: 0.35)
+        ]
+
+        for i in 0..<40 {
+            let angle = Double(i) / 40 * .pi * 2
+            let distance = ringExpansion * CGFloat.random(in: 0.3...1.0)
+
+            let x = center.x + cos(angle) * distance
+            let y = center.y + sin(angle) * distance
+
+            let particleSize: CGFloat = CGFloat.random(in: 2...6)
+
+            let particlePath = Path(ellipseIn: CGRect(
+                x: x - particleSize / 2,
+                y: y - particleSize / 2,
+                width: particleSize,
+                height: particleSize
+            ))
+
+            context.fill(
+                particlePath,
+                with: .color(colors[i % colors.count].opacity(particleOpacity))
+            )
         }
     }
 

@@ -269,7 +269,7 @@ struct AISuggestionsCard: View {
                 Spacer()
 
                 Button {
-                    HapticsService.shared.lightFeedback()
+                    HapticsService.shared.impact(.light)
                 } label: {
                     Text("Refresh")
                         .font(.system(size: 11, weight: .medium))
@@ -399,122 +399,8 @@ struct WeeklyReflectionCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header
-            Button {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    isExpanded.toggle()
-                }
-            } label: {
-                HStack {
-                    Image(systemName: "doc.text.fill")
-                        .font(.system(size: 16))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
-
-                    Text("Weekly Reflection")
-                        .font(.system(size: 17, weight: .semibold, design: .serif))
-                        .foregroundStyle(.white)
-
-                    Spacer()
-
-                    Text("Auto-generated")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(0.4))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Capsule().fill(Color.white.opacity(0.05)))
-
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.4))
-                }
-            }
-            .buttonStyle(.plain)
-
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Wins
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "trophy.fill")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.CelestialColors.auroraGreen)
-
-                            Text("Wins & Accomplishments")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(Theme.CelestialColors.auroraGreen)
-                        }
-
-                        ForEach(wins, id: \.self) { win in
-                            HStack(alignment: .top, spacing: 8) {
-                                Circle()
-                                    .fill(Theme.CelestialColors.auroraGreen)
-                                    .frame(width: 6, height: 6)
-                                    .offset(y: 6)
-
-                                Text(win)
-                                    .font(.system(size: 14, design: .serif))
-                                    .foregroundStyle(.white.opacity(0.8))
-                            }
-                        }
-                    }
-
-                    Divider()
-                        .background(Color.white.opacity(0.1))
-
-                    // Improvements
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "lightbulb.fill")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.CelestialColors.solarFlare)
-
-                            Text("Areas for Growth")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(Theme.CelestialColors.solarFlare)
-                        }
-
-                        ForEach(improvements, id: \.self) { improvement in
-                            HStack(alignment: .top, spacing: 8) {
-                                Circle()
-                                    .fill(Theme.CelestialColors.solarFlare)
-                                    .frame(width: 6, height: 6)
-                                    .offset(y: 6)
-
-                                Text(improvement)
-                                    .font(.system(size: 14, design: .serif))
-                                    .foregroundStyle(.white.opacity(0.8))
-                            }
-                        }
-                    }
-
-                    // Share button
-                    Button {
-                        HapticsService.shared.mediumFeedback()
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: 12))
-
-                            Text("Share Reflection")
-                                .font(.system(size: 13, weight: .medium))
-                        }
-                        .foregroundStyle(Theme.CelestialColors.nebulaEdge)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background {
-                            Capsule()
-                                .fill(Theme.CelestialColors.nebulaCore.opacity(0.15))
-                                .overlay(
-                                    Capsule()
-                                        .stroke(Theme.CelestialColors.nebulaCore.opacity(0.3), lineWidth: 1)
-                                )
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
+            headerButton
+            expandedContent
         }
         .padding(20)
         .background {
@@ -525,6 +411,132 @@ struct WeeklyReflectionCard: View {
                         .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
                 )
         }
+    }
+
+    private var headerButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                isExpanded.toggle()
+            }
+        } label: {
+            HStack {
+                Image(systemName: "doc.text.fill")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
+
+                Text("Weekly Reflection")
+                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .foregroundStyle(.white)
+
+                Spacer()
+
+                Text("Auto-generated")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.white.opacity(0.4))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(Color.white.opacity(0.05)))
+
+                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var expandedContent: some View {
+        if isExpanded {
+            VStack(alignment: .leading, spacing: 20) {
+                winsSection
+                Divider().background(Color.white.opacity(0.1))
+                improvementsSection
+                shareButton
+            }
+            .transition(.opacity.combined(with: .move(edge: .top)))
+        }
+    }
+
+    private var winsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+
+                Text("Wins & Accomplishments")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+            }
+
+            ForEach(wins, id: \.self) { win in
+                HStack(alignment: .top, spacing: 8) {
+                    Circle()
+                        .fill(Theme.CelestialColors.auroraGreen)
+                        .frame(width: 6, height: 6)
+                        .offset(y: 6)
+
+                    Text(win)
+                        .font(.system(size: 14, design: .serif))
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+            }
+        }
+    }
+
+    private var improvementsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "lightbulb.fill")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.CelestialColors.solarFlare)
+
+                Text("Areas for Growth")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.CelestialColors.solarFlare)
+            }
+
+            ForEach(improvements, id: \.self) { improvement in
+                HStack(alignment: .top, spacing: 8) {
+                    Circle()
+                        .fill(Theme.CelestialColors.solarFlare)
+                        .frame(width: 6, height: 6)
+                        .offset(y: 6)
+
+                    Text(improvement)
+                        .font(.system(size: 14, design: .serif))
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+            }
+        }
+    }
+
+    private var shareButton: some View {
+        Button {
+            HapticsService.shared.impact(.medium)
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.system(size: 12))
+
+                Text("Share Reflection")
+                    .font(.system(size: 13, weight: .medium))
+            }
+            .foregroundStyle(Theme.CelestialColors.nebulaEdge)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background {
+                Capsule()
+                    .fill(Theme.CelestialColors.nebulaCore.opacity(0.15))
+                    .overlay(
+                        Capsule()
+                            .stroke(Theme.CelestialColors.nebulaCore.opacity(0.3), lineWidth: 1)
+                    )
+            }
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
@@ -670,7 +682,7 @@ struct AskOracleCard: View {
 
     var body: some View {
         Button(action: {
-            HapticsService.shared.mediumFeedback()
+            HapticsService.shared.impact(.medium)
             onAsk()
         }) {
             VStack(spacing: 16) {
@@ -870,7 +882,7 @@ struct OracleChatSheet: View {
         guard !question.isEmpty else { return }
 
         isThinking = true
-        HapticsService.shared.mediumFeedback()
+        HapticsService.shared.impact(.medium)
 
         // Simulate AI response
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

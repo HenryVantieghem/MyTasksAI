@@ -21,7 +21,7 @@ struct MomentumIndicator: View {
             ZStack {
                 // Glow background
                 if state.isActive {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -315,7 +315,7 @@ struct MomentumActivationBanner: View {
             HStack(spacing: 12) {
                 // Animated flame
                 ZStack {
-                    Circle()
+                    SwiftUI.Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
@@ -428,11 +428,11 @@ struct MomentumProgressRing: View {
     var body: some View {
         ZStack {
             // Background ring
-            Circle()
+            SwiftUI.Circle()
                 .stroke(Color.white.opacity(0.1), lineWidth: 3)
 
             // Progress ring
-            Circle()
+            SwiftUI.Circle()
                 .trim(from: 0, to: animatedProgress)
                 .stroke(
                     AngularGradient(

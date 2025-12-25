@@ -214,7 +214,7 @@ struct QuestRow: View {
 
     @State private var progressAnimated: Double = 0
 
-    private var challengeType: ChallengeType {
+    private var challengeType: DailyChallengeType {
         challenge.challengeType
     }
 

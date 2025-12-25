@@ -82,7 +82,7 @@ struct ShareableWinCard: View {
 
             // Icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Celebration.successGlow.opacity(0.2))
                     .frame(width: 100, height: 100)
 
@@ -136,7 +136,7 @@ struct ShareableWinCard: View {
 
             // Trophy
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Celebration.starGold.opacity(0.2))
                     .frame(width: 100, height: 100)
 
@@ -192,7 +192,7 @@ struct ShareableWinCard: View {
 
             // Icon
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(type.color.opacity(0.2))
                     .frame(width: 100, height: 100)
 
@@ -245,7 +245,7 @@ struct ShareableWinCard: View {
 
             // Flame
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Celebration.flameInner.opacity(0.2))
                     .frame(width: 120, height: 120)
 
@@ -317,11 +317,11 @@ struct ShareableWinCard: View {
 
             // Level badge
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Celebration.nebulaCore.opacity(0.2))
                     .frame(width: 120, height: 120)
 
-                Circle()
+                SwiftUI.Circle()
                     .strokeBorder(
                         LinearGradient(
                             colors: [Theme.Celebration.plasmaCore, Theme.Celebration.nebulaCore],
@@ -376,7 +376,7 @@ struct ShareableWinCard: View {
 
             // Badge
             ZStack {
-                Circle()
+                SwiftUI.Circle()
                     .fill(Theme.Celebration.starGold.opacity(0.2))
                     .frame(width: 100, height: 100)
 
@@ -497,7 +497,10 @@ struct ShareCardGenerator {
         )
 
         // Present
-        if let vc = viewController ?? UIApplication.shared.keyWindow?.rootViewController {
+        if let vc = viewController ?? UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+            .first(where: { $0.isKeyWindow })?.rootViewController {
             vc.present(activityVC, animated: true)
         }
     }

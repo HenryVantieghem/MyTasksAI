@@ -20,7 +20,7 @@ struct CreateGoalButton: View {
 
     var body: some View {
         Button(action: {
-            HapticsService.shared.mediumFeedback()
+            HapticsService.shared.impact(.medium)
             action()
         }) {
             HStack(spacing: 12) {
@@ -218,7 +218,8 @@ struct ExpandableGoalCard: View {
     @State private var progressAnimated: Double = 0
 
     private var linkedTasks: [TaskItem] {
-        tasks.filter { $0.linkedGoalId == goal.id }
+        // TODO: Add linkedGoalId property to TaskItem model when goal linking is implemented
+        []
     }
 
     private var completedLinkedTasks: Int {

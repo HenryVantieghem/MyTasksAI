@@ -53,7 +53,7 @@ struct CirclesTabViewRedesign: View {
     @State private var showJoinCircle = false
     @State private var showSendChallenge = false
     @State private var selectedFriend: FriendProfile?
-    @State private var selectedCircle: Circle?
+    @State private var selectedCircle: SocialCircle?
     @State private var selectedChallenge: Challenge?
 
     // Leaderboard state

@@ -257,7 +257,8 @@ struct VoidBackground: View {
             }
         }
         .onAppear {
-            regenerateStars(in: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+            // Use a reasonable default size, actual size determined by view bounds
+            regenerateStars(in: CGSize(width: 400, height: 800))
         }
     }
 
@@ -284,9 +285,9 @@ struct VoidBackground: View {
     // MARK: - Scroll Tracking
 
     func trackScroll(offset: CGFloat) -> VoidBackground {
-        var copy = self
-        copy.scrollOffset = offset
-        return copy
+        var result = self
+        result.scrollOffset = offset
+        return result
     }
 }
 

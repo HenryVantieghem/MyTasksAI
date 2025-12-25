@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CircleDetailView: View {
-    let circle: Circle
+    let circle: SocialCircle
     @Environment(\.dismiss) private var dismiss
     @State private var circleService = CircleService.shared
     @State private var activity: [CircleActivity] = []
