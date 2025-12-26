@@ -25,38 +25,38 @@ struct StatsPillView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "flame.fill")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(AppColors.accentSecondary)
+                        .foregroundStyle(Theme.Colors.aiGold)
                         .symbolEffect(.pulse, options: .repeating, value: streak > 0)
 
                     Text("\(streak)")
-                        .font(AppTypography.stats)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white)
                 }
 
                 // Points
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(AppColors.accentSecondary)
+                        .foregroundStyle(Theme.Colors.aiGold)
 
                     Text(formatPoints(points))
-                        .font(AppTypography.stats)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white)
                         .contentTransition(.numericText())
                 }
 
                 // Level badge
                 Text("\(level)")
-                    .font(AppTypography.statsBadge)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(AppColors.accentPrimary)
+                    .background(Theme.Colors.aiPurple)
                     .clipShape(Capsule())
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
-            .glassEffect(.regular, in: .capsule)
+            .glassEffect(.regular, in: Capsule())
         }
         .buttonStyle(.plain)
         .onAppear {
@@ -119,6 +119,6 @@ struct StatsPillView: View {
         StatsPillView(streak: 30, points: 15000, level: 12) { }
     }
     .padding()
-    .background(AppColors.backgroundPrimary)
+    .background(Theme.CelestialColors.void)
     .preferredColorScheme(.dark)
 }

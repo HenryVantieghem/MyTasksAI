@@ -8,6 +8,7 @@
 
 import SwiftUI
 import EventKit
+import UniformTypeIdentifiers
 
 // MARK: - Tiimo Day View
 
@@ -144,7 +145,7 @@ struct TiimoDayView: View {
             .offset(y: yOffset(for: task))
             .padding(.leading, timeGutterWidth + blockInset)
             .padding(.trailing, blockInset)
-            .draggable(task) {
+            .draggable(TaskTransferID(from: task)) {
                 TiimoTaskDragPreview(task: task)
             }
         }
@@ -167,8 +168,9 @@ struct TiimoDayView: View {
                         x: timeGutterWidth + blockInset,
                         y: CGFloat(slot) * hourHeight / 4
                     )
-                    .dropDestination(for: TaskItem.self) { items, _ in
-                        guard let task = items.first else { return false }
+                    .dropDestination(for: TaskTransferID.self) { items, _ in
+                        guard let transferID = items.first,
+                              let task = tasks.first(where: { $0.id == transferID.id }) else { return false }
                         let targetDate = makeTargetDate(hour: hour, minute: minute)
                         HapticsService.shared.success()
                         onReschedule?(task, targetDate)

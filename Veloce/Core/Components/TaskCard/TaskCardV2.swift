@@ -318,9 +318,12 @@ struct TaskCardV2: View {
                 )
             }
 
-            // AI indicator
+            // AI indicator with quick tip preview
             if task.hasAIProcessing {
-                AIGuidanceChip(hasGuidance: hasGuidanceText)
+                AIGuidanceChip(
+                    hasGuidance: hasGuidanceText,
+                    previewText: task.aiQuickTip ?? task.aiAdvice
+                )
             }
 
             Spacer()

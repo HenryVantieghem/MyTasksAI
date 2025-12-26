@@ -9,6 +9,20 @@
 import SwiftUI
 import Combine
 
+// MARK: - Screen Bounds Helper
+
+/// Helper to get screen bounds without using deprecated UIScreen.main
+private extension UIApplication {
+    static var screenBounds: CGRect {
+        guard let windowScene = shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first else {
+            return CGRect(x: 0, y: 0, width: 393, height: 852) // iPhone 15 Pro fallback
+        }
+        return windowScene.screen.bounds
+    }
+}
+
 // MARK: - Celebration Container Modifier
 
 /// Adds celebration overlays to any view
@@ -72,9 +86,8 @@ extension CelebrationEngine {
             position = fallback
         } else {
             // Default to center of screen
-            let screenWidth = UIScreen.main.bounds.width
-            let screenHeight = UIScreen.main.bounds.height
-            position = CGPoint(x: screenWidth / 2, y: screenHeight / 2)
+            let screenBounds = UIApplication.screenBounds
+            position = CGPoint(x: screenBounds.width / 2, y: screenBounds.height / 2)
         }
 
         // Calculate XP from gamification service
@@ -239,9 +252,10 @@ struct CelebrationSettingsView: View {
     }
 
     private func previewCelebration(_ level: CelebrationLevel) {
+        let screenBounds = UIApplication.screenBounds
         let center = CGPoint(
-            x: UIScreen.main.bounds.width / 2,
-            y: UIScreen.main.bounds.height / 2
+            x: screenBounds.width / 2,
+            y: screenBounds.height / 2
         )
 
         CelebrationEngine.shared.celebrate(

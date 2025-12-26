@@ -319,6 +319,7 @@ struct ChatTasksView: View {
                 .scaleEffect(depthScale(for: index))
                 .zIndex(Double(inProgressTasks.count - index))
                 .transition(cosmicTransition)
+                .preloadTaskCard(task) // Preload AI data in background
             }
         }
         .padding(.bottom, Theme.Spacing.sm)
@@ -353,6 +354,7 @@ struct ChatTasksView: View {
                 .scaleEffect(depthScale(for: index + inProgressTasks.count))
                 .zIndex(Double(toDoTasks.count - index))
                 .transition(cosmicTransition)
+                .preloadTaskCard(task) // Preload AI data in background
             }
         }
         .padding(.bottom, Theme.Spacing.sm)

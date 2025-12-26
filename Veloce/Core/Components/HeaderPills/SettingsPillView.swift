@@ -53,7 +53,7 @@ struct SettingsPillView: View {
         if transparent {
             content
         } else {
-            content.liquidGlass(cornerRadius: 20)  // Circular liquid glass pill
+            content.glassEffect(.regular, in: Circle())  // Circular liquid glass pill
         }
     }
 

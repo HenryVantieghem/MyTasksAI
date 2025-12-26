@@ -154,7 +154,7 @@ struct PomodoroTimerSection: View {
             }
         }
         .padding(Theme.Spacing.lg)
-        .liquidGlass(cornerRadius: Theme.Radius.card)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.card))
         .onAppear {
             // Initialize selected duration with AI estimate if available
             selectedDuration = task.estimatedMinutes ?? 25

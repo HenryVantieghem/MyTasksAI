@@ -66,7 +66,7 @@ struct AppPickerView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Header (Liquid Glass)
 
     private var headerView: some View {
         HStack {
@@ -74,18 +74,17 @@ struct AppPickerView: View {
                 dismiss()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.CelestialColors.starDim)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 36, height: 36)
-                    .background(Theme.CelestialColors.abyss)
-                    .clipShape(SwiftUI.Circle())
             }
+            .glassEffect(.regular, in: SwiftUI.Circle())
 
             Spacer()
 
             Text("Block Apps")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(Theme.CelestialColors.starWhite)
+                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
 
             Spacer()
 
@@ -94,10 +93,13 @@ struct AppPickerView: View {
                 dismiss()
             } label: {
                 Text("Done")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
             }
-            .frame(width: 36, alignment: .trailing)
+            .buttonStyle(.plain)
+            .glassEffect(.regular, in: Capsule())
         }
     }
 
@@ -153,18 +155,18 @@ struct AppPickerView: View {
         )
     }
 
-    // MARK: - Selection Summary
+    // MARK: - Selection Summary (Liquid Glass)
 
     private var selectionSummaryCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Image(systemName: "app.badge.checkmark")
-                    .font(.system(size: 20))
+                    .font(.system(size: 18))
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
                 Text("Selected Apps")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.CelestialColors.starWhite)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
 
                 Spacer()
 
@@ -174,13 +176,13 @@ struct AppPickerView: View {
                         focusBlockingService.clearSelection()
                         HapticsService.shared.selectionFeedback()
                     }
-                    .font(.system(size: 14))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(Theme.CelestialColors.errorNebula)
                 }
             }
 
             // Selection counts
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 selectionBadge(
                     count: selection.applicationTokens.count,
                     label: "Apps",
@@ -210,35 +212,18 @@ struct AppPickerView: View {
                     VStack(spacing: 8) {
                         Image(systemName: "apps.iphone")
                             .font(.system(size: 28))
-                            .foregroundStyle(Theme.CelestialColors.starGhost)
+                            .foregroundStyle(.white.opacity(0.3))
                         Text("No apps selected")
-                            .font(.system(size: 14))
-                            .foregroundStyle(Theme.CelestialColors.starGhost)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.white.opacity(0.4))
                     }
                     .padding(.vertical, 16)
                     Spacer()
                 }
             }
         }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.CelestialColors.abyss)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Theme.CelestialColors.nebulaCore.opacity(0.3),
-                                    Theme.CelestialColors.nebulaEdge.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
-        )
+        .padding(18)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
     }
 
     private func selectionBadge(count: Int, label: String, icon: String, color: Color) -> some View {
@@ -258,7 +243,7 @@ struct AppPickerView: View {
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Select Apps Button
+    // MARK: - Select Apps Button (Liquid Glass)
 
     private var selectAppsButton: some View {
         Button {
@@ -275,35 +260,33 @@ struct AppPickerView: View {
                 ZStack {
                     SwiftUI.Circle()
                         .fill(Theme.CelestialColors.nebulaCore.opacity(0.2))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 42, height: 42)
 
                     Image(systemName: "plus.app.fill")
-                        .font(.system(size: 22))
+                        .font(.system(size: 20))
                         .foregroundStyle(Theme.CelestialColors.nebulaCore)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Select Apps to Block")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Theme.CelestialColors.starWhite)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
 
                     Text("Choose apps, categories, or websites")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.CelestialColors.starGhost)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.3))
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Theme.CelestialColors.abyss)
-            )
+            .padding(14)
         }
+        .buttonStyle(.plain)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
         .disabled(!screenTimeAuthService.isAuthorized)
         .opacity(screenTimeAuthService.isAuthorized ? 1 : 0.5)
     }
@@ -352,35 +335,33 @@ struct AppPickerView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(color.opacity(0.15))
-                        .frame(width: 40, height: 40)
+                        .frame(width: 38, height: 38)
 
                     Image(systemName: icon)
-                        .font(.system(size: 18))
+                        .font(.system(size: 16))
                         .foregroundStyle(color)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.starWhite)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white)
 
                     Text(subtitle)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Theme.CelestialColors.starGhost)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.3))
             }
             .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Theme.CelestialColors.abyss)
-            )
         }
+        .buttonStyle(.plain)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 14))
         .disabled(!screenTimeAuthService.isAuthorized)
         .opacity(screenTimeAuthService.isAuthorized ? 1 : 0.5)
     }

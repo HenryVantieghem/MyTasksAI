@@ -190,7 +190,31 @@ final class AppViewModel {
         #if DEBUG
         print("🔵 [AppViewModel] handleSubscriptionCompleted() → .authenticated")
         #endif
+        haptics.success()
         appState = .authenticated
+    }
+
+    /// Force check subscription status and enforce paywall if needed
+    /// Call this periodically or when app becomes active
+    func enforceSubscriptionCheck() async {
+        // Only check if user is authenticated
+        guard appState == .authenticated else { return }
+
+        let subscription = SubscriptionService.shared
+        await subscription.checkSubscriptionStatus()
+
+        if subscription.shouldShowPaywall {
+            #if DEBUG
+            print("🔵 [AppViewModel] enforceSubscriptionCheck() - Trial expired → .paywall")
+            #endif
+            haptics.warning()
+            appState = .paywall
+        }
+    }
+
+    /// Check if user can access the app (not locked out by paywall)
+    var canAccessApp: Bool {
+        appState == .authenticated || appState == .onboarding
     }
 
     /// Handle user continuing from Free Trial welcome screen

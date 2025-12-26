@@ -175,16 +175,28 @@ struct AIWhisperLoading: View {
     var body: some View {
         HStack(alignment: .top, spacing: 6) {
             // Spinning sparkle
-            Image(systemName: "sparkle")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: Theme.Colors.aiGradient,
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            if #available(iOS 18.0, *) {
+                Image(systemName: "sparkle")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: Theme.Colors.aiGradient,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
-                .symbolEffect(.rotate, options: .repeating.speed(0.5))
+                    .symbolEffect(.rotate, options: .repeating.speed(0.5))
+            } else {
+                Image(systemName: "sparkle")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: Theme.Colors.aiGradient,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
 
             // Loading text with animated dots
             Text("Thinking" + String(repeating: ".", count: dotCount))

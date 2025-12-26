@@ -33,6 +33,7 @@ struct MainContainerView: View {
     // Sheet state
     @State private var showStatsSheet = false
     @State private var showSettingsSheet = false
+    @State private var showCirclesSheet = false
 
     // Input bar state (managed at container level for proper z-ordering)
     @State private var taskInputText = ""
@@ -113,11 +114,8 @@ struct MainContainerView: View {
                 FocusTabView()
                     .tag(MainTab.focus)
 
-                // Circles Tab - Social Accountability
-                CirclesTabView()
-                    .tag(MainTab.circles)
-
                 // Momentum Tab - Gamification Dashboard (Living Universe Redesign)
+                // Note: Circles removed from tabs - now accessed via CirclesPill
                 MomentumTabViewRedesign()
                     .tag(MainTab.momentum)
 
@@ -133,6 +131,22 @@ struct MainContainerView: View {
                 LiquidGlassTabBar(selectedTab: $selectedTab)
             }
             .safeAreaPadding(.bottom)
+
+            // Circles Pill - top-left floating pill for social access
+            VStack {
+                HStack {
+                    CirclesPill(
+                        isPresented: $showCirclesSheet,
+                        friendsOnlineCount: 0, // TODO: Wire to real data from CirclesService
+                        hasNotifications: false
+                    )
+                    .padding(.leading, Veloce.Spacing.screenPadding)
+                    .padding(.top, 60) // Below status bar and header
+                    Spacer()
+                }
+                Spacer()
+            }
+            .zIndex(50)
 
             // Unified Celestial Task Card overlay - at container level to cover everything
             if showCelestialCard, let task = selectedTask {
@@ -183,7 +197,14 @@ struct MainContainerView: View {
             .presentationDetents([.height(280)])
             .presentationDragIndicator(.visible)
         }
-        .animation(Theme.Animation.spring, value: selectedTab)
+        .sheet(isPresented: $showCirclesSheet) {
+            CirclesTabView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+                .voidPresentationBackground()
+        }
+        .animation(Veloce.Animation.spring, value: selectedTab)
         .onAppear {
             setupViewModels()
         }
@@ -195,9 +216,10 @@ struct MainContainerView: View {
         let text = taskInputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
 
-        // Clear input immediately
-        withAnimation {
+        // Clear input and dismiss keyboard
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             taskInputText = ""
+            isTaskInputFocused = false
         }
 
         Task {
@@ -335,17 +357,17 @@ struct TasksPageView: View {
             // Clean thin icon
             Image(systemName: emptyStateIcon)
                 .font(.system(size: 64, weight: .thin))
-                .foregroundStyle(AppColors.textTertiary)
+                .foregroundStyle(Theme.Colors.textTertiary)
                 .accessibilityHidden(true)
 
             VStack(spacing: 8) {
                 Text(emptyStateTitle)
-                    .font(AppTypography.title2)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .font(.system(size: 22, weight: .light))
+                    .foregroundStyle(.white)
 
                 Text(emptyStateSubtitle)
-                    .font(AppTypography.subheadline)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
             }
             .fadeIn(delay: 0.2)
@@ -763,12 +785,12 @@ struct TaskRow: View {
                 } label: {
                     SwiftUI.Circle()
                         .strokeBorder(
-                            task.isCompleted ? AppColors.accentSuccess : AppColors.textTertiary,
+                            task.isCompleted ? Theme.Colors.successGreen : Theme.Colors.textTertiary,
                             lineWidth: 1.5
                         )
                         .background(
                             SwiftUI.Circle()
-                                .fill(task.isCompleted ? AppColors.accentSuccess : Color.clear)
+                                .fill(task.isCompleted ? Theme.Colors.successGreen : Color.clear)
                         )
                         .overlay {
                             if task.isCompleted {
@@ -788,9 +810,9 @@ struct TaskRow: View {
                 // Content
                 VStack(alignment: .leading, spacing: 4) {
                     Text(task.title)
-                        .font(AppTypography.body)
-                        .foregroundStyle(task.isCompleted ? AppColors.textTertiary : AppColors.textPrimary)
-                        .strikethrough(task.isCompleted, color: AppColors.textTertiary)
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : .white)
+                        .strikethrough(task.isCompleted, color: Theme.Colors.textTertiary)
                         .lineLimit(2)
 
                     // Priority stars
@@ -799,7 +821,7 @@ struct TaskRow: View {
                             ForEach(0..<task.starRating, id: \.self) { _ in
                                 Image(systemName: "star.fill")
                                     .font(.system(size: 12))
-                                    .foregroundStyle(AppColors.accentSecondary)
+                                    .foregroundStyle(Theme.Colors.aiGold)
                             }
                         }
                         .accessibilityLabel("\(task.starRating) star priority")
@@ -810,10 +832,10 @@ struct TaskRow: View {
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(AppColors.textTertiary)
+                    .foregroundStyle(Theme.Colors.textTertiary)
             }
             .padding(16)
-            .background(AppColors.backgroundSurface)
+            .background(Theme.CelestialColors.voidSurface)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(TaskRowButtonStyle())
@@ -1380,16 +1402,16 @@ struct CalendarPageView: View {
         VStack(spacing: 24) {
             Image(systemName: "calendar.badge.exclamationmark")
                 .font(.system(size: 64, weight: .thin))
-                .foregroundStyle(AppColors.textTertiary)
+                .foregroundStyle(Theme.Colors.textTertiary)
 
             VStack(spacing: 8) {
                 Text("Calendar Access Required")
-                    .font(AppTypography.title2)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .font(.system(size: 22, weight: .light))
+                    .foregroundStyle(.white)
 
                 Text("Enable calendar access to sync your tasks with your schedule.")
-                    .font(AppTypography.subheadline)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
             }
 
@@ -1676,17 +1698,17 @@ struct GoalsPageView: View {
         VStack(spacing: 24) {
             Image(systemName: "target")
                 .font(.system(size: 64, weight: .thin))
-                .foregroundStyle(AppColors.textTertiary)
+                .foregroundStyle(Theme.Colors.textTertiary)
                 .accessibilityHidden(true)
 
             VStack(spacing: 8) {
                 Text("No goals yet")
-                    .font(AppTypography.title2)
-                    .foregroundStyle(AppColors.textPrimary)
+                    .font(.system(size: 22, weight: .light))
+                    .foregroundStyle(.white)
 
                 Text("Set SMART goals to stay focused on what matters.")
-                    .font(AppTypography.subheadline)
-                    .foregroundStyle(AppColors.textSecondary)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
             }
 
@@ -1699,7 +1721,7 @@ struct GoalsPageView: View {
                     Image(systemName: "plus.circle.fill")
                     Text("Create Goal")
                 }
-                .font(AppTypography.headline)
+                .font(.system(size: 17, weight: .semibold))
             }
             .buttonStyle(.glassProminent)
         }

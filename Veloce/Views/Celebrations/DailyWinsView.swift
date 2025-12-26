@@ -466,36 +466,38 @@ struct DailyWinRow: View {
 
 private struct DailyWinsVoidBackground: View {
     var body: some View {
-        ZStack {
-            Color(red: 0.02, green: 0.02, blue: 0.04)
-                .ignoresSafeArea()
+        GeometryReader { geometry in
+            ZStack {
+                Color(red: 0.02, green: 0.02, blue: 0.04)
+                    .ignoresSafeArea()
 
-            // Subtle nebula glow
-            SwiftUI.Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Theme.Celebration.nebulaCore.opacity(0.15),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 300
-                    )
-                )
-                .frame(width: 600, height: 600)
-                .offset(y: -200)
-                .blur(radius: 60)
-
-            // Stars
-            ForEach(0..<30, id: \.self) { _ in
+                // Subtle nebula glow
                 SwiftUI.Circle()
-                    .fill(Color.white.opacity(Double.random(in: 0.2...0.6)))
-                    .frame(width: CGFloat.random(in: 1...3))
-                    .position(
-                        x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
-                        y: CGFloat.random(in: 0...UIScreen.main.bounds.height)
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Theme.Celebration.nebulaCore.opacity(0.15),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 300
+                        )
                     )
+                    .frame(width: 600, height: 600)
+                    .offset(y: -200)
+                    .blur(radius: 60)
+
+                // Stars
+                ForEach(0..<30, id: \.self) { index in
+                    SwiftUI.Circle()
+                        .fill(Color.white.opacity(Double(index % 4 + 2) / 10))
+                        .frame(width: CGFloat((index % 3) + 1))
+                        .position(
+                            x: CGFloat((index * 47 + 23) % Int(geometry.size.width.isZero ? 393 : geometry.size.width)),
+                            y: CGFloat((index * 31 + 17) % Int(geometry.size.height.isZero ? 852 : geometry.size.height))
+                        )
+                }
             }
         }
     }

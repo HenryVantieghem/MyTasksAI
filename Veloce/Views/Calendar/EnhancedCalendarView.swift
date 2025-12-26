@@ -2,9 +2,9 @@
 //  EnhancedCalendarView.swift
 //  Veloce
 //
-//  Living Cosmos Calendar - Visual Planner
-//  Cosmic timeline with plasma effects, drag-to-reschedule,
-//  and Apple Calendar integration
+//  Tiimo-Style Visual Planner - Entry Point
+//  ADHD-friendly calendar with visual timeline,
+//  drag-to-reschedule, and Apple Calendar integration
 //
 
 import SwiftUI
@@ -12,12 +12,12 @@ import SwiftData
 
 // MARK: - Enhanced Calendar View
 
-/// Main calendar entry point - delegates to CosmosCalendarView
+/// Main calendar entry point - delegates to TiimoCalendarView
 struct EnhancedCalendarView: View {
     @Bindable var viewModel: CalendarViewModel
 
     var body: some View {
-        CosmosCalendarView(viewModel: viewModel)
+        TiimoCalendarView(viewModel: viewModel)
     }
 }
 

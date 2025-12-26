@@ -59,7 +59,7 @@ struct GamificationPill: View {
         if transparent {
             content
         } else {
-            content.liquidGlass(cornerRadius: Theme.Radius.pill)
+            content.glassEffect(.regular, in: Capsule())
         }
     }
 }
@@ -304,7 +304,7 @@ struct GamificationCard: View {
             }
         }
         .padding(Theme.Spacing.lg)
-        .liquidGlass(cornerRadius: Theme.Radius.xl)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.xl))
     }
 }
 
@@ -360,7 +360,7 @@ struct PointsGainToast: View {
         }
         .padding(.horizontal, Theme.Spacing.md)
         .padding(.vertical, Theme.Spacing.sm)
-        .liquidGlass(cornerRadius: Theme.Radius.lg)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.lg))
         .opacity(isVisible ? 1 : 0)
         .offset(y: offset)
         .onAppear {

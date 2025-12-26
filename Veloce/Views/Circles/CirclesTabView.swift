@@ -80,43 +80,48 @@ struct CirclesTabView: View {
         }
     }
 
-    // MARK: - Friend Requests Banner
+    // MARK: - Friend Requests Banner (Liquid Glass)
 
     private var friendRequestsBanner: some View {
         NavigationLink {
             FriendRequestsView()
         } label: {
-            HStack(spacing: Theme.Spacing.md) {
+            HStack(spacing: 14) {
+                // Icon with accent
                 ZStack {
                     SwiftUI.Circle()
                         .fill(Theme.Colors.aiPurple.opacity(0.2))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 40, height: 40)
 
                     Image(systemName: "person.badge.plus")
-                        .font(.system(size: 20, weight: .medium))
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Friend Requests")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Theme.CelestialColors.starWhite)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
 
                     Text("\(friendService.pendingCount) pending")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Spacer()
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.CelestialColors.starGhost)
+                // Badge with count
+                Text("\(friendService.pendingCount)")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Theme.Colors.aiPurple, in: Capsule())
             }
-            .padding(Theme.Spacing.md)
-            .celestialGlass()
+            .padding(14)
         }
         .buttonStyle(.plain)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - Circles Section
@@ -152,25 +157,25 @@ struct CirclesTabView: View {
             }
 
             if circleService.circles.isEmpty {
-                // Empty circles state
+                // Empty circles state with Liquid Glass
                 VStack(spacing: Theme.Spacing.md) {
                     Image(systemName: "person.3")
-                        .font(.system(size: 40, weight: .light))
-                        .foregroundStyle(Theme.CelestialColors.starGhost)
+                        .font(.system(size: 36, weight: .light))
+                        .foregroundStyle(.white.opacity(0.3))
 
                     Text("No circles yet")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.6))
 
-                    HStack(spacing: Theme.Spacing.sm) {
+                    HStack(spacing: 10) {
                         Button {
                             showCreateCircle = true
                         } label: {
                             Text("Create")
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(.white)
-                                .padding(.horizontal, Theme.Spacing.md)
-                                .padding(.vertical, Theme.Spacing.sm)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
                                 .background(Theme.Colors.aiPurple, in: Capsule())
                         }
 
@@ -180,18 +185,16 @@ struct CirclesTabView: View {
                             Text("Join")
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(Theme.Colors.aiPurple)
-                                .padding(.horizontal, Theme.Spacing.md)
-                                .padding(.vertical, Theme.Spacing.sm)
-                                .background {
-                                    Capsule()
-                                        .strokeBorder(Theme.Colors.aiPurple, lineWidth: 1.5)
-                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
                         }
+                        .glassEffect(.regular, in: Capsule())
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, Theme.Spacing.xl)
-                .celestialGlass()
+                .padding(.vertical, 32)
+                .padding(.horizontal, 20)
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
             } else {
                 // Circle cards
                 LazyVStack(spacing: Theme.Spacing.sm) {
@@ -288,7 +291,7 @@ struct CirclesTabView: View {
         .padding(.vertical, Theme.Spacing.xxl)
     }
 
-    // MARK: - FAB Button
+    // MARK: - FAB Button (Liquid Glass)
 
     private var fabButton: some View {
         Menu {
@@ -311,18 +314,20 @@ struct CirclesTabView: View {
             }
         } label: {
             ZStack {
+                // Accent background
                 SwiftUI.Circle()
-                    .fill(Theme.Colors.aiPurple)
+                    .fill(Theme.Colors.aiPurple.opacity(0.3))
                     .frame(width: 56, height: 56)
-                    .shadow(color: Theme.Colors.aiPurple.opacity(0.4), radius: 12, y: 4)
 
                 Image(systemName: "plus")
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(.white)
             }
+            .glassEffect(.regular, in: SwiftUI.Circle())
+            .shadow(color: Theme.Colors.aiPurple.opacity(0.3), radius: 12, y: 4)
         }
         .padding(.trailing, Theme.Spacing.lg)
-        .padding(.bottom, 100) // Above tab bar
+        .padding(.bottom, 100)
     }
 
     // MARK: - Helpers
@@ -348,14 +353,14 @@ struct CirclesTabView: View {
     }
 }
 
-// MARK: - Circle Card View
+// MARK: - Circle Card View (Liquid Glass)
 
 struct CircleCardView: View {
     let circle: SocialCircle
 
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {
-            // Circle avatar
+            // Circle avatar with gradient
             ZStack {
                 SwiftUI.Circle()
                     .fill(
@@ -365,27 +370,35 @@ struct CircleCardView: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 50, height: 50)
+                    .frame(width: 46, height: 46)
 
                 Text(circle.name.prefix(2).uppercased())
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(circle.name)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Theme.CelestialColors.starWhite)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
 
-                HStack(spacing: Theme.Spacing.sm) {
-                    Label("\(circle.memberCount)", systemImage: "person.2")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                HStack(spacing: 12) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.2")
+                            .font(.system(size: 11))
+                        Text("\(circle.memberCount)")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundStyle(.white.opacity(0.5))
 
                     if circle.circleStreak > 0 {
-                        Label("\(circle.circleStreak)", systemImage: "flame")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.orange)
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 11))
+                            Text("\(circle.circleStreak)")
+                                .font(.system(size: 12, weight: .semibold))
+                        }
+                        .foregroundStyle(.orange)
                     }
                 }
             }
@@ -393,11 +406,11 @@ struct CircleCardView: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Theme.CelestialColors.starGhost)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.3))
         }
-        .padding(Theme.Spacing.md)
-        .celestialGlass()
+        .padding(14)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

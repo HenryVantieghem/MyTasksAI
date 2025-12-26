@@ -129,10 +129,10 @@ struct JournalFeedView: View {
         }
     }
 
-    // MARK: - Date Navigation Header
+    // MARK: - Date Navigation Header (Liquid Glass)
 
     private var dateNavigationHeader: some View {
-        HStack(spacing: Theme.Spacing.md) {
+        HStack(spacing: 12) {
             // Previous day
             Button {
                 HapticsService.shared.selectionFeedback()
@@ -142,49 +142,36 @@ struct JournalFeedView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(width: 36, height: 36)
-                    .background {
-                        SwiftUI.Circle()
-                            .fill(.white.opacity(0.08))
-                    }
             }
             .buttonStyle(.plain)
+            .glassEffect(.regular, in: SwiftUI.Circle())
 
-            // Date Pill
+            // Date Pill with Liquid Glass
             Button {
                 HapticsService.shared.selectionFeedback()
                 viewModel.showDatePicker = true
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
 
                     Text(viewModel.formattedSelectedDate)
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
 
                     if viewModel.isToday {
                         Text("Today")
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background {
-                                Capsule()
-                                    .fill(Theme.CelestialColors.auroraGreen.opacity(0.3))
-                            }
+                            .background(Theme.CelestialColors.auroraGreen.opacity(0.3), in: Capsule())
                     }
                 }
                 .foregroundStyle(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background {
-                    Capsule()
-                        .fill(.ultraThinMaterial)
-                }
-                .overlay {
-                    Capsule()
-                        .stroke(.white.opacity(0.15), lineWidth: 0.5)
-                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
             }
             .buttonStyle(.plain)
+            .glassEffect(.regular, in: Capsule())
 
             // Next day
             Button {
@@ -195,12 +182,9 @@ struct JournalFeedView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(width: 36, height: 36)
-                    .background {
-                        SwiftUI.Circle()
-                            .fill(.white.opacity(0.08))
-                    }
             }
             .buttonStyle(.plain)
+            .glassEffect(.regular, in: SwiftUI.Circle())
 
             Spacer()
 
@@ -210,15 +194,12 @@ struct JournalFeedView: View {
                 showSearch = true
             } label: {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(width: 36, height: 36)
-                    .background {
-                        SwiftUI.Circle()
-                            .fill(.white.opacity(0.08))
-                    }
             }
             .buttonStyle(.plain)
+            .glassEffect(.regular, in: SwiftUI.Circle())
         }
         .sheet(isPresented: $viewModel.showDatePicker) {
             DatePickerSheet(selectedDate: $viewModel.selectedDate)
@@ -332,7 +313,7 @@ struct JournalFeedView: View {
     }
 }
 
-// MARK: - Filter Pill
+// MARK: - Filter Pill (Liquid Glass)
 
 struct JournalFilterPill: View {
     let label: String
@@ -343,33 +324,25 @@ struct JournalFilterPill: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Image(systemName: icon)
-                    .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+                    .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
 
                 Text(label)
-                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                    .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
             }
             .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
             .background {
                 if isSelected {
                     Capsule()
-                        .fill(color.opacity(0.4))
-                } else {
-                    Capsule()
-                        .fill(.white.opacity(0.06))
-                }
-            }
-            .overlay {
-                if isSelected {
-                    Capsule()
-                        .stroke(color.opacity(0.5), lineWidth: 1)
+                        .fill(color.opacity(0.3))
                 }
             }
         }
         .buttonStyle(.plain)
+        .glassEffect(.regular, in: Capsule())
     }
 }
 
@@ -511,25 +484,16 @@ struct JournalFeedEntryCard: View {
         }
         .padding(LivingCosmos.FloatingIsland.padding)
         .background {
+            // Subtle entry color tint
             RoundedRectangle(cornerRadius: LivingCosmos.FloatingIsland.cornerRadius)
-                .fill(.ultraThinMaterial)
+                .fill(entryColor.opacity(0.03))
         }
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: LivingCosmos.FloatingIsland.cornerRadius))
         .overlay {
             RoundedRectangle(cornerRadius: LivingCosmos.FloatingIsland.cornerRadius)
-                .stroke(
-                    LinearGradient(
-                        colors: [
-                            entryColor.opacity(0.3),
-                            entryColor.opacity(0.1),
-                            .clear
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.5
-                )
+                .stroke(.white.opacity(0.08), lineWidth: 0.5)
         }
-        .shadow(color: entryColor.opacity(0.15), radius: 12, y: 4)
+        .shadow(color: entryColor.opacity(0.12), radius: 8, y: 3)
         .opacity(isVisible ? 1 : 0)
         .offset(y: isVisible ? 0 : 20)
         .onAppear {

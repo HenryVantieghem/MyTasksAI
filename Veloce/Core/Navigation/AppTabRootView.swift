@@ -41,9 +41,7 @@ struct AppTabRootView: View {
         case .focus:
             FocusTabView()
 
-        case .circles:
-            CirclesTabView()
-
+        // Note: Circles removed from tabs - accessed via CirclesPill
         case .momentum:
             MomentumTabViewRedesign()
 
@@ -105,9 +103,7 @@ struct AppTabContentView: View {
         case .focus:
             FocusTabView()
 
-        case .circles:
-            CirclesTabView()
-
+        // Note: Circles removed from tabs - accessed via CirclesPill
         case .momentum:
             MomentumTabViewRedesign()
 

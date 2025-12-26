@@ -77,7 +77,7 @@ struct TotalPointsPill: View {
                         .blur(radius: 8)
                 }
             }
-            .glassEffect(in: Capsule())
+            .glassEffect(.regular, in: Capsule())
         }
         .buttonStyle(PointsPillButtonStyle())
         .onAppear {
@@ -188,7 +188,7 @@ struct CompactPointsPill: View {
             }
             .padding(.horizontal, Theme.Spacing.sm)
             .padding(.vertical, Theme.Spacing.xs)
-            .glassEffect(in: Capsule())
+            .glassEffect(.regular, in: Capsule())
         }
         .buttonStyle(.plain)
     }

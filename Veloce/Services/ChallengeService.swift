@@ -350,7 +350,7 @@ final class ChallengeService {
 
         realtimeChannel = supabase.realtimeV2.channel("challenges")
 
-        _ = await realtimeChannel?.onPostgresChange(
+        _ = realtimeChannel?.onPostgresChange(
             AnyAction.self,
             schema: "public",
             table: "challenge_participants"
@@ -360,7 +360,7 @@ final class ChallengeService {
             }
         }
 
-        _ = await realtimeChannel?.onPostgresChange(
+        _ = realtimeChannel?.onPostgresChange(
             AnyAction.self,
             schema: "public",
             table: "challenges"

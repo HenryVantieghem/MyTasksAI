@@ -234,19 +234,35 @@ enum AIGuidanceGenerator {
 // MARK: - Compact AI Chip
 
 /// Smaller AI indicator for when full guidance isn't shown
+/// Now includes optional preview text (truncated to 40 chars)
 struct AIGuidanceChip: View {
     let hasGuidance: Bool
+    var previewText: String? = nil
 
     @State private var pulsePhase: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var truncatedPreview: String? {
+        guard let text = previewText, !text.isEmpty else { return nil }
+        if text.count <= 40 {
+            return text
+        }
+        return String(text.prefix(37)) + "..."
+    }
 
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "sparkles")
                 .font(.system(size: 10, weight: .semibold))
 
-            Text("AI")
-                .font(.system(size: 10, weight: .semibold))
+            if let preview = truncatedPreview {
+                Text(preview)
+                    .font(.system(size: 10, weight: .medium))
+                    .lineLimit(1)
+            } else {
+                Text("AI")
+                    .font(.system(size: 10, weight: .semibold))
+            }
         }
         .foregroundStyle(
             LinearGradient(

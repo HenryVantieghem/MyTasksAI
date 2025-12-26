@@ -612,18 +612,20 @@ struct FocusTabView: View {
         }
 
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if remainingSeconds > 0 {
-                remainingSeconds -= 1
-                updateProgress()
+            Task { @MainActor in
+                if remainingSeconds > 0 {
+                    remainingSeconds -= 1
+                    updateProgress()
 
-                // Haptic feedback at milestones
-                if remainingSeconds == 60 {
-                    HapticsService.shared.lightImpact()
-                } else if remainingSeconds <= 3 && remainingSeconds > 0 {
-                    HapticsService.shared.lightImpact()
+                    // Haptic feedback at milestones
+                    if remainingSeconds == 60 {
+                        HapticsService.shared.lightImpact()
+                    } else if remainingSeconds <= 3 && remainingSeconds > 0 {
+                        HapticsService.shared.lightImpact()
+                    }
+                } else {
+                    completeSession()
                 }
-            } else {
-                completeSession()
             }
         }
     }
@@ -986,12 +988,14 @@ struct FocusAppBlockingConfigSheet: View {
     }
 }
 
-// MARK: - Focus Section Pill
+// MARK: - Focus Section Pill (Liquid Glass)
 
 struct FocusSectionPill: View {
     let section: FocusSection
     let isSelected: Bool
     let action: () -> Void
+
+    @Namespace private var pillNamespace
 
     var body: some View {
         Button(action: action) {
@@ -1007,16 +1011,12 @@ struct FocusSectionPill: View {
             .background {
                 if isSelected {
                     Capsule()
-                        .fill(Theme.Colors.aiAmber)
-                        .shadow(color: Theme.Colors.aiAmber.opacity(0.4), radius: 8, y: 2)
-                } else {
-                    Capsule()
-                        .fill(.ultraThinMaterial)
+                        .fill(Theme.Colors.aiAmber.opacity(0.3))
                 }
             }
-            .glassEffect(.regular, in: Capsule())
         }
         .buttonStyle(.plain)
+        .glassEffect(.regular, in: Capsule())
     }
 }
 

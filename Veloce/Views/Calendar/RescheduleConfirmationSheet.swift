@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - Reschedule Confirmation Sheet
 
@@ -152,11 +153,19 @@ struct RescheduleConfirmationSheet: View {
     }
 }
 
-// MARK: - Draggable Task Extension
+// MARK: - Task ID Transfer Wrapper
 
-extension TaskItem: Transferable {
+/// Lightweight Sendable wrapper for transferring task IDs in drag operations
+/// SwiftData @Model classes are not Sendable, so we transfer just the UUID
+struct TaskTransferID: Codable, Transferable, Sendable {
+    let id: UUID
+
     static var transferRepresentation: some TransferRepresentation {
-        ProxyRepresentation(exporting: \.id.uuidString)
+        CodableRepresentation(contentType: .plainText)
+    }
+
+    init(from task: TaskItem) {
+        self.id = task.id
     }
 }
 
@@ -171,7 +180,7 @@ struct DraggableTaskModifier: ViewModifier {
             .opacity(isDragging ? 0.5 : 1)
             .scaleEffect(isDragging ? 0.95 : 1)
             .animation(.spring(response: 0.3), value: isDragging)
-            .draggable(task) {
+            .draggable(TaskTransferID(from: task)) {
                 // Drag preview
                 TaskDragPreview(task: task)
             }
@@ -216,7 +225,7 @@ struct TaskDragPreview: View {
 
 struct CalendarDropZoneModifier: ViewModifier {
     let targetTime: Date
-    let onDrop: (TaskItem, Date) -> Void
+    let onDrop: (UUID, Date) -> Void
 
     @State private var isTargeted = false
 
@@ -232,9 +241,9 @@ struct CalendarDropZoneModifier: ViewModifier {
                         )
                 }
             }
-            .dropDestination(for: TaskItem.self) { items, _ in
-                guard let task = items.first else { return false }
-                onDrop(task, targetTime)
+            .dropDestination(for: TaskTransferID.self) { items, _ in
+                guard let transferID = items.first else { return false }
+                onDrop(transferID.id, targetTime)
                 return true
             } isTargeted: { targeted in
                 withAnimation(.easeInOut(duration: 0.2)) {
@@ -251,7 +260,7 @@ extension View {
         modifier(DraggableTaskModifier(task: task))
     }
 
-    func calendarDropZone(targetTime: Date, onDrop: @escaping (TaskItem, Date) -> Void) -> some View {
+    func calendarDropZone(targetTime: Date, onDrop: @escaping (UUID, Date) -> Void) -> some View {
         modifier(CalendarDropZoneModifier(targetTime: targetTime, onDrop: onDrop))
     }
 }

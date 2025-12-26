@@ -34,10 +34,14 @@ struct FloatingInputBar: View {
     let onSchedule: () -> Void
     let onPriority: () -> Void
     let onAI: () -> Void
+    var onVoiceInput: (() -> Void)? = nil
 
     // AI processing state
     @State private var isAIEnabled: Bool = true
     @State private var isAIProcessing: Bool = false
+
+    // Voice input state
+    @State private var isRecordingVoice: Bool = false
 
     // Animation states
     @State private var showQuickActions = false
@@ -104,8 +108,8 @@ struct FloatingInputBar: View {
 
     private var mainInputContainer: some View {
         HStack(spacing: 12) {
-            // Plus button (quick actions)
-            plusButton
+            // Voice input button (replaces plus button)
+            voiceInputButton
 
             // Text field with expanding behavior
             expandingTextField
@@ -157,7 +161,51 @@ struct FloatingInputBar: View {
         )
     }
 
-    // MARK: - Plus Button
+    // MARK: - Voice Input Button
+
+    private var voiceInputButton: some View {
+        Button {
+            HapticsService.shared.selectionFeedback()
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                isRecordingVoice.toggle()
+            }
+            onVoiceInput?()
+        } label: {
+            ZStack {
+                // Recording pulse animation
+                if isRecordingVoice {
+                    SwiftUI.Circle()
+                        .fill(Color.red.opacity(0.2))
+                        .frame(width: InputBarMetrics.buttonSize + 8, height: InputBarMetrics.buttonSize + 8)
+                        .scaleEffect(isRecordingVoice ? 1.2 : 1.0)
+                        .animation(
+                            .easeInOut(duration: 0.8)
+                            .repeatForever(autoreverses: true),
+                            value: isRecordingVoice
+                        )
+                }
+
+                SwiftUI.Circle()
+                    .fill(isRecordingVoice
+                        ? Color.red.opacity(0.15)
+                        : Color.white.opacity(0.08))
+                    .frame(width: InputBarMetrics.buttonSize, height: InputBarMetrics.buttonSize)
+
+                Image(systemName: isRecordingVoice ? "stop.fill" : "mic.fill")
+                    .font(.system(size: InputBarMetrics.iconSize, weight: .medium))
+                    .foregroundStyle(isRecordingVoice
+                        ? Color.red
+                        : Color.secondary)
+                    .scaleEffect(isRecordingVoice ? 0.9 : 1.0)
+            }
+        }
+        .buttonStyle(.plain)
+        .contentShape(SwiftUI.Circle())
+        .accessibilityLabel(isRecordingVoice ? "Stop recording" : "Voice input")
+        .accessibilityHint("Tap to record voice input for task creation")
+    }
+
+    // MARK: - Plus Button (Quick Actions)
 
     private var plusButton: some View {
         Button {

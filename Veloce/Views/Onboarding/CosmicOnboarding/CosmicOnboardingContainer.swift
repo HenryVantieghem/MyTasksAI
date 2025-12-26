@@ -208,7 +208,7 @@ struct CosmicOnboardingContainer: View {
         }
     }
 
-    // MARK: - Top Bar
+    // MARK: - Top Bar (Liquid Glass)
 
     private var topBar: some View {
         HStack {
@@ -218,17 +218,18 @@ struct CosmicOnboardingContainer: View {
                     previousStep()
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
-                        .frame(width: 44, height: 44)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .frame(width: 40, height: 40)
                 }
+                .glassEffect(.regular, in: SwiftUI.Circle())
             } else {
-                Spacer().frame(width: 44)
+                Spacer().frame(width: 40)
             }
 
             Spacer()
 
-            // Progress dots
+            // Progress dots with Liquid Glass container
             progressDots
 
             Spacer()
@@ -239,25 +240,31 @@ struct CosmicOnboardingContainer: View {
                     skipToEnd()
                 } label: {
                     Text("Skip")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.starGhost)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
                 }
-                .frame(width: 44)
+                .buttonStyle(.plain)
+                .glassEffect(.regular, in: Capsule())
             } else {
-                Spacer().frame(width: 44)
+                Spacer().frame(width: 40)
             }
         }
         .padding(.horizontal, horizontalPadding)
     }
 
-    // MARK: - Progress Dots
+    // MARK: - Progress Dots (Liquid Glass Container)
 
     private var progressDots: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 5) {
             ForEach(CosmicOnboardingStep.allCases) { step in
                 progressDot(for: step)
             }
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .glassEffect(.regular, in: Capsule())
     }
 
     private func progressDot(for step: CosmicOnboardingStep) -> some View {

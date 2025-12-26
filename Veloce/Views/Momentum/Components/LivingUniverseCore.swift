@@ -287,7 +287,7 @@ struct LivingUniverseCore: View {
 
             let starCount = min(tier.backgroundStarCount + completedTaskCount / 5, 800)
 
-            for i in 0..<starCount {
+            for _ in 0..<starCount {
                 // Distribute stars across the canvas
                 let angle = drand48() * 2 * .pi
                 let radiusFactor = sqrt(drand48()) // Square root for even distribution

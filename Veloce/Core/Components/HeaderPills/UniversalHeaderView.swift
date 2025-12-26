@@ -38,7 +38,7 @@ struct UniversalHeaderView: View {
             // Title (center) - Editorial thin typography
             Text(title)
                 .font(Theme.Typography.displaySmall)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
@@ -90,7 +90,7 @@ struct CompactHeaderView: View {
             // Title - smaller for compact
             Text(title)
                 .font(.system(size: 16, weight: .light))
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(.white)
                 .lineLimit(1)
 
             Spacer()
@@ -139,7 +139,7 @@ struct HeaderWithStreak: View {
             // Title
             Text(title)
                 .font(Theme.Typography.displaySmall)
-                .foregroundStyle(AppColors.textPrimary)
+                .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
@@ -186,7 +186,7 @@ struct StreakIndicator: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
-        .glassEffect(in: Capsule())
+        .glassEffect(.regular, in: Capsule())
         .onAppear {
             withAnimation(
                 .easeInOut(duration: 0.8)
@@ -212,7 +212,7 @@ struct StreakIndicator: View {
 
         Spacer()
     }
-    .background(AppColors.backgroundPrimary)
+    .background(Theme.CelestialColors.void)
     .preferredColorScheme(.dark)
 }
 
@@ -227,7 +227,7 @@ struct StreakIndicator: View {
 
         Spacer()
     }
-    .background(AppColors.backgroundPrimary)
+    .background(Theme.CelestialColors.void)
     .preferredColorScheme(.dark)
 }
 
@@ -242,7 +242,7 @@ struct StreakIndicator: View {
 
         Spacer()
     }
-    .background(AppColors.backgroundPrimary)
+    .background(Theme.CelestialColors.void)
     .preferredColorScheme(.dark)
 }
 
@@ -284,6 +284,6 @@ struct StreakIndicator: View {
         Spacer()
     }
     .padding(.top, 60)
-    .background(AppColors.backgroundPrimary)
+    .background(Theme.CelestialColors.void)
     .preferredColorScheme(.dark)
 }

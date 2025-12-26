@@ -60,7 +60,7 @@ struct HealthSection: View {
             }
         }
         .padding(Theme.Spacing.lg)
-        .liquidGlass(cornerRadius: Theme.Radius.card)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.card))
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHealthTrackingEnabled)
     }
 }

@@ -77,7 +77,6 @@ final class CelestialTaskCardViewModel {
     var isChallengeActive: Bool = false
     var countdown: Int = 30
     var challengeCompleted: Bool = false
-    private var challengeTimer: Timer?
 
     // AI Strategy
     var aiStrategy: String?
@@ -231,7 +230,7 @@ final class CelestialTaskCardViewModel {
         async let strategyLoad: () = loadAIStrategy()
         async let durationLoad: () = loadAIDurationEstimate()
 
-        await (subTasksLoad, youtubeLoad, scheduleLoad, strategyLoad, durationLoad)
+        _ = await (subTasksLoad, youtubeLoad, scheduleLoad, strategyLoad, durationLoad)
 
         isInitialLoadComplete = true
     }
@@ -551,35 +550,35 @@ final class CelestialTaskCardViewModel {
 
     // MARK: - Micro-Challenge
 
+    private var challengeTask: Task<Void, Never>?
+
     func startMicroChallenge() {
         isChallengeActive = true
         countdown = firstStepSeconds
 
-        challengeTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            Task { @MainActor in
-                guard let self else {
-                    timer.invalidate()
-                    return
-                }
+        // Use Task-based timer to avoid Swift 6 Sendable issues with Timer
+        challengeTask = Task { [weak self] in
+            while let self = self, self.countdown > 0 {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled else { return }
 
-                if self.countdown > 0 {
-                    self.countdown -= 1
+                self.countdown -= 1
 
-                    // Haptic at 3, 2, 1
-                    if self.countdown <= 3 && self.countdown > 0 {
-                        self.haptics.lightImpact()
-                    }
-                } else {
-                    timer.invalidate()
-                    self.completeMicroChallenge()
+                // Haptic at 3, 2, 1
+                if self.countdown <= 3 && self.countdown > 0 {
+                    self.haptics.lightImpact()
                 }
+            }
+
+            if let self = self, !Task.isCancelled {
+                self.completeMicroChallenge()
             }
         }
     }
 
     func completeMicroChallenge() {
-        challengeTimer?.invalidate()
-        challengeTimer = nil
+        challengeTask?.cancel()
+        challengeTask = nil
         isChallengeActive = false
         challengeCompleted = true
         haptics.celebration()
@@ -697,8 +696,8 @@ final class CelestialTaskCardViewModel {
     // MARK: - Cleanup
 
     func cleanup() {
-        challengeTimer?.invalidate()
-        challengeTimer = nil
+        challengeTask?.cancel()
+        challengeTask = nil
     }
 }
 

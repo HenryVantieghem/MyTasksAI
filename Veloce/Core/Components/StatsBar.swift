@@ -58,7 +58,7 @@ struct StatsBar: View {
             .padding(.horizontal, Theme.Spacing.sm)
             .padding(.vertical, Theme.Spacing.sm)
         }
-        .liquidGlass(cornerRadius: Theme.Radius.xl)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.xl))
     }
 }
 
@@ -290,7 +290,7 @@ struct WeeklyProgressBar: View {
             }
         }
         .padding(Theme.Spacing.sm)
-        .liquidGlass(cornerRadius: Theme.Radius.md)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.md))
     }
 }
 

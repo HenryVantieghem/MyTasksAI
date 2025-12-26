@@ -145,7 +145,7 @@ final class CosmicOnboardingViewModel {
     private func checkExistingPermissions() {
         // Check calendar
         let calendarStatus = EKEventStore.authorizationStatus(for: .event)
-        calendarGranted = calendarStatus == .fullAccess || calendarStatus == .authorized
+        calendarGranted = calendarStatus == .fullAccess
 
         // Check notifications
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -306,7 +306,7 @@ final class CosmicOnboardingViewModel {
     }
 
     private func saveGoal() {
-        guard let category = selectedCategory else { return }
+        guard selectedCategory != nil else { return }
 
         Task {
             if let userId = await SupabaseService.shared.getCurrentUserId() {

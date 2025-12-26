@@ -285,8 +285,11 @@ struct VoidBackground: View {
     // MARK: - Scroll Tracking
 
     func trackScroll(offset: CGFloat) -> VoidBackground {
-        var result = self
-        result.scrollOffset = offset
+        // Note: Since scrollOffset is @State, we can't modify it on a copy.
+        // This method returns self unchanged - scroll tracking should be done
+        // via a different mechanism (e.g., PreferenceKey or initializer parameter)
+        let result = self
+        // scrollOffset is managed by SwiftUI @State, not modifiable on struct copy
         return result
     }
 }

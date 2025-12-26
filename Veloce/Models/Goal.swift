@@ -171,7 +171,7 @@ extension Goal {
     }
 
     /// Decoded progress history
-    nonisolated var decodedProgressHistory: [ProgressSnapshot] {
+    var decodedProgressHistory: [ProgressSnapshot] {
         guard let data = progressHistory else { return [] }
         return (try? JSONDecoder().decode([ProgressSnapshot].self, from: data)) ?? []
     }

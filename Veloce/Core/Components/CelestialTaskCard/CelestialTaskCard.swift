@@ -46,7 +46,9 @@ struct CelestialTaskCard: View {
         self.task = task
         self.delegate = delegate
         self._isPresented = isPresented
-        self._viewModel = State(initialValue: CelestialTaskCardViewModel(task: task))
+        // Use preloaded ViewModel if available, otherwise create new one
+        let vm = TaskCardPreloadService.shared.getViewModel(for: task)
+        self._viewModel = State(initialValue: vm)
     }
 
     // MARK: - Body
@@ -545,40 +547,34 @@ struct FloatingIslandSection<Content: View>: View {
         }
         .padding(Theme.Spacing.md)
         .background {
-            ZStack {
-                // Glass base
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(.ultraThinMaterial)
-
-                // Accent tint
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                accentColor.opacity(0.08),
-                                accentColor.opacity(0.03),
-                                Color.clear
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+            // Accent tint layer
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            accentColor.opacity(0.08),
+                            accentColor.opacity(0.03),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-            }
+                )
         }
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .strokeBorder(
                     LinearGradient(
                         colors: [
-                            .white.opacity(0.2),
-                            accentColor.opacity(0.3),
-                            .white.opacity(0.1),
+                            .white.opacity(0.15),
+                            accentColor.opacity(0.2),
                             .clear
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.5
                 )
         }
         // Floating shadow
@@ -675,45 +671,30 @@ struct CosmicQuickActions: View {
                         .frame(width: 56, height: 56)
                         .blur(radius: 8)
 
-                    // Glass orb
-                    SwiftUI.Circle()
-                        .fill(.ultraThinMaterial)
-                        .frame(width: 48, height: 48)
-                        .overlay {
-                            SwiftUI.Circle()
-                                .fill(
-                                    RadialGradient(
-                                        colors: [
-                                            type.color.opacity(0.3),
-                                            type.color.opacity(0.1),
-                                            Color.clear
-                                        ],
-                                        center: .topLeading,
-                                        startRadius: 0,
-                                        endRadius: 30
-                                    )
+                    // Glass orb with native Liquid Glass
+                    ZStack {
+                        // Color tint layer
+                        SwiftUI.Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [
+                                        type.color.opacity(0.2),
+                                        type.color.opacity(0.08),
+                                        Color.clear
+                                    ],
+                                    center: .topLeading,
+                                    startRadius: 0,
+                                    endRadius: 30
                                 )
-                        }
-                        .overlay {
-                            SwiftUI.Circle()
-                                .strokeBorder(
-                                    LinearGradient(
-                                        colors: [
-                                            .white.opacity(0.3),
-                                            type.color.opacity(0.4),
-                                            .clear
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1
-                                )
-                        }
+                            )
 
-                    // Icon
-                    Image(systemName: type.icon)
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(type.color)
+                        // Icon
+                        Image(systemName: type.icon)
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundStyle(type.color)
+                    }
+                    .frame(width: 48, height: 48)
+                    .glassEffect(.regular, in: SwiftUI.Circle())
                 }
                 .shadow(color: type.color.opacity(0.3), radius: 8, x: 0, y: 4)
 

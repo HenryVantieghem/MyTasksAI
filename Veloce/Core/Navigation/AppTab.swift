@@ -4,19 +4,20 @@
 //
 //  Tab enumeration for main navigation
 //  Following Apple's recommended pattern for tab-based apps
+//  Note: Circles moved to CirclesPill (top-left floating pill)
 //
 
 import SwiftUI
 
 /// Main app tab enumeration
 /// Defines all primary navigation destinations with their display properties
+/// Note: Circles is no longer a tab - it's accessed via CirclesPill
 enum AppTab: Int, CaseIterable {
     case tasks = 0
     case calendar = 1
     case focus = 2
-    case circles = 3
-    case momentum = 4
-    case journal = 5
+    case momentum = 3
+    case journal = 4
 
     // MARK: - Display Properties
 
@@ -28,8 +29,6 @@ enum AppTab: Int, CaseIterable {
             return "Calendar"
         case .focus:
             return "Focus"
-        case .circles:
-            return "Circles"
         case .momentum:
             return "Momentum"
         case .journal:
@@ -46,8 +45,6 @@ enum AppTab: Int, CaseIterable {
             return "calendar"
         case .focus:
             return "timer"
-        case .circles:
-            return "person.3"
         case .momentum:
             return "flame"
         case .journal:
@@ -64,8 +61,6 @@ enum AppTab: Int, CaseIterable {
             return "calendar"
         case .focus:
             return "timer"
-        case .circles:
-            return "person.3.fill"
         case .momentum:
             return "flame.fill"
         case .journal:

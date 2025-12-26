@@ -407,7 +407,7 @@ struct QuestRow: View {
 
                 // With some completed
                 DailyQuestsCard(challenges: {
-                    var challenges = DailyChallenge.previews
+                    let challenges = DailyChallenge.previews
                     challenges[0].updateProgress(newValue: 2)
                     challenges[1].updateProgress(newValue: 15)
                     return challenges
@@ -415,7 +415,7 @@ struct QuestRow: View {
 
                 // All complete
                 DailyQuestsCard(challenges: {
-                    var challenges = DailyChallenge.previews
+                    let challenges = DailyChallenge.previews
                     challenges.forEach { $0.updateProgress(newValue: $0.targetValue) }
                     return challenges
                 }())

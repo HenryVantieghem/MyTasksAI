@@ -471,7 +471,6 @@ struct CosmicGoalSetupPage: View {
     }
 
     private func generateConstellation() {
-        let width: CGFloat = 300
         let height: CGFloat = 150
 
         starConstellation = [

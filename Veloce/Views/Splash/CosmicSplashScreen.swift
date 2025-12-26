@@ -9,6 +9,19 @@
 
 import SwiftUI
 
+// MARK: - Screen Bounds Helper
+
+private extension UIApplication {
+    static var screenBounds: CGRect {
+        guard let windowScene = shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first else {
+            return CGRect(x: 0, y: 0, width: 393, height: 852) // iPhone 15 Pro fallback
+        }
+        return windowScene.screen.bounds
+    }
+}
+
 // MARK: - Cosmic Splash Screen
 
 struct CosmicSplashScreen: View {
@@ -152,9 +165,7 @@ struct CosmicSplashScreen: View {
     // MARK: - Coalescing Stars Layer
 
     private func coalescingStarsLayer(in geometry: GeometryProxy) -> some View {
-        let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height * 0.42)
-
-        return ForEach(coalescingStars) { star in
+        ForEach(coalescingStars) { star in
             SwiftUI.Circle()
                 .fill(star.color)
                 .frame(width: star.size, height: star.size)
@@ -211,76 +222,38 @@ struct CosmicSplashScreen: View {
     // MARK: - Logo Reveal
 
     private func logoReveal(in geometry: GeometryProxy) -> some View {
-        VStack(spacing: Theme.Spacing.lg) {
-            // App Icon/Logo
+        VStack(spacing: Veloce.Spacing.lg) {
+            // App Icon/Logo - Infinity Ring
             ZStack {
-                // Amber glow behind logo
-                SwiftUI.Circle()
+                // Ambient glow behind logo
+                Ellipse()
                     .fill(
                         RadialGradient(
                             colors: [
-                                Theme.CelestialColors.solarFlare.opacity(0.5 * glowIntensity),
-                                Theme.CelestialColors.solarFlare.opacity(0.2 * glowIntensity),
+                                Veloce.Colors.accentPrimary.opacity(0.4 * glowIntensity),
+                                Veloce.Colors.accentSecondary.opacity(0.2 * glowIntensity),
                                 Color.clear
                             ],
                             center: .center,
                             startRadius: 0,
-                            endRadius: 100
+                            endRadius: 120
                         )
                     )
-                    .frame(width: 200, height: 200)
-                    .blur(radius: 30)
+                    .frame(width: 240, height: 160)
+                    .blur(radius: 40)
 
-                // Logo placeholder - orbital design
-                ZStack {
-                    // Outer ring
-                    SwiftUI.Circle()
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Theme.CelestialColors.solarFlare.opacity(0.8),
-                                    Theme.Colors.aiPurple.opacity(0.6),
-                                    Theme.CelestialColors.plasmaCore.opacity(0.4)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 3
-                        )
-                        .frame(width: 80, height: 80)
-
-                    // Inner filled circle
-                    SwiftUI.Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [
-                                    Theme.CelestialColors.solarFlare,
-                                    Theme.Colors.aiPurple.opacity(0.8)
-                                ],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: 25
-                            )
-                        )
-                        .frame(width: 50, height: 50)
-
-                    // Orbital dot
-                    SwiftUI.Circle()
-                        .fill(.white)
-                        .frame(width: 10, height: 10)
-                        .offset(x: 40, y: 0)
-                        .rotationEffect(.degrees(glowIntensity * 90))
-                }
+                // Infinity Ring Logo
+                AppLogoView(size: .large, isAnimating: true, showParticles: true)
             }
 
             // App Name
             Text("MyTasksAI")
-                .font(.system(size: 42, weight: .thin, design: .default))
+                .font(Veloce.Typography.displayHero)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [
-                            Theme.CelestialColors.starWhite,
-                            Theme.CelestialColors.solarFlare.opacity(0.9)
+                            Veloce.Colors.textPrimary,
+                            Veloce.Colors.accentSecondary.opacity(0.9)
                         ],
                         startPoint: .leading,
                         endPoint: .trailing
@@ -289,8 +262,8 @@ struct CosmicSplashScreen: View {
 
             // Tagline
             Text("Achieve the Impossible")
-                .font(.system(size: 16, weight: .light, design: .default))
-                .foregroundStyle(Theme.CelestialColors.starDim)
+                .font(Veloce.Typography.body)
+                .foregroundStyle(Veloce.Colors.textSecondary)
                 .opacity(taglineOpacity)
         }
         .position(x: geometry.size.width / 2, y: geometry.size.height * 0.45)
@@ -301,7 +274,7 @@ struct CosmicSplashScreen: View {
     // MARK: - Star Generation
 
     private func generateStars() {
-        let screenBounds = UIScreen.main.bounds
+        let screenBounds = UIApplication.screenBounds
 
         // Generate static star field
         stars = (0..<60).map { _ in
@@ -484,7 +457,7 @@ struct SplashParticleBurst: View {
                     RadialGradient(
                         colors: [
                             .white,
-                            Theme.CelestialColors.solarFlare.opacity(0.8),
+                            Veloce.Colors.accentPrimary.opacity(0.8),
                             Color.clear
                         ],
                         center: .center,
@@ -521,9 +494,9 @@ struct SplashParticleBurst: View {
         // Generate particles
         let colors: [Color] = [
             .white,
-            Theme.CelestialColors.solarFlare,
-            Theme.CelestialColors.plasmaCore,
-            Theme.CelestialColors.nebulaCore
+            Veloce.Colors.accentPrimary,
+            Veloce.Colors.accentSecondary,
+            Veloce.Colors.accentTertiary
         ]
 
         for i in 0..<24 {
@@ -534,7 +507,7 @@ struct SplashParticleBurst: View {
                 y: center.y + CGFloat(Darwin.sin(angle)) * distance
             )
 
-            var particle = SplashBurstParticle(
+            let particle = SplashBurstParticle(
                 id: UUID(),
                 position: center,
                 targetPosition: targetPosition,

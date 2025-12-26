@@ -533,7 +533,7 @@ struct ProcessingQueueIndicator: View {
         }
         .padding(.horizontal, Theme.Spacing.md)
         .padding(.vertical, Theme.Spacing.sm)
-        .liquidGlass(cornerRadius: Theme.Radius.pill)
+        .glassEffect(.regular, in: Capsule())
     }
 }
 

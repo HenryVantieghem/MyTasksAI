@@ -276,12 +276,9 @@ struct OracleTaskDetailSheet: View {
             .padding(.vertical, 12)
             .background {
                 Capsule()
-                    .fill(.ultraThinMaterial)
-                    .overlay {
-                        Capsule()
-                            .strokeBorder(Theme.CelestialColors.auroraGreen.opacity(0.3), lineWidth: 1)
-                    }
+                    .fill(Theme.CelestialColors.auroraGreen.opacity(0.1))
             }
+            .glassEffect(.regular, in: Capsule())
             .padding(.top, 60)
 
             Spacer()
@@ -555,7 +552,7 @@ struct OracleAmbientParticles: View {
             Theme.CelestialColors.starWhite.opacity(0.3)
         ]
 
-        for i in 0..<15 {
+        for _ in 0..<15 {
             let particle = AmbientParticle(
                 id: UUID(),
                 position: CGPoint(
@@ -2331,16 +2328,13 @@ struct OracleActionBar: View {
         .padding(.vertical, 16)
         .background {
             Rectangle()
-                .fill(.ultraThinMaterial)
-                .overlay {
-                    Rectangle()
-                        .fill(Theme.CelestialColors.voidDeep.opacity(0.8))
-                }
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(Theme.CelestialColors.starDim.opacity(0.1))
-                        .frame(height: 1)
-                }
+                .fill(Theme.CelestialColors.voidDeep.opacity(0.6))
+        }
+        .glassEffect(.regular, in: Rectangle())
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Theme.CelestialColors.starDim.opacity(0.08))
+                .frame(height: 0.5)
         }
         .onAppear {
             if !reduceMotion {

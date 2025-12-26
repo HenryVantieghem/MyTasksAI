@@ -112,14 +112,14 @@ struct CosmosTimeBlock: View {
         }
         .buttonStyle(.plain)
         .background(blockBackground)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: LivingCosmos.Calendar.blockCornerRadius))
         .overlay(blockBorder)
         .overlay(urgencyGlow)
-        .clipShape(RoundedRectangle(cornerRadius: LivingCosmos.Calendar.blockCornerRadius))
-        .scaleEffect(isPressed ? 0.97 : 1.0)
+        .scaleEffect(isPressed ? 0.98 : 1.0)
         .shadow(
-            color: taskColor.opacity(isPressed ? 0.4 : 0.2),
-            radius: isPressed ? 12 : 6,
-            y: isPressed ? 2 : 4
+            color: taskColor.opacity(isPressed ? 0.25 : 0.15),
+            radius: isPressed ? 8 : 4,
+            y: isPressed ? 1 : 2
         )
         .supernovaBurst(
             trigger: $showSupernova,
@@ -241,52 +241,36 @@ struct CosmosTimeBlock: View {
         .foregroundStyle(taskColor)
     }
 
-    // MARK: - Block Background
+    // MARK: - Block Background (Native Liquid Glass)
 
     private var blockBackground: some View {
         ZStack {
-            // Base glass
-            RoundedRectangle(cornerRadius: LivingCosmos.Calendar.blockCornerRadius)
-                .fill(.ultraThinMaterial)
+            // Task color accent bar on leading edge
+            HStack(spacing: 0) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(taskColor)
+                    .frame(width: 3)
+                    .padding(.vertical, 6)
+                Spacer()
+            }
 
-            // Task color tint
+            // Subtle task color tint
             RoundedRectangle(cornerRadius: LivingCosmos.Calendar.blockCornerRadius)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            taskColor.opacity(0.12),
-                            taskColor.opacity(0.05),
-                            Color.clear
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(taskColor.opacity(0.05))
 
             // High priority breathing overlay
             if isHighPriority && !task.isCompleted && !reduceMotion {
                 RoundedRectangle(cornerRadius: LivingCosmos.Calendar.blockCornerRadius)
-                    .fill(taskColor.opacity(0.05 + plasmaPhase * 0.08))
+                    .fill(taskColor.opacity(0.03 + plasmaPhase * 0.05))
             }
         }
     }
 
-    // MARK: - Block Border
+    // MARK: - Block Border (Minimal)
 
     private var blockBorder: some View {
         RoundedRectangle(cornerRadius: LivingCosmos.Calendar.blockCornerRadius)
-            .stroke(
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.2),
-                        taskColor.opacity(0.3),
-                        Color.white.opacity(0.1)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                lineWidth: 1
-            )
+            .stroke(.white.opacity(0.08), lineWidth: 0.5)
     }
 
     // MARK: - Urgency Glow

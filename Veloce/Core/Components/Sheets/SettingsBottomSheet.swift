@@ -556,13 +556,9 @@ struct ProfileEditSheet: View {
             }
 
             // Save to backend
-            do {
-                try await viewModel.saveProfile()
-                HapticsService.shared.taskComplete()
-                dismiss()
-            } catch {
-                viewModel.error = error.localizedDescription
-            }
+            await viewModel.saveProfile()
+            HapticsService.shared.taskComplete()
+            dismiss()
 
             isSaving = false
         }

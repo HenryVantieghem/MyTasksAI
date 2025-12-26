@@ -56,7 +56,7 @@ struct CelestialQuickActions: View {
                     )
                     .shadow(color: Theme.Colors.success.opacity(0.3), radius: 8, y: 4)
             )
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 14))
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
     }
