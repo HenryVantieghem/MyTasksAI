@@ -198,7 +198,7 @@ struct AuthView: View {
                     )
                 )
 
-            Text("AI-Powered Productivity")
+            Text("Infinite Momentum")
                 .font(Theme.Typography.cosmosWhisper)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }

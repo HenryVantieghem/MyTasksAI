@@ -114,9 +114,9 @@ struct MainContainerView: View {
                 FocusTabView()
                     .tag(MainTab.focus)
 
-                // Momentum Tab - Gamification Dashboard (Living Universe Redesign)
-                // Note: Circles removed from tabs - now accessed via CirclesPill
-                MomentumTabViewRedesign()
+                // Momentum Tab - Living Data Garden (Data Art Redesign)
+                // Two realms: Flow (stats) & Grow (goals with AI)
+                MomentumDataArtView()
                     .tag(MainTab.momentum)
 
                 // Journal Tab - Daily reflections with Brain Dump and Reminders
@@ -159,7 +159,6 @@ struct MainContainerView: View {
                 .zIndex(100)
             }
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
         .safeAreaInset(edge: .top) {
             UniversalHeaderView(
                 title: selectedTab.title,
@@ -773,69 +772,73 @@ struct TaskRow: View {
         }
     }
 
+    // MARK: - Extracted Views
+
+    private var checkboxView: some View {
+        Button {
+            toggleWithAnimation()
+        } label: {
+            SwiftUI.Circle()
+                .strokeBorder(
+                    task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary,
+                    lineWidth: 1.5
+                )
+                .background(
+                    SwiftUI.Circle()
+                        .fill(task.isCompleted ? Theme.Colors.success : Color.clear)
+                )
+                .overlay {
+                    if task.isCompleted {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+                }
+                .frame(width: 24, height: 24)
+                .scaleEffect(checkScale)
+                .opacity(checkOpacity)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(task.isCompleted ? "Mark incomplete" : "Mark complete")
+        .accessibilityHint("Double tap to toggle task completion")
+    }
+
+    private var contentView: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(task.title)
+                .font(.system(size: 17, weight: .regular))
+                .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : .white)
+                .strikethrough(task.isCompleted, color: Theme.Colors.textTertiary)
+                .lineLimit(2)
+
+            if task.starRating > 0 {
+                HStack(spacing: 2) {
+                    ForEach(0..<task.starRating, id: \.self) { _ in
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.Colors.aiGold)
+                    }
+                }
+                .accessibilityLabel("\(task.starRating) star priority")
+            }
+        }
+    }
+
     var body: some View {
         Button {
             showDetail = true
             HapticsService.shared.selectionFeedback()
         } label: {
             HStack(spacing: 16) {
-                // Checkbox - Clean minimal style
-                Button {
-                    toggleWithAnimation()
-                } label: {
-                    SwiftUI.Circle()
-                        .strokeBorder(
-                            task.isCompleted ? Theme.Colors.successGreen : Theme.Colors.textTertiary,
-                            lineWidth: 1.5
-                        )
-                        .background(
-                            SwiftUI.Circle()
-                                .fill(task.isCompleted ? Theme.Colors.successGreen : Color.clear)
-                        )
-                        .overlay {
-                            if task.isCompleted {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                        .frame(width: 24, height: 24)
-                        .scaleEffect(checkScale)
-                        .opacity(checkOpacity)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(task.isCompleted ? "Mark incomplete" : "Mark complete")
-                .accessibilityHint("Double tap to toggle task completion")
-
-                // Content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(task.title)
-                        .font(.system(size: 17, weight: .regular))
-                        .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : .white)
-                        .strikethrough(task.isCompleted, color: Theme.Colors.textTertiary)
-                        .lineLimit(2)
-
-                    // Priority stars
-                    if task.starRating > 0 {
-                        HStack(spacing: 2) {
-                            ForEach(0..<task.starRating, id: \.self) { _ in
-                                Image(systemName: "star.fill")
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Theme.Colors.aiGold)
-                            }
-                        }
-                        .accessibilityLabel("\(task.starRating) star priority")
-                    }
-                }
-
+                checkboxView
+                contentView
                 Spacer()
-
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.Colors.textTertiary)
             }
             .padding(16)
-            .background(Theme.CelestialColors.voidSurface)
+            .background(Theme.CelestialColors.abyss)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(TaskRowButtonStyle())

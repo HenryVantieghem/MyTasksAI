@@ -6,10 +6,21 @@
 //  Bioluminescent deep sea meets cosmic nebula
 //  Features: Morphic glass, parallax depth, plasma core, urgency glow, supernova completion
 //
+//  DEPRECATED: This component is being replaced by TaskCardV3, which offers:
+//  - Simplified visual hierarchy (~88pt height vs ~140pt)
+//  - Things 3-style ElegantCheckBubble for completion
+//  - Swipe gestures for quick actions (complete, snooze, delete)
+//  - Better scannability with reduced visual noise
+//  - ~400 lines vs ~1100 lines
+//
+//  Migration: Replace TaskCardV2 with TaskCardV3 in all new code.
+//  This file is retained for reference during transition.
+//
 
 import SwiftUI
 
-// MARK: - Task Card V2 (Living Cosmos Edition)
+// MARK: - Task Card V2 (Living Cosmos Edition) - DEPRECATED
+/// @available(*, deprecated, message: "Use TaskCardV3 instead")
 
 struct TaskCardV2: View {
     let task: TaskItem
@@ -318,11 +329,11 @@ struct TaskCardV2: View {
                 )
             }
 
-            // AI indicator with quick tip preview
-            if task.hasAIProcessing {
+            // AI indicator badge (no preview text - whisper section shows the full text)
+            if task.hasAIProcessing && !shouldShowWhisper {
                 AIGuidanceChip(
                     hasGuidance: hasGuidanceText,
-                    previewText: task.aiQuickTip ?? task.aiAdvice
+                    previewText: nil  // No preview to avoid duplicate text
                 )
             }
 

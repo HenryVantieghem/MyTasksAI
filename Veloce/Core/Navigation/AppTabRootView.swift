@@ -43,7 +43,7 @@ struct AppTabRootView: View {
 
         // Note: Circles removed from tabs - accessed via CirclesPill
         case .momentum:
-            MomentumTabViewRedesign()
+            MomentumDataArtView()
 
         case .journal:
             JournalTabView(tasksViewModel: tasksViewModel)
@@ -105,7 +105,7 @@ struct AppTabContentView: View {
 
         // Note: Circles removed from tabs - accessed via CirclesPill
         case .momentum:
-            MomentumTabViewRedesign()
+            MomentumDataArtView()
 
         case .journal:
             // Placeholder - actual implementation in MainContainerView

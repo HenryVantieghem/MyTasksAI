@@ -184,11 +184,8 @@ struct ChatTasksView: View {
 
     var body: some View {
         ZStack {
-            // Dynamic productivity nebula background
-            DynamicNebulaBackground(
-                productivityLevel: productivityLevel,
-                hasOverdueTasks: filteredTasks.contains { $0.isOverdue }
-            )
+            // Cosmic void background (matches calendar)
+            VoidBackground.calendar
 
             // Main content
             VStack(spacing: 0) {
@@ -272,31 +269,6 @@ struct ChatTasksView: View {
             }
         }
     }
-
-    // MARK: - Depth Stacking
-
-    /// Calculate scale for depth effect (recent tasks appear closer)
-    private func depthScale(for index: Int) -> CGFloat {
-        guard !reduceMotion else { return 1.0 }
-
-        // First few tasks are "closer" (slightly larger)
-        let maxBoost: CGFloat = 0.02
-        let depthFactor = CGFloat(index) / CGFloat(max(filteredTasks.count, 1))
-        return 1.0 + (maxBoost * (1 - depthFactor))
-    }
-
-    // MARK: - Cosmic Transition
-
-    private var cosmicTransition: AnyTransition {
-        .asymmetric(
-            insertion: .scale(scale: 0.9)
-                .combined(with: .opacity)
-                .combined(with: .offset(y: 30)),
-            removal: .scale(scale: 0.95)
-                .combined(with: .opacity)
-        )
-    }
-
     // MARK: - In Progress Section
 
     private var inProgressSection: some View {
@@ -304,7 +276,7 @@ struct ChatTasksView: View {
             KanbanSectionHeader(section: .inProgress, count: inProgressTasks.count)
 
             ForEach(Array(inProgressTasks.enumerated()), id: \.element.id) { index, task in
-                TaskCardV2(
+                TaskCardV3(
                     task: task,
                     onTap: {
                         HapticsService.shared.selectionFeedback()
@@ -313,12 +285,16 @@ struct ChatTasksView: View {
                     onToggleComplete: {
                         completeTask(task)
                     },
-                    onStartTimer: onStartTimer
+                    onStartTimer: onStartTimer,
+                    onSnooze: { task in
+                        viewModel.snoozeTask(task)
+                    },
+                    onDelete: { task in
+                        viewModel.deleteTask(task)
+                    }
                 )
                 .id(task.id)
-                .scaleEffect(depthScale(for: index))
                 .zIndex(Double(inProgressTasks.count - index))
-                .transition(cosmicTransition)
                 .preloadTaskCard(task) // Preload AI data in background
             }
         }
@@ -339,7 +315,7 @@ struct ChatTasksView: View {
             KanbanSectionHeader(section: .toDo, count: toDoTasks.count)
 
             ForEach(Array(toDoTasks.enumerated()), id: \.element.id) { index, task in
-                TaskCardV2(
+                TaskCardV3(
                     task: task,
                     onTap: {
                         HapticsService.shared.selectionFeedback()
@@ -348,12 +324,16 @@ struct ChatTasksView: View {
                     onToggleComplete: {
                         completeTask(task)
                     },
-                    onStartTimer: onStartTimer
+                    onStartTimer: onStartTimer,
+                    onSnooze: { task in
+                        viewModel.snoozeTask(task)
+                    },
+                    onDelete: { task in
+                        viewModel.deleteTask(task)
+                    }
                 )
                 .id(task.id)
-                .scaleEffect(depthScale(for: index + inProgressTasks.count))
                 .zIndex(Double(toDoTasks.count - index))
-                .transition(cosmicTransition)
                 .preloadTaskCard(task) // Preload AI data in background
             }
         }

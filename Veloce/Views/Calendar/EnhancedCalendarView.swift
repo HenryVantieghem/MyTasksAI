@@ -2,9 +2,9 @@
 //  EnhancedCalendarView.swift
 //  Veloce
 //
-//  Tiimo-Style Visual Planner - Entry Point
-//  ADHD-friendly calendar with visual timeline,
-//  drag-to-reschedule, and Apple Calendar integration
+//  Notion Calendar-Inspired Visual Planner - Entry Point
+//  Clean, minimal calendar with visual timeline,
+//  swipe navigation, and Apple Calendar integration
 //
 
 import SwiftUI
@@ -12,12 +12,12 @@ import SwiftData
 
 // MARK: - Enhanced Calendar View
 
-/// Main calendar entry point - delegates to TiimoCalendarView
+/// Main calendar entry point - delegates to NotionCalendarView
 struct EnhancedCalendarView: View {
     @Bindable var viewModel: CalendarViewModel
 
     var body: some View {
-        TiimoCalendarView(viewModel: viewModel)
+        NotionCalendarView(viewModel: viewModel)
     }
 }
 

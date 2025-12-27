@@ -38,8 +38,8 @@ struct LiquidGlassTabBar: View {
         .padding(.vertical, 10)
         .glassEffect(.regular, in: Capsule())
         .shadow(
-            color: Veloce.Colors.accentPrimary.opacity(0.15),
-            radius: 20,
+            color: Color.black.opacity(0.3),
+            radius: 16,
             x: 0,
             y: 8
         )

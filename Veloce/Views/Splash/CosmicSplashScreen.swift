@@ -4,7 +4,7 @@
 //
 //  Cosmic Splash Screen - Living Cosmos Design
 //  A mesmerizing 3-second journey from void to brand reveal
-//  Stars coalesce into the MyTasksAI logo with cosmic energy
+//  Stars coalesce into the Veloce logo with cosmic energy
 //
 
 import SwiftUI
@@ -247,7 +247,7 @@ struct CosmicSplashScreen: View {
             }
 
             // App Name
-            Text("MyTasksAI")
+            Text("Veloce")
                 .font(Veloce.Typography.displayHero)
                 .foregroundStyle(
                     LinearGradient(
@@ -261,7 +261,7 @@ struct CosmicSplashScreen: View {
                 )
 
             // Tagline
-            Text("Achieve the Impossible")
+            Text("Infinite Momentum")
                 .font(Veloce.Typography.body)
                 .foregroundStyle(Veloce.Colors.textSecondary)
                 .opacity(taglineOpacity)

@@ -351,8 +351,9 @@ extension View {
     }
 }
 
-// MARK: - Liquid Glass Modifier (iOS 26 Style)
-struct LiquidGlassModifier: ViewModifier {
+// MARK: - Tinted Liquid Glass Modifier (iOS 26 Style with Color Tint)
+/// Renamed to avoid conflict with LiquidGlassModifier in LiquidGlassHelper.swift
+struct TintedLiquidGlassModifier: ViewModifier {
     let cornerRadius: CGFloat
     let tint: Color?
 
@@ -387,12 +388,12 @@ struct LiquidGlassModifier: ViewModifier {
 }
 
 extension View {
-    /// Apply liquid glass effect (iOS 26 style)
-    func liquidGlass(
+    /// Apply tinted liquid glass effect (iOS 26 style with optional color tint)
+    func tintedLiquidGlass(
         cornerRadius: CGFloat = Theme.CornerRadius.lg,
         tint: Color? = nil
     ) -> some View {
-        modifier(LiquidGlassModifier(cornerRadius: cornerRadius, tint: tint))
+        modifier(TintedLiquidGlassModifier(cornerRadius: cornerRadius, tint: tint))
     }
 }
 

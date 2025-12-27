@@ -2,8 +2,8 @@
 //  JournalFeedView.swift
 //  Veloce
 //
-//  Beautiful Journal Feed - Apple Notes/Journal inspired rich experience
-//  Date navigation, entry type filters, and stunning entry cards
+//  Apple Notes-Inspired Journal - Clean, minimal, free-form writing
+//  Beautiful typography, open canvas, and distraction-free experience
 //
 
 import SwiftUI
@@ -45,859 +45,620 @@ enum JournalColors {
     }
 }
 
-// MARK: - Journal Feed View
+// MARK: - Notes Journal View
 
 struct JournalFeedView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = JournalFeedViewModel()
     @State private var showEditor = false
     @State private var selectedEntry: JournalEntry?
-    @State private var newEntryType: JournalEntryType = .brainDump
-    @State private var showSearch = false
-    @State private var isLoaded = false
+    @State private var searchText = ""
+    @State private var isSearching = false
+    @FocusState private var isSearchFocused: Bool
+
+    // Filtered entries based on search
+    private var displayedEntries: [JournalEntry] {
+        if searchText.isEmpty {
+            return viewModel.filteredEntries
+        }
+        return viewModel.filteredEntries.filter { entry in
+            entry.plainText.localizedCaseInsensitiveContains(searchText) ||
+            (entry.title ?? "").localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    // Group entries by date
+    private var groupedEntries: [(String, [JournalEntry])] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: displayedEntries) { entry -> String in
+            if calendar.isDateInToday(entry.createdAt) {
+                return "Today"
+            } else if calendar.isDateInYesterday(entry.createdAt) {
+                return "Yesterday"
+            } else if calendar.isDate(entry.createdAt, equalTo: Date(), toGranularity: .weekOfYear) {
+                return "This Week"
+            } else if calendar.isDate(entry.createdAt, equalTo: Date(), toGranularity: .month) {
+                return "This Month"
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MMMM yyyy"
+                return formatter.string(from: entry.createdAt)
+            }
+        }
+
+        let order = ["Today", "Yesterday", "This Week", "This Month"]
+        return grouped.sorted { first, second in
+            let firstIndex = order.firstIndex(of: first.key) ?? Int.max
+            let secondIndex = order.firstIndex(of: second.key) ?? Int.max
+            if firstIndex != Int.max || secondIndex != Int.max {
+                return firstIndex < secondIndex
+            }
+            return first.key > second.key
+        }
+    }
 
     var body: some View {
         ZStack {
-            // Background - Living Cosmos journal variant
-            VoidBackground.journal
+            // Background - Warm paper-like void
+            notesBackground
 
-            ScrollView {
-                VStack(spacing: Theme.Spacing.lg) {
-                    // Date Navigation Header
-                    dateNavigationHeader
-                        .padding(.top, Theme.Spacing.universalHeaderHeight)
+            VStack(spacing: 0) {
+                // Header
+                notesHeader
 
-                    // Entry Type Filters
-                    entryTypeFilters
-
-                    // AI Daily Prompt Card
-                    if let prompt = viewModel.dailyPrompt {
-                        JournalAIPromptCard(prompt: prompt) {
-                            newEntryType = .reflection
-                            showEditor = true
-                        }
-                        .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .move(edge: .top)),
-                            removal: .opacity
-                        ))
-                    }
-
-                    // Gratitude Streak (if applicable)
-                    if viewModel.gratitudeStreak > 0 && viewModel.selectedFilter == .gratitude {
-                        GratitudeStreakCard(streak: viewModel.gratitudeStreak)
-                    }
-
-                    // Journal Entries
-                    if viewModel.filteredEntries.isEmpty {
-                        emptyState
-                    } else {
-                        entriesGrid
-                    }
+                // Search bar (when active)
+                if isSearching {
+                    searchBar
+                        .transition(.move(edge: .top).combined(with: .opacity))
                 }
-                .padding(.horizontal, Theme.Spacing.screenPadding)
-                .padding(.bottom, 140)
+
+                // Content
+                if displayedEntries.isEmpty {
+                    emptyState
+                } else {
+                    notesList
+                }
             }
 
-            // Floating Create Button
+            // Floating Compose Button
             VStack {
                 Spacer()
-                createEntryButton
-                    .padding(.bottom, 100)
+                HStack {
+                    Spacer()
+                    composeButton
+                        .padding(.trailing, 24)
+                        .padding(.bottom, 120)
+                }
             }
         }
         .preferredColorScheme(.dark)
         .onAppear {
             viewModel.setup(context: modelContext)
-            withAnimation(Theme.Animation.spring.delay(0.3)) {
-                isLoaded = true
-            }
         }
-        .onChange(of: viewModel.selectedDate) { _, newDate in
-            Task {
-                await viewModel.loadEntries(for: newDate)
-            }
-        }
-        .sheet(isPresented: $showEditor) {
-            JournalEditorSheet(
+        .fullScreenCover(isPresented: $showEditor) {
+            NotesEditorView(
                 viewModel: viewModel,
                 entry: selectedEntry,
-                entryType: newEntryType
+                onDismiss: {
+                    showEditor = false
+                    selectedEntry = nil
+                }
             )
-        }
-        .sheet(isPresented: $showSearch) {
-            JournalSearchView(viewModel: viewModel)
         }
     }
 
-    // MARK: - Date Navigation Header (Liquid Glass)
+    // MARK: - Background
 
-    private var dateNavigationHeader: some View {
-        HStack(spacing: 12) {
-            // Previous day
-            Button {
-                HapticsService.shared.selectionFeedback()
-                viewModel.previousDay()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .frame(width: 36, height: 36)
+    private var notesBackground: some View {
+        ZStack {
+            // Base void color
+            Color(red: 0.06, green: 0.06, blue: 0.08)
+                .ignoresSafeArea()
+
+            // Subtle warm gradient overlay (paper-like warmth)
+            LinearGradient(
+                colors: [
+                    Color(red: 0.12, green: 0.10, blue: 0.08).opacity(0.3),
+                    Color.clear
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        }
+    }
+
+    // MARK: - Header
+
+    private var notesHeader: some View {
+        HStack(alignment: .center) {
+            // Title
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Journal")
+                    .font(.system(size: 34, weight: .bold, design: .serif))
+                    .foregroundStyle(.white)
+
+                Text("\(displayedEntries.count) Notes")
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.5))
             }
-            .buttonStyle(.plain)
-            .glassEffect(.regular, in: SwiftUI.Circle())
-
-            // Date Pill with Liquid Glass
-            Button {
-                HapticsService.shared.selectionFeedback()
-                viewModel.showDatePicker = true
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 13, weight: .medium))
-
-                    Text(viewModel.formattedSelectedDate)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-
-                    if viewModel.isToday {
-                        Text("Today")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Theme.CelestialColors.auroraGreen.opacity(0.3), in: Capsule())
-                    }
-                }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-            }
-            .buttonStyle(.plain)
-            .glassEffect(.regular, in: Capsule())
-
-            // Next day
-            Button {
-                HapticsService.shared.selectionFeedback()
-                viewModel.nextDay()
-            } label: {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .frame(width: 36, height: 36)
-            }
-            .buttonStyle(.plain)
-            .glassEffect(.regular, in: SwiftUI.Circle())
 
             Spacer()
 
             // Search button
             Button {
-                HapticsService.shared.selectionFeedback()
-                showSearch = true
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    isSearching.toggle()
+                    if isSearching {
+                        isSearchFocused = true
+                    } else {
+                        searchText = ""
+                        isSearchFocused = false
+                    }
+                }
             } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .frame(width: 36, height: 36)
+                Image(systemName: isSearching ? "xmark" : "magnifyingglass")
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.7))
+                    .frame(width: 40, height: 40)
+                    .background {
+                        Circle()
+                            .fill(.white.opacity(0.08))
+                    }
             }
             .buttonStyle(.plain)
-            .glassEffect(.regular, in: SwiftUI.Circle())
         }
-        .sheet(isPresented: $viewModel.showDatePicker) {
-            DatePickerSheet(selectedDate: $viewModel.selectedDate)
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-        }
+        .padding(.horizontal, 20)
+        .padding(.top, Theme.Spacing.universalHeaderHeight + 8)
+        .padding(.bottom, 16)
     }
 
-    // MARK: - Entry Type Filters
+    // MARK: - Search Bar
 
-    private var entryTypeFilters: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                // All filter
-                JournalFilterPill(
-                    label: "All",
-                    icon: "square.grid.2x2",
-                    isSelected: viewModel.selectedFilter == nil,
-                    color: Theme.Colors.aiPurple
-                ) {
-                    HapticsService.shared.selectionFeedback()
-                    withAnimation(Theme.Animation.spring) {
-                        viewModel.selectedFilter = nil
-                    }
+    private var searchBar: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 15))
+                .foregroundStyle(.white.opacity(0.4))
+
+            TextField("Search notes...", text: $searchText)
+                .font(.system(size: 16))
+                .foregroundStyle(.white)
+                .focused($isSearchFocused)
+
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(.white.opacity(0.4))
                 }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.white.opacity(0.06))
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
+    }
 
-                // Entry type filters
-                ForEach(JournalEntryType.allCases, id: \.self) { type in
-                    JournalFilterPill(
-                        label: type.displayName,
-                        icon: type.icon,
-                        isSelected: viewModel.selectedFilter == type,
-                        color: JournalColors.colorFor(entryType: type)
-                    ) {
-                        HapticsService.shared.selectionFeedback()
-                        withAnimation(Theme.Animation.spring) {
-                            viewModel.selectedFilter = type
+    // MARK: - Notes List
+
+    private var notesList: some View {
+        ScrollView {
+            LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                ForEach(groupedEntries, id: \.0) { section, entries in
+                    Section {
+                        ForEach(entries) { entry in
+                            NoteRowView(entry: entry)
+                                .onTapGesture {
+                                    HapticsService.shared.selectionFeedback()
+                                    selectedEntry = entry
+                                    showEditor = true
+                                }
                         }
+                    } header: {
+                        sectionHeader(section)
                     }
                 }
             }
-            .padding(.horizontal, 4)
+            .padding(.bottom, 160)
         }
     }
 
-    // MARK: - Entries Grid
+    private func sectionHeader(_ title: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.4))
+                .textCase(.uppercase)
+                .tracking(0.5)
 
-    private var entriesGrid: some View {
-        LazyVStack(spacing: Theme.Spacing.md) {
-            ForEach(Array(viewModel.filteredEntries.enumerated()), id: \.element.id) { index, entry in
-                JournalFeedEntryCard(entry: entry, index: index, isLoaded: isLoaded)
-                    .onTapGesture {
-                        HapticsService.shared.impact()
-                        selectedEntry = entry
-                        newEntryType = entry.entryType
-                        showEditor = true
-                    }
-            }
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 8)
+        .background {
+            Color(red: 0.06, green: 0.06, blue: 0.08).opacity(0.95)
         }
     }
 
     // MARK: - Empty State
 
     private var emptyState: some View {
-        JournalEmptyState(entryType: viewModel.selectedFilter) {
-            if let filter = viewModel.selectedFilter {
-                newEntryType = filter
+        VStack(spacing: 24) {
+            Spacer()
+
+            // Pencil icon
+            Image(systemName: "pencil.and.scribble")
+                .font(.system(size: 56, weight: .ultraLight))
+                .foregroundStyle(.white.opacity(0.25))
+
+            VStack(spacing: 8) {
+                Text("No Notes Yet")
+                    .font(.system(size: 24, weight: .light, design: .serif))
+                    .foregroundStyle(.white.opacity(0.8))
+
+                Text("Tap the compose button to start writing")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.4))
             }
-            showEditor = true
+
+            Spacer()
         }
+        .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Create Entry Button
+    // MARK: - Compose Button
 
-    private var createEntryButton: some View {
-        Menu {
-            ForEach(JournalEntryType.allCases, id: \.self) { type in
-                Button {
-                    HapticsService.shared.impact()
-                    newEntryType = type
-                    selectedEntry = nil
-                    showEditor = true
-                } label: {
-                    Label(type.displayName, systemImage: type.icon)
-                }
-            }
+    private var composeButton: some View {
+        Button {
+            HapticsService.shared.impact()
+            selectedEntry = nil
+            showEditor = true
         } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "plus")
-                    .font(.system(size: 18, weight: .semibold))
-
-                Text("New Entry")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-            }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
-            .background {
-                Capsule()
+            ZStack {
+                // Glow
+                Circle()
                     .fill(
-                        LinearGradient(
-                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
-                            startPoint: .leading,
-                            endPoint: .trailing
+                        RadialGradient(
+                            colors: [
+                                Color(red: 1.0, green: 0.8, blue: 0.4).opacity(0.4),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 40
                         )
                     )
+                    .frame(width: 80, height: 80)
+                    .blur(radius: 8)
+
+                // Button
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 1.0, green: 0.85, blue: 0.5),
+                                Color(red: 0.95, green: 0.7, blue: 0.3)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 60, height: 60)
+                    .shadow(color: Color(red: 1.0, green: 0.7, blue: 0.3).opacity(0.5), radius: 16, y: 8)
+
+                // Icon
+                Image(systemName: "square.and.pencil")
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(Color(red: 0.15, green: 0.1, blue: 0.05))
             }
-            .shadow(color: Theme.Colors.aiPurple.opacity(0.4), radius: 16, y: 8)
         }
         .buttonStyle(.plain)
     }
 }
 
-// MARK: - Filter Pill (Liquid Glass)
+// MARK: - Note Row View
 
-struct JournalFilterPill: View {
-    let label: String
-    let icon: String
-    let isSelected: Bool
-    let color: Color
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                    .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
-
-                Text(label)
-                    .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
-            }
-            .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
-            .background {
-                if isSelected {
-                    Capsule()
-                        .fill(color.opacity(0.3))
-                }
-            }
-        }
-        .buttonStyle(.plain)
-        .glassEffect(.regular, in: Capsule())
-    }
-}
-
-// MARK: - Journal Entry Card
-
-struct JournalFeedEntryCard: View {
+struct NoteRowView: View {
     let entry: JournalEntry
-    let index: Int
-    let isLoaded: Bool
 
-    @State private var isVisible = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var displayTitle: String {
+        if let title = entry.title, !title.isEmpty {
+            return title
+        }
+        let firstLine = entry.plainText.split(separator: "\n").first ?? ""
+        return String(firstLine.prefix(50))
+    }
 
-    private var entryColor: Color {
-        JournalColors.colorFor(entryType: entry.entryType)
+    private var previewText: String {
+        let text = entry.plainText
+        if let title = entry.title, !title.isEmpty {
+            return String(text.prefix(100))
+        }
+        let lines = text.split(separator: "\n", omittingEmptySubsequences: true)
+        if lines.count > 1 {
+            return String(lines.dropFirst().joined(separator: " ").prefix(100))
+        }
+        return ""
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-            // Header: Type badge + Time + Mood
-            HStack {
-                // Entry type badge
-                HStack(spacing: 6) {
-                    Image(systemName: entry.entryType.icon)
-                        .font(.system(size: 11, weight: .semibold))
+        VStack(alignment: .leading, spacing: 6) {
+            // Title
+            Text(displayTitle.isEmpty ? "New Note" : displayTitle)
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(.white)
+                .lineLimit(1)
 
-                    Text(entry.entryType.displayName)
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                }
-                .foregroundStyle(entryColor)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background {
-                    Capsule()
-                        .fill(entryColor.opacity(0.2))
-                }
-
-                Spacer()
-
-                // Time
+            HStack(spacing: 8) {
+                // Date
                 Text(entry.formattedTime)
-                    .font(Theme.Typography.cosmosMeta)
-                    .foregroundStyle(Theme.CelestialColors.starGhost)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.4))
 
-                // Mood indicator
-                if let mood = entry.mood {
-                    Text(mood.emoji)
-                        .font(.system(size: 16))
-                }
-
-                // Pinned/Favorite indicators
-                if entry.isPinned {
-                    Image(systemName: "pin.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(Theme.CelestialColors.solarFlare)
-                }
-
-                if entry.isFavorite {
-                    Image(systemName: "heart.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(JournalColors.gratitude)
-                }
-            }
-
-            // Title (if exists)
-            if let title = entry.title, !title.isEmpty {
-                Text(title)
-                    .font(Theme.Typography.cosmosTitle)
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-            }
-
-            // Preview text
-            if !entry.previewText.isEmpty {
-                Text(entry.previewText)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(Theme.CelestialColors.starDim)
-                    .lineLimit(3)
-                    .lineSpacing(2)
-            }
-
-            // Media indicators
-            if entry.hasMedia {
-                HStack(spacing: 12) {
-                    if entry.photoCount > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "photo.fill")
-                                .font(.system(size: 11))
-                            Text("\(entry.photoCount)")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .foregroundStyle(Theme.CelestialColors.starGhost)
-                    }
-
-                    if entry.hasDrawing {
-                        HStack(spacing: 4) {
-                            Image(systemName: "pencil.tip")
-                                .font(.system(size: 11))
-                            Text("Drawing")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .foregroundStyle(Theme.CelestialColors.starGhost)
-                    }
-
-                    if entry.recordingCount > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "waveform")
-                                .font(.system(size: 11))
-                            Text("\(entry.recordingCount)")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .foregroundStyle(Theme.CelestialColors.starGhost)
-                    }
-
-                    Spacer()
-
-                    // Word count
-                    if entry.wordCount > 0 {
-                        Text("\(entry.wordCount) words")
-                            .font(Theme.Typography.cosmosMeta)
-                            .foregroundStyle(Theme.CelestialColors.starGhost)
-                    }
-                }
-            }
-
-            // AI Summary (if available)
-            if let summary = entry.aiSummary, !summary.isEmpty {
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 10))
-
-                    Text(summary)
-                        .font(Theme.Typography.cosmosWhisperSmall)
+                // Preview
+                if !previewText.isEmpty {
+                    Text(previewText)
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundStyle(.white.opacity(0.35))
                         .lineLimit(1)
                 }
-                .foregroundStyle(Theme.CelestialColors.nebulaCore.opacity(0.8))
-                .padding(.top, 4)
             }
         }
-        .padding(LivingCosmos.FloatingIsland.padding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
         .background {
-            // Subtle entry color tint
-            RoundedRectangle(cornerRadius: LivingCosmos.FloatingIsland.cornerRadius)
-                .fill(entryColor.opacity(0.03))
+            Rectangle()
+                .fill(Color.clear)
         }
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: LivingCosmos.FloatingIsland.cornerRadius))
-        .overlay {
-            RoundedRectangle(cornerRadius: LivingCosmos.FloatingIsland.cornerRadius)
-                .stroke(.white.opacity(0.08), lineWidth: 0.5)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(.white.opacity(0.06))
+                .frame(height: 0.5)
+                .padding(.leading, 20)
         }
-        .shadow(color: entryColor.opacity(0.12), radius: 8, y: 3)
-        .opacity(isVisible ? 1 : 0)
-        .offset(y: isVisible ? 0 : 20)
+        .contentShape(Rectangle())
+    }
+}
+
+// MARK: - Notes Editor View (Full Screen)
+
+struct NotesEditorView: View {
+    @Bindable var viewModel: JournalFeedViewModel
+    var entry: JournalEntry?
+    let onDismiss: () -> Void
+
+    @Environment(\.modelContext) private var modelContext
+    @State private var content: String = ""
+    @State private var isLoaded = false
+    @State private var currentEntry: JournalEntry?
+    @FocusState private var isFocused: Bool
+
+    // Word and character count
+    private var wordCount: Int {
+        content.split(separator: " ").count
+    }
+
+    private var characterCount: Int {
+        content.count
+    }
+
+    var body: some View {
+        ZStack {
+            // Background - Warm paper-like
+            editorBackground
+
+            VStack(spacing: 0) {
+                // Header
+                editorHeader
+
+                // Divider
+                Rectangle()
+                    .fill(.white.opacity(0.08))
+                    .frame(height: 0.5)
+
+                // Text Editor
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        // Date stamp
+                        Text(Date().formatted(date: .abbreviated, time: .shortened))
+                            .font(.system(size: 12, weight: .regular))
+                            .foregroundStyle(.white.opacity(0.3))
+                            .padding(.top, 20)
+                            .padding(.bottom, 16)
+
+                        // Free-form text area
+                        ZStack(alignment: .topLeading) {
+                            if content.isEmpty {
+                                Text("Start writing...")
+                                    .font(.system(size: 18, weight: .regular, design: .serif))
+                                    .foregroundStyle(.white.opacity(0.25))
+                                    .padding(.top, 8)
+                            }
+
+                            TextEditor(text: $content)
+                                .font(.system(size: 18, weight: .regular, design: .serif))
+                                .foregroundStyle(.white.opacity(0.9))
+                                .scrollContentBackground(.hidden)
+                                .focused($isFocused)
+                                .frame(minHeight: 400)
+                                .lineSpacing(8)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 100)
+                }
+            }
+
+            // Word count footer
+            VStack {
+                Spacer()
+                wordCountFooter
+            }
+        }
+        .preferredColorScheme(.dark)
         .onAppear {
-            guard !reduceMotion else {
-                isVisible = true
-                return
-            }
-
-            withAnimation(
-                Theme.Animation.spring
-                    .delay(Double(index) * Theme.Animation.staggerDelay)
-            ) {
-                isVisible = isLoaded
+            setupEntry()
+            withAnimation(.easeOut(duration: 0.3).delay(0.2)) {
+                isLoaded = true
+                isFocused = true
             }
         }
-        .onChange(of: isLoaded) { _, loaded in
-            guard !reduceMotion else {
-                isVisible = loaded
-                return
-            }
-
-            withAnimation(
-                Theme.Animation.spring
-                    .delay(Double(index) * Theme.Animation.staggerDelay)
-            ) {
-                isVisible = loaded
-            }
+        .onDisappear {
+            saveEntry()
         }
     }
-}
 
-// MARK: - AI Prompt Card
+    // MARK: - Background
 
-struct JournalAIPromptCard: View {
-    let prompt: String
-    let onTap: () -> Void
+    private var editorBackground: some View {
+        ZStack {
+            // Warm dark paper
+            Color(red: 0.07, green: 0.065, blue: 0.06)
+                .ignoresSafeArea()
 
-    @State private var isGlowing = false
+            // Subtle texture overlay
+            LinearGradient(
+                colors: [
+                    Color(red: 0.1, green: 0.09, blue: 0.07).opacity(0.5),
+                    Color.clear
+                ],
+                startPoint: .top,
+                endPoint: .center
+            )
+            .ignoresSafeArea()
+        }
+    }
 
-    var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-                HStack {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+    // MARK: - Header
 
-                    Text("Today's Reflection")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.8))
-
-                    Spacer()
-
-                    Image(systemName: "arrow.right.circle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+    private var editorHeader: some View {
+        HStack {
+            // Back button
+            Button {
+                HapticsService.shared.selectionFeedback()
+                saveEntry()
+                onDismiss()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .medium))
+                    Text("Notes")
+                        .font(.system(size: 17, weight: .regular))
                 }
-
-                Text(prompt)
-                    .font(Theme.Typography.cosmosWhisper)
-                    .foregroundStyle(.white.opacity(0.9))
-                    .lineLimit(3)
-                    .lineSpacing(4)
-            }
-            .padding(Theme.Spacing.lg)
-            .background {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Theme.CelestialColors.nebulaCore.opacity(0.15),
-                                Theme.CelestialColors.nebulaGlow.opacity(0.1),
-                                .clear
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Theme.CelestialColors.nebulaCore.opacity(0.4),
-                                Theme.CelestialColors.nebulaGlow.opacity(0.2),
-                                .clear
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-            .shadow(color: Theme.CelestialColors.nebulaCore.opacity(isGlowing ? 0.3 : 0.15), radius: isGlowing ? 20 : 12, y: 4)
-        }
-        .buttonStyle(.plain)
-        .onAppear {
-            withAnimation(Theme.Animation.plasmaPulse) {
-                isGlowing = true
-            }
-        }
-    }
-}
-
-// MARK: - Gratitude Streak Card
-
-struct GratitudeStreakCard: View {
-    let streak: Int
-
-    var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            // Flame icon with glow
-            ZStack {
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 24))
-                    .foregroundStyle(Theme.Colors.streakOrange)
-                    .blur(radius: 6)
-
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 24))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Theme.Colors.aiOrange, Theme.Colors.fire],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(streak) Day Streak!")
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text("Keep the gratitude flowing")
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.6))
-            }
-
-            Spacer()
-
-            // Streak number
-            Text("\(streak)")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Theme.Colors.aiOrange, Theme.Colors.fire],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-        }
-        .padding(Theme.Spacing.lg)
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Theme.Colors.streakOrange.opacity(0.15),
-                            Theme.Colors.fire.opacity(0.08),
-                            .clear
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Theme.Colors.streakOrange.opacity(0.3), lineWidth: 0.5)
-        }
-    }
-}
-
-// MARK: - Journal Empty State
-
-struct JournalEmptyState: View {
-    let entryType: JournalEntryType?
-    let onCreate: () -> Void
-
-    private var title: String {
-        if let type = entryType {
-            return "No \(type.displayName) Entries"
-        }
-        return "No Entries Yet"
-    }
-
-    private var subtitle: String {
-        if let type = entryType {
-            return type.placeholder
-        }
-        return "Start capturing your thoughts, feelings, and reflections"
-    }
-
-    private var icon: String {
-        entryType?.icon ?? "book.pages"
-    }
-
-    private var color: Color {
-        if let type = entryType {
-            return JournalColors.colorFor(entryType: type)
-        }
-        return Theme.Colors.aiPurple
-    }
-
-    var body: some View {
-        VStack(spacing: Theme.Spacing.xl) {
-            Spacer()
-                .frame(height: 40)
-
-            // Animated icon
-            ZStack {
-                SwiftUI.Circle()
-                    .fill(color.opacity(0.1))
-                    .frame(width: 100, height: 100)
-
-                SwiftUI.Circle()
-                    .stroke(color.opacity(0.2), lineWidth: 1)
-                    .frame(width: 100, height: 100)
-
-                Image(systemName: icon)
-                    .font(.system(size: 40, weight: .light))
-                    .foregroundStyle(color.opacity(0.6))
-            }
-
-            VStack(spacing: Theme.Spacing.sm) {
-                Text(title)
-                    .font(.system(size: 20, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text(subtitle)
-                    .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.5))
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-            }
-
-            // Benefits of journaling
-            VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-                benefitRow(icon: "brain.head.profile", text: "Clear your mind")
-                benefitRow(icon: "chart.line.uptrend.xyaxis", text: "Track your growth")
-                benefitRow(icon: "heart.text.square", text: "Process emotions")
-            }
-            .padding(.top, Theme.Spacing.lg)
-
-            // Create button
-            Button(action: onCreate) {
-                HStack(spacing: 8) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 16, weight: .semibold))
-
-                    Text("Start Your First Entry")
-                        .font(.system(size: 15, weight: .semibold))
-                }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 14)
-                .background {
-                    Capsule()
-                        .fill(color)
-                }
+                .foregroundStyle(Color(red: 1.0, green: 0.8, blue: 0.4))
             }
             .buttonStyle(.plain)
-            .padding(.top, Theme.Spacing.lg)
+
+            Spacer()
+
+            // Action buttons
+            HStack(spacing: 20) {
+                Button {
+                    // Share action
+                    HapticsService.shared.selectionFeedback()
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    // More options
+                    HapticsService.shared.selectionFeedback()
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.system(size: 20, weight: .regular))
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .padding(.top, 50)
+    }
+
+    // MARK: - Word Count Footer
+
+    private var wordCountFooter: some View {
+        HStack {
+            Text("\(wordCount) words")
+                .font(.system(size: 12, weight: .regular))
+                .foregroundStyle(.white.opacity(0.35))
+
+            Text("•")
+                .foregroundStyle(.white.opacity(0.2))
+
+            Text("\(characterCount) characters")
+                .font(.system(size: 12, weight: .regular))
+                .foregroundStyle(.white.opacity(0.35))
 
             Spacer()
         }
-        .padding(.horizontal, Theme.Spacing.xl)
-    }
-
-    private func benefitRow(icon: String, text: String) -> some View {
-        HStack(spacing: Theme.Spacing.md) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundStyle(color.opacity(0.6))
-                .frame(width: 24)
-
-            Text(text)
-                .font(.system(size: 14, weight: .regular))
-                .foregroundStyle(.white.opacity(0.6))
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+        .background {
+            Color(red: 0.06, green: 0.055, blue: 0.05)
+                .ignoresSafeArea()
         }
     }
-}
 
-// MARK: - Date Picker Sheet
+    // MARK: - Actions
 
-struct DatePickerSheet: View {
-    @Binding var selectedDate: Date
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                DatePicker(
-                    "Select Date",
-                    selection: $selectedDate,
-                    displayedComponents: .date
-                )
-                .datePickerStyle(.graphical)
-                .tint(Theme.Colors.aiPurple)
-                .padding()
-
-                Spacer()
-            }
-            .background(Theme.CelestialColors.void)
-            .navigationTitle("Select Date")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Today") {
-                        selectedDate = Date()
-                        dismiss()
-                    }
-                }
-            }
+    private func setupEntry() {
+        if let existingEntry = entry {
+            currentEntry = existingEntry
+            content = existingEntry.plainText
+        } else {
+            // Create new entry
+            currentEntry = viewModel.createEntry(type: .brainDump)
         }
-        .preferredColorScheme(.dark)
     }
-}
 
-// MARK: - Journal Search View (Placeholder)
+    private func saveEntry() {
+        guard let entry = currentEntry else { return }
 
-struct JournalSearchView: View {
-    let viewModel: JournalFeedViewModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var searchText = ""
-    @State private var selectedFilter: JournalEntryType?
-    @State private var selectedMood: JournalMood?
-    @State private var dateRange: ClosedRange<Date>?
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                Theme.CelestialColors.void
-                    .ignoresSafeArea()
-
-                VStack(spacing: Theme.Spacing.lg) {
-                    // Search bar
-                    HStack(spacing: Theme.Spacing.md) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 16))
-                            .foregroundStyle(.white.opacity(0.5))
-
-                        TextField("Search entries...", text: $searchText)
-                            .font(.system(size: 16))
-                            .foregroundStyle(.white)
-                    }
-                    .padding(Theme.Spacing.md)
-                    .background {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(.white.opacity(0.08))
-                    }
-                    .padding(.horizontal)
-
-                    // Filters
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(JournalEntryType.allCases, id: \.self) { type in
-                                JournalFilterPill(
-                                    label: type.displayName,
-                                    icon: type.icon,
-                                    isSelected: selectedFilter == type,
-                                    color: JournalColors.colorFor(entryType: type)
-                                ) {
-                                    if selectedFilter == type {
-                                        selectedFilter = nil
-                                    } else {
-                                        selectedFilter = type
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    // Results would go here
-                    Spacer()
-
-                    Text("Search results will appear here")
-                        .font(.system(size: 14))
-                        .foregroundStyle(.white.opacity(0.4))
-
-                    Spacer()
-                }
-                .padding(.top, Theme.Spacing.lg)
-            }
-            .navigationTitle("Search Journal")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
+        // Don't save empty entries
+        let trimmedContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedContent.isEmpty {
+            // Delete the entry if it's empty
+            modelContext.delete(entry)
+            return
         }
-        .preferredColorScheme(.dark)
+
+        // Extract title from first line if not set
+        let lines = trimmedContent.split(separator: "\n", omittingEmptySubsequences: true)
+        if let firstLine = lines.first {
+            let titleText = String(firstLine.prefix(50))
+            entry.title = titleText
+        }
+
+        // Save content
+        let attributedString = NSAttributedString(
+            string: content,
+            attributes: [
+                .font: UIFont.preferredFont(forTextStyle: .body),
+                .foregroundColor: UIColor.white
+            ]
+        )
+        entry.setAttributedString(attributedString)
+        entry.updatedAt = .now
+
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to save entry: \(error)")
+        }
     }
 }
 

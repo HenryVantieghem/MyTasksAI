@@ -128,7 +128,7 @@ struct LogoWithText: View {
 
             VStack(spacing: 4) {
                 // Editorial thin typography from Auth design
-                Text("MyTasksAI")
+                Text("Veloce")
                     .font(titleFont)
                     .foregroundStyle(
                         LinearGradient(
@@ -139,9 +139,9 @@ struct LogoWithText: View {
                     )
 
                 if showTagline {
-                    Text("INFINITE PRODUCTIVITY")
+                    Text("INFINITE MOMENTUM")
                         .font(taglineFont)
-                        .foregroundStyle(Color(hex: "06B6D4").opacity(0.7))
+                        .foregroundStyle(Color(red: 0.50, green: 0.80, blue: 0.95).opacity(0.7))
                         .tracking(taglineTracking)
                 }
             }
@@ -192,12 +192,12 @@ struct AppIconView: View {
     let iconSize: CGFloat
 
     private let gradientColors: [Color] = [
-        Color(hex: "8B5CF6"),
-        Color(hex: "6366F1"),
-        Color(hex: "3B82F6"),
-        Color(hex: "0EA5E9"),
-        Color(hex: "06B6D4"),
-        Color(hex: "14B8A6"),
+        Color(red: 0.95, green: 0.75, blue: 0.85),   // Soft pink
+        Color(red: 0.85, green: 0.65, blue: 0.90),   // Lavender pink
+        Color(red: 0.70, green: 0.60, blue: 0.95),   // Soft purple
+        Color(red: 0.55, green: 0.70, blue: 0.95),   // Periwinkle
+        Color(red: 0.50, green: 0.80, blue: 0.95),   // Sky cyan
+        Color(red: 0.60, green: 0.85, blue: 0.90),   // Soft teal
     ]
 
     var body: some View {

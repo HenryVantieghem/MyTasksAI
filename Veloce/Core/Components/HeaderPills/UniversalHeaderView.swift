@@ -27,31 +27,32 @@ struct UniversalHeaderView: View {
     @State private var showContent = false
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            // Points pill (left) - Shows total XP with gold star
-            TotalPointsPill(points: gamification.totalPoints) {
-                showStatsSheet = true
-            }
-
-            Spacer()
-
-            // Title (center) - Editorial thin typography
+        ZStack {
+            // Title (absolute center) - Editorial thin typography
             Text(title)
                 .font(Theme.Typography.displaySmall)
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            Spacer()
+            // Pills on sides
+            HStack {
+                // Points pill (left) - Shows total XP with gold star
+                TotalPointsPill(points: gamification.totalPoints) {
+                    showStatsSheet = true
+                }
 
-            // Settings pill (right) - User avatar/settings
-            SettingsPillView(
-                avatarUrl: avatarUrl,
-                userName: userName,
-                transparent: false
-            ) {
-                HapticsService.shared.selectionFeedback()
-                showSettingsSheet = true
+                Spacer()
+
+                // Settings pill (right) - User avatar/settings
+                SettingsPillView(
+                    avatarUrl: avatarUrl,
+                    userName: userName,
+                    transparent: false
+                ) {
+                    HapticsService.shared.selectionFeedback()
+                    showSettingsSheet = true
+                }
             }
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
@@ -79,29 +80,30 @@ struct CompactHeaderView: View {
     var avatarUrl: String? = nil
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
-            // Compact points pill
-            CompactPointsPill(points: gamification.totalPoints) {
-                showStatsSheet = true
-            }
-
-            Spacer()
-
-            // Title - smaller for compact
+        ZStack {
+            // Title (absolute center) - smaller for compact
             Text(title)
                 .font(.system(size: 16, weight: .light))
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
-            Spacer()
+            // Pills on sides
+            HStack {
+                // Compact points pill
+                CompactPointsPill(points: gamification.totalPoints) {
+                    showStatsSheet = true
+                }
 
-            // Settings pill
-            SettingsPillView(
-                avatarUrl: avatarUrl,
-                userName: userName
-            ) {
-                HapticsService.shared.selectionFeedback()
-                showSettingsSheet = true
+                Spacer()
+
+                // Settings pill
+                SettingsPillView(
+                    avatarUrl: avatarUrl,
+                    userName: userName
+                ) {
+                    HapticsService.shared.selectionFeedback()
+                    showSettingsSheet = true
+                }
             }
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
@@ -123,36 +125,37 @@ struct HeaderWithStreak: View {
     var avatarUrl: String? = nil
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
-            // Points pill
-            TotalPointsPill(points: gamification.totalPoints) {
-                showStatsSheet = true
-            }
-
-            // Streak badge (only if active)
-            if gamification.currentStreak > 0 {
-                StreakIndicator(days: gamification.currentStreak)
-            }
-
-            Spacer()
-
-            // Title
+        ZStack {
+            // Title (absolute center)
             Text(title)
                 .font(Theme.Typography.displaySmall)
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            Spacer()
+            // Pills on sides
+            HStack(spacing: Theme.Spacing.sm) {
+                // Points pill
+                TotalPointsPill(points: gamification.totalPoints) {
+                    showStatsSheet = true
+                }
 
-            // Settings pill
-            SettingsPillView(
-                avatarUrl: avatarUrl,
-                userName: userName,
-                transparent: false
-            ) {
-                HapticsService.shared.selectionFeedback()
-                showSettingsSheet = true
+                // Streak badge (only if active)
+                if gamification.currentStreak > 0 {
+                    StreakIndicator(days: gamification.currentStreak)
+                }
+
+                Spacer()
+
+                // Settings pill
+                SettingsPillView(
+                    avatarUrl: avatarUrl,
+                    userName: userName,
+                    transparent: false
+                ) {
+                    HapticsService.shared.selectionFeedback()
+                    showSettingsSheet = true
+                }
             }
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)

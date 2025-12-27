@@ -348,6 +348,27 @@ final class GamificationService {
         return min(1.0, Double(tasksCompletedToday) / Double(dailyGoal))
     }
 
+    /// Velocity score (0-100) - composite productivity health metric
+    var velocityScore: Double {
+        // Streak Score (0-25): current vs longest streak
+        let streakRatio = longestStreak > 0 ? Double(currentStreak) / Double(max(longestStreak, 7)) : 0
+        let streakScore = min(25, streakRatio * 25)
+
+        // Completion Score (0-25): weekly progress
+        let weeklyProgress = weeklyGoal > 0 ? Double(tasksCompleted % weeklyGoal) / Double(weeklyGoal) : 0
+        let completionScore = min(25, weeklyProgress * 25)
+
+        // Focus Score (0-25): focus hours this week (goal: 5 hours)
+        let focusGoalHours = 5.0
+        let focusRatio = focusHours / focusGoalHours
+        let focusScoreValue = min(25, focusRatio * 25)
+
+        // On-Time Score (0-25): completion rate as proxy
+        let onTimeScore = min(25, completionRate * 25)
+
+        return streakScore + completionScore + focusScoreValue + onTimeScore
+    }
+
     // MARK: - Streak System
 
     /// Update streak on task completion (enhanced with combo)

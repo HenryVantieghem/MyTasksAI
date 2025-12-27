@@ -43,7 +43,10 @@ struct GeniusTaskSheet: View {
                 animateModulesIn()
             }
             .fullScreenCover(isPresented: $showFocusMode) {
-                FocusMode(task: task)
+                FocusTimerSetupView(
+                    taskContext: FocusTaskContext(task: task),
+                    onStartSession: { _ in }
+                )
             }
             .sheet(isPresented: $showCalendarScheduling) {
                 CalendarSchedulingSheet(task: task)

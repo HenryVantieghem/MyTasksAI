@@ -2,15 +2,15 @@
 //  AppLogoView.swift
 //  Veloce
 //
-//  App Logo - Glowing Infinity Ring
-//  Premium 3D infinity symbol with cloud-like glow and orbiting particles
+//  App Logo - Iridescent Cloud Orb
+//  Ethereal glowing sphere with soft iridescent colors
 //
 
 import SwiftUI
 
 // MARK: - App Logo View
 
-/// Main app logo component - delegates to InfinityRingLogo
+/// Main app logo component - delegates to GlowingOrbLogo
 /// This is the primary logo used throughout the app
 struct AppLogoView: View {
     let size: LogoSize
@@ -19,10 +19,11 @@ struct AppLogoView: View {
     var intensity: Double = 1.0
 
     var body: some View {
-        InfinityRingLogo(
+        GlowingOrbLogo(
             size: size,
             isAnimating: isAnimating,
-            showParticles: showParticles && size.showParticles
+            showParticles: showParticles && size.showParticles,
+            intensity: intensity
         )
     }
 }

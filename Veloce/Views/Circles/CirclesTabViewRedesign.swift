@@ -279,7 +279,7 @@ struct CirclesTabViewRedesign: View {
     @ViewBuilder
     private var tabContent: some View {
         TabView(selection: $selectedTab) {
-            FriendsTabContent(
+            FriendsArenaView(
                 friendService: friendService,
                 leaderboardMode: $leaderboardMode,
                 onFriendSelected: { friend in selectedFriend = friend },
