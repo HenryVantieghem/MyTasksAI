@@ -372,3 +372,102 @@ struct PhaseAnimator<Phase: Equatable, Content: View>: View {
         }
     }
 }
+
+// MARK: - Animated Number View
+/// Smoothly animates between number values with numeric text transition
+struct AnimatedNumber: View {
+    let value: Int
+    let format: String?
+
+    @State private var displayValue: Int = 0
+
+    init(_ value: Int, format: String? = nil) {
+        self.value = value
+        self.format = format
+    }
+
+    var body: some View {
+        Text(formattedValue)
+            .contentTransition(.numericText())
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: displayValue)
+            .onChange(of: value) { _, newValue in
+                displayValue = newValue
+            }
+            .onAppear {
+                displayValue = value
+            }
+    }
+
+    private var formattedValue: String {
+        if let format = format {
+            return String(format: format, displayValue)
+        }
+        return "\(displayValue)"
+    }
+}
+
+// MARK: - Animated Double View
+/// Smoothly animates between decimal values
+struct AnimatedDouble: View {
+    let value: Double
+    let decimalPlaces: Int
+    let suffix: String
+
+    @State private var displayValue: Double = 0
+
+    init(_ value: Double, decimalPlaces: Int = 1, suffix: String = "") {
+        self.value = value
+        self.decimalPlaces = decimalPlaces
+        self.suffix = suffix
+    }
+
+    var body: some View {
+        Text(formattedValue)
+            .contentTransition(.numericText())
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: displayValue)
+            .onChange(of: value) { _, newValue in
+                displayValue = newValue
+            }
+            .onAppear {
+                displayValue = value
+            }
+    }
+
+    private var formattedValue: String {
+        String(format: "%.\(decimalPlaces)f\(suffix)", displayValue)
+    }
+}
+
+// MARK: - List Item Transition
+/// Standard transition for list items with asymmetric insert/remove
+extension AnyTransition {
+    static var listItem: AnyTransition {
+        .asymmetric(
+            insertion: .scale(scale: 0.9)
+                .combined(with: .opacity)
+                .combined(with: .move(edge: .top)),
+            removal: .scale(scale: 0.9)
+                .combined(with: .opacity)
+        )
+    }
+
+}
+
+// MARK: - Spring Presets
+/// Consistent spring animation presets used across the app
+extension Animation {
+    /// Quick response for button presses (0.2s)
+    static let pressSpring = Animation.spring(response: 0.2, dampingFraction: 0.7)
+
+    /// Standard UI spring (0.3s)
+    static let uiSpring = Animation.spring(response: 0.3, dampingFraction: 0.75)
+
+    /// Card/modal presentation spring (0.4s)
+    static let presentSpring = Animation.spring(response: 0.4, dampingFraction: 0.8)
+
+    /// Bouncy spring for celebrations (0.5s)
+    static let bouncySpring = Animation.spring(response: 0.5, dampingFraction: 0.6)
+
+    /// Gentle spring for ambient animations (0.6s)
+    static let gentleSpring = Animation.spring(response: 0.6, dampingFraction: 0.85)
+}

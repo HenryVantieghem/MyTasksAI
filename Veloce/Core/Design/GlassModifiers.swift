@@ -35,7 +35,34 @@ extension View {
     }
 }
 
-// MARK: - Glass Effect Modifier
+// MARK: - iOS 26 Native Liquid Glass Extensions
+// These provide convenient wrappers around iOS 26's native .glassEffect() API
+
+extension View {
+    /// Apply iOS 26 native Liquid Glass with interactive behavior
+    /// Use this for navigation elements (tab bars, toolbars, floating buttons)
+    @available(iOS 26.0, *)
+    func liquidGlassInteractive<S: Shape>(in shape: S = Capsule() as! S) -> some View {
+        self.glassEffect(.regular.interactive(true), in: shape)
+    }
+
+    /// Apply iOS 26 native Liquid Glass card effect
+    /// Use this for cards and containers on the navigation layer
+    @available(iOS 26.0, *)
+    func liquidGlassCard(cornerRadius: CGFloat = 16) -> some View {
+        self.glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius))
+    }
+
+    /// Apply iOS 26 native Liquid Glass with clear variant
+    /// Only use when: over media-rich content, with dimming layer, bold/bright content on top
+    @available(iOS 26.0, *)
+    func liquidGlassClear<S: Shape>(in shape: S) -> some View {
+        self.glassEffect(.clear, in: shape)
+    }
+}
+
+// MARK: - Legacy Glass Effect Modifier (Pre-iOS 26 Compatibility)
+/// Uses ultraThinMaterial for backwards compatibility
 struct GlassEffectModifier: ViewModifier {
     let cornerRadius: CGFloat
     let opacity: Double
@@ -193,8 +220,9 @@ struct FloatingGlassModifier: ViewModifier {
 
 // MARK: - View Extensions
 extension View {
-    /// Apply glass effect
-    func glassEffect(
+    /// Apply legacy glass effect (ultraThinMaterial-based)
+    /// For iOS 26+, prefer using native .glassEffect() or .liquidGlassCard()
+    func legacyGlassEffect(
         cornerRadius: CGFloat = Theme.CornerRadius.card,
         opacity: Double = DesignTokens.Opacity.glassBackground,
         borderWidth: CGFloat = DesignTokens.BorderWidth.glassBorder
@@ -270,6 +298,31 @@ struct GlassPillButtonStyle: ButtonStyle {
 
 extension ButtonStyle where Self == GlassPillButtonStyle {
     static var glassPill: GlassPillButtonStyle { GlassPillButtonStyle() }
+}
+
+// MARK: - Pressable Button Style
+/// Standard press feedback style for interactive elements
+/// Provides subtle scale effect with spring animation
+struct PressableButtonStyle: ButtonStyle {
+    let scale: CGFloat
+
+    init(scale: CGFloat = 0.96) {
+        self.scale = scale
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? scale : 1)
+            .animation(.pressSpring, value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == PressableButtonStyle {
+    static var pressable: PressableButtonStyle { PressableButtonStyle() }
+
+    static func pressable(scale: CGFloat) -> PressableButtonStyle {
+        PressableButtonStyle(scale: scale)
+    }
 }
 
 // MARK: - Glass Segmented Control Style
