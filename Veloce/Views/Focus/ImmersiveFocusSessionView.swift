@@ -676,14 +676,14 @@ struct ImmersiveFocusSessionView: View {
     }
 
     private func timerCompleted() {
-        HapticsService.shared.notification(.success)
-
         if isBreak {
             // Break ended, start new session
+            HapticsService.shared.heartbeatPulse() // Gentle pulse for break end
             isBreak = false
             startNextSession()
         } else {
-            // Focus session completed
+            // Focus session completed - CELEBRATE!
+            HapticsService.shared.starburstAscend() // Rising triumph haptic
             sessionsCompleted += 1
             showCompletion = true
         }
@@ -691,7 +691,7 @@ struct ImmersiveFocusSessionView: View {
 
     private func togglePause() {
         isPaused.toggle()
-        HapticsService.shared.impact()
+        HapticsService.shared.magneticSnap() // Satisfying pause click
     }
 
     private func adjustTime(by seconds: TimeInterval) {
