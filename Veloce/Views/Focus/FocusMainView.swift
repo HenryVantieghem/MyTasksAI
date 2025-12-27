@@ -302,21 +302,23 @@ struct FocusMainView: View {
             quickStatItem(value: "85%", label: "Focus Score", icon: "star.fill", color: Theme.Colors.aiAmber)
         }
         .padding(Theme.Spacing.md)
-        .background {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial)
-        }
+        // 🌟 LIQUID GLASS: Interactive glass stats bar
+        .glassEffect(
+            .regular.interactive(true),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.2), .white.opacity(0.05)],
+                        colors: [.white.opacity(0.3), .white.opacity(0.1)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 0.5
                 )
         }
+        .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
     }
 
     private func quickStatItem(value: String, label: String, icon: String, color: Color) -> some View {
