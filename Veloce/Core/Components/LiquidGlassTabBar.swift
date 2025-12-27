@@ -36,12 +36,39 @@ struct LiquidGlassTabBar: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: Capsule())
+        // 🌟 LIQUID GLASS: Apple Music-style interactive glass with premium feel
+        .glassEffect(
+            .regular
+                .interactive(true),
+            in: Capsule()
+        )
+        .overlay {
+            // Premium glass highlight border
+            Capsule()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            .white.opacity(0.4),
+                            .white.opacity(0.2),
+                            .white.opacity(0.05)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: 0.5
+                )
+        }
         .shadow(
             color: Color.black.opacity(0.3),
-            radius: 16,
+            radius: 20,
             x: 0,
-            y: 8
+            y: 10
+        )
+        .shadow(
+            color: Color.black.opacity(0.1),
+            radius: 8,
+            x: 0,
+            y: 4
         )
         .padding(.horizontal, 20)
         .animation(

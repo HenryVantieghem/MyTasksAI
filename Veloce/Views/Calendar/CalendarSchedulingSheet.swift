@@ -453,6 +453,77 @@ struct CalendarSchedulingSheet: View {
     }
 }
 
+// MARK: - Mini Timeline Preview
+
+struct MiniTimelinePreview: View {
+    let scheduledDate: Date
+    let duration: Int
+    let existingEvents: [EKEvent]
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                // Background with hour lines
+                VStack(spacing: 0) {
+                    ForEach(0..<4, id: \.self) { hour in
+                        HStack(spacing: 8) {
+                            Text(hourLabel(for: hour))
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.4))
+                                .frame(width: 40, alignment: .trailing)
+
+                            Rectangle()
+                                .fill(Color.white.opacity(0.1))
+                                .frame(height: 1)
+                        }
+                        if hour < 3 {
+                            Spacer()
+                        }
+                    }
+                }
+
+                // Scheduled task block
+                let taskBlock = RoundedRectangle(cornerRadius: 6)
+                    .fill(Theme.Colors.aiPurple.opacity(0.3))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Theme.Colors.aiPurple, lineWidth: 1)
+                    }
+                    .frame(width: geometry.size.width - 60, height: blockHeight(for: duration, in: geometry.size.height))
+                    .offset(x: 52, y: blockOffset(in: geometry.size.height))
+
+                taskBlock
+            }
+        }
+        .padding(Theme.Spacing.sm)
+    }
+
+    private func hourLabel(for index: Int) -> String {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: scheduledDate) + index - 1
+        let formatter = DateFormatter()
+        formatter.dateFormat = "ha"
+        if let date = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: scheduledDate) {
+            return formatter.string(from: date).lowercased()
+        }
+        return ""
+    }
+
+    private func blockHeight(for duration: Int, in totalHeight: CGFloat) -> CGFloat {
+        let hoursShown: CGFloat = 3
+        let minutesPerHour: CGFloat = 60
+        let heightPerMinute = totalHeight / (hoursShown * minutesPerHour)
+        return CGFloat(duration) * heightPerMinute
+    }
+
+    private func blockOffset(in totalHeight: CGFloat) -> CGFloat {
+        let calendar = Calendar.current
+        let minute = calendar.component(.minute, from: scheduledDate)
+        let heightPerMinute = totalHeight / (3 * 60)
+        return (totalHeight / 3) + CGFloat(minute) * heightPerMinute
+    }
+}
+
 // MARK: - Preview
 #Preview {
     CalendarSchedulingSheet(

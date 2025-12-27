@@ -135,29 +135,52 @@ struct FloatingInputBar: View {
                 aiProcessingBackground
             }
         }
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: InputBarMetrics.cornerRadius))
+        // 🌟 LIQUID GLASS: Interactive glass with tint for premium Claude mobile feel
+        .glassEffect(
+            .regular
+                .tint(isFocused ? Color(hex: "8B5CF6").opacity(0.08) : .clear)
+                .interactive(true),
+            in: RoundedRectangle(cornerRadius: InputBarMetrics.cornerRadius)
+        )
         .overlay {
-            // Focus glow border
+            // Focus glow border with enhanced glass reflection
             if isFocused {
                 RoundedRectangle(cornerRadius: InputBarMetrics.cornerRadius)
                     .stroke(
                         LinearGradient(
                             colors: [
-                                Color(hex: "8B5CF6").opacity(0.5),
-                                Color(hex: "3B82F6").opacity(0.3),
-                                Color(hex: "06B6D4").opacity(0.2)
+                                Color(hex: "8B5CF6").opacity(0.6),
+                                Color(hex: "3B82F6").opacity(0.4),
+                                Color(hex: "06B6D4").opacity(0.3),
+                                .white.opacity(0.15)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
                         lineWidth: 1.5
                     )
+                    .blur(radius: 0.5)
+            } else {
+                // Subtle glass border when not focused
+                RoundedRectangle(cornerRadius: InputBarMetrics.cornerRadius)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(0.25),
+                                .white.opacity(0.08),
+                                .clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
             }
         }
         .shadow(
-            color: canSend ? Color(hex: "8B5CF6").opacity(0.3) : Color.clear,
-            radius: 16,
-            y: 4
+            color: canSend ? Color(hex: "8B5CF6").opacity(0.4) : .black.opacity(0.1),
+            radius: isFocused ? 24 : 16,
+            y: isFocused ? 8 : 4
         )
     }
 
@@ -414,7 +437,26 @@ struct FloatingInputBar: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: Capsule())
+        // 🌟 LIQUID GLASS: Interactive glass with subtle tint
+        .glassEffect(
+            .regular.interactive(true),
+            in: Capsule()
+        )
+        .overlay {
+            Capsule()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            .white.opacity(0.3),
+                            .white.opacity(0.1)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+        }
+        .shadow(color: .black.opacity(0.15), radius: 12, y: 4)
     }
 
     // MARK: - AI Processing Background
