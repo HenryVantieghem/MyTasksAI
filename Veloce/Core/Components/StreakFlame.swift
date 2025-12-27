@@ -10,7 +10,7 @@ struct StreakFlame: View {
     @State private var flamePhase: CGFloat = 0
     @State private var emberPhase: CGFloat = 0
 
-    private var flameIntensity: FlameIntensity {
+    private var flameIntensity: BasicFlameIntensity {
         switch streakDays {
         case 0: return .none
         case 1...2: return .spark
@@ -61,7 +61,7 @@ struct StreakFlame: View {
     }
 }
 
-enum FlameIntensity {
+private enum BasicFlameIntensity {
     case none, spark, small, medium, large, blazing, inferno
 
     var colors: [Color] {
@@ -102,10 +102,10 @@ enum FlameIntensity {
     }
 }
 
-struct FlameLayer: View {
+private struct FlameLayer: View {
     let phase: CGFloat
     let layer: Int
-    let intensity: FlameIntensity
+    let intensity: BasicFlameIntensity
 
     var body: some View {
         Image(systemName: "flame.fill")
@@ -119,7 +119,7 @@ struct FlameLayer: View {
     }
 }
 
-struct EmberParticles: View {
+private struct EmberParticles: View {
     let phase: CGFloat
     let count: Int
 
@@ -137,7 +137,7 @@ struct EmberParticles: View {
     }
 }
 
-struct SparkleOverlay: View {
+private struct SparkleOverlay: View {
     @State private var sparklePhase: CGFloat = 0
 
     var body: some View {

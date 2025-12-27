@@ -262,12 +262,17 @@ final class SharedTaskService {
                 let currentCount = countResponse.first?["shared_with_count"] ?? 1
                 let newCount = max(0, currentCount - 1)
 
+                // Update shared_with_count
                 try await client
                     .from("tasks")
-                    .update([
-                        "shared_with_count": newCount,
-                        "is_shared": newCount > 0
-                    ])
+                    .update(["shared_with_count": newCount])
+                    .eq("id", value: taskId)
+                    .execute()
+
+                // Update is_shared flag
+                try await client
+                    .from("tasks")
+                    .update(["is_shared": newCount > 0])
                     .eq("id", value: taskId)
                     .execute()
             }

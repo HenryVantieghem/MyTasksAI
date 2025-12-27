@@ -133,21 +133,21 @@ struct GoalsContentView: View {
 
     private var statsRow: some View {
         HStack(spacing: 12) {
-            StatCard(
+            GoalStatCard(
                 icon: "flame.fill",
                 value: "\(activeCount)",
                 label: "Active",
                 color: Theme.Colors.aiCyan
             )
 
-            StatCard(
+            GoalStatCard(
                 icon: "checkmark.seal.fill",
                 value: "\(completedCount)",
                 label: "Completed",
                 color: Theme.Colors.success
             )
 
-            StatCard(
+            GoalStatCard(
                 icon: "chart.line.uptrend.xyaxis",
                 value: "\(Int(averageProgress * 100))%",
                 label: "Progress",
@@ -360,9 +360,9 @@ private struct GoalFilterPill: View {
     }
 }
 
-// MARK: - Stat Card
+// MARK: - Goal Stat Card
 
-private struct StatCard: View {
+private struct GoalStatCard: View {
     let icon: String
     let value: String
     let label: String
@@ -388,7 +388,7 @@ private struct StatCard: View {
         .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(.ultraThinMaterial.opacity(0.5))
+                .fill(.white.opacity(0.05))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(color.opacity(0.2), lineWidth: 1)

@@ -265,7 +265,7 @@ struct GoalDetailSheet: View {
     private var quickActions: some View {
         HStack(spacing: 12) {
             // Update Progress
-            QuickActionButton(
+            GoalQuickActionButton(
                 icon: "slider.horizontal.3",
                 label: "Progress",
                 color: Theme.Colors.aiCyan
@@ -275,7 +275,7 @@ struct GoalDetailSheet: View {
 
             // Check-in
             if goal.isCheckInDue {
-                QuickActionButton(
+                GoalQuickActionButton(
                     icon: "bell.badge.fill",
                     label: "Check-in",
                     color: Theme.Colors.warning,
@@ -287,7 +287,7 @@ struct GoalDetailSheet: View {
 
             // Generate AI
             if !goalsVM.hasAIContent(goal) && goalsVM.isAIAvailable {
-                QuickActionButton(
+                GoalQuickActionButton(
                     icon: "sparkles",
                     label: "AI Roadmap",
                     color: Theme.Colors.aiPurple
@@ -449,9 +449,9 @@ struct GoalDetailSheet: View {
     }
 }
 
-// MARK: - Quick Action Button
+// MARK: - Goal Quick Action Button
 
-private struct QuickActionButton: View {
+private struct GoalQuickActionButton: View {
     let icon: String
     let label: String
     let color: Color

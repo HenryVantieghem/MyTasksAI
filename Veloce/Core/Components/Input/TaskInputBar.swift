@@ -219,62 +219,76 @@ struct TaskInputBar: View {
     }
 
     // MARK: - Input Background
+    // iOS 26: Uses native Liquid Glass with adaptive fallback
 
     private var inputBackground: some View {
         ZStack {
-            LiquidGlassCapsule(
-                tint: LinearGradient(
-                    colors: [
-                        (isFocused.wrappedValue ? Theme.Colors.aiPurple.opacity(0.06) : .white.opacity(0.06)),
-                        (isFocused.wrappedValue ? Theme.Colors.aiBlue.opacity(0.03) : .clear)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                strokeColors: isFocused.wrappedValue ? [
-                    Theme.Colors.aiPurple.opacity(0.5),
-                    Theme.Colors.aiBlue.opacity(0.3),
-                    Theme.Colors.aiCyan.opacity(0.2),
-                    .white.opacity(0.1)
-                ] : [
-                    .white.opacity(0.2),
-                    .white.opacity(0.08),
-                    .clear
-                ],
-                lineWidth: isFocused.wrappedValue ? 1.2 : 0.6
-            )
-        }
-    }
+            // iOS 26 native Liquid Glass (or fallback for older versions)
+            Capsule()
+                .fill(.clear)
+                .adaptiveGlassCapsule()
 
-    // MARK: - Input Border
-
-    private var inputBorder: some View {
-        ZStack {
-            // Base border is handled by LiquidGlassCapsule now
-
-            // Animated holographic border when recording
-            if isRecording && !reduceMotion {
+            // Focused state: add subtle AI tint overlay
+            if isFocused.wrappedValue {
                 Capsule()
-                    .stroke(
-                        AngularGradient(
+                    .fill(
+                        LinearGradient(
                             colors: [
-                                .red.opacity(0.6),
-                                Theme.Colors.aiPurple.opacity(0.4),
-                                .red.opacity(0.3),
-                                Theme.Colors.aiPink.opacity(0.5),
-                                .red.opacity(0.6)
+                                Theme.Colors.aiPurple.opacity(0.04),
+                                Theme.Colors.aiBlue.opacity(0.02)
                             ],
-                            center: .center,
-                            angle: .degrees(borderRotation)
-                        ),
-                        lineWidth: 2
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                    .blur(radius: 0.5)
+                    .allowsHitTesting(false)
             }
         }
     }
 
+    // MARK: - Input Border
+    // iOS 26: Liquid Glass handles base border, only show special states
+
+    @ViewBuilder
+    private var inputBorder: some View {
+        // Animated holographic border when recording
+        if isRecording && !reduceMotion {
+            Capsule()
+                .stroke(
+                    AngularGradient(
+                        colors: [
+                            .red.opacity(0.6),
+                            Theme.Colors.aiPurple.opacity(0.4),
+                            .red.opacity(0.3),
+                            Theme.Colors.aiPink.opacity(0.5),
+                            .red.opacity(0.6)
+                        ],
+                        center: .center,
+                        angle: .degrees(borderRotation)
+                    ),
+                    lineWidth: 2
+                )
+                .blur(radius: 0.5)
+        } else if isFocused.wrappedValue {
+            // Subtle focus indicator with AI gradient
+            Capsule()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Theme.Colors.aiPurple.opacity(0.4),
+                            Theme.Colors.aiBlue.opacity(0.2),
+                            Theme.Colors.aiCyan.opacity(0.15)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        }
+    }
+
     // MARK: - Voice Input Button
+    // iOS 26: Simplified design with glass effect
 
     private var voiceInputButton: some View {
         Button {
@@ -282,8 +296,8 @@ struct TaskInputBar: View {
             toggleVoiceRecording()
         } label: {
             ZStack {
-                // Recording pulse rings
-                if isRecording {
+                // Recording pulse rings (kept for visual feedback)
+                if isRecording && !reduceMotion {
                     ForEach(0..<3, id: \.self) { ring in
                         SwiftUI.Circle()
                             .stroke(Color.red.opacity(0.3 - Double(ring) * 0.1), lineWidth: 2)
@@ -296,48 +310,44 @@ struct TaskInputBar: View {
                     }
                 }
 
-                // Transcribing pulse rings (purple)
-                if isTranscribing {
-                    ForEach(0..<2, id: \.self) { ring in
-                        SwiftUI.Circle()
-                            .stroke(Theme.Colors.aiPurple.opacity(0.4 - Double(ring) * 0.15), lineWidth: 2)
-                            .frame(
-                                width: TaskInputBarMetrics.buttonSize + CGFloat(ring) * 10,
-                                height: TaskInputBarMetrics.buttonSize + CGFloat(ring) * 10
-                            )
-                            .scaleEffect(recordingPulse)
-                    }
+                // Transcribing pulse (purple)
+                if isTranscribing && !reduceMotion {
+                    SwiftUI.Circle()
+                        .stroke(Theme.Colors.aiPurple.opacity(0.3), lineWidth: 2)
+                        .frame(width: TaskInputBarMetrics.buttonSize + 8, height: TaskInputBarMetrics.buttonSize + 8)
+                        .scaleEffect(recordingPulse)
                 }
 
-                // Button background
-                SwiftUI.Circle()
-                    .fill(
-                        isRecording
-                            ? Color.red.opacity(0.15)
-                            : isTranscribing
-                                ? Theme.Colors.aiPurple.opacity(0.15)
-                                : Color.white.opacity(0.08)
-                    )
-                    .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                // Button with state-based styling
+                Group {
+                    if isRecording {
+                        // Recording: solid red background
+                        SwiftUI.Circle()
+                            .fill(Color.red)
+                            .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                    } else if isTranscribing {
+                        // Transcribing: purple tinted
+                        SwiftUI.Circle()
+                            .fill(Theme.Colors.aiPurple.opacity(0.2))
+                            .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                    } else {
+                        // Default: subtle glass-like background
+                        SwiftUI.Circle()
+                            .fill(Color(.tertiarySystemFill))
+                            .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                    }
+                }
 
                 // Audio level indicator (when recording)
                 if isRecording {
                     SwiftUI.Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [.red.opacity(0.4), .clear],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: TaskInputBarMetrics.buttonSize / 2
-                            )
-                        )
+                        .fill(Color.white.opacity(0.3))
                         .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
-                        .scaleEffect(0.5 + CGFloat(audioLevel) * 0.5)
+                        .scaleEffect(0.3 + CGFloat(audioLevel) * 0.7)
                 }
 
                 // Icon based on state
                 if isTranscribing {
-                    // Transcribing: show waveform animation
                     Image(systemName: "waveform")
                         .font(.system(size: TaskInputBarMetrics.micIconSize, weight: .medium))
                         .foregroundStyle(Theme.Colors.aiPurple)
@@ -345,11 +355,7 @@ struct TaskInputBar: View {
                 } else {
                     Image(systemName: isRecording ? "stop.fill" : "mic.fill")
                         .font(.system(size: TaskInputBarMetrics.micIconSize, weight: .medium))
-                        .foregroundStyle(
-                            isRecording
-                                ? Color.red
-                                : Color.secondary
-                        )
+                        .foregroundStyle(isRecording ? .white : .secondary)
                         .scaleEffect(isRecording ? 0.85 : 1.0)
                 }
             }
@@ -392,6 +398,21 @@ struct TaskInputBar: View {
             .tint(Theme.Colors.aiPurple)
             .textInputAutocapitalization(.sentences)
             .disableAutocorrection(false)
+            // iOS 26: Keyboard dismiss button
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+
+                    Button {
+                        isFocused.wrappedValue = false
+                        HapticsService.shared.lightImpact()
+                    } label: {
+                        Image(systemName: "keyboard.chevron.compact.down")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
     }
 
     private var placeholderText: Text {
@@ -558,64 +579,42 @@ struct TaskInputBar: View {
     }
 
     // MARK: - Send Button
+    // iOS 26: Cleaner gradient orb design
 
     private var sendButton: some View {
         Button {
             submitTask()
         } label: {
             ZStack {
-                // Outer glow
-                SwiftUI.Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Theme.Colors.aiPurple.opacity(0.5),
-                                Theme.Colors.aiBlue.opacity(0.3),
-                                Color.clear
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 28
-                        )
-                    )
-                    .frame(width: 52, height: 52)
-                    .blur(radius: 6)
-                    .scaleEffect(sendPulse)
+                // Subtle ambient glow (only when not reducing motion)
+                if !reduceMotion {
+                    SwiftUI.Circle()
+                        .fill(Theme.AdaptiveColors.aiPrimary.opacity(0.4))
+                        .frame(width: 48, height: 48)
+                        .blur(radius: 8)
+                        .scaleEffect(sendPulse)
+                }
 
-                // Main orb
+                // Main button with gradient
                 SwiftUI.Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Theme.Colors.aiPurple,
-                                Theme.Colors.aiBlue.opacity(0.9),
-                                Theme.Colors.aiCyan.opacity(0.8)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: TaskInputBarMetrics.sendButtonSize, height: TaskInputBarMetrics.sendButtonSize)
+                    .fill(Theme.AdaptiveColors.aiGradient)
+                    .frame(width: 38, height: 38)
                     .overlay {
-                        // Inner highlight
+                        // Subtle inner highlight for depth
                         SwiftUI.Circle()
                             .fill(
                                 RadialGradient(
-                                    colors: [
-                                        Color.white.opacity(0.4),
-                                        Color.clear
-                                    ],
+                                    colors: [Color.white.opacity(0.3), Color.clear],
                                     center: UnitPoint(x: 0.3, y: 0.3),
                                     startRadius: 0,
-                                    endRadius: 18
+                                    endRadius: 16
                                 )
                             )
                     }
-                    .scaleEffect(sendPulse)
 
                 // Arrow icon
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(.white)
             }
         }

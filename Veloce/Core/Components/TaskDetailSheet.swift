@@ -46,6 +46,10 @@ struct TaskDetailContentView: View {
     @State private var showFriendPicker: Bool = false
     @State private var sharedTaskService = SharedTaskService.shared
 
+    // MARK: - Focus Mode States
+    @State private var showFocusOverlay: Bool = false
+    @State private var focusDuration: Int = 25
+
     // Get priority from task (default to medium)
     private var taskPriority: TaskPriority {
         TaskPriority(rawValue: task.starRating) ?? .medium
@@ -169,6 +173,12 @@ struct TaskDetailContentView: View {
                     .offset(y: appeared ? 0 : 20)
                     .animation(.spring(response: 0.4, dampingFraction: 0.8).delay(0.4), value: appeared)
 
+                // MARK: - Focus Mode Section (NEW)
+                focusModeSection
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 20)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.8).delay(0.42), value: appeared)
+
                 // Actions card (existing)
                 actionsCard
                     .opacity(appeared ? 1 : 0)
@@ -220,6 +230,24 @@ struct TaskDetailContentView: View {
                 onSkip: { }
             )
             .presentationDetents([.large])
+        }
+        .fullScreenCover(isPresented: $showFocusOverlay) {
+            ImmersiveFocusOverlay(
+                task: task,
+                duration: focusDuration,
+                onComplete: {
+                    // Task completed through focus session
+                    HapticsService.shared.success()
+                    showFocusOverlay = false
+                    // Optionally show reflection sheet
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        showingReflectionSheet = true
+                    }
+                },
+                onDismiss: {
+                    showFocusOverlay = false
+                }
+            )
         }
     }
 
@@ -499,6 +527,75 @@ struct TaskDetailContentView: View {
         }
         .padding(16)
         .glassCard()
+    }
+
+    // MARK: - Focus Mode Section
+
+    private var focusModeSection: some View {
+        VStack(spacing: 16) {
+            // Header with icon
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.AdaptiveColors.aiGradient)
+                        .frame(width: 44, height: 44)
+
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Focus Mode")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text("Immersive timer to power through")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+            }
+
+            // Duration Picker
+            HStack(spacing: 12) {
+                ForEach([15, 25, 45, 60], id: \.self) { minutes in
+                    DurationChip(
+                        minutes: minutes,
+                        isSelected: focusDuration == minutes,
+                        onTap: {
+                            HapticsService.shared.selectionFeedback()
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                focusDuration = minutes
+                            }
+                        }
+                    )
+                }
+            }
+
+            // Start Focus Button
+            Button {
+                HapticsService.shared.impact()
+                showFocusOverlay = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 14, weight: .semibold))
+
+                    Text("Start \(focusDuration) min Focus")
+                        .font(.headline)
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Theme.AdaptiveColors.aiGradient)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .glassCard(tint: Theme.AdaptiveColors.aiPrimary.opacity(0.03))
     }
 
     // MARK: - Actions Card
@@ -1274,6 +1371,69 @@ struct QuickDateButton: View {
                 )
         }
         .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Duration Chip
+
+struct DurationChip: View {
+    let minutes: Int
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            Text("\(minutes)m")
+                .font(.subheadline.weight(isSelected ? .semibold : .medium))
+                .foregroundStyle(isSelected ? .white : .secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background {
+                    if isSelected {
+                        Capsule()
+                            .fill(Theme.AdaptiveColors.aiGradient)
+                    } else {
+                        Capsule()
+                            .fill(Color(.tertiarySystemFill))
+                    }
+                }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Veloce Section Card Modifier
+
+extension View {
+    /// Premium section card with optional tint accent
+    func veloceSectionCard(tint: Color? = nil) -> some View {
+        self
+            .padding(16)
+            .background {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(.secondarySystemGroupedBackground))
+                    .overlay {
+                        if let tint {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(tint.opacity(0.05))
+                        }
+                    }
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(0.15),
+                                .white.opacity(0.05),
+                                .clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            }
     }
 }
 

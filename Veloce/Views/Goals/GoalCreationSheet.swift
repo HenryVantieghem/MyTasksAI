@@ -1016,15 +1016,22 @@ private struct CategoryCard: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? category.color.opacity(0.2) : .ultraThinMaterial.opacity(0.3))
-                    .overlay(
+                Group {
+                    if isSelected {
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                isSelected ? category.color.opacity(0.5) : .white.opacity(0.1),
-                                lineWidth: 1
-                            )
-                    )
+                            .fill(category.color.opacity(0.2))
+                    } else {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.white.opacity(0.05))
+                    }
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            isSelected ? category.color.opacity(0.5) : .white.opacity(0.1),
+                            lineWidth: 1
+                        )
+                )
             )
         }
         .buttonStyle(.plain)
@@ -1083,15 +1090,22 @@ private struct TimeframeCard: View {
             }
             .padding(14)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? timeframe.color.opacity(0.15) : .ultraThinMaterial.opacity(0.3))
-                    .overlay(
+                Group {
+                    if isSelected {
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                isSelected ? timeframe.color.opacity(0.5) : .white.opacity(0.1),
-                                lineWidth: 1
-                            )
-                    )
+                            .fill(timeframe.color.opacity(0.15))
+                    } else {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.white.opacity(0.05))
+                    }
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            isSelected ? timeframe.color.opacity(0.5) : .white.opacity(0.1),
+                            lineWidth: 1
+                        )
+                )
             )
         }
         .buttonStyle(.plain)

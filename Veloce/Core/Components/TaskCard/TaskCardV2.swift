@@ -969,7 +969,7 @@ struct LivingEnergyBar: View {
 struct AISparkleParticles: View {
     let color: Color
 
-    @State private var particles: [SparkleParticle] = []
+    @State private var particles: [TaskCardSparkle] = []
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -998,7 +998,7 @@ struct AISparkleParticles: View {
         ]
 
         for i in 0..<8 {
-            let particle = SparkleParticle(
+            let particle = TaskCardSparkle(
                 id: UUID(),
                 position: CGPoint(
                     x: CGFloat.random(in: 0...size.width),
@@ -1023,7 +1023,7 @@ struct AISparkleParticles: View {
     }
 }
 
-struct SparkleParticle: Identifiable {
+private struct TaskCardSparkle: Identifiable {
     let id: UUID
     var position: CGPoint
     let size: CGFloat

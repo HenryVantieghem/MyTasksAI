@@ -933,3 +933,180 @@ extension ButtonStyle where Self == GhostButtonStyle {
 // MARK: - Glass Button Styles
 // NOTE: iOS 26 provides built-in .glass and .glassProminent button styles
 // via Liquid Glass design system. Use .buttonStyle(.glass) directly.
+
+// MARK: - iOS 26 Adaptive Colors
+extension Theme {
+    /// iOS 26 semantic colors that blend with Liquid Glass design system
+    /// Use these for proper light/dark mode adaptation and HIG compliance
+    enum AdaptiveColors {
+        // MARK: Background Layers (NOT glass - solid for content)
+        /// Primary card/content background - adapts to appearance
+        static let cardBackground = Color(.secondarySystemGroupedBackground)
+        /// Sheet/modal background
+        static let sheetBackground = Color(.systemGroupedBackground)
+        /// Elevated surface background
+        static let elevatedBackground = Color(.tertiarySystemGroupedBackground)
+        /// True background (root level)
+        static let primaryBackground = Color(.systemBackground)
+
+        // MARK: Semantic Accents (work in light/dark)
+        /// Primary brand accent
+        static let accent = Color.purple
+        /// Success state
+        static let success = Color.green
+        /// Warning state
+        static let warning = Color.orange
+        /// Destructive/error state
+        static let destructive = Color.red
+        /// Informational
+        static let info = Color.blue
+
+        // MARK: AI Feature Colors (vibrant, brand-specific)
+        /// Primary AI accent (nebula purple)
+        static let aiPrimary = Color(red: 0.58, green: 0.25, blue: 0.98)
+        /// Secondary AI accent (electric blue)
+        static let aiSecondary = Color(red: 0.28, green: 0.52, blue: 0.98)
+        /// AI tertiary (cyan highlight)
+        static let aiTertiary = Color(red: 0.18, green: 0.82, blue: 0.92)
+
+        // MARK: Text Colors (semantic)
+        /// Primary text - adapts automatically
+        static let textPrimary = Color(.label)
+        /// Secondary text
+        static let textSecondary = Color(.secondaryLabel)
+        /// Tertiary/hint text
+        static let textTertiary = Color(.tertiaryLabel)
+        /// Quaternary/ghost text
+        static let textQuaternary = Color(.quaternaryLabel)
+
+        // MARK: Interactive Element Colors
+        /// Border for cards and containers
+        static let border = Color(.separator)
+        /// Subtle border for glass elements
+        static let glassBorder = Color.white.opacity(0.2)
+        /// Fill for interactive elements
+        static let fill = Color(.systemFill)
+        /// Secondary fill
+        static let secondaryFill = Color(.secondarySystemFill)
+
+        // MARK: Gradients
+        /// AI gradient for buttons and highlights
+        static var aiGradient: LinearGradient {
+            LinearGradient(
+                colors: [aiPrimary, aiSecondary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// Premium accent gradient
+        static var accentGradient: LinearGradient {
+            LinearGradient(
+                colors: [.purple, .blue],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+}
+
+// MARK: - iOS 26 Liquid Glass View Extensions
+extension View {
+    /// Apply iOS 26 native Liquid Glass effect for navigation/interactive elements
+    /// Use for: buttons, pickers, toolbars, input bars - NOT for content cards
+    @available(iOS 26.0, *)
+    func veloceGlass() -> some View {
+        self.glassEffect()
+    }
+
+    /// Apply iOS 26 native Liquid Glass with custom shape
+    @available(iOS 26.0, *)
+    func veloceGlass<S: Shape>(in shape: S) -> some View {
+        self.glassEffect(in: shape)
+    }
+
+    /// Apply iOS 26 native Liquid Glass capsule (for pill-shaped elements)
+    @available(iOS 26.0, *)
+    func veloceGlassCapsule() -> some View {
+        self.glassEffect(in: Capsule())
+    }
+
+    /// Card background for content (NOT glass - per HIG, glass is for navigation layer only)
+    /// Use for: task cards, list items, content sections
+    func veloceCard(cornerRadius: CGFloat = 16) -> some View {
+        self
+            .padding(Theme.Spacing.cardPadding)
+            .background(Theme.AdaptiveColors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+
+    /// Elevated card with subtle shadow
+    func veloceElevatedCard(cornerRadius: CGFloat = 16) -> some View {
+        self
+            .padding(Theme.Spacing.cardPadding)
+            .background(Theme.AdaptiveColors.elevatedBackground)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
+    }
+
+    /// Section card with optional tint color for task type indication
+    func veloceSectionCard(tint: Color? = nil, cornerRadius: CGFloat = 16) -> some View {
+        self
+            .padding(Theme.Spacing.cardPadding)
+            .background {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Theme.AdaptiveColors.cardBackground)
+                    .overlay {
+                        if let tint = tint {
+                            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                                .fill(tint.opacity(0.08))
+                        }
+                    }
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(tint?.opacity(0.2) ?? Color.clear, lineWidth: 0.5)
+            }
+    }
+}
+
+// MARK: - Fallback Liquid Glass (Pre-iOS 26)
+extension View {
+    /// Fallback glass effect for iOS < 26
+    /// Provides similar visual appearance using ultraThinMaterial
+    func veloceGlassFallback<S: Shape>(in shape: S = Capsule() as! S) -> some View {
+        self
+            .background(.ultraThinMaterial, in: shape)
+            .overlay {
+                shape
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.25), .white.opacity(0.1), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            }
+    }
+
+    /// Adaptive glass that uses iOS 26 native when available, fallback otherwise
+    @ViewBuilder
+    func adaptiveGlass<S: Shape>(in shape: S) -> some View {
+        if #available(iOS 26.0, *) {
+            self.glassEffect(in: shape)
+        } else {
+            self.veloceGlassFallback(in: shape)
+        }
+    }
+
+    /// Adaptive glass capsule
+    @ViewBuilder
+    func adaptiveGlassCapsule() -> some View {
+        if #available(iOS 26.0, *) {
+            self.glassEffect(in: Capsule())
+        } else {
+            self.veloceGlassFallback(in: Capsule())
+        }
+    }
+}

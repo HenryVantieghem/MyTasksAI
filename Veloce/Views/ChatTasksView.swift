@@ -2,12 +2,26 @@
 //  ChatTasksView.swift
 //  Veloce
 //
-//  Living Cosmos Tasks View
-//  Cosmic Observatory - window into a living universe of productivity
-//  Features: Staggered entry animations, depth stacking, dynamic nebula, gravitational clustering
+//  Living Cosmos Tasks View - iOS 26 Ultrathink Edition
+//  Features: List/Column toggle, TaskCardV4, staggered animations
 //
 
 import SwiftUI
+
+// MARK: - View Mode
+
+/// Display mode for tasks list
+enum TaskViewMode: String, CaseIterable {
+    case list = "List"
+    case columns = "Columns"
+
+    var icon: String {
+        switch self {
+        case .list: return "list.bullet"
+        case .columns: return "rectangle.split.3x1"
+        }
+    }
+}
 
 // MARK: - Kanban Section
 
@@ -27,9 +41,9 @@ enum KanbanSection: String, CaseIterable {
 
     var color: Color {
         switch self {
-        case .toDo: return Theme.CelestialColors.nebulaCore
-        case .inProgress: return Theme.Colors.aiAmber
-        case .done: return Theme.CelestialColors.auroraGreen
+        case .toDo: return Theme.AdaptiveColors.aiSecondary
+        case .inProgress: return Theme.AdaptiveColors.warning
+        case .done: return Theme.AdaptiveColors.success
         }
     }
 }
@@ -104,8 +118,14 @@ struct ChatTasksView: View {
     // Timer start callback - navigate to Focus tab with task context
     var onStartTimer: ((TaskItem) -> Void)?
 
+    // Focus callback - for ImmersiveFocusOverlay
+    var onStartFocus: ((TaskItem, Int) -> Void)?
+
     // Date selection
     @State private var selectedDate: Date = Date()
+
+    // View mode toggle
+    @State private var viewMode: TaskViewMode = .list
 
     // Animation states
     @State private var showConfetti = false
@@ -184,21 +204,26 @@ struct ChatTasksView: View {
 
     var body: some View {
         ZStack {
-            // Cosmic void background (matches calendar)
-            VoidBackground.calendar
+            // Adaptive background
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
 
             // Main content
             VStack(spacing: 0) {
-                // Orbital date ring
-                TodayPillView(selectedDate: $selectedDate)
+                // Header with date and view toggle
+                viewModeHeader
                     .padding(.top, 48)
 
-                // Task feed or cosmic void empty state
+                // Task feed or empty state
                 if filteredTasks.isEmpty && filteredRecentlyCompleted.isEmpty {
                     EmptyTasksView()
                         .padding(.top, Theme.Spacing.universalHeaderHeight - 60)
                 } else {
-                    cosmicTaskFeed
+                    if viewMode == .list {
+                        listTaskFeed
+                    } else {
+                        columnTaskFeed
+                    }
                 }
             }
 
@@ -213,12 +238,37 @@ struct ChatTasksView: View {
         }
     }
 
-    // MARK: - Cosmic Task Feed
+    // MARK: - View Mode Header
 
-    private var cosmicTaskFeed: some View {
+    private var viewModeHeader: some View {
+        HStack(spacing: 16) {
+            // Date pill
+            TodayPillView(selectedDate: $selectedDate)
+
+            Spacer()
+
+            // View mode toggle
+            Picker("View", selection: $viewMode) {
+                ForEach(TaskViewMode.allCases, id: \.self) { mode in
+                    Image(systemName: mode.icon)
+                        .tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 100)
+            .onChange(of: viewMode) { _, _ in
+                HapticsService.shared.selectionFeedback()
+            }
+        }
+        .padding(.horizontal, Theme.Spacing.screenPadding)
+    }
+
+    // MARK: - List Task Feed
+
+    private var listTaskFeed: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: Theme.Spacing.md + 4) {
+                LazyVStack(spacing: 12) {
                     // In Progress section (high priority, urgent tasks)
                     if !inProgressTasks.isEmpty {
                         inProgressSection
@@ -239,7 +289,7 @@ struct ChatTasksView: View {
                             )
                     }
 
-                    // Done section (completed tasks - constellation style)
+                    // Done section (completed tasks)
                     if !filteredRecentlyCompleted.isEmpty {
                         doneSection
                             .staggeredReveal(
@@ -259,22 +309,88 @@ struct ChatTasksView: View {
             .scrollIndicators(.hidden)
             .onChange(of: filteredTasks.count) { oldCount, newCount in
                 if newCount > oldCount {
-                    // New task added - scroll to bottom with cosmic animation
-                    withAnimation(Theme.Animation.gravityPull) {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                         proxy.scrollTo("bottom", anchor: .bottom)
                     }
                 }
             }
         }
     }
+
+    // MARK: - Column Task Feed
+
+    private var columnTaskFeed: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(alignment: .top, spacing: 16) {
+                // To Do Column
+                KanbanColumn(
+                    section: .toDo,
+                    tasks: toDoTasks,
+                    onTaskTap: { task in
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onTaskComplete: { task in
+                        completeTask(task)
+                    },
+                    onStartFocus: onStartFocus,
+                    onSnooze: { task in
+                        viewModel.snoozeTask(task)
+                    },
+                    onDelete: { task in
+                        viewModel.deleteTask(task)
+                    }
+                )
+
+                // In Progress Column
+                KanbanColumn(
+                    section: .inProgress,
+                    tasks: inProgressTasks,
+                    onTaskTap: { task in
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onTaskComplete: { task in
+                        completeTask(task)
+                    },
+                    onStartFocus: onStartFocus,
+                    onSnooze: { task in
+                        viewModel.snoozeTask(task)
+                    },
+                    onDelete: { task in
+                        viewModel.deleteTask(task)
+                    }
+                )
+
+                // Done Column
+                KanbanColumn(
+                    section: .done,
+                    tasks: filteredRecentlyCompleted,
+                    onTaskTap: { task in
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onTaskComplete: { task in
+                        viewModel.uncompleteTask(task)
+                    },
+                    onStartFocus: nil,
+                    onSnooze: nil,
+                    onDelete: nil
+                )
+            }
+            .padding(.horizontal, Theme.Spacing.screenPadding)
+            .padding(.top, Theme.Spacing.md)
+            .padding(.bottom, 120)
+        }
+    }
     // MARK: - In Progress Section
 
     private var inProgressSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: 10) {
             KanbanSectionHeader(section: .inProgress, count: inProgressTasks.count)
 
             ForEach(Array(inProgressTasks.enumerated()), id: \.element.id) { index, task in
-                TaskCardV3(
+                TaskCardV4(
                     task: task,
                     onTap: {
                         HapticsService.shared.selectionFeedback()
@@ -283,7 +399,7 @@ struct ChatTasksView: View {
                     onToggleComplete: {
                         completeTask(task)
                     },
-                    onStartTimer: onStartTimer,
+                    onStartFocus: onStartFocus,
                     onSnooze: { task in
                         viewModel.snoozeTask(task)
                     },
@@ -293,27 +409,19 @@ struct ChatTasksView: View {
                 )
                 .id(task.id)
                 .zIndex(Double(inProgressTasks.count - index))
-                .preloadTaskCard(task) // Preload AI data in background
             }
         }
         .padding(.bottom, Theme.Spacing.sm)
-        // Amber energy glow for in-progress section
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.Colors.aiAmber.opacity(0.03))
-                .blur(radius: 20)
-                .offset(y: 10)
-        }
     }
 
     // MARK: - To Do Section
 
     private var toDoSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: 10) {
             KanbanSectionHeader(section: .toDo, count: toDoTasks.count)
 
             ForEach(Array(toDoTasks.enumerated()), id: \.element.id) { index, task in
-                TaskCardV3(
+                TaskCardV4(
                     task: task,
                     onTap: {
                         HapticsService.shared.selectionFeedback()
@@ -322,7 +430,7 @@ struct ChatTasksView: View {
                     onToggleComplete: {
                         completeTask(task)
                     },
-                    onStartTimer: onStartTimer,
+                    onStartFocus: onStartFocus,
                     onSnooze: { task in
                         viewModel.snoozeTask(task)
                     },
@@ -332,17 +440,9 @@ struct ChatTasksView: View {
                 )
                 .id(task.id)
                 .zIndex(Double(toDoTasks.count - index))
-                .preloadTaskCard(task) // Preload AI data in background
             }
         }
         .padding(.bottom, Theme.Spacing.sm)
-        // Nebula glow for to-do section
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.CelestialColors.nebulaCore.opacity(0.02))
-                .blur(radius: 20)
-                .offset(y: 10)
-        }
     }
 
     // MARK: - Done Section
@@ -623,6 +723,102 @@ struct ConstellationTaskRow: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Kanban Column
+
+struct KanbanColumn: View {
+    let section: KanbanSection
+    let tasks: [TaskItem]
+    let onTaskTap: (TaskItem) -> Void
+    let onTaskComplete: (TaskItem) -> Void
+    var onStartFocus: ((TaskItem, Int) -> Void)?
+    var onSnooze: ((TaskItem) -> Void)?
+    var onDelete: ((TaskItem) -> Void)?
+
+    private let columnWidth: CGFloat = 280
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Column header with Liquid Glass
+            columnHeader
+
+            // Tasks in column
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(spacing: 10) {
+                    ForEach(tasks) { task in
+                        TaskCardV4(
+                            task: task,
+                            onTap: { onTaskTap(task) },
+                            onToggleComplete: { onTaskComplete(task) },
+                            onStartFocus: onStartFocus,
+                            onSnooze: onSnooze,
+                            onDelete: onDelete
+                        )
+                    }
+
+                    if tasks.isEmpty {
+                        emptyColumnPlaceholder
+                    }
+                }
+                .padding(.bottom, 20)
+            }
+        }
+        .frame(width: columnWidth)
+    }
+
+    private var columnHeader: some View {
+        HStack(spacing: 10) {
+            // Status indicator
+            Circle()
+                .fill(section.color)
+                .frame(width: 10, height: 10)
+
+            Text(section.rawValue)
+                .font(.headline)
+                .foregroundStyle(.primary)
+
+            Spacer()
+
+            // Count badge
+            Text("\(tasks.count)")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(section.color)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(section.color.opacity(0.12))
+                )
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(section.color.opacity(0.2), lineWidth: 0.5)
+        }
+    }
+
+    private var emptyColumnPlaceholder: some View {
+        VStack(spacing: 8) {
+            Image(systemName: section.icon)
+                .font(.system(size: 28, weight: .light))
+                .foregroundStyle(.tertiary)
+
+            Text("No tasks")
+                .font(.subheadline)
+                .foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
+                .foregroundStyle(Color(.tertiarySystemFill))
+        )
     }
 }
 

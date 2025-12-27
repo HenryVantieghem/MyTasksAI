@@ -205,7 +205,7 @@ struct FriendRequestsView: View {
                         Circle()
                             .stroke(Theme.Colors.aiPurple.opacity(0.1 + Double(i) * 0.05), lineWidth: 1)
                             .frame(width: 80 + CGFloat(i) * 30)
-                            .rotationEffect(.degrees(orbitPhase * (i % 2 == 0 ? 1 : -1) * 360))
+                            .rotationEffect(.degrees(orbitPhase * Double(i % 2 == 0 ? 1 : -1) * 360.0))
                     }
                 }
 

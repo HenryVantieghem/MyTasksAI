@@ -1142,48 +1142,9 @@ struct FocusModeOption: View {
     }
 }
 
-struct AmbientParticleField: View {
-    @State private var particles: [ParticleData] = []
+// AmbientParticleField is imported from Core/Components/Animations/AmbientParticleField.swift
 
-    var body: some View {
-        GeometryReader { geometry in
-            ForEach(particles) { particle in
-                Circle()
-                    .fill(particle.color)
-                    .frame(width: particle.size, height: particle.size)
-                    .position(particle.position)
-                    .blur(radius: 2)
-                    .opacity(particle.opacity)
-            }
-            .onAppear {
-                generateParticles(in: geometry.size)
-            }
-        }
-    }
-
-    private func generateParticles(in size: CGSize) {
-        let colors: [Color] = [
-            Theme.CelestialColors.nebulaCore.opacity(0.6),
-            Theme.Colors.aiAmber.opacity(0.4),
-            Theme.CelestialColors.starWhite.opacity(0.3)
-        ]
-
-        for _ in 0..<12 {
-            particles.append(ParticleData(
-                id: UUID(),
-                position: CGPoint(
-                    x: CGFloat.random(in: 0...size.width),
-                    y: CGFloat.random(in: 0...size.height)
-                ),
-                size: CGFloat.random(in: 2...5),
-                color: colors.randomElement() ?? .white,
-                opacity: Double.random(in: 0.2...0.5)
-            ))
-        }
-    }
-}
-
-struct ParticleData: Identifiable {
+private struct TaskDetailParticleData: Identifiable {
     let id: UUID
     let position: CGPoint
     let size: CGFloat

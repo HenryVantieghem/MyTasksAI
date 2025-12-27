@@ -279,7 +279,7 @@ enum MilestoneType {
 struct ConfettiView: View {
     let colors: [Color]
 
-    @State private var particles: [ConfettiParticle] = []
+    @State private var particles: [MilestoneConfettiParticle] = []
 
     var body: some View {
         Canvas { context, size in
@@ -307,7 +307,7 @@ struct ConfettiView: View {
 
     private func generateParticles() {
         particles = (0..<60).map { _ in
-            ConfettiParticle(
+            MilestoneConfettiParticle(
                 position: CGPoint(
                     x: CGFloat.random(in: 50...350),
                     y: -20
@@ -342,7 +342,7 @@ struct ConfettiView: View {
     }
 }
 
-struct ConfettiParticle {
+private struct MilestoneConfettiParticle {
     var position: CGPoint
     var velocity: CGPoint
     let color: Color
