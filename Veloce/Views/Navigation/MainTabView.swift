@@ -13,6 +13,7 @@ import SwiftData
 struct MainTabView: View {
     @Environment(AppViewModel.self) private var appViewModel
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.responsiveLayout) private var layout
 
     // Tab state
     @State private var selectedTab: AppTab = .tasks
@@ -25,59 +26,97 @@ struct MainTabView: View {
 
     // Sheet state
     @State private var showProfileSheet = false
+    @State private var showBrainDumpSheet = false
+    @State private var showSearchSheet = false
 
     // Input bar state (managed at container level)
     @State private var taskInputText = ""
     @FocusState private var isTaskInputFocused: Bool
 
-    // Task card state (managed at container level to overlay everything)
+    // Task card state (managed at container level)
     @State private var selectedTask: TaskItem?
-    @State private var showCelestialCard = false
+    @State private var showTaskDetailSheet = false
 
     var body: some View {
-        ZStack {
-            // Tab content with standard TabView
-            TabView(selection: $selectedTab) {
-                // Tasks Tab
-                tasksTab
-                    .tabItem {
-                        Label(AppTab.tasks.title, systemImage: selectedTab == .tasks ? AppTab.tasks.selectedIcon : AppTab.tasks.icon)
-                    }
-                    .tag(AppTab.tasks)
+        // Tab content with standard TabView
+        TabView(selection: $selectedTab) {
+            // Tasks Tab
+            tasksTab
+                .tabItem {
+                    Label(AppTab.tasks.title, systemImage: selectedTab == .tasks ? AppTab.tasks.selectedIcon : AppTab.tasks.icon)
+                }
+                .tag(AppTab.tasks)
 
-                // Plan Tab (Calendar)
-                EnhancedCalendarView(viewModel: calendarViewModel)
-                    .tabItem {
-                        Label(AppTab.plan.title, systemImage: selectedTab == .plan ? AppTab.plan.selectedIcon : AppTab.plan.icon)
-                    }
-                    .tag(AppTab.plan)
+            // Plan Tab (Calendar)
+            EnhancedCalendarView(viewModel: calendarViewModel)
+                .tabItem {
+                    Label(AppTab.plan.title, systemImage: selectedTab == .plan ? AppTab.plan.selectedIcon : AppTab.plan.icon)
+                }
+                .tag(AppTab.plan)
 
-                // Grow Tab (Stats/Goals/Circles)
-                GrowView()
-                    .tabItem {
-                        Label(AppTab.grow.title, systemImage: selectedTab == .grow ? AppTab.grow.selectedIcon : AppTab.grow.icon)
-                    }
-                    .tag(AppTab.grow)
+            // Grow Tab (Stats/Goals/Circles)
+            GrowView()
+                .tabItem {
+                    Label(AppTab.grow.title, systemImage: selectedTab == .grow ? AppTab.grow.selectedIcon : AppTab.grow.icon)
+                }
+                .tag(AppTab.grow)
 
-                // Flow Tab (Focus)
-                FocusTabView()
-                    .tabItem {
-                        Label(AppTab.flow.title, systemImage: selectedTab == .flow ? AppTab.flow.selectedIcon : AppTab.flow.icon)
-                    }
-                    .tag(AppTab.flow)
+            // Flow Tab (Focus)
+            FocusTabView()
+                .tabItem {
+                    Label(AppTab.flow.title, systemImage: selectedTab == .flow ? AppTab.flow.selectedIcon : AppTab.flow.icon)
+                }
+                .tag(AppTab.flow)
 
-                // Journal Tab
-                JournalTabView(tasksViewModel: tasksViewModel)
-                    .tabItem {
-                        Label(AppTab.journal.title, systemImage: selectedTab == .journal ? AppTab.journal.selectedIcon : AppTab.journal.icon)
+            // Journal Tab
+            JournalTabView(tasksViewModel: tasksViewModel)
+                .tabItem {
+                    Label(AppTab.journal.title, systemImage: selectedTab == .journal ? AppTab.journal.selectedIcon : AppTab.journal.icon)
+                }
+                .tag(AppTab.journal)
+        }
+        .tint(.purple)
+        // Full-featured Liquid Glass Task Detail Sheet
+        .sheet(isPresented: $showTaskDetailSheet) {
+            if let task = selectedTask {
+                LiquidGlassTaskDetailSheet(
+                    task: task,
+                    onComplete: {
+                        chatTasksViewModel.taskDidComplete(task)
+                        showTaskDetailSheet = false
+                    },
+                    onDuplicate: {
+                        chatTasksViewModel.taskDidDuplicate(task)
+                    },
+                    onSnooze: { snoozeDate in
+                        task.scheduledTime = snoozeDate
+                        task.updatedAt = Date()
+                        chatTasksViewModel.taskDidSnooze(task)
+                    },
+                    onDelete: {
+                        chatTasksViewModel.taskDidDelete(task)
+                        showTaskDetailSheet = false
+                    },
+                    onSchedule: { scheduledDate in
+                        chatTasksViewModel.updateTask(task, scheduledTime: scheduledDate)
+                    },
+                    onStartTimer: { taskItem in
+                        showTaskDetailSheet = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            selectedTab = .flow
+                        }
+                    },
+                    onDismiss: {
+                        showTaskDetailSheet = false
                     }
-                    .tag(AppTab.journal)
-            }
-            .tint(.purple)
-
-            // Task Detail Overlay - at container level to cover everything
-            if showCelestialCard, let task = selectedTask {
-                taskDetailOverlay(task: task)
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(32)
+                .presentationBackground {
+                    Theme.CelestialColors.voidDeep
+                        .ignoresSafeArea()
+                }
             }
         }
         .safeAreaInset(edge: .top) {
@@ -94,6 +133,26 @@ struct MainTabView: View {
                 .voidPresentationBackground()
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedTab)
+        // iPadOS 26 keyboard command handlers
+        .handleCommands(
+            selectedTab: $selectedTab,
+            onNewTask: {
+                // Focus the task input bar
+                isTaskInputFocused = true
+            },
+            onBrainDump: {
+                showBrainDumpSheet = true
+            },
+            onSearch: {
+                showSearchSheet = true
+            },
+            onFocusMode: {
+                selectedTab = .flow
+            },
+            onGoToToday: {
+                calendarViewModel.goToToday()
+            }
+        )
         .onAppear {
             setupViewModels()
         }
@@ -118,77 +177,30 @@ struct MainTabView: View {
             )
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 0) {
-                    TaskInputBar(
+                    TaskInputBarV2(
                         text: $taskInputText,
                         isFocused: $isTaskInputFocused,
                         onSubmit: { taskText in
                             createTaskFromInput(taskText)
                         },
                         onVoiceInput: {
-                            // Voice recording handled internally by TaskInputBar
+                            // Voice recording handled internally by TaskInputBarV2
                         }
                     )
-                    // Spacer for tab bar height
+                    // Spacer for tab bar height (responsive)
                     Spacer()
-                        .frame(height: 90)
+                        .frame(height: layout.bottomSafeArea)
                 }
             }
         }
     }
 
-    // MARK: - Task Detail Overlay
-
-    private func taskDetailOverlay(task: TaskItem) -> some View {
-        LiquidGlassTaskDetailSheet(
-            task: task,
-            onComplete: {
-                chatTasksViewModel.taskDidComplete(task)
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    showCelestialCard = false
-                }
-            },
-            onDuplicate: {
-                chatTasksViewModel.taskDidDuplicate(task)
-            },
-            onSnooze: { snoozeDate in
-                task.scheduledTime = snoozeDate
-                task.updatedAt = Date()
-                chatTasksViewModel.taskDidSnooze(task)
-            },
-            onDelete: {
-                chatTasksViewModel.taskDidDelete(task)
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    showCelestialCard = false
-                }
-            },
-            onSchedule: { scheduledDate in
-                chatTasksViewModel.updateTask(task, scheduledTime: scheduledDate)
-            },
-            onStartTimer: { taskItem in
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    showCelestialCard = false
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    selectedTab = .flow
-                }
-            },
-            onDismiss: {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    showCelestialCard = false
-                }
-            }
-        )
-        .transition(.opacity)
-        .zIndex(100)
-    }
 
     // MARK: - Helper Methods
 
     private func presentTaskCard(_ task: TaskItem) {
         selectedTask = task
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-            showCelestialCard = true
-        }
+        showTaskDetailSheet = true
         HapticsService.shared.impact(.medium)
     }
 

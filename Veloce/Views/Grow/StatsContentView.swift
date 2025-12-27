@@ -21,16 +21,31 @@ struct StatsContentView: View {
     let totalPoints: Int
     let levelProgress: Double
 
+    @Environment(\.responsiveLayout) private var layout
     @State private var hasAnimated = false
+
+    // Adaptive columns based on device
+    private var gridColumns: [GridItem] {
+        let columnCount: Int
+        switch layout.deviceType {
+        case .iPhoneSE, .iPhoneStandard, .iPhoneProMax:
+            columnCount = 2
+        case .iPadMini, .iPad:
+            columnCount = 3
+        case .iPadPro11, .iPadPro13:
+            columnCount = layout.isLandscape ? 4 : 3
+        }
+        return Array(repeating: GridItem(.flexible(), spacing: layout.spacing), count: columnCount)
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
+            VStack(spacing: layout.spacing * 1.5) {
                 // Velocity Circle (Hero)
                 velocityCircle
-                    .padding(.top, 20)
+                    .padding(.top, layout.spacing)
 
-                // Stats Grid
+                // Stats Grid - adaptive columns
                 statsGrid
 
                 // Weekly Trend
@@ -41,9 +56,10 @@ struct StatsContentView: View {
                     streaksCard
                 }
 
-                Spacer(minLength: 120)
+                Spacer(minLength: layout.bottomSafeArea)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, layout.screenPadding)
+            .maxWidthConstrained()
         }
         .onAppear {
             withAnimation(.easeOut(duration: 0.6).delay(0.2)) {
@@ -54,12 +70,24 @@ struct StatsContentView: View {
 
     // MARK: - Velocity Circle
 
+    // Responsive circle size based on device
+    private var circleSize: CGFloat {
+        switch layout.deviceType {
+        case .iPhoneSE: return 140
+        case .iPhoneStandard: return 160
+        case .iPhoneProMax: return 180
+        case .iPadMini: return 200
+        case .iPad, .iPadPro11: return 220
+        case .iPadPro13: return 260
+        }
+    }
+
     private var velocityCircle: some View {
         ZStack {
             // Outer ring
             Circle()
-                .stroke(Color.gray.opacity(0.2), lineWidth: 8)
-                .frame(width: 160, height: 160)
+                .stroke(Color.gray.opacity(0.2), lineWidth: layout.deviceType.isTablet ? 10 : 8)
+                .frame(width: circleSize, height: circleSize)
 
             // Progress ring
             Circle()
@@ -70,19 +98,19 @@ struct StatsContentView: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                    style: StrokeStyle(lineWidth: layout.deviceType.isTablet ? 10 : 8, lineCap: .round)
                 )
-                .frame(width: 160, height: 160)
+                .frame(width: circleSize, height: circleSize)
                 .rotationEffect(.degrees(-90))
 
-            // Score display
+            // Score display - Dynamic Type for accessibility
             VStack(spacing: 4) {
                 Text("\(Int(velocityScore))")
-                    .font(.system(size: 48, weight: .thin, design: .rounded))
+                    .dynamicTypeFont(base: layout.deviceType.isTablet ? 56 : 48, weight: .thin, design: .rounded)
                     .foregroundStyle(.white)
 
                 Text("VELOCITY")
-                    .font(.caption.weight(.semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
                     .foregroundStyle(.secondary)
                     .tracking(2)
             }
@@ -92,10 +120,7 @@ struct StatsContentView: View {
     // MARK: - Stats Grid
 
     private var statsGrid: some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible(), spacing: 12),
-            GridItem(.flexible(), spacing: 12)
-        ], spacing: 12) {
+        LazyVGrid(columns: gridColumns, spacing: layout.spacing) {
             QuickStatCard(
                 value: "\(tasksCompletedToday)/\(dailyGoal)",
                 label: "Today",
@@ -128,42 +153,49 @@ struct StatsContentView: View {
 
     // MARK: - Weekly Trend Card
 
+    // Responsive bar width for weekly trend
+    private var trendBarWidth: CGFloat {
+        layout.deviceType.isTablet ? 36 : 28
+    }
+
     private var weeklyTrendCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: layout.spacing) {
             Text("Weekly Trend")
-                .font(.subheadline.weight(.medium))
+                .dynamicTypeFont(base: 15, weight: .medium)
                 .foregroundStyle(.secondary)
 
-            HStack(alignment: .bottom, spacing: 8) {
+            HStack(alignment: .bottom, spacing: layout.spacing * 0.75) {
                 ForEach(["M", "T", "W", "T", "F", "S", "S"], id: \.self) { day in
                     VStack(spacing: 6) {
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Theme.Colors.aiPurple)
-                            .frame(width: 28, height: CGFloat.random(in: 20...80))
+                            .frame(width: trendBarWidth, height: CGFloat.random(in: 20...80))
 
                         Text(day)
-                            .font(.caption2)
+                            .dynamicTypeFont(base: 10, weight: .regular)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
-            .frame(height: 100, alignment: .bottom)
+            .frame(height: layout.deviceType.isTablet ? 120 : 100, alignment: .bottom)
         }
-        .padding(20)
+        .padding(layout.cardPadding)
         .background(Color(.systemGray6).opacity(0.5), in: RoundedRectangle(cornerRadius: 16))
     }
 
     // MARK: - Streaks Card
 
     private var streaksCard: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: layout.spacing) {
             HStack {
                 Image(systemName: "flame.fill")
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.orange)
                 Text("Current Streak")
+                    .dynamicTypeFont(base: 16, weight: .regular)
                 Spacer()
                 Text("\(streak) days")
-                    .fontWeight(.semibold)
+                    .dynamicTypeFont(base: 16, weight: .semibold)
             }
 
             Divider()
@@ -171,14 +203,16 @@ struct StatsContentView: View {
 
             HStack {
                 Image(systemName: "trophy.fill")
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.yellow)
                 Text("Longest Streak")
+                    .dynamicTypeFont(base: 16, weight: .regular)
                 Spacer()
                 Text("\(longestStreak) days")
-                    .fontWeight(.semibold)
+                    .dynamicTypeFont(base: 16, weight: .semibold)
             }
         }
-        .padding(20)
+        .padding(layout.cardPadding)
         .background(Color(.systemGray6).opacity(0.5), in: RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -191,16 +225,17 @@ struct QuickStatCard: View {
     let progress: Double
     let color: Color
 
+    @Environment(\.responsiveLayout) private var layout
     @State private var animatedProgress: Double = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: layout.spacing * 0.75) {
             Text(value)
-                .font(.title2.weight(.semibold))
+                .dynamicTypeFont(base: 20, weight: .semibold)
                 .foregroundStyle(.white)
 
             Text(label)
-                .font(.caption)
+                .dynamicTypeFont(base: 12, weight: .regular)
                 .foregroundStyle(.secondary)
 
             GeometryReader { geo in
@@ -213,9 +248,9 @@ struct QuickStatCard: View {
                         .frame(width: geo.size.width * animatedProgress)
                 }
             }
-            .frame(height: 4)
+            .frame(height: layout.deviceType.isTablet ? 6 : 4)
         }
-        .padding(16)
+        .padding(layout.cardPadding)
         .background(Color(.systemGray6).opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.3)) {

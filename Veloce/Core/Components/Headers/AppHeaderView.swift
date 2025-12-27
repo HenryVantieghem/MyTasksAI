@@ -49,10 +49,11 @@ struct AppHeaderView: View {
 
     var body: some View {
         ZStack {
-            // Center: Title
+            // Center: Title - Ultra-thin elegant typography (MyTasksAI brand style)
             Text(title)
-                .font(.headline.weight(.semibold))
+                .font(Theme.Typography.pageTitle)
                 .foregroundStyle(.white)
+                .tracking(1.5)
 
             // Left & Right content
             HStack {
@@ -118,12 +119,22 @@ struct ProfileButton: View {
     var userInitial: String = "V"
 
     @State private var isPressed = false
+    @State private var glowPhase: Bool = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    // Glow opacity based on animation phase
+    private var glowOpacity: Double {
+        reduceMotion ? 0.35 : (glowPhase ? 0.5 : 0.25)
+    }
+
+    // Glow color (purple to match AI theme)
+    private let glowColor = Theme.Colors.aiPurple
 
     var body: some View {
         Button(action: onTap) {
             Group {
                 if let image = avatarImage {
-                    // Show actual avatar image
+                    // Show actual avatar image with gradient border
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -131,7 +142,14 @@ struct ProfileButton: View {
                         .clipShape(Circle())
                         .overlay(
                             Circle()
-                                .strokeBorder(.white.opacity(0.2), lineWidth: 1)
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [Theme.Colors.aiPurple.opacity(0.6), Theme.Colors.aiBlue.opacity(0.4)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
                         )
                 } else {
                     // Show gradient with user initial
@@ -151,14 +169,26 @@ struct ProfileButton: View {
                         )
                         .overlay(
                             Circle()
-                                .strokeBorder(.white.opacity(0.2), lineWidth: 1)
+                                .strokeBorder(.white.opacity(0.25), lineWidth: 1)
                         )
                 }
             }
+            // Purple glow effect (layered for depth)
+            .shadow(color: glowColor.opacity(glowOpacity), radius: 8, x: 0, y: 0)
+            .shadow(color: glowColor.opacity(glowOpacity * 0.4), radius: 14, x: 0, y: 2)
         }
-        .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.95 : 1.0)
+        .buttonStyle(PillButtonStyle())
         .sensoryFeedback(.impact(flexibility: .soft), trigger: isPressed)
+        .onAppear {
+            startGlowAnimation()
+        }
+    }
+
+    private func startGlowAnimation() {
+        guard !reduceMotion else { return }
+        withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
+            glowPhase = true
+        }
     }
 }
 

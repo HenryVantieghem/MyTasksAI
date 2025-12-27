@@ -176,6 +176,18 @@ enum ScoreTier: String, CaseIterable {
         case .legendary: return "crown.fill"
         }
     }
+
+    /// Filled icon variant for premium display
+    var iconFilled: String {
+        switch self {
+        case .beginning: return "leaf.fill"
+        case .starting: return "flame.fill"
+        case .building: return "bolt.fill"
+        case .good: return "star.fill"
+        case .excellent: return "crown.fill"
+        case .legendary: return "crown.fill"
+        }
+    }
 }
 
 // MARK: - Weekly Score History

@@ -54,8 +54,8 @@ struct AuthView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Celestial void background
-                celestialBackground
+                // Cosmic void background (consistent across app)
+                VoidBackground.auth
 
                 // Ambient floating particles
                 if !reduceMotion {
@@ -150,53 +150,6 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Celestial Background
-
-    private var celestialBackground: some View {
-        ZStack {
-            // True void base
-            Color(red: 0.01, green: 0.01, blue: 0.02)
-                .ignoresSafeArea()
-
-            // Soft purple nebula
-            RadialGradient(
-                colors: [
-                    etherealColors[0].opacity(0.10),
-                    etherealColors[3].opacity(0.05),
-                    Color.clear
-                ],
-                center: UnitPoint(x: 0.32, y: 0.18),
-                startRadius: 0,
-                endRadius: 320
-            )
-            .blur(radius: 40)
-
-            // Soft cyan nebula
-            RadialGradient(
-                colors: [
-                    etherealColors[1].opacity(0.08),
-                    etherealColors[2].opacity(0.04),
-                    Color.clear
-                ],
-                center: UnitPoint(x: 0.75, y: 0.65),
-                startRadius: 0,
-                endRadius: 280
-            )
-            .blur(radius: 35)
-
-            // Subtle vignette
-            RadialGradient(
-                colors: [
-                    Color.clear,
-                    Color.black.opacity(0.30)
-                ],
-                center: .center,
-                startRadius: 180,
-                endRadius: 550
-            )
-        }
-        .ignoresSafeArea()
-    }
 
     // MARK: - Orb State
 

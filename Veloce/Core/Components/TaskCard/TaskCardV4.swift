@@ -19,12 +19,18 @@ struct TaskCardV4: View {
     var onSnooze: ((TaskItem) -> Void)?
     var onDelete: ((TaskItem) -> Void)?
 
+    /// Set to true to show AI thinking animation (e.g., after task creation)
+    var showAIThinking: Bool = false
+    var onAIThinkingComplete: (() -> Void)?
+
     // Interaction states
     @State private var isPressed = false
     @State private var swipeOffset: CGFloat = 0
     @State private var showMoreMenu = false
     @State private var selectedFocusDuration: Int = 25
+    @State private var isShowingAIThinking = false
 
+    @Environment(\.responsiveLayout) private var layout
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
 
@@ -85,8 +91,32 @@ struct TaskCardV4: View {
                 .offset(x: swipeOffset)
                 .gesture(swipeGesture)
         }
+        .aiThinkingOverlay(
+            isThinking: $isShowingAIThinking,
+            duration: 3.0,
+            onComplete: {
+                onAIThinkingComplete?()
+            }
+        )
+        // Premium glow on newly created tasks (during AI thinking)
+        .premiumGlowRoundedRect(
+            cornerRadius: 16,
+            style: .aiAccent,
+            intensity: isShowingAIThinking ? .subtle : .whisper,
+            animated: isShowingAIThinking && !reduceMotion
+        )
         .opacity(task.isCompleted ? 0.65 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: task.isCompleted)
+        .onChange(of: showAIThinking) { _, newValue in
+            if newValue {
+                isShowingAIThinking = true
+            }
+        }
+        .onAppear {
+            if showAIThinking {
+                isShowingAIThinking = true
+            }
+        }
     }
 
     // MARK: - Card Content
@@ -99,47 +129,48 @@ struct TaskCardV4: View {
             VStack(spacing: 0) {
                 // Main row: Checkbox + Title + Stars
                 mainRow
-                    .padding(.horizontal, 16)
-                    .padding(.top, 14)
+                    .padding(.horizontal, layout.cardPadding)
+                    .padding(.top, layout.cardPadding - 2)
 
                 // AI insight whisper
                 if let insight = aiInsight, !task.isCompleted {
                     Text(insight)
-                        .font(.subheadline)
+                        .dynamicTypeFont(base: 14, weight: .regular)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, layout.cardPadding)
                         .padding(.top, 4)
                 }
 
                 // Divider
                 Divider()
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, layout.cardPadding)
+                    .padding(.vertical, layout.spacing / 2)
 
                 // Metadata row
                 metadataRow
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, layout.cardPadding)
 
                 // Action row: Focus button + More menu
                 if !task.isCompleted {
                     actionRow
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
+                        .padding(.horizontal, layout.cardPadding)
+                        .padding(.top, layout.spacing * 0.75)
                 }
 
-                Spacer().frame(height: 14)
+                Spacer().frame(height: layout.cardPadding - 2)
             }
             .background(cardBackground)
         }
         .buttonStyle(TaskCardV4ButtonStyle(isPressed: $isPressed, reduceMotion: reduceMotion))
+        .iPadHoverEffect(.lift)
     }
 
     // MARK: - Main Row
 
     private var mainRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: layout.spacing * 0.75) {
             // Elegant checkbox
             ElegantCheckBubble(
                 taskTypeColor: taskTypeColor,
@@ -150,9 +181,9 @@ struct TaskCardV4: View {
                 }
             )
 
-            // Title
+            // Title - Dynamic Type for accessibility
             Text(task.title)
-                .font(.body.weight(.medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.primary)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
@@ -172,7 +203,7 @@ struct TaskCardV4: View {
         HStack(spacing: 2) {
             ForEach(0..<3, id: \.self) { index in
                 Image(systemName: index < task.starRating ? "star.fill" : "star")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(
                         index < task.starRating
                             ? Theme.AdaptiveColors.warning
@@ -185,7 +216,7 @@ struct TaskCardV4: View {
     // MARK: - Metadata Row
 
     private var metadataRow: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: layout.spacing * 0.625) {
             // Duration estimate
             if let duration = task.estimatedMinutes, duration > 0 {
                 MetadataChip(
@@ -229,14 +260,14 @@ struct TaskCardV4: View {
 
         return HStack(spacing: 3) {
             Image(systemName: "bolt.fill")
-                .font(.system(size: 9, weight: .bold))
+                .dynamicTypeFont(base: 9, weight: .bold)
 
             Text("+\(points)")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .dynamicTypeFont(base: 12, weight: .bold, design: .rounded)
         }
         .foregroundStyle(Theme.AdaptiveColors.success)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
+        .padding(.horizontal, layout.spacing / 2)
+        .padding(.vertical, layout.spacing / 4)
         .background(
             Capsule()
                 .fill(Theme.AdaptiveColors.success.opacity(0.12))
@@ -246,7 +277,7 @@ struct TaskCardV4: View {
     // MARK: - Action Row
 
     private var actionRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: layout.spacing * 0.75) {
             // Focus button (Liquid Glass)
             focusButton
 
@@ -266,19 +297,23 @@ struct TaskCardV4: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "play.fill")
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
 
                 Text("Focus")
-                    .font(.subheadline.weight(.medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
             }
             .foregroundStyle(.white)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
+            .padding(.horizontal, layout.cardPadding - 2)
+            .padding(.vertical, layout.spacing / 2)
             .background(Theme.AdaptiveColors.aiGradient)
             .clipShape(Capsule())
+            .premiumGlowCapsule(
+                style: .aiAccent,
+                intensity: .whisper,
+                animated: !reduceMotion
+            )
         }
         .buttonStyle(.plain)
-        .adaptiveGlassCapsule()
     }
 
     // MARK: - More Menu Button

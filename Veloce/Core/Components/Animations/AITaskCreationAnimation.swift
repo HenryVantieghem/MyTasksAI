@@ -22,10 +22,37 @@ struct AITaskCreationAnimation: View {
     @State private var showBloom: Bool = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.responsiveLayout) private var layout
 
     // Animation timing constants
     private let totalDuration: Double = 3.5
     private let phaseDuration: Double = 0.6
+
+    // MARK: - Responsive Sizes
+
+    private var auroraSize: CGFloat {
+        layout.deviceType.isTablet ? 600 : 400
+    }
+
+    private var dimensionalRingSize: CGFloat {
+        layout.deviceType.isTablet ? 180 : 120
+    }
+
+    private var orbitRadius: CGFloat {
+        layout.deviceType.isTablet ? 105 : 70
+    }
+
+    private var constellationRadius: CGFloat {
+        layout.deviceType.isTablet ? 75 : 50
+    }
+
+    private var coreSize: CGFloat {
+        layout.deviceType.isTablet ? 90 : 60
+    }
+
+    private var bloomSize: CGFloat {
+        layout.deviceType.isTablet ? 300 : 200
+    }
 
     enum Phase: Int, CaseIterable {
         case awakening = 0      // Aurora + base glow
@@ -54,16 +81,16 @@ struct AITaskCreationAnimation: View {
                 .opacity(overallOpacity)
 
             // Layer 1: Aurora Waves (outer atmosphere)
-            AuroraWaves(size: 400, isActive: isLayerActive[0])
+            AuroraWaves(size: auroraSize, isActive: isLayerActive[0])
                 .opacity(isLayerActive[0] ? 1 : 0)
 
             // Layer 2: Dimensional Rings (outer structure)
-            DimensionalRings(size: 120, isActive: isLayerActive[1])
+            DimensionalRings(size: dimensionalRingSize, isActive: isLayerActive[1])
                 .opacity(isLayerActive[1] ? 1 : 0)
 
             // Layer 3: Orbiting Thought Particles (middle layer)
             OrbitingThoughtParticles(
-                radius: 70,
+                radius: orbitRadius,
                 isActive: isLayerActive[2],
                 phase: CGFloat(currentPhase.rawValue) / CGFloat(Phase.allCases.count)
             )
@@ -71,14 +98,14 @@ struct AITaskCreationAnimation: View {
 
             // Layer 4: Neural Constellation Ring (inner ring)
             NeuralConstellationRing(
-                radius: 50,
+                radius: constellationRadius,
                 isActive: isLayerActive[3],
                 phase: CGFloat(currentPhase.rawValue) / CGFloat(Phase.allCases.count)
             )
             .opacity(isLayerActive[3] ? 1 : 0)
 
             // Layer 5: Singularity Core (center orb)
-            SingularityCore(size: 60, isActive: isLayerActive[4])
+            SingularityCore(size: coreSize, isActive: isLayerActive[4])
                 .opacity(isLayerActive[4] ? 1 : 0)
 
             // Layer 6: Status Text (bottom)
@@ -89,13 +116,13 @@ struct AITaskCreationAnimation: View {
                     messages: Phase.allCases.dropLast().map(\.statusMessage),
                     isActive: isLayerActive[5]
                 )
-                .padding(.bottom, 100)
+                .padding(.bottom, layout.deviceType.isTablet ? 150 : 100)
             }
             .opacity(isLayerActive[5] ? 1 : 0)
 
             // Bloom completion overlay
             if showBloom {
-                BloomCompletion(size: 200) {
+                BloomCompletion(size: bloomSize) {
                     withAnimation(.easeOut(duration: 0.3)) {
                         overallOpacity = 0
                     }
@@ -258,6 +285,16 @@ struct QuickAIIndicator: View {
 
     @State private var rotation: Double = 0
     @State private var scale: CGFloat = 1
+    @Environment(\.responsiveLayout) private var layout
+
+    // Responsive sizes
+    private var indicatorSize: CGFloat {
+        layout.deviceType.isTablet ? 32 : 24
+    }
+
+    private var sparkleSize: CGFloat {
+        layout.deviceType.isTablet ? 14 : 10
+    }
 
     var body: some View {
         ZStack {
@@ -268,14 +305,14 @@ struct QuickAIIndicator: View {
                         colors: Theme.TaskCardColors.iridescent,
                         center: .center
                     ),
-                    lineWidth: 2
+                    lineWidth: layout.deviceType.isTablet ? 2.5 : 2
                 )
-                .frame(width: 24, height: 24)
+                .frame(width: indicatorSize, height: indicatorSize)
                 .rotationEffect(.degrees(rotation))
 
             // Center sparkle
             Image(systemName: "sparkle")
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: sparkleSize, weight: .medium)
                 .foregroundStyle(.white)
                 .scaleEffect(scale)
         }

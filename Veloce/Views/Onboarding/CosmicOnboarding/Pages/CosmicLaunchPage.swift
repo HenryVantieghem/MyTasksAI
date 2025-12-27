@@ -28,6 +28,22 @@ struct CosmicLaunchPage: View {
     @State private var launchProgress: CGFloat = 0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.responsiveLayout) private var layout
+
+    // MARK: - Responsive Sizes
+
+    // Portal/orb sizes scale with device
+    private var portalBaseSize: CGFloat {
+        layout.portalOrbSize
+    }
+
+    private var portalHeight: CGFloat {
+        layout.deviceType.isTablet ? 400 : 300
+    }
+
+    private var buttonHeight: CGFloat {
+        layout.buttonHeight
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -37,12 +53,12 @@ struct CosmicLaunchPage: View {
                     LaunchStarBurst(progress: launchProgress)
                 }
 
-                VStack(spacing: Theme.Spacing.xl) {
+                VStack(spacing: layout.spacing * 1.5) {
                     Spacer()
 
                     // Portal/Rocket illustration
                     portalIllustration
-                        .frame(height: 300)
+                        .frame(height: portalHeight)
 
                     // Title section
                     titleSection
@@ -51,9 +67,10 @@ struct CosmicLaunchPage: View {
 
                     // Launch button
                     launchButton
-                        .padding(.horizontal, Theme.Spacing.lg)
-                        .padding(.bottom, Theme.Spacing.xl * 2)
+                        .padding(.horizontal, layout.screenPadding)
+                        .padding(.bottom, layout.bottomSafeArea)
                 }
+                .maxWidthConstrained()
             }
         }
         .onAppear {
@@ -63,9 +80,24 @@ struct CosmicLaunchPage: View {
 
     // MARK: - Portal Illustration
 
+    // Responsive inner core size
+    private var innerCoreSize: CGFloat {
+        portalBaseSize * 0.53  // ~160 at base 300
+    }
+
+    // Responsive energy swirl size
+    private var energySwirlSize: CGFloat {
+        portalBaseSize * 0.43  // ~130 at base 300
+    }
+
+    // Responsive rocket icon size
+    private var rocketIconSize: CGFloat {
+        layout.deviceType.isTablet ? 60 : 48
+    }
+
     private var portalIllustration: some View {
         ZStack {
-            // Outer portal rings
+            // Outer portal rings - scale with portalBaseSize
             ForEach(0..<4) { ring in
                 Circle()
                     .stroke(
@@ -83,8 +115,8 @@ struct CosmicLaunchPage: View {
                         lineWidth: 3 - CGFloat(ring) * 0.5
                     )
                     .frame(
-                        width: 200 + CGFloat(ring) * 50,
-                        height: 200 + CGFloat(ring) * 50
+                        width: portalBaseSize * 0.67 + CGFloat(ring) * (portalBaseSize * 0.17),
+                        height: portalBaseSize * 0.67 + CGFloat(ring) * (portalBaseSize * 0.17)
                     )
                     .rotationEffect(.degrees(portalRotation * (ring % 2 == 0 ? 1 : -1)))
                     .scaleEffect(1 + portalPulse * 0.02 * CGFloat(ring + 1))
@@ -103,10 +135,10 @@ struct CosmicLaunchPage: View {
                         ],
                         center: .center,
                         startRadius: 20,
-                        endRadius: 150
+                        endRadius: portalBaseSize * 0.5
                     )
                 )
-                .frame(width: 300, height: 300)
+                .frame(width: portalBaseSize, height: portalBaseSize)
                 .scaleEffect(1 + portalPulse * 0.05)
 
             // Inner portal core
@@ -122,10 +154,10 @@ struct CosmicLaunchPage: View {
                             ],
                             center: .center,
                             startRadius: 0,
-                            endRadius: 80
+                            endRadius: innerCoreSize * 0.5
                         )
                     )
-                    .frame(width: 160, height: 160)
+                    .frame(width: innerCoreSize, height: innerCoreSize)
 
                 // Energy swirl
                 Circle()
@@ -139,9 +171,9 @@ struct CosmicLaunchPage: View {
                             ],
                             center: .center
                         ),
-                        lineWidth: 4
+                        lineWidth: layout.deviceType.isTablet ? 5 : 4
                     )
-                    .frame(width: 130, height: 130)
+                    .frame(width: energySwirlSize, height: energySwirlSize)
                     .rotationEffect(.degrees(-portalRotation * 2))
                     .blur(radius: 2)
 
@@ -160,13 +192,13 @@ struct CosmicLaunchPage: View {
                                 endPoint: .bottom
                             )
                         )
-                        .frame(width: 40, height: 80)
-                        .offset(y: 50)
+                        .frame(width: rocketIconSize * 0.83, height: rocketIconSize * 1.67)
+                        .offset(y: rocketIconSize * 1.04)
                         .blur(radius: 10)
 
-                    // Rocket icon
+                    // Rocket icon - Dynamic Type for accessibility
                     Image(systemName: "paperplane.fill")
-                        .font(.system(size: 48, weight: .light))
+                        .font(.system(size: rocketIconSize, weight: .light))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
@@ -199,33 +231,33 @@ struct CosmicLaunchPage: View {
     // MARK: - Title Section
 
     private var titleSection: some View {
-        VStack(spacing: Theme.Spacing.md) {
+        VStack(spacing: layout.spacing) {
             Text("Ready for Liftoff, \(displayName)")
-                .font(.system(size: 30, weight: .thin, design: .default))
+                .dynamicTypeFont(base: 30, weight: .thin)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
                 .multilineTextAlignment(.center)
 
             if let goal = goalSummary, !goal.isEmpty {
                 Text("Your mission: \(goal)")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.solarFlare.opacity(0.9))
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
-                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.horizontal, layout.screenPadding)
             }
 
             Text("Your productivity journey begins now")
-                .font(.system(size: 15, weight: .regular))
+                .dynamicTypeFont(base: 15, weight: .regular)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .multilineTextAlignment(.center)
 
             // Fun stats preview
-            HStack(spacing: Theme.Spacing.xl) {
-                LaunchStatBadge(icon: "target", value: "∞", label: "Goals")
-                LaunchStatBadge(icon: "flame.fill", value: "1", label: "Streak")
-                LaunchStatBadge(icon: "star.fill", value: "0", label: "Focus hrs")
+            HStack(spacing: layout.spacing * 1.5) {
+                LaunchStatBadge(icon: "target", value: "∞", label: "Goals", layout: layout)
+                LaunchStatBadge(icon: "flame.fill", value: "1", label: "Streak", layout: layout)
+                LaunchStatBadge(icon: "star.fill", value: "0", label: "Focus hrs", layout: layout)
             }
-            .padding(.top, Theme.Spacing.lg)
+            .padding(.top, layout.spacing)
         }
         .opacity(showTitle ? 1 : 0)
         .offset(y: showTitle ? 0 : 30)
@@ -235,7 +267,7 @@ struct CosmicLaunchPage: View {
     // MARK: - Launch Button
 
     private var launchButton: some View {
-        VStack(spacing: Theme.Spacing.md) {
+        VStack(spacing: layout.spacing) {
             Button {
                 triggerLaunch()
             } label: {
@@ -243,26 +275,26 @@ struct CosmicLaunchPage: View {
                     // Pulsing glow behind button
                     Capsule()
                         .fill(Theme.CelestialColors.auroraGreen.opacity(0.3))
-                        .frame(height: 56)
+                        .frame(height: buttonHeight)
                         .scaleEffect(1 + portalPulse * 0.05)
                         .blur(radius: 10)
 
-                    HStack(spacing: Theme.Spacing.sm) {
+                    HStack(spacing: layout.spacing * 0.5) {
                         if isLaunching {
                             ProgressView()
                                 .progressViewStyle(.circular)
                                 .tint(.white)
                         } else {
                             Image(systemName: "bolt.fill")
-                                .font(.system(size: 18, weight: .semibold))
+                                .dynamicTypeFont(base: 18, weight: .semibold)
 
                             Text("Launch My Journey")
-                                .font(.system(size: 17, weight: .bold))
+                                .dynamicTypeFont(base: 17, weight: .bold)
                         }
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 56)
+                    .frame(height: buttonHeight)
                     .background(
                         Capsule()
                             .fill(
@@ -280,6 +312,7 @@ struct CosmicLaunchPage: View {
                 }
             }
             .buttonStyle(.plain)
+            .iPadHoverEffect(.lift)
             .disabled(isLaunching)
         }
         .opacity(showButton ? 1 : 0)
@@ -385,32 +418,38 @@ struct LaunchStatBadge: View {
     let icon: String
     let value: String
     let label: String
+    let layout: ResponsiveLayout
+
+    // Responsive badge size
+    private var badgeSize: CGFloat {
+        layout.deviceType.isTablet ? 60 : 50
+    }
 
     var body: some View {
-        VStack(spacing: Theme.Spacing.xs) {
+        VStack(spacing: layout.spacing * 0.25) {
             ZStack {
                 Circle()
                     .fill(Theme.CelestialColors.void.opacity(0.5))
-                    .frame(width: 50, height: 50)
+                    .frame(width: badgeSize, height: badgeSize)
 
                 Circle()
                     .stroke(
                         Theme.CelestialColors.starGhost.opacity(0.2),
                         lineWidth: 1
                     )
-                    .frame(width: 50, height: 50)
+                    .frame(width: badgeSize, height: badgeSize)
 
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
 
             Text(value)
-                .font(.system(size: 20, weight: .bold))
+                .dynamicTypeFont(base: 20, weight: .bold)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
 
             Text(label)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         }
     }

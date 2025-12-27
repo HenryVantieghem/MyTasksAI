@@ -241,7 +241,13 @@ final class GoalsViewModel {
         guard perplexity.isReady else { return }
 
         isRefiningGoal = true
-        defer { isRefiningGoal = false }
+
+        // Use defer to ensure flag is always reset
+        defer {
+            Task { @MainActor in
+                isRefiningGoal = false
+            }
+        }
 
         do {
             let refinement = try await perplexity.refineGoalToSMART(
@@ -275,7 +281,7 @@ final class GoalsViewModel {
         }
     }
 
-    /// Generate AI roadmap for a goal
+    /// Generate AI roadmap for a goal with timeout protection
     func generateRoadmap(for goal: Goal, context: ModelContext) async {
         guard perplexity.isReady else {
             error = "AI service not available"
@@ -283,7 +289,13 @@ final class GoalsViewModel {
         }
 
         isGeneratingRoadmap = true
-        defer { isGeneratingRoadmap = false }
+
+        // Use defer to ensure flag is always reset
+        defer {
+            Task { @MainActor in
+                isGeneratingRoadmap = false
+            }
+        }
 
         do {
             // Convert UserProductivityProfile to UserPatterns format if available

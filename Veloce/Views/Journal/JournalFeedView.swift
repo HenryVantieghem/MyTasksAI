@@ -50,6 +50,7 @@ enum JournalColors {
 
 struct JournalFeedView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.responsiveLayout) private var layout
     @State private var viewModel = JournalFeedViewModel()
 
     // Date navigation
@@ -69,14 +70,14 @@ struct JournalFeedView: View {
 
     var body: some View {
         ZStack {
-            // Cosmic void background (matches Tasks page)
-            VoidBackground.journal
+            // Cosmic void background (matches Calendar page styling)
+            VoidBackground.calendar
 
             VStack(spacing: 0) {
                 // Today pill with date navigation (matches ChatTasksView pattern)
                 dateNavigationPill
-                    .padding(.top, 48)
-                    .padding(.bottom, 12)
+                    .padding(.top, layout.headerHeight)
+                    .padding(.bottom, layout.spacing)
 
                 // Free-form editor
                 editorArea
@@ -85,6 +86,7 @@ struct JournalFeedView: View {
                 journalToolbar
             }
         }
+        .ignoresSafeArea(.container, edges: .bottom)
         .preferredColorScheme(.dark)
         .onAppear {
             viewModel.setup(context: modelContext)
@@ -120,44 +122,50 @@ struct JournalFeedView: View {
             VStack(alignment: .leading, spacing: 0) {
                 // Date stamp
                 Text(formattedDate)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.3))
-                    .padding(.top, 20)
-                    .padding(.bottom, 16)
+                    .padding(.top, layout.spacing)
+                    .padding(.bottom, layout.spacing)
 
                 // Free-form text editor
                 ZStack(alignment: .topLeading) {
                     // Placeholder
                     if currentText.isEmpty {
                         Text("What's on your mind?")
-                            .font(.system(size: 18, weight: .regular, design: .serif))
+                            .dynamicTypeFont(base: 18, weight: .regular, design: .serif)
                             .foregroundStyle(.white.opacity(0.25))
                             .padding(.top, 8)
                     }
 
                     // Editor
                     TextEditor(text: $currentText)
-                        .font(.system(size: 18, weight: .regular, design: .serif))
+                        .font(.system(size: layout.deviceType.isTablet ? 20 : 18, weight: .regular, design: .serif))
                         .foregroundStyle(.white.opacity(0.9))
                         .scrollContentBackground(.hidden)
                         .focused($isEditing)
-                        .frame(minHeight: 400)
-                        .lineSpacing(8)
+                        .frame(minHeight: layout.deviceType.isTablet ? 500 : 400)
+                        .lineSpacing(layout.deviceType.isTablet ? 10 : 8)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 120)
+            .padding(.horizontal, layout.screenPadding)
+            .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
+            .maxWidthConstrained()
         }
     }
 
     // MARK: - Minimal Toolbar
 
+    // Responsive toolbar button size
+    private var toolbarButtonSize: CGFloat {
+        layout.deviceType.isTablet ? 48 : 40
+    }
+
     private var journalToolbar: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: layout.spacing) {
             // Word count (left side)
             if wordCount > 0 {
                 Text("\(wordCount) words")
-                    .font(.system(size: 12, weight: .regular))
+                    .dynamicTypeFont(base: 12, weight: .regular)
                     .foregroundStyle(.white.opacity(0.35))
             }
 
@@ -169,15 +177,16 @@ struct JournalFeedView: View {
                 // Voice input action (placeholder)
             } label: {
                 Image(systemName: "mic.fill")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(Theme.Colors.aiPurple)
-                    .frame(width: 40, height: 40)
+                    .dynamicTypeFont(base: 16, weight: .medium)
+                    .foregroundStyle(Theme.Colors.aiBlue)
+                    .frame(width: toolbarButtonSize, height: toolbarButtonSize)
                     .background {
                         Circle()
                             .fill(.white.opacity(0.08))
                     }
             }
             .buttonStyle(.plain)
+            .iPadHoverEffect(.highlight)
 
             // Keyboard dismiss button
             Button {
@@ -185,19 +194,30 @@ struct JournalFeedView: View {
                 isEditing = false
             } label: {
                 Image(systemName: "keyboard.chevron.compact.down")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
-                    .frame(width: 40, height: 40)
+                    .frame(width: toolbarButtonSize, height: toolbarButtonSize)
                     .background {
                         Circle()
                             .fill(.white.opacity(0.08))
                     }
             }
             .buttonStyle(.plain)
+            .iPadHoverEffect(.highlight)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .background(.ultraThinMaterial)
+        .padding(.horizontal, layout.screenPadding)
+        .padding(.vertical, layout.spacing)
+        .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
+        .background(
+            LinearGradient(
+                colors: [
+                    Theme.CelestialColors.void.opacity(0.95),
+                    Theme.CelestialColors.void
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
     }
 
     // MARK: - Computed Properties

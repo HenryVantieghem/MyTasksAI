@@ -11,6 +11,8 @@ import SwiftUI
 
 struct CirclesContentView: View {
     // MARK: State
+    @Environment(\.responsiveLayout) private var layout
+
     private var friendService: FriendService { FriendService.shared }
     private var circleService: CircleService { CircleService.shared }
     @State private var showAddFriend = false
@@ -21,7 +23,7 @@ struct CirclesContentView: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 20) {
+            VStack(spacing: layout.spacing * 1.25) {
                 // Friend Requests Banner (if any pending)
                 if friendService.pendingCount > 0 {
                     friendRequestsBanner
@@ -43,10 +45,11 @@ struct CirclesContentView: View {
                     emptyStateView
                 }
 
-                Spacer(minLength: 120)
+                Spacer(minLength: layout.bottomSafeArea)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
+            .padding(.horizontal, layout.screenPadding)
+            .padding(.top, layout.spacing)
+            .maxWidthConstrained()
         }
         .sheet(isPresented: $showAddFriend) {
             AddFriendSheet()
@@ -57,6 +60,22 @@ struct CirclesContentView: View {
             CreateCircleSheet()
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
+        }
+        .onChange(of: showCreateCircle) { wasShowing, isShowing in
+            // Refresh circles when sheet is dismissed after creation
+            if wasShowing && !isShowing {
+                Task {
+                    try? await circleService.loadCircles()
+                }
+            }
+        }
+        .onChange(of: showJoinCircle) { wasShowing, isShowing in
+            // Refresh circles when join sheet is dismissed
+            if wasShowing && !isShowing {
+                Task {
+                    try? await circleService.loadCircles()
+                }
+            }
         }
         .sheet(isPresented: $showJoinCircle) {
             JoinCircleSheet()
@@ -286,7 +305,12 @@ struct CirclesContentView: View {
 
     private func loadData() async {
         isLoading = true
-        // Services handle their own data loading
+        do {
+            try await friendService.loadFriendships()
+            try await circleService.loadCircles()
+        } catch {
+            print("Error loading circles data: \(error)")
+        }
         isLoading = false
     }
 }

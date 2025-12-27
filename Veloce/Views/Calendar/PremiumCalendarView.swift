@@ -18,10 +18,12 @@ struct PremiumCalendarView: View {
 
     // MARK: State
     @State private var selectedTask: TaskItem?
+    @State private var showTaskDetailSheet = false
+    @State private var sheetDetent: PresentationDetent = .medium
     @State private var showQuickAdd = false
     @State private var quickAddDate: Date?
     @State private var showDatePicker = false
-    @State private var showTaskDetail = false
+    @State private var showNewTaskDetail = false
     @State private var newTaskForDetail: TaskItem?
     @State private var draggedTask: TaskItem?
     @State private var dragOffset: CGSize = .zero
@@ -63,35 +65,36 @@ struct PremiumCalendarView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(item: $selectedTask) { task in
-            LiquidGlassTaskDetailSheet(
-                task: task,
-                onComplete: {
-                    completeTask(task)
-                    selectedTask = nil
-                },
-                onDuplicate: {
-                    duplicateTask(task)
-                    selectedTask = nil
-                },
-                onSnooze: { date in
-                    snoozeTask(task, to: date)
-                    selectedTask = nil
-                },
-                onDelete: {
-                    deleteTask(task)
-                    selectedTask = nil
-                },
-                onSchedule: { date in
-                    rescheduleTask(task, to: date)
-                },
-                onStartTimer: { _ in
-                    selectedTask = nil
-                },
-                onDismiss: { selectedTask = nil }
-            )
-            .presentationDetents([.large])
-            .presentationDragIndicator(.visible)
+        // iOS-Native Slidable Bottom Sheet for Task Details
+        .slidableBottomSheet(
+            isPresented: $showTaskDetailSheet,
+            selectedDetent: $sheetDetent,
+            detents: [.fraction(0.25), .medium, .fraction(0.85), .large],
+            showDragIndicator: true,
+            cornerRadius: 32,
+            backgroundStyle: .celestial
+        ) {
+            if let task = selectedTask {
+                TaskDetailBottomSheet(
+                    task: task,
+                    onComplete: {
+                        completeTask(task)
+                    },
+                    onDuplicate: {
+                        duplicateTask(task)
+                    },
+                    onSnooze: { date in
+                        snoozeTask(task, to: date)
+                    },
+                    onDelete: {
+                        deleteTask(task)
+                    },
+                    onSchedule: { date in
+                        rescheduleTask(task, to: date)
+                    },
+                    onStartTimer: { _ in }
+                )
+            }
         }
         .sheet(isPresented: $showQuickAdd) {
             if let date = quickAddDate {
@@ -109,7 +112,7 @@ struct PremiumCalendarView: View {
                         modelContext.insert(task)
                         newTaskForDetail = task
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            showTaskDetail = true
+                            showNewTaskDetail = true
                         }
                     }
                 )
@@ -117,38 +120,42 @@ struct PremiumCalendarView: View {
                 .presentationDragIndicator(.visible)
             }
         }
-        .sheet(isPresented: $showTaskDetail) {
+        .slidableBottomSheet(
+            isPresented: $showNewTaskDetail,
+            selectedDetent: .constant(.large),
+            detents: [.medium, .large],
+            showDragIndicator: true,
+            cornerRadius: 32,
+            backgroundStyle: .celestial
+        ) {
             if let task = newTaskForDetail {
-                LiquidGlassTaskDetailSheet(
+                TaskDetailBottomSheet(
                     task: task,
                     onComplete: {
                         completeTask(task)
-                        showTaskDetail = false
                         newTaskForDetail = nil
                     },
                     onDuplicate: {},
                     onSnooze: { _ in },
                     onDelete: {
                         deleteTask(task)
-                        showTaskDetail = false
                         newTaskForDetail = nil
                     },
                     onSchedule: { date in
                         rescheduleTask(task, to: date)
                     },
-                    onStartTimer: { _ in },
-                    onDismiss: {
-                        showTaskDetail = false
-                        // Keep the task if it has a title
-                        if let task = newTaskForDetail, task.title.isEmpty {
-                            modelContext.delete(task)
-                        }
-                        newTaskForDetail = nil
-                        Task { await viewModel.loadData() }
-                    }
+                    onStartTimer: { _ in }
                 )
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
+            }
+        }
+        .onChange(of: showNewTaskDetail) { _, isPresented in
+            if !isPresented {
+                // Keep the task if it has a title
+                if let task = newTaskForDetail, task.title.isEmpty {
+                    modelContext.delete(task)
+                }
+                newTaskForDetail = nil
+                Task { await viewModel.loadData() }
             }
         }
     }
@@ -246,7 +253,11 @@ struct PremiumCalendarView: View {
                 date: viewModel.selectedDate,
                 tasks: viewModel.tasks(for: viewModel.selectedDate),
                 events: viewModel.events(for: viewModel.selectedDate),
-                onTaskTap: { task in selectedTask = task },
+                onTaskTap: { task in
+                    selectedTask = task
+                    sheetDetent = .medium
+                    showTaskDetailSheet = true
+                },
                 onTimeSlotTap: { date in
                     quickAddDate = date
                     showQuickAdd = true
@@ -280,7 +291,11 @@ struct PremiumCalendarView: View {
                 weekDates: currentWeekDates,
                 tasks: viewModel.scheduledTasks,
                 events: viewModel.events,
-                onTaskTap: { task in selectedTask = task },
+                onTaskTap: { task in
+                    selectedTask = task
+                    sheetDetent = .medium
+                    showTaskDetailSheet = true
+                },
                 onTimeSlotTap: { date in
                     quickAddDate = date
                     showQuickAdd = true
@@ -348,6 +363,8 @@ struct PremiumCalendarView: View {
     private func upcomingTaskCard(_ task: TaskItem) -> some View {
         Button {
             selectedTask = task
+            sheetDetent = .medium
+            showTaskDetailSheet = true
         } label: {
             HStack(spacing: 10) {
                 RoundedRectangle(cornerRadius: 3)

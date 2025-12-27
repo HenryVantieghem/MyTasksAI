@@ -369,6 +369,164 @@ final class HapticsService {
         playCustomPattern(.aiComplete)
     }
 
+    // MARK: - ✨ Ultra-Premium Haptic Patterns
+
+    /// Dopamine burst - The ultimate task completion feeling
+    /// A euphoric cascade that feels like pure accomplishment
+    func dopamineBurst() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.dopamineBurst)
+    }
+
+    /// Magnetic snap - Satisfying lock-in feeling for selections
+    /// Like snapping a magnetic piece perfectly into place
+    func magneticSnap() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.rigid)
+            return
+        }
+        playCustomPattern(.magneticSnap)
+    }
+
+    /// Cosmic pulse - Deep resonant pulse for major achievements
+    /// A wave of energy that radiates outward
+    func cosmicPulse() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.cosmicPulse)
+    }
+
+    /// Starburst ascend - Rising success pattern for level ups
+    /// Energy builds and explodes upward
+    func starburstAscend() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.starburstAscend)
+    }
+
+    /// Gravity drop - Satisfying weight drop for confirmations
+    /// Like dropping something heavy and solid
+    func gravityDrop() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.heavy)
+            return
+        }
+        playCustomPattern(.gravityDrop)
+    }
+
+    /// Sparkle cascade - Gentle cascading sparkles for delightful moments
+    /// Light touches that dance across the senses
+    func sparkleCascade() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.light)
+            return
+        }
+        playCustomPattern(.sparkleCascade)
+    }
+
+    /// Heartbeat pulse - Rhythmic pulse for streaks and momentum
+    /// A living, breathing feeling of progress
+    func heartbeatPulse() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.medium)
+            return
+        }
+        playCustomPattern(.heartbeatPulse)
+    }
+
+    /// Whoosh glide - Smooth transition feeling for navigation
+    /// Like air rushing past during movement
+    func whooshGlide() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.soft)
+            return
+        }
+        playCustomPattern(.whooshGlide)
+    }
+
+    /// Electric surge - Quick energy burst for power-ups and boosts
+    /// Sharp electricity coursing through
+    func electricSurge() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.rigid)
+            return
+        }
+        playCustomPattern(.electricSurge)
+    }
+
+    /// Ripple wave - Expanding wave for notifications and alerts
+    /// A wave that radiates outward from center
+    func rippleWave() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.warning)
+            return
+        }
+        playCustomPattern(.rippleWave)
+    }
+
+    // MARK: - Premium Interaction Patterns
+
+    /// Button press - Satisfying immediate feedback
+    func premiumButtonPress() {
+        guard hapticsEnabled else { return }
+        impact(.medium)
+    }
+
+    /// Button release with bounce
+    func premiumButtonRelease() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.light)
+            return
+        }
+        playDynamicPattern(intensity: 0.3, sharpness: 0.8)
+    }
+
+    /// Sheet presentation with elegant weight
+    func sheetPresent() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.medium)
+            return
+        }
+        playCustomPattern(.sheetPresent)
+    }
+
+    /// Sheet dismissal with satisfying close
+    func sheetDismiss() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.light)
+            return
+        }
+        playDynamicPattern(intensity: 0.5, sharpness: 0.4)
+    }
+
+    /// Threshold crossed - For swipe actions and pull-to-refresh
+    func thresholdCrossed() {
+        guard hapticsEnabled else { return }
+        impact(.rigid)
+    }
+
+    /// Scroll snap - For paginated scrolling
+    func scrollSnap() {
+        guard hapticsEnabled else { return }
+        selectionFeedback()
+    }
+
+    /// Long press recognized
+    func longPressRecognized() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.heavy)
+            return
+        }
+        playCustomPattern(.longPressRecognized)
+    }
+
     // MARK: - Gamification Haptics
 
     /// Combo increase - rising intensity based on combo level
@@ -492,6 +650,19 @@ final class HapticsService {
         case achievementSecret
         case questComplete
         case milestone
+        // ✨ Ultra-Premium patterns
+        case dopamineBurst
+        case magneticSnap
+        case cosmicPulse
+        case starburstAscend
+        case gravityDrop
+        case sparkleCascade
+        case heartbeatPulse
+        case whooshGlide
+        case electricSurge
+        case rippleWave
+        case sheetPresent
+        case longPressRecognized
 
         var events: [CHHapticEvent] {
             switch self {
@@ -809,6 +980,271 @@ final class HapticsService {
                         CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
                         CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
                     ], relativeTime: 0.5)
+                ]
+
+            // MARK: ✨ Ultra-Premium Patterns
+
+            case .dopamineBurst:
+                // The ultimate task completion - euphoric cascade
+                // Builds anticipation → explosive climax → satisfying fade
+                return [
+                    // Anticipation build
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0, duration: 0.08),
+                    // First spark
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.08),
+                    // Growing energy
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.12),
+                    // CLIMAX - The dopamine hit
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.16),
+                    // Resonant afterglow
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0.2, duration: 0.15),
+                    // Final sparkle
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.38)
+                ]
+
+            case .magneticSnap:
+                // Satisfying lock-in - like magnets clicking together
+                return [
+                    // Approach tension
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.15),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0, duration: 0.05),
+                    // SNAP - Sharp satisfying click
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.95),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+                    ], relativeTime: 0.05),
+                    // Tiny settle bounce
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.1)
+                ]
+
+            case .cosmicPulse:
+                // Deep resonant pulse - a wave of energy
+                return [
+                    // Deep bass rumble start
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.1)
+                    ], relativeTime: 0, duration: 0.25),
+                    // Wave peak
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.12),
+                    // Resonance fade
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.15)
+                    ], relativeTime: 0.28, duration: 0.2)
+                ]
+
+            case .starburstAscend:
+                // Rising energy that explodes - for level ups
+                return [
+                    // Building energy (low to high)
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.05),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.55),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.1),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.14),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.85),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.75)
+                    ], relativeTime: 0.17),
+                    // BURST - The explosion
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+                    ], relativeTime: 0.2),
+                    // Starburst scatter
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.22, duration: 0.18)
+                ]
+
+            case .gravityDrop:
+                // Heavy satisfying drop - for confirmations
+                return [
+                    // Weightless moment
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.1),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0),
+                    // IMPACT - Heavy landing
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.08),
+                    // Ground shake
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.15)
+                    ], relativeTime: 0.1, duration: 0.12),
+                    // Settle bounce
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0.24)
+                ]
+
+            case .sparkleCascade:
+                // Gentle cascading sparkles - delightful moments
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.85)
+                    ], relativeTime: 0.06),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.95)
+                    ], relativeTime: 0.11),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.15),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0.18),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.22),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.88)
+                    ], relativeTime: 0.24)
+                ]
+
+            case .heartbeatPulse:
+                // Rhythmic pulse - living, breathing progress
+                return [
+                    // First beat (lub)
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0),
+                    // Second beat (dub)
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.35)
+                    ], relativeTime: 0.12)
+                ]
+
+            case .whooshGlide:
+                // Smooth transition - air rushing past
+                return [
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.15),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0, duration: 0.1),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.05, duration: 0.08),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.1),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.12, duration: 0.06)
+                ]
+
+            case .electricSurge:
+                // Quick sharp electricity - power-ups
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.95)
+                    ], relativeTime: 0.03),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+                    ], relativeTime: 0.06),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.1)
+                ]
+
+            case .rippleWave:
+                // Expanding wave - notifications
+                return [
+                    // Center impact
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0),
+                    // First ripple
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.35),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.08, duration: 0.1),
+                    // Second ripple
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.25)
+                    ], relativeTime: 0.2, duration: 0.1)
+                ]
+
+            case .sheetPresent:
+                // Elegant sheet presentation with weight
+                return [
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0),
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.05, duration: 0.12)
+                ]
+
+            case .longPressRecognized:
+                // Long press recognition - satisfying confirm
+                return [
+                    // Initial hold feedback
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0, duration: 0.1),
+                    // Recognition pop
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.85),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.1)
                 ]
 
             }

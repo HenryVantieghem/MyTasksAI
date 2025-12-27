@@ -11,34 +11,44 @@ import Speech
 
 // MARK: - Task Input Bar Metrics
 
-private enum TaskInputBarMetrics {
-    static let baseHeight: CGFloat = 52
-    static let expandedHeight: CGFloat = 72
-    static let horizontalPadding: CGFloat = 16
-    static let cornerRadius: CGFloat = 26
-    static let buttonSize: CGFloat = 38
-    static let sendButtonSize: CGFloat = 42
-    static let iconSize: CGFloat = 16
-    static let micIconSize: CGFloat = 18
+/// Responsive metrics that scale based on device type
+struct TaskInputBarMetrics {
+    let layout: ResponsiveLayout
+
+    var baseHeight: CGFloat {
+        layout.deviceType.isTablet ? 60 : 52
+    }
+
+    var expandedHeight: CGFloat {
+        layout.deviceType.isTablet ? 84 : 72
+    }
+
+    var horizontalPadding: CGFloat {
+        layout.screenPadding
+    }
+
+    var cornerRadius: CGFloat {
+        layout.deviceType.isTablet ? 30 : 26
+    }
+
+    var buttonSize: CGFloat {
+        layout.deviceType.isTablet ? 46 : 38
+    }
+
+    var sendButtonSize: CGFloat {
+        layout.deviceType.isTablet ? 50 : 42
+    }
+
+    var iconSize: CGFloat {
+        layout.deviceType.isTablet ? 18 : 16
+    }
+
+    var micIconSize: CGFloat {
+        layout.deviceType.isTablet ? 20 : 18
+    }
 }
 
-// MARK: - Quick Add Template
-
-struct QuickAddTemplate: Identifiable, Equatable {
-    let id = UUID()
-    let title: String
-    let icon: String
-    let color: Color
-
-    static let defaults: [QuickAddTemplate] = [
-        QuickAddTemplate(title: "Email", icon: "envelope.fill", color: Theme.Colors.aiBlue),
-        QuickAddTemplate(title: "Call", icon: "phone.fill", color: Theme.Colors.aiGreen),
-        QuickAddTemplate(title: "Meeting", icon: "person.2.fill", color: Theme.Colors.aiPurple),
-        QuickAddTemplate(title: "Review", icon: "doc.text.fill", color: Theme.Colors.aiOrange),
-        QuickAddTemplate(title: "Exercise", icon: "figure.run", color: Theme.Colors.aiCyan),
-        QuickAddTemplate(title: "Shopping", icon: "cart.fill", color: Theme.Colors.aiPink)
-    ]
-}
+// Note: QuickAddTemplate is defined in ActionTray.swift
 
 // MARK: - Task Input Bar
 
@@ -48,6 +58,14 @@ struct TaskInputBar: View {
 
     var onSubmit: (String) -> Void
     var onVoiceInput: (() -> Void)? = nil
+
+    // Responsive layout
+    @Environment(\.responsiveLayout) private var layout
+
+    // Responsive metrics computed from layout
+    private var metrics: TaskInputBarMetrics {
+        TaskInputBarMetrics(layout: layout)
+    }
 
     // Voice recording service
     private var voiceService: VoiceRecordingService { VoiceRecordingService.shared }
@@ -197,17 +215,23 @@ struct TaskInputBar: View {
                 }
             }
         }
-        .padding(.horizontal, TaskInputBarMetrics.horizontalPadding)
+        .padding(.horizontal, metrics.horizontalPadding)
         .padding(.vertical, isFocused.wrappedValue ? 14 : 8)
-        .frame(minHeight: isFocused.wrappedValue ? TaskInputBarMetrics.expandedHeight : TaskInputBarMetrics.baseHeight)
+        .frame(minHeight: isFocused.wrappedValue ? metrics.expandedHeight : metrics.baseHeight)
         .background { inputBackground }
         .overlay { inputBorder }
+        // Premium glow effect when focused or has content
+        .premiumGlowCapsule(
+            style: canSend ? .aiAccent : .iridescent,
+            intensity: isFocused.wrappedValue ? .subtle : .whisper,
+            animated: !reduceMotion
+        )
         .shadow(
             color: canSend
                 ? Theme.Colors.aiPurple.opacity(0.35)
-                : Color.black.opacity(0.15),
-            radius: isFocused.wrappedValue ? 20 : 12,
-            y: isFocused.wrappedValue ? 6 : 4
+                : Color.black.opacity(0.12),
+            radius: isFocused.wrappedValue ? 16 : 10,
+            y: isFocused.wrappedValue ? 4 : 3
         )
         // AI Processing shimmer overlay
         .overlay {
@@ -215,7 +239,7 @@ struct TaskInputBar: View {
                 aiProcessingOverlay
             }
         }
-        .padding(.horizontal, TaskInputBarMetrics.horizontalPadding)
+        .padding(.horizontal, metrics.horizontalPadding)
     }
 
     // MARK: - Input Background
@@ -302,8 +326,8 @@ struct TaskInputBar: View {
                         SwiftUI.Circle()
                             .stroke(Color.red.opacity(0.3 - Double(ring) * 0.1), lineWidth: 2)
                             .frame(
-                                width: TaskInputBarMetrics.buttonSize + CGFloat(ring) * 12,
-                                height: TaskInputBarMetrics.buttonSize + CGFloat(ring) * 12
+                                width: metrics.buttonSize + CGFloat(ring) * 12,
+                                height: metrics.buttonSize + CGFloat(ring) * 12
                             )
                             .scaleEffect(recordingPulse)
                             .opacity(Double(3 - ring) / 3)
@@ -314,7 +338,7 @@ struct TaskInputBar: View {
                 if isTranscribing && !reduceMotion {
                     SwiftUI.Circle()
                         .stroke(Theme.Colors.aiPurple.opacity(0.3), lineWidth: 2)
-                        .frame(width: TaskInputBarMetrics.buttonSize + 8, height: TaskInputBarMetrics.buttonSize + 8)
+                        .frame(width: metrics.buttonSize + 8, height: metrics.buttonSize + 8)
                         .scaleEffect(recordingPulse)
                 }
 
@@ -324,17 +348,17 @@ struct TaskInputBar: View {
                         // Recording: solid red background
                         SwiftUI.Circle()
                             .fill(Color.red)
-                            .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                            .frame(width: metrics.buttonSize, height: metrics.buttonSize)
                     } else if isTranscribing {
                         // Transcribing: purple tinted
                         SwiftUI.Circle()
                             .fill(Theme.Colors.aiPurple.opacity(0.2))
-                            .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                            .frame(width: metrics.buttonSize, height: metrics.buttonSize)
                     } else {
                         // Default: subtle glass-like background
                         SwiftUI.Circle()
                             .fill(Color(.tertiarySystemFill))
-                            .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                            .frame(width: metrics.buttonSize, height: metrics.buttonSize)
                     }
                 }
 
@@ -342,19 +366,19 @@ struct TaskInputBar: View {
                 if isRecording {
                     SwiftUI.Circle()
                         .fill(Color.white.opacity(0.3))
-                        .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                        .frame(width: metrics.buttonSize, height: metrics.buttonSize)
                         .scaleEffect(0.3 + CGFloat(audioLevel) * 0.7)
                 }
 
                 // Icon based on state
                 if isTranscribing {
                     Image(systemName: "waveform")
-                        .font(.system(size: TaskInputBarMetrics.micIconSize, weight: .medium))
+                        .dynamicTypeFont(base: metrics.micIconSize, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiPurple)
                         .symbolEffect(.variableColor.iterative.reversing, options: .repeating)
                 } else {
                     Image(systemName: isRecording ? "stop.fill" : "mic.fill")
-                        .font(.system(size: TaskInputBarMetrics.micIconSize, weight: .medium))
+                        .dynamicTypeFont(base: metrics.micIconSize, weight: .medium)
                         .foregroundStyle(isRecording ? .white : .secondary)
                         .scaleEffect(isRecording ? 0.85 : 1.0)
                 }
@@ -383,9 +407,14 @@ struct TaskInputBar: View {
 
     // MARK: - Expanding Text Field
 
+    // Responsive text size for input
+    private var inputTextSize: CGFloat {
+        layout.deviceType.isTablet ? 18 : 16
+    }
+
     private var expandingTextField: some View {
         TextField("", text: $text, prompt: placeholderText, axis: .vertical)
-            .font(.system(size: 16, weight: .regular))
+            .font(.system(size: inputTextSize, weight: .regular))
             .foregroundStyle(.primary)
             .lineLimit(isFocused.wrappedValue ? 1...6 : 1...2)
             .focused(isFocused)
@@ -417,7 +446,7 @@ struct TaskInputBar: View {
 
     private var placeholderText: Text {
         Text("What's on your mind?")
-            .font(.system(size: 16, weight: .light))
+            .font(.system(size: inputTextSize, weight: .light))
             .italic()
             .foregroundStyle(.secondary.opacity(0.6))
     }
@@ -492,7 +521,7 @@ struct TaskInputBar: View {
                                 endPoint: .bottom
                             )
                     )
-                    .frame(width: TaskInputBarMetrics.buttonSize - 4, height: TaskInputBarMetrics.buttonSize - 4)
+                    .frame(width: metrics.buttonSize - 4, height: metrics.buttonSize - 4)
                     .overlay {
                         if aiModeEnabled {
                             SwiftUI.Circle()
@@ -566,15 +595,16 @@ struct TaskInputBar: View {
             ZStack {
                 SwiftUI.Circle()
                     .fill(Color.white.opacity(0.08))
-                    .frame(width: TaskInputBarMetrics.buttonSize, height: TaskInputBarMetrics.buttonSize)
+                    .frame(width: metrics.buttonSize, height: metrics.buttonSize)
 
                 Image(systemName: "bolt.fill")
-                    .font(.system(size: TaskInputBarMetrics.iconSize, weight: .medium))
+                    .dynamicTypeFont(base: metrics.iconSize, weight: .medium)
                     .foregroundStyle(.secondary)
             }
         }
         .buttonStyle(.plain)
         .contentShape(SwiftUI.Circle())
+        .iPadHoverEffect(.highlight)
         .accessibilityLabel("Quick add")
     }
 
@@ -590,7 +620,7 @@ struct TaskInputBar: View {
                 if !reduceMotion {
                     SwiftUI.Circle()
                         .fill(Theme.AdaptiveColors.aiPrimary.opacity(0.4))
-                        .frame(width: 48, height: 48)
+                        .frame(width: metrics.sendButtonSize + 8, height: metrics.sendButtonSize + 8)
                         .blur(radius: 8)
                         .scaleEffect(sendPulse)
                 }
@@ -598,7 +628,7 @@ struct TaskInputBar: View {
                 // Main button with gradient
                 SwiftUI.Circle()
                     .fill(Theme.AdaptiveColors.aiGradient)
-                    .frame(width: 38, height: 38)
+                    .frame(width: metrics.sendButtonSize - 4, height: metrics.sendButtonSize - 4)
                     .overlay {
                         // Subtle inner highlight for depth
                         SwiftUI.Circle()
@@ -607,18 +637,25 @@ struct TaskInputBar: View {
                                     colors: [Color.white.opacity(0.3), Color.clear],
                                     center: UnitPoint(x: 0.3, y: 0.3),
                                     startRadius: 0,
-                                    endRadius: 16
+                                    endRadius: (metrics.sendButtonSize - 4) / 2.4
                                 )
                             )
                     }
+                    // Premium iridescent glow ring
+                    .premiumGlowCircle(
+                        style: .aiAccent,
+                        intensity: .subtle,
+                        animated: !reduceMotion
+                    )
 
                 // Arrow icon
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 16, weight: .bold))
+                    .dynamicTypeFont(base: metrics.iconSize, weight: .bold)
                     .foregroundStyle(.white)
             }
         }
         .buttonStyle(OrbButtonStyle())
+        .iPadHoverEffect(.lift)
         .accessibilityLabel("Send task")
     }
 
@@ -945,6 +982,23 @@ struct TaskInputBar: View {
                         isAIEnhancing = false
                         HapticsService.shared.success()
                     }
+
+                // Extended actions - placeholder implementations
+                case .smartSchedule, .findSimilar, .autoTag, .summarize:
+                    await MainActor.run {
+                        categoryText = action.rawValue
+                        isAIEnhancing = false
+                        withAnimation(Theme.Animation.springBouncy) {
+                            showCategoryBadge = true
+                        }
+                        HapticsService.shared.success()
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation(Theme.Animation.spring) {
+                                showCategoryBadge = false
+                            }
+                        }
+                    }
                 }
             } catch {
                 await MainActor.run {
@@ -1018,162 +1072,7 @@ struct TaskInputBar: View {
     }
 }
 
-// MARK: - AI Enhance Action
-
-enum AIEnhanceAction: String, CaseIterable, Identifiable {
-    case enhance = "Enhance"
-    case estimateTime = "Estimate Time"
-    case categorize = "Categorize"
-    case breakDown = "Break Down"
-
-    var id: String { rawValue }
-
-    var icon: String {
-        switch self {
-        case .enhance: return "wand.and.stars"
-        case .estimateTime: return "clock"
-        case .categorize: return "tag"
-        case .breakDown: return "list.bullet.indent"
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .enhance: return "Rewrite to be clearer"
-        case .estimateTime: return "Add time estimate"
-        case .categorize: return "Assess priority"
-        case .breakDown: return "Split into sub-tasks"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .enhance: return Theme.Colors.aiPurple
-        case .estimateTime: return Theme.Colors.aiBlue
-        case .categorize: return Theme.Colors.aiOrange
-        case .breakDown: return Theme.Colors.aiCyan
-        }
-    }
-}
-
-// MARK: - AI Enhance Sheet
-
-struct AIEnhanceSheet: View {
-    @Binding var text: String
-    @Binding var isProcessing: Bool
-    let onEnhance: (AIEnhanceAction) -> Void
-    let onDismiss: () -> Void
-
-    @State private var selectedAction: AIEnhanceAction?
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                // Preview of current text
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Your task")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(.secondary)
-
-                    Text(text)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundStyle(.primary)
-                        .lineLimit(3)
-                        .padding(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.06))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
-                                }
-                        }
-                }
-                .padding(.horizontal)
-
-                // AI action buttons
-                VStack(spacing: 12) {
-                    ForEach(AIEnhanceAction.allCases) { action in
-                        Button {
-                            selectedAction = action
-                            HapticsService.shared.selectionFeedback()
-                            onEnhance(action)
-                        } label: {
-                            HStack(spacing: 14) {
-                                // Icon
-                                ZStack {
-                                    SwiftUI.Circle()
-                                        .fill(action.color.opacity(0.15))
-                                        .frame(width: 44, height: 44)
-
-                                    Image(systemName: action.icon)
-                                        .font(.system(size: 18, weight: .medium))
-                                        .foregroundStyle(action.color)
-                                }
-
-                                // Text
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(action.rawValue)
-                                        .font(.system(size: 16, weight: .semibold))
-                                        .foregroundStyle(.primary)
-
-                                    Text(action.description)
-                                        .font(.system(size: 13, weight: .regular))
-                                        .foregroundStyle(.secondary)
-                                }
-
-                                Spacer()
-
-                                // Arrow or spinner
-                                if isProcessing && selectedAction == action {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                        .tint(action.color)
-                                } else {
-                                    Image(systemName: "chevron.right")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .foregroundStyle(.tertiary)
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background {
-                                RoundedRectangle(cornerRadius: 14)
-                                    .fill(Color.white.opacity(0.04))
-                                    .overlay {
-                                        RoundedRectangle(cornerRadius: 14)
-                                            .stroke(
-                                                selectedAction == action
-                                                    ? action.color.opacity(0.4)
-                                                    : Color.white.opacity(0.08),
-                                                lineWidth: selectedAction == action ? 1.5 : 0.5
-                                            )
-                                    }
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(isProcessing)
-                    }
-                }
-                .padding(.horizontal)
-
-                Spacer()
-            }
-            .padding(.top, 20)
-            .navigationTitle("AI Enhance")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Cancel") {
-                        onDismiss()
-                    }
-                    .foregroundStyle(Theme.Colors.aiPurple)
-                }
-            }
-        }
-    }
-}
+// Note: AIEnhanceAction and AIEnhanceSheet are defined in AIActionsTray.swift
 
 // MARK: - Orb Button Style
 
@@ -1185,100 +1084,7 @@ private struct OrbButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Quick Add Sheet
-
-struct QuickAddSheet: View {
-    @Binding var templates: [QuickAddTemplate]
-    let onSelect: (QuickAddTemplate) -> Void
-    let onAddCustom: () -> Void
-
-    @State private var editMode: EditMode = .inactive
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    ForEach(templates) { template in
-                        Button {
-                            onSelect(template)
-                        } label: {
-                            HStack(spacing: 14) {
-                                // Icon circle
-                                ZStack {
-                                    SwiftUI.Circle()
-                                        .fill(template.color.opacity(0.15))
-                                        .frame(width: 40, height: 40)
-
-                                    Image(systemName: template.icon)
-                                        .font(.system(size: 16, weight: .medium))
-                                        .foregroundStyle(template.color)
-                                }
-
-                                Text(template.title)
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundStyle(.primary)
-
-                                Spacer()
-
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 20))
-                                    .foregroundStyle(template.color.opacity(0.6))
-                            }
-                            .padding(.vertical, 4)
-                        }
-                        .listRowBackground(Color.clear)
-                    }
-                    .onDelete { indexSet in
-                        templates.remove(atOffsets: indexSet)
-                        HapticsService.shared.lightImpact()
-                    }
-                } header: {
-                    Text("Quick Tasks")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                }
-
-                Section {
-                    Button {
-                        onAddCustom()
-                    } label: {
-                        HStack(spacing: 14) {
-                            ZStack {
-                                SwiftUI.Circle()
-                                    .fill(Theme.Colors.aiPurple.opacity(0.15))
-                                    .frame(width: 40, height: 40)
-
-                                Image(systemName: "pencil")
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundStyle(Theme.Colors.aiPurple)
-                            }
-
-                            Text("Add Custom Task")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(Theme.Colors.aiPurple)
-
-                            Spacer()
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .listRowBackground(Color.clear)
-                }
-            }
-            .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
-            .background(.ultraThinMaterial)
-            .navigationTitle("Quick Add")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    EditButton()
-                        .foregroundStyle(Theme.Colors.aiPurple)
-                }
-            }
-            .environment(\.editMode, $editMode)
-        }
-    }
-}
+// Note: QuickAddSheet is defined in ActionTray.swift
 
 // MARK: - Preview
 

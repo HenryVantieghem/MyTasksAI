@@ -8,6 +8,32 @@
 
 import SwiftUI
 
+// MARK: - Flow Section
+
+enum FlowSection: String, CaseIterable {
+    case timer = "Timer"
+    case blocking = "Blocking"
+    case insights = "Insights"
+
+    var icon: String {
+        switch self {
+        case .timer: return "timer"
+        case .blocking: return "shield.lefthalf.filled"
+        case .insights: return "chart.bar.fill"
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .timer: return Theme.Colors.aiAmber
+        case .blocking: return Theme.Colors.aiCyan
+        case .insights: return Theme.Colors.aiPurple
+        }
+    }
+}
+
+// MARK: - Flow Section Toggle
+
 struct FlowSectionToggle: View {
     @Binding var selected: FlowSection
 

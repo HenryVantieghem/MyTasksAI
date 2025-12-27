@@ -14,6 +14,8 @@ import UserNotifications
 
 struct PermissionsView: View {
     @Bindable var viewModel: OnboardingViewModel
+    @Environment(\.responsiveLayout) private var layout
+
     @State private var showContent = false
     @State private var notificationCardVisible = false
     @State private var calendarCardVisible = false
@@ -22,7 +24,7 @@ struct PermissionsView: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: Aurora.Layout.spacingXL) {
+            VStack(spacing: layout.spacing * 1.5) {
                 // Enhanced header
                 enhancedHeaderSection
                     .opacity(showContent ? 1 : 0)
@@ -75,9 +77,10 @@ struct PermissionsView: View {
                     .opacity(privacyVisible ? 1 : 0)
                     .offset(y: privacyVisible ? 0 : 20)
 
-                Spacer(minLength: 100)
+                Spacer(minLength: layout.bottomSafeArea)
             }
-            .padding(Aurora.Layout.screenPadding)
+            .padding(layout.screenPadding)
+            .maxWidthConstrained()
         }
         .onAppear {
             startAnimations()
@@ -86,23 +89,32 @@ struct PermissionsView: View {
 
     // MARK: - Enhanced Header Section
 
+    // Responsive icon sizes
+    private var headerIconSize: CGFloat {
+        layout.deviceType.isTablet ? 100 : 80
+    }
+
+    private var headerGlowSize: CGFloat {
+        layout.deviceType.isTablet ? 110 : 90
+    }
+
     private var enhancedHeaderSection: some View {
-        VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: layout.spacing) {
             // Animated icon
             ZStack {
                 // Glow
                 SwiftUI.Circle()
                     .fill(Aurora.Colors.electric.opacity(0.2))
-                    .frame(width: 90, height: 90)
+                    .frame(width: headerGlowSize, height: headerGlowSize)
                     .blur(radius: 20)
                     .scaleEffect(iconPulse)
 
                 SwiftUI.Circle()
                     .fill(Aurora.Colors.cosmicElevated)
-                    .frame(width: 80, height: 80)
+                    .frame(width: headerIconSize, height: headerIconSize)
 
                 Image(systemName: "bell.badge")
-                    .font(.system(size: 40, weight: .light))
+                    .dynamicTypeFont(base: 40, weight: .light)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Aurora.Colors.electric, Aurora.Colors.cyan],
@@ -113,11 +125,11 @@ struct PermissionsView: View {
             }
 
             Text("Stay on Track")
-                .font(.system(size: 28, weight: .bold))
+                .dynamicTypeFont(base: 28, weight: .bold)
                 .foregroundStyle(Aurora.Colors.textPrimary)
 
             Text("Enable permissions to get the\nmost out of MyTasksAI")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16, weight: .regular)
                 .foregroundStyle(Aurora.Colors.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -126,33 +138,33 @@ struct PermissionsView: View {
     // MARK: - Enhanced Privacy Note
 
     private var enhancedPrivacyNote: some View {
-        HStack(spacing: Aurora.Layout.spacing) {
+        HStack(spacing: layout.spacing) {
             ZStack {
                 SwiftUI.Circle()
                     .fill(Aurora.Colors.success.opacity(0.1))
-                    .frame(width: 40, height: 40)
+                    .frame(width: layout.minTouchTarget, height: layout.minTouchTarget)
 
                 Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(Aurora.Colors.success)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Your Privacy Matters")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text("Your data stays on your device. We never sell your information.")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13, weight: .regular)
                     .foregroundStyle(Aurora.Colors.textSecondary)
             }
         }
-        .padding(Aurora.Layout.spacingLarge)
+        .padding(layout.cardPadding)
         .background(
-            RoundedRectangle(cornerRadius: Aurora.Radius.large)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Aurora.Colors.success.opacity(0.08))
                 .overlay(
-                    RoundedRectangle(cornerRadius: Aurora.Radius.large)
+                    RoundedRectangle(cornerRadius: 16)
                         .stroke(Aurora.Colors.success.opacity(0.2), lineWidth: 1)
                 )
         )
@@ -211,37 +223,47 @@ struct EnhancedPermissionCard: View {
     let status: String
     let onRequest: () -> Void
 
+    @Environment(\.responsiveLayout) private var layout
     @State private var isPressed = false
 
+    // Responsive icon sizes
+    private var iconSize: CGFloat {
+        layout.deviceType.isTablet ? 60 : 50
+    }
+
+    private var glowSize: CGFloat {
+        layout.deviceType.isTablet ? 72 : 60
+    }
+
     var body: some View {
-        VStack(spacing: Aurora.Layout.spacingLarge) {
-            HStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: layout.cardPadding) {
+            HStack(spacing: layout.spacing) {
                 // Icon with glow
                 ZStack {
                     if isEnabled {
                         SwiftUI.Circle()
                             .fill(iconColor.opacity(0.2))
-                            .frame(width: 60, height: 60)
+                            .frame(width: glowSize, height: glowSize)
                             .blur(radius: 10)
                     }
 
                     SwiftUI.Circle()
                         .fill(iconColor.opacity(0.15))
-                        .frame(width: 50, height: 50)
+                        .frame(width: iconSize, height: iconSize)
 
                     Image(systemName: icon)
-                        .font(.system(size: 22))
+                        .dynamicTypeFont(base: 22, weight: .medium)
                         .foregroundStyle(iconColor)
                 }
 
                 // Text
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.textPrimary)
 
                     Text(subtitle)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14, weight: .regular)
                         .foregroundStyle(Aurora.Colors.textSecondary)
                         .lineLimit(2)
                 }
@@ -258,7 +280,7 @@ struct EnhancedPermissionCard: View {
                         .frame(width: 10, height: 10)
 
                     Text(status)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(isEnabled ? Aurora.Colors.success : Aurora.Colors.textSecondary)
                 }
 
@@ -271,13 +293,13 @@ struct EnhancedPermissionCard: View {
                     } label: {
                         HStack(spacing: 6) {
                             Text("Enable")
-                                .font(.system(size: 15, weight: .semibold))
+                                .dynamicTypeFont(base: 15, weight: .semibold)
                             Image(systemName: "arrow.right")
-                                .font(.system(size: 12, weight: .bold))
+                                .dynamicTypeFont(base: 12, weight: .bold)
                         }
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
+                        .padding(.horizontal, layout.cardPadding)
+                        .padding(.vertical, layout.spacing)
                         .background(
                             LinearGradient(
                                 colors: [iconColor, iconColor.opacity(0.8)],
@@ -289,24 +311,25 @@ struct EnhancedPermissionCard: View {
                         .shadow(color: iconColor.opacity(0.3), radius: 8, y: 4)
                     }
                     .buttonStyle(.plain)
+                    .iPadHoverEffect(.lift)
                     .scaleEffect(isPressed ? 0.95 : 1.0)
                 } else {
                     HStack(spacing: 6) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 22))
+                            .dynamicTypeFont(base: 22, weight: .medium)
                         Text("Done")
-                            .font(.system(size: 15, weight: .medium))
+                            .dynamicTypeFont(base: 15, weight: .medium)
                     }
                     .foregroundStyle(Aurora.Colors.success)
                 }
             }
         }
-        .padding(Aurora.Layout.spacingXL)
+        .padding(layout.cardPadding * 1.25)
         .background(
-            RoundedRectangle(cornerRadius: Aurora.Radius.xl)
+            RoundedRectangle(cornerRadius: 20)
                 .fill(Aurora.Colors.cosmicSurface)
                 .overlay(
-                    RoundedRectangle(cornerRadius: Aurora.Radius.xl)
+                    RoundedRectangle(cornerRadius: 20)
                         .stroke(
                             isEnabled ? iconColor.opacity(0.4) : Aurora.Colors.glassBorder,
                             lineWidth: isEnabled ? 2 : 1

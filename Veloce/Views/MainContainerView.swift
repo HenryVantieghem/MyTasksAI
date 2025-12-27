@@ -20,6 +20,8 @@ typealias MainTab = AppTab
 struct MainContainerView: View {
     @Environment(AppViewModel.self) private var appViewModel
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.responsiveLayout) private var layout
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     // Tab state - using AppTab enum for navigation
     @State private var selectedTab: AppTab = .tasks
@@ -39,9 +41,10 @@ struct MainContainerView: View {
     @State private var taskInputText = ""
     @FocusState private var isTaskInputFocused: Bool
 
-    // Task card state (managed at container level to overlay everything)
+    // Task card state (managed at container level)
     @State private var selectedTask: TaskItem?
-    @State private var showCelestialCard = false
+    @State private var showTaskDetailSheet = false
+    @State private var sheetDetent: PresentationDetent = .medium
 
     // Computed property for greeting context
     private var completedTasksToday: Int {
@@ -75,21 +78,21 @@ struct MainContainerView: View {
                         }
                     )
                         .safeAreaInset(edge: .bottom, spacing: 0) {
-                            // Premium Claude-inspired input bar
+                            // Premium Floating Island input bar
                             VStack(spacing: 0) {
-                                TaskInputBar(
+                                TaskInputBarV2(
                                     text: $taskInputText,
                                     isFocused: $isTaskInputFocused,
                                     onSubmit: { taskText in
                                         createTaskFromInput(taskText)
                                     },
                                     onVoiceInput: {
-                                        // Voice recording handled internally by TaskInputBar
+                                        // Voice recording handled internally by TaskInputBarV2
                                     }
                                 )
-                                // Spacer for tab bar height
+                                // Spacer for tab bar height - responsive to device
                                 Spacer()
-                                    .frame(height: 90)
+                                    .frame(height: layout.bottomSafeArea)
                             }
                         }
                 }
@@ -128,59 +131,51 @@ struct MainContainerView: View {
                         friendsOnlineCount: 0, // TODO: Wire to real data from CirclesService
                         hasNotifications: false
                     )
-                    .padding(.leading, Veloce.Spacing.screenPadding)
-                    .padding(.top, 60) // Below status bar and header
+                    .padding(.leading, layout.screenPadding)
+                    .padding(.top, layout.headerHeight + 12) // Below status bar and header, responsive
                     Spacer()
                 }
                 Spacer()
             }
             .zIndex(50)
 
-            // Unified Liquid Glass Task Detail Sheet - at container level to cover everything
-            if showCelestialCard, let task = selectedTask {
-                LiquidGlassTaskDetailSheet(
+        }
+        // iOS-Native Slidable Bottom Sheet for Task Details
+        .slidableBottomSheet(
+            isPresented: $showTaskDetailSheet,
+            selectedDetent: $sheetDetent,
+            detents: [.fraction(0.25), .medium, .fraction(0.85), .large],
+            showDragIndicator: true,
+            cornerRadius: 32,
+            backgroundStyle: .celestial
+        ) {
+            if let task = selectedTask {
+                TaskDetailBottomSheet(
                     task: task,
                     onComplete: {
                         chatTasksViewModel.taskDidComplete(task)
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            showCelestialCard = false
-                        }
                     },
                     onDuplicate: {
                         chatTasksViewModel.taskDidDuplicate(task)
                     },
                     onSnooze: { snoozeDate in
-                        // Update task scheduled time for snooze
                         task.scheduledTime = snoozeDate
                         task.updatedAt = Date()
                         chatTasksViewModel.taskDidSnooze(task)
                     },
                     onDelete: {
                         chatTasksViewModel.taskDidDelete(task)
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            showCelestialCard = false
-                        }
                     },
                     onSchedule: { scheduledDate in
                         chatTasksViewModel.updateTask(task, scheduledTime: scheduledDate)
                     },
                     onStartTimer: { taskItem in
-                        // Dismiss sheet then navigate to focus tab
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            showCelestialCard = false
-                        }
+                        showTaskDetailSheet = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             selectedTab = .flow
                         }
-                    },
-                    onDismiss: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            showCelestialCard = false
-                        }
                     }
                 )
-                .transition(.opacity)
-                .zIndex(100)
             }
         }
         .safeAreaInset(edge: .top) {
@@ -260,10 +255,9 @@ struct MainContainerView: View {
 
     private func presentTaskCard(_ task: TaskItem) {
         selectedTask = task
+        sheetDetent = .medium
+        showTaskDetailSheet = true
         HapticsService.shared.selectionFeedback()
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-            showCelestialCard = true
-        }
     }
 
     private func setupViewModels() {

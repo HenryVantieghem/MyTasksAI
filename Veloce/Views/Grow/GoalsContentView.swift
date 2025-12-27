@@ -13,6 +13,7 @@ struct GoalsContentView: View {
     let goals: [Goal]
     @Bindable var goalsVM: GoalsViewModel
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.responsiveLayout) private var layout
 
     @State private var showGoalCreation = false
     @State private var selectedGoal: Goal?
@@ -35,9 +36,23 @@ struct GoalsContentView: View {
     private var activeCount: Int { goals.filter { !$0.isCompleted }.count }
     private var completedCount: Int { goals.filter { $0.isCompleted }.count }
 
+    // Adaptive columns for iPad goals grid
+    private var goalsColumns: [GridItem] {
+        let columnCount: Int
+        switch layout.deviceType {
+        case .iPhoneSE, .iPhoneStandard, .iPhoneProMax:
+            columnCount = 1
+        case .iPadMini, .iPad:
+            columnCount = 2
+        case .iPadPro11, .iPadPro13:
+            columnCount = layout.isLandscape ? 3 : 2
+        }
+        return Array(repeating: GridItem(.flexible(), spacing: layout.spacing), count: columnCount)
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
+            VStack(spacing: layout.spacing * 1.5) {
                 // Header with stats
                 headerSection
 
@@ -51,9 +66,10 @@ struct GoalsContentView: View {
                     goalsSection
                 }
 
-                Spacer(minLength: 120)
+                Spacer(minLength: layout.bottomSafeArea)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, layout.screenPadding)
+            .maxWidthConstrained()
         }
         .sheet(isPresented: $showGoalCreation) {
             GoalCreationSheet(goalsVM: goalsVM)
@@ -70,17 +86,22 @@ struct GoalsContentView: View {
 
     // MARK: - Header Section
 
+    // Responsive button size
+    private var addButtonSize: CGFloat {
+        layout.deviceType.isTablet ? 56 : 48
+    }
+
     private var headerSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: layout.spacing * 1.25) {
             // Title row
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Your Goals")
-                        .font(.system(size: 28, weight: .bold))
+                        .dynamicTypeFont(base: 28, weight: .bold)
                         .foregroundStyle(.white)
 
                     Text(headerSubtitle)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14, weight: .regular)
                         .foregroundStyle(.white.opacity(0.6))
                 }
 
@@ -98,17 +119,18 @@ struct GoalsContentView: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .frame(width: 48, height: 48)
+                            .frame(width: addButtonSize, height: addButtonSize)
                             .shadow(color: Theme.Colors.aiPurple.opacity(0.4), radius: 12, y: 4)
 
                         Image(systemName: "plus")
-                            .font(.system(size: 20, weight: .semibold))
+                            .dynamicTypeFont(base: 20, weight: .semibold)
                             .foregroundStyle(.white)
                     }
                 }
                 .buttonStyle(.plain)
+                .iPadHoverEffect(.lift)
             }
-            .padding(.top, 20)
+            .padding(.top, layout.spacing)
 
             // Stats cards
             if !goals.isEmpty {
@@ -196,21 +218,44 @@ struct GoalsContentView: View {
     // MARK: - Goals Section
 
     private var goalsSection: some View {
-        LazyVStack(spacing: 16) {
-            ForEach(Array(filteredGoals.enumerated()), id: \.element.id) { index, goal in
-                PremiumGoalCard(
-                    goal: goal,
-                    goalsVM: goalsVM,
-                    onTap: {
-                        selectedGoal = goal
+        // Use grid on iPad, list on iPhone
+        Group {
+            if layout.deviceType.isTablet {
+                LazyVGrid(columns: goalsColumns, spacing: layout.spacing) {
+                    ForEach(Array(filteredGoals.enumerated()), id: \.element.id) { index, goal in
+                        PremiumGoalCard(
+                            goal: goal,
+                            goalsVM: goalsVM,
+                            onTap: {
+                                selectedGoal = goal
+                            }
+                        )
+                        .offset(y: animateIn ? 0 : 30)
+                        .opacity(animateIn ? 1 : 0)
+                        .animation(
+                            .spring(response: 0.6, dampingFraction: 0.8).delay(0.15 + Double(index) * 0.05),
+                            value: animateIn
+                        )
                     }
-                )
-                .offset(y: animateIn ? 0 : 30)
-                .opacity(animateIn ? 1 : 0)
-                .animation(
-                    .spring(response: 0.6, dampingFraction: 0.8).delay(0.15 + Double(index) * 0.05),
-                    value: animateIn
-                )
+                }
+            } else {
+                LazyVStack(spacing: layout.spacing) {
+                    ForEach(Array(filteredGoals.enumerated()), id: \.element.id) { index, goal in
+                        PremiumGoalCard(
+                            goal: goal,
+                            goalsVM: goalsVM,
+                            onTap: {
+                                selectedGoal = goal
+                            }
+                        )
+                        .offset(y: animateIn ? 0 : 30)
+                        .opacity(animateIn ? 1 : 0)
+                        .animation(
+                            .spring(response: 0.6, dampingFraction: 0.8).delay(0.15 + Double(index) * 0.05),
+                            value: animateIn
+                        )
+                    }
+                }
             }
         }
     }

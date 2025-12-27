@@ -278,7 +278,7 @@ struct OracleTaskDetailSheet: View {
                 Capsule()
                     .fill(Theme.CelestialColors.auroraGreen.opacity(0.1))
             }
-            .glassEffect(.regular, in: Capsule())
+            .glassEffect(SwiftUI.Glass.regular, in: Capsule())
             .padding(.top, 60)
 
             Spacer()
@@ -2330,7 +2330,7 @@ struct OracleActionBar: View {
             Rectangle()
                 .fill(Theme.CelestialColors.voidDeep.opacity(0.6))
         }
-        .glassEffect(.regular, in: Rectangle())
+        .glassEffect(SwiftUI.Glass.regular, in: Rectangle())
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(Theme.CelestialColors.starDim.opacity(0.08))

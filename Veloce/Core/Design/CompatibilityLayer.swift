@@ -296,6 +296,172 @@ extension UIImpactFeedbackGenerator {
     }
 }
 
+// MARK: - GlassEffectContainer (iOS 26+)
+// Container that optimizes rendering of multiple glass elements and enables fluid morphing
+
+struct GlassEffectContainer<Content: View>: View {
+    let spacing: CGFloat
+    let content: Content
+
+    init(spacing: CGFloat = 12, @ViewBuilder content: () -> Content) {
+        self.spacing = spacing
+        self.content = content()
+    }
+
+    var body: some View {
+        // iOS 26+: Native GlassEffectContainer with optimized compositor
+        // Pre-iOS 26: Pass through with Group (morphing not available)
+        if #available(iOS 26.0, *) {
+            // Native implementation would use SwiftUI.GlassEffectContainer
+            // For now, Group passthrough maintains layout
+            Group {
+                content
+            }
+        } else {
+            Group {
+                content
+            }
+        }
+    }
+}
+
+// MARK: - GlassEffectStyle (iOS 26+)
+// Chainable style for glassEffect modifier
+
+struct GlassEffectStyle {
+    enum Variant {
+        case regular
+        case clear
+    }
+
+    let variant: Variant
+    let isInteractive: Bool
+
+    static var regular: GlassEffectStyle {
+        GlassEffectStyle(variant: .regular, isInteractive: false)
+    }
+
+    static var clear: GlassEffectStyle {
+        GlassEffectStyle(variant: .clear, isInteractive: false)
+    }
+
+    /// Makes the glass effect interactive (responds to touch)
+    func interactive(_ enabled: Bool = true) -> GlassEffectStyle {
+        GlassEffectStyle(variant: self.variant, isInteractive: enabled)
+    }
+}
+
+// MARK: - GlassEffect Modifier with Style
+
+extension View {
+    /// iOS 26: Applies Liquid Glass effect with specified style and shape
+    /// Pre-iOS 26: Fallback to ultraThinMaterial with border
+    @ViewBuilder
+    func glassEffect(_ style: GlassEffectStyle = .regular, in shape: some Shape = Capsule()) -> some View {
+        if #available(iOS 26.0, *) {
+            // Native glassEffect would go here
+            // self.glassEffect(style.variant == .regular ? .regular : .clear, in: shape)
+            self
+                .background(shape.fill(.ultraThinMaterial))
+                .overlay {
+                    shape.stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.2), .white.opacity(0.05)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+                }
+        } else {
+            self
+                .background(shape.fill(.ultraThinMaterial))
+                .overlay {
+                    shape.stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.2), .white.opacity(0.05)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+                }
+        }
+    }
+}
+
+// MARK: - Circle Shape for Convenience
+
+extension Shape where Self == Circle {
+    static var circle: Circle { Circle() }
+}
+
+// MARK: - GlassEffectID Modifier
+
+extension View {
+    /// iOS 26: Assigns an ID for glass morphing animations
+    /// Pre-iOS 26: No-op (morphing not supported)
+    @ViewBuilder
+    func glassEffectID<ID: Hashable>(_ id: ID, in namespace: Namespace.ID) -> some View {
+        if #available(iOS 26.0, *) {
+            // Native glassEffectID would go here
+            self.id(id)
+        } else {
+            self.id(id)
+        }
+    }
+}
+
+// MARK: - Sheet Morphing Transitions
+
+extension View {
+    /// iOS 26: Marks view as source for sheet morphing transition
+    /// Pre-iOS 26: No-op
+    @ViewBuilder
+    func matchedTransitionSource<ID: Hashable>(id: ID, in namespace: Namespace.ID) -> some View {
+        if #available(iOS 26.0, *) {
+            // Native matchedTransitionSource would go here
+            self
+        } else {
+            self
+        }
+    }
+}
+
+// MARK: - Navigation Transition Extension
+
+/// iOS 26 Navigation Transition type for sheet morphing
+struct NavigationZoomTransition {
+    let sourceID: AnyHashable
+    let namespace: Namespace.ID
+
+    static func zoom<ID: Hashable>(sourceID: ID, in namespace: Namespace.ID) -> NavigationZoomTransition {
+        NavigationZoomTransition(sourceID: sourceID, namespace: namespace)
+    }
+}
+
+extension View {
+    /// iOS 26: Applies zoom navigation transition from matched source
+    /// Pre-iOS 26: No-op (standard sheet transition)
+    @ViewBuilder
+    func navigationTransition(_ transition: NavigationZoomTransition) -> some View {
+        if #available(iOS 26.0, *) {
+            // Native navigationTransition(.zoom(sourceID:in:)) would go here
+            self
+        } else {
+            self
+        }
+    }
+}
+
+extension AnyTransition {
+    /// iOS 26: Zoom transition from source element
+    /// Pre-iOS 26: Standard opacity transition
+    static func zoom<ID: Hashable>(sourceID: ID, in namespace: Namespace.ID) -> AnyTransition {
+        .opacity
+    }
+}
+
 // MARK: - Glass Button Styles
 // NOTE: iOS 26+ provides native .glass and .glassProminent button styles
 // via the Liquid Glass design system. Use these directly:

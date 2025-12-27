@@ -28,7 +28,22 @@ struct LiquidGlassTaskDetailSheet: View {
     @State private var showDeleteConfirm = false
     @State private var showMoreMenu = false
 
+    // MARK: - Quick Action Pickers
+    @State private var showSchedulePicker = false
+    @State private var showDurationPicker = false
+    @State private var showRecurringPicker = false
+    @State private var showFriendPicker = false
+
+    // MARK: - Recurring State
+    @State private var selectedRecurringType: RecurringTypeExtended = .once
+    @State private var customRecurringDays: Set<Int> = []
+    @State private var recurringEndDate: Date? = nil
+
+    // MARK: - Namespace for Glass Animations
+    @Namespace private var quickActionNamespace
+
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         ZStack {
@@ -255,35 +270,112 @@ struct LiquidGlassTaskDetailSheet: View {
                 .fill(Theme.CelestialColors.starDim.opacity(0.15))
                 .frame(height: 1)
 
-            // Quick action pills
-            HStack(spacing: 10) {
-                // Duration pill
-                QuickActionPill(
-                    icon: "clock",
-                    text: viewModel.estimatedMinutes > 0 ? "\(viewModel.estimatedMinutes)m" : "Add",
-                    color: Theme.CelestialColors.nebulaCore,
-                    onTap: { viewModel.cycleDuration() }
-                )
+            // Quick Action Buttons - Interactive Snippets Design (WWDC 2025)
+            VStack(spacing: 12) {
+                // Time of Day Button
+                InteractiveSnippetButton(
+                    icon: "clock.fill",
+                    label: "Time of Day",
+                    value: task.scheduledTimeFormatted ?? "Not Set",
+                    accentColor: Theme.Colors.aiBlue
+                ) {
+                    HapticsService.shared.selectionFeedback()
+                    showSchedulePicker = true
+                }
 
-                // Schedule pill
-                QuickActionPill(
-                    icon: "calendar",
-                    text: task.scheduledDateFormatted ?? "Today",
-                    color: Theme.Colors.aiBlue,
-                    onTap: { viewModel.showSchedulePicker = true }
-                )
+                // Duration Button
+                InteractiveSnippetButton(
+                    icon: "timer",
+                    label: "Duration",
+                    value: viewModel.estimatedMinutes > 0 ? "\(viewModel.estimatedMinutes) min" : "Set Duration",
+                    accentColor: Theme.CelestialColors.nebulaCore
+                ) {
+                    HapticsService.shared.selectionFeedback()
+                    showDurationPicker = true
+                }
 
-                // Recurring pill
-                QuickActionPill(
-                    icon: "arrow.triangle.2.circlepath",
-                    text: task.recurring.displayName,
-                    color: Theme.Colors.aiAmber,
-                    onTap: { viewModel.cycleRecurring() }
-                )
+                // Recurring Button
+                InteractiveSnippetButton(
+                    icon: "arrow.trianglehead.2.clockwise.rotate.90",
+                    label: "Recurring",
+                    value: selectedRecurringType.displayName,
+                    accentColor: Theme.Colors.aiAmber
+                ) {
+                    HapticsService.shared.selectionFeedback()
+                    showRecurringPicker = true
+                }
             }
         }
         .padding(20)
         .glassCard()
+        // Schedule Picker Sheet
+        .sheet(isPresented: $showSchedulePicker) {
+            CalendarSchedulingSheet(task: task) { scheduledDate, duration in
+                task.scheduledTime = scheduledDate
+                task.estimatedMinutes = duration
+                viewModel.estimatedMinutes = duration
+                task.updatedAt = Date()
+                onSchedule(scheduledDate)
+
+                // Sync to Apple Calendar
+                Task {
+                    await syncToCalendar(date: scheduledDate, duration: duration)
+                }
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+        // Duration Picker Sheet
+        .sheet(isPresented: $showDurationPicker) {
+            DurationPickerSheet(
+                selectedDuration: viewModel.estimatedMinutes,
+                onSelect: { duration in
+                    viewModel.estimatedMinutes = duration
+                    task.estimatedMinutes = duration
+                    task.duration = duration
+                    task.updatedAt = Date()
+
+                    // Update calendar event if exists
+                    if let eventId = task.calendarEventId {
+                        Task {
+                            await CalendarService.shared.updateEvent(
+                                eventId: eventId,
+                                title: nil,
+                                startDate: nil,
+                                duration: duration
+                            )
+                        }
+                    }
+
+                    showDurationPicker = false
+                    HapticsService.shared.successFeedback()
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(.ultraThinMaterial)
+        }
+        // Recurring Picker Sheet
+        .sheet(isPresented: $showRecurringPicker) {
+            RecurringPickerSheet(
+                selectedType: $selectedRecurringType,
+                customDays: $customRecurringDays,
+                endDate: $recurringEndDate,
+                onSave: {
+                    task.setRecurringExtended(
+                        type: selectedRecurringType,
+                        customDays: customRecurringDays.isEmpty ? nil : customRecurringDays,
+                        endDate: recurringEndDate
+                    )
+                    task.updatedAt = Date()
+                    showRecurringPicker = false
+                    HapticsService.shared.successFeedback()
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(.ultraThinMaterial)
+        }
     }
 
     // MARK: - Sub-tasks Section
@@ -424,176 +516,625 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - AI Genius Section (Perplexity Powered)
 
     private var aiGeniusSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
             // Header with sparkle
-            HStack {
+            aiGeniusHeader
+
+            // Context Input Section
+            aiContextInputSection
+
+            // Loading or Content
+            if viewModel.isLoadingAI {
+                aiLoadingState
+            } else {
+                VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
+                    // AI Advice Card
+                    if !viewModel.aiAdvice.isEmpty {
+                        aiAdviceCard
+                    }
+
+                    // Web Sources (Inline Link Chips)
+                    if !viewModel.aiWebSources.isEmpty {
+                        aiWebSourcesSection
+                    }
+
+                    // YouTube Resources
+                    if !viewModel.aiYouTubeResources.isEmpty {
+                        aiYouTubeSection
+                    }
+
+                    // Time Estimate & Best Time Cards
+                    aiTimeEstimateCards
+
+                    // AI Suggested Sub-tasks
+                    if !viewModel.aiSuggestedSubTasks.isEmpty {
+                        aiSuggestedSubTasksSection
+                    }
+
+                    // AI Prompt Section
+                    aiPromptSection
+                }
+            }
+
+            // Error Display
+            if let error = viewModel.aiError {
+                aiErrorCard(error)
+            }
+        }
+        .padding(20)
+        .glassCard(accent: Theme.CelestialColors.nebulaCore)
+    }
+
+    // MARK: - AI Genius Header
+
+    private var aiGeniusHeader: some View {
+        HStack {
+            HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "sparkles")
                     .font(.system(size: 16))
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                    .symbolEffect(.pulse, options: .repeating, value: viewModel.isLoadingAI)
 
                 Text("AI Insights")
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
 
-                Spacer()
+                // Powered by Perplexity badge
+                Text("Perplexity")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background {
+                        Capsule()
+                            .fill(Theme.CelestialColors.nebulaCore.opacity(0.15))
+                    }
+            }
 
-                // Refresh button
-                Button {
-                    HapticsService.shared.impact()
-                    Task { await viewModel.loadAIInsights() }
-                } label: {
+            Spacer()
+
+            // Update Insights button
+            Button {
+                HapticsService.shared.impact()
+                Task { await viewModel.loadAIInsights() }
+            } label: {
+                HStack(spacing: 4) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                        .font(.system(size: 12, weight: .medium))
                         .rotationEffect(.degrees(viewModel.isLoadingAI ? 360 : 0))
                         .animation(
                             viewModel.isLoadingAI ? .linear(duration: 1).repeatForever(autoreverses: false) : .default,
                             value: viewModel.isLoadingAI
                         )
+                    Text("Update")
+                        .font(.system(size: 12, weight: .medium))
                 }
-                .disabled(viewModel.isLoadingAI)
+                .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+            }
+            .glassEffect(.regular, in: Capsule())
+            .disabled(viewModel.isLoadingAI)
+        }
+    }
+
+    // MARK: - AI Context Input
+
+    private var aiContextInputSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            Text("Add Context")
+                .font(Theme.Typography.cosmosMeta)
+                .foregroundStyle(Theme.CelestialColors.starDim)
+
+            HStack(spacing: Theme.Spacing.sm) {
+                TextField("e.g., first time doing this, deadline is Friday...", text: $viewModel.aiContext)
+                    .font(.system(size: 14))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white.opacity(0.05))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(Theme.CelestialColors.starDim.opacity(0.2), lineWidth: 1)
+                            }
+                    }
+            }
+        }
+    }
+
+    // MARK: - AI Loading State
+
+    private var aiLoadingState: some View {
+        VStack(spacing: Theme.Spacing.md) {
+            HStack(spacing: 8) {
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .fill(Theme.CelestialColors.nebulaCore)
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(viewModel.isLoadingAI ? 1.2 : 0.8)
+                        .animation(
+                            .easeInOut(duration: 0.6)
+                            .repeatForever()
+                            .delay(Double(index) * 0.2),
+                            value: viewModel.isLoadingAI
+                        )
+                }
             }
 
-            if viewModel.isLoadingAI {
-                // Loading state
-                HStack(spacing: 8) {
-                    ForEach(0..<3, id: \.self) { index in
-                        Circle()
-                            .fill(Theme.CelestialColors.nebulaCore)
-                            .frame(width: 8, height: 8)
-                            .opacity(viewModel.isLoadingAI ? 1 : 0.3)
-                    }
-                    Text("Analyzing task...")
-                        .font(.system(size: 13))
+            Text("Analyzing with Perplexity AI...")
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.CelestialColors.starDim)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+    }
+
+    // MARK: - AI Advice Card
+
+    private var aiAdviceCard: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "lightbulb.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.Colors.aiAmber)
+
+                Text("AI Advice")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+
+            Text(viewModel.aiAdvice)
+                .font(.system(size: 14))
+                .foregroundStyle(.white.opacity(0.9))
+                .lineSpacing(4)
+
+            if !viewModel.aiThoughtProcess.isEmpty {
+                DisclosureGroup {
+                    Text(viewModel.aiThoughtProcess)
+                        .font(.system(size: 12))
                         .foregroundStyle(Theme.CelestialColors.starDim)
+                        .padding(.top, 8)
+                } label: {
+                    Text("Show reasoning")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
                 }
-                .padding(.vertical, 12)
-            } else {
-                // Insights content
-                VStack(alignment: .leading, spacing: 16) {
-                    // Helpful Resources
-                    if !viewModel.aiResources.isEmpty {
-                        AIInsightRow(
-                            icon: "link",
-                            title: "Helpful Resources",
-                            color: Theme.Colors.aiBlue
-                        ) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(viewModel.aiResources.prefix(3)) { resource in
-                                    Button {
-                                        if let url = URL(string: resource.url) {
-                                            UIApplication.shared.open(url)
-                                        }
-                                    } label: {
-                                        HStack {
-                                            Image(systemName: resource.type.icon)
-                                                .font(.system(size: 12))
-                                                .foregroundStyle(resource.type.color)
+                .tint(Theme.CelestialColors.nebulaCore)
+            }
+        }
+        .padding(Theme.Spacing.lg)
+        .background {
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Theme.Colors.aiAmber.opacity(0.08))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Theme.Colors.aiAmber.opacity(0.2), lineWidth: 1)
+                }
+        }
+    }
 
-                                            Text(resource.title)
-                                                .font(.system(size: 13))
-                                                .foregroundStyle(Theme.Colors.aiBlue)
-                                                .lineLimit(1)
+    // MARK: - Web Sources Section (Inline Link Chips)
 
-                                            Image(systemName: "arrow.up.right")
-                                                .font(.system(size: 10))
-                                                .foregroundStyle(Theme.CelestialColors.starDim)
-                                        }
+    private var aiWebSourcesSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "link")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.Colors.aiBlue)
+
+                Text("Web Sources")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white)
+            }
+
+            // Inline link chips (horizontal scroll)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: Theme.Spacing.sm) {
+                    ForEach(viewModel.aiWebSources) { source in
+                        Button {
+                            if let url = URL(string: source.url) {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 10))
+
+                                Text(source.source)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .lineLimit(1)
+
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 8))
+                            }
+                            .foregroundStyle(Theme.Colors.aiBlue)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background {
+                                Capsule()
+                                    .fill(Theme.Colors.aiBlue.opacity(0.12))
+                                    .overlay {
+                                        Capsule()
+                                            .strokeBorder(Theme.Colors.aiBlue.opacity(0.25), lineWidth: 1)
                                     }
-                                }
                             }
-                        }
-                    }
-
-                    // AI Assistant Prompt
-                    AIInsightRow(
-                        icon: "bubble.left.and.text.bubble.right",
-                        title: "AI Assistant Prompt",
-                        color: Theme.Colors.aiPurple
-                    ) {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(viewModel.aiPrompt)
-                                .font(.system(size: 13))
-                                .foregroundStyle(.white.opacity(0.85))
-                                .lineLimit(3)
-                                .padding(12)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(Color.white.opacity(0.05))
-                                }
-
-                            Button {
-                                UIPasteboard.general.string = viewModel.aiPrompt
-                                HapticsService.shared.successFeedback()
-                                showCopiedToast = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                    showCopiedToast = false
-                                }
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "doc.on.doc")
-                                        .font(.system(size: 12))
-                                    Text("Copy")
-                                        .font(.system(size: 13, weight: .medium))
-                                }
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                            }
-                            .glassEffect(.regular, in: Capsule())
-                            .tint(Theme.Colors.aiPurple)
-                        }
-                    }
-
-                    // Time Estimate & Best Time
-                    HStack(spacing: 12) {
-                        // Estimated time
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "timer")
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Theme.Colors.aiAmber)
-                                Text("Estimated")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(Theme.CelestialColors.starDim)
-                            }
-                            Text(viewModel.aiEstimatedTime)
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(.white)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.05))
-                        }
-
-                        // Best time
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "calendar.badge.clock")
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
-                                Text("Best Time")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(Theme.CelestialColors.starDim)
-                            }
-                            Text(viewModel.aiBestTime)
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(.white)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.05))
                         }
                     }
                 }
             }
         }
-        .padding(20)
-        .glassCard(accent: Theme.CelestialColors.nebulaCore)
+    }
+
+    // MARK: - YouTube Resources Section
+
+    private var aiYouTubeSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "play.rectangle.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.red)
+
+                Text("YouTube Resources")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+
+            VStack(spacing: Theme.Spacing.sm) {
+                ForEach(viewModel.aiYouTubeResources) { resource in
+                    Button {
+                        if let url = resource.youtubeSearchURL {
+                            UIApplication.shared.open(url)
+                        }
+                    } label: {
+                        HStack(spacing: Theme.Spacing.md) {
+                            // YouTube icon
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(.red.opacity(0.15))
+                                    .frame(width: 44, height: 44)
+
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundStyle(.red)
+                            }
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(resource.searchQuery)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+
+                                Text(resource.reasoning)
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(Theme.CelestialColors.starDim)
+                                    .lineLimit(1)
+                            }
+
+                            Spacer()
+
+                            // Relevance indicator
+                            Text("\(Int(resource.relevanceScore * 100))%")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background {
+                                    Capsule()
+                                        .fill(Theme.CelestialColors.auroraGreen.opacity(0.15))
+                                }
+
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.CelestialColors.starDim)
+                        }
+                        .padding(Theme.Spacing.md)
+                        .background {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.03))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Time Estimate Cards
+
+    private var aiTimeEstimateCards: some View {
+        HStack(spacing: Theme.Spacing.md) {
+            // Estimated Time Card
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Image(systemName: "timer")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.Colors.aiAmber)
+
+                    Text("Estimated")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.CelestialColors.starDim)
+                }
+
+                Text(viewModel.aiEstimatedTimeDisplay)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                // Confidence indicator
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(confidenceColor(viewModel.aiEstimateConfidence))
+                        .frame(width: 6, height: 6)
+
+                    Text(viewModel.aiEstimateConfidence.capitalized)
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.CelestialColors.starDim)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(Theme.Spacing.lg)
+            .background {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.white.opacity(0.05))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Theme.Colors.aiAmber.opacity(0.2), lineWidth: 1)
+                    }
+            }
+
+            // Best Time Card with Schedule Now
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.CelestialColors.auroraGreen)
+
+                    Text("Best Time")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.CelestialColors.starDim)
+                }
+
+                Text(viewModel.aiBestTimeDisplay)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+
+                // Schedule Now button
+                if viewModel.aiBestTime != nil {
+                    Button {
+                        if let bestTime = viewModel.aiBestTime {
+                            task.scheduledTime = bestTime
+                            task.updatedAt = Date()
+                            Task {
+                                await syncToCalendar(date: bestTime, duration: viewModel.aiEstimatedMinutes > 0 ? viewModel.aiEstimatedMinutes : viewModel.estimatedMinutes)
+                            }
+                            HapticsService.shared.successFeedback()
+                        }
+                    } label: {
+                        Text("Schedule")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.black)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Theme.CelestialColors.auroraGreen)
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(Theme.Spacing.lg)
+            .background {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.white.opacity(0.05))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Theme.CelestialColors.auroraGreen.opacity(0.2), lineWidth: 1)
+                    }
+            }
+        }
+    }
+
+    private func confidenceColor(_ confidence: String) -> Color {
+        switch confidence.lowercased() {
+        case "high": return Theme.CelestialColors.auroraGreen
+        case "medium": return Theme.Colors.aiAmber
+        case "low": return .orange
+        default: return Theme.CelestialColors.starDim
+        }
+    }
+
+    // MARK: - AI Suggested Sub-tasks Section
+
+    private var aiSuggestedSubTasksSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack {
+                HStack(spacing: Theme.Spacing.sm) {
+                    Image(systemName: "list.bullet.clipboard")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+
+                    Text("AI Suggested Steps")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    Text("\(viewModel.aiSuggestedSubTasks.count)")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background {
+                            Capsule()
+                                .fill(Theme.CelestialColors.nebulaCore.opacity(0.15))
+                        }
+                }
+
+                Spacer()
+
+                // Add All button
+                Button {
+                    viewModel.addAllAISuggestedSubTasks()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 12))
+                        Text("Add All")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Theme.CelestialColors.auroraGreen)
+                    .clipShape(Capsule())
+                }
+            }
+
+            // Sub-task suggestions
+            VStack(spacing: Theme.Spacing.sm) {
+                ForEach(viewModel.aiSuggestedSubTasks) { suggestion in
+                    HStack(spacing: Theme.Spacing.md) {
+                        // Add button
+                        Button {
+                            viewModel.addSingleAISuggestedSubTask(suggestion)
+                        } label: {
+                            Image(systemName: "plus.circle")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(suggestion.title)
+                                .font(.system(size: 14))
+                                .foregroundStyle(.white)
+
+                            HStack(spacing: 8) {
+                                Text("\(suggestion.estimatedMinutes) min")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(Theme.Colors.aiAmber)
+
+                                if !suggestion.reasoning.isEmpty {
+                                    Text(suggestion.reasoning)
+                                        .font(.system(size: 11))
+                                        .foregroundStyle(Theme.CelestialColors.starDim)
+                                        .lineLimit(1)
+                                }
+                            }
+                        }
+
+                        Spacer()
+                    }
+                    .padding(Theme.Spacing.md)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white.opacity(0.03))
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - AI Prompt Section
+
+    private var aiPromptSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack(spacing: Theme.Spacing.sm) {
+                Image(systemName: "bubble.left.and.text.bubble.right")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.Colors.aiPurple)
+
+                Text("AI Prompt")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+
+            // Prompt preview
+            Text(viewModel.aiPrompt)
+                .font(.system(size: 13))
+                .foregroundStyle(.white.opacity(0.85))
+                .lineLimit(4)
+                .padding(Theme.Spacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white.opacity(0.05))
+                }
+
+            // Action buttons
+            HStack(spacing: Theme.Spacing.md) {
+                // Copy button
+                Button {
+                    viewModel.copyPromptToClipboard()
+                    showCopiedToast = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        showCopiedToast = false
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 12))
+                        Text("Copy")
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                }
+                .glassEffect(.regular, in: Capsule())
+
+                // Open in ChatGPT button
+                Button {
+                    viewModel.openInChatGPT()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.up.right.circle.fill")
+                            .font(.system(size: 12))
+                        Text("ChatGPT")
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background {
+                        Capsule()
+                            .fill(Theme.Colors.aiPurple.opacity(0.3))
+                    }
+                }
+                .glassEffect(.regular, in: Capsule())
+            }
+        }
+    }
+
+    // MARK: - AI Error Card
+
+    private func aiErrorCard(_ error: String) -> some View {
+        HStack(spacing: Theme.Spacing.md) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 14))
+                .foregroundStyle(.orange)
+
+            Text(error)
+                .font(.system(size: 12))
+                .foregroundStyle(.white.opacity(0.8))
+                .lineLimit(2)
+
+            Spacer()
+
+            Button {
+                Task { await viewModel.loadAIInsights() }
+            } label: {
+                Text("Retry")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.orange)
+            }
+        }
+        .padding(Theme.Spacing.md)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.orange.opacity(0.1))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(.orange.opacity(0.3), lineWidth: 1)
+                }
+        }
     }
 
     // MARK: - Notes Section
@@ -709,7 +1250,7 @@ struct LiquidGlassTaskDetailSheet: View {
 
             Button {
                 HapticsService.shared.selectionFeedback()
-                // Open circles picker
+                showFriendPicker = true
             } label: {
                 HStack {
                     Image(systemName: "plus.circle.fill")
@@ -739,6 +1280,26 @@ struct LiquidGlassTaskDetailSheet: View {
         }
         .padding(20)
         .glassCard()
+        .sheet(isPresented: $showFriendPicker) {
+            FriendPickerSheet(
+                taskId: task.id,
+                taskTitle: task.title,
+                onInvite: { friendIds in
+                    // Invite each friend via SharedTaskService
+                    Task {
+                        for friendId in friendIds {
+                            await SharedTaskService.shared.inviteFriendToTask(
+                                taskId: task.id,
+                                friendId: friendId
+                            )
+                        }
+                    }
+                    HapticsService.shared.successFeedback()
+                }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     // MARK: - Action Bar (Sticky Bottom)
@@ -831,6 +1392,39 @@ struct LiquidGlassTaskDetailSheet: View {
         onSnooze(snoozeDate)
         HapticsService.shared.successFeedback()
     }
+
+    // MARK: - Calendar Sync
+
+    private func syncToCalendar(date: Date, duration: Int) async {
+        // Check if task already has a calendar event
+        if let existingEventId = task.calendarEventId {
+            // Update existing event
+            do {
+                try await CalendarService.shared.updateEvent(
+                    eventId: existingEventId,
+                    title: task.title,
+                    startDate: date,
+                    duration: duration
+                )
+            } catch {
+                print("Failed to update calendar event: \(error)")
+            }
+        } else {
+            // Create new calendar event
+            do {
+                let eventId = try await CalendarService.shared.createEvent(
+                    for: task,
+                    at: date,
+                    duration: duration
+                )
+                // Store the event ID on the task
+                task.calendarEventId = eventId
+                task.updatedAt = Date()
+            } catch {
+                print("Failed to create calendar event: \(error)")
+            }
+        }
+    }
 }
 
 // MARK: - View Model
@@ -849,12 +1443,28 @@ class TaskDetailViewModel {
     var isAddingSubTask: Bool = false
     var newSubTaskTitle: String = ""
 
-    // AI State
+    // AI State - Core
     var isLoadingAI: Bool = false
-    var aiResources: [TaskResource] = []
-    var aiPrompt: String = "Help me complete this task efficiently..."
-    var aiEstimatedTime: String = "15-20 min"
-    var aiBestTime: String = "Tomorrow 9AM"
+    var aiError: String?
+    var aiContext: String = ""  // User-provided context for AI
+
+    // AI State - Resources
+    var aiWebSources: [AIWebSourceDisplay] = []
+    var aiYouTubeResources: [AIYouTubeResourceDisplay] = []
+
+    // AI State - Insights
+    var aiAdvice: String = ""
+    var aiThoughtProcess: String = ""
+    var aiEstimatedMinutes: Int = 0
+    var aiEstimateConfidence: String = "medium"
+    var aiBestTime: Date?
+    var aiBestTimeReason: String = ""
+
+    // AI State - Suggested Sub-tasks
+    var aiSuggestedSubTasks: [AISuggestedSubTaskDisplay] = []
+
+    // AI State - Prompt for ChatGPT
+    var aiPrompt: String = ""
 
     // Focus Mode
     var selectedFocusMode: WorkMode = .deepWork
@@ -863,14 +1473,49 @@ class TaskDetailViewModel {
     // Task reference
     private var task: TaskItem?
 
+    // Computed Properties
+    var aiEstimatedTimeDisplay: String {
+        if aiEstimatedMinutes > 0 {
+            return formatDuration(aiEstimatedMinutes)
+        }
+        return estimatedMinutes > 0 ? formatDuration(estimatedMinutes) : "Not set"
+    }
+
+    var aiBestTimeDisplay: String {
+        guard let bestTime = aiBestTime else { return "Not suggested" }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE h:mm a"
+        return formatter.string(from: bestTime)
+    }
+
+    var hasAIInsights: Bool {
+        !aiAdvice.isEmpty || !aiWebSources.isEmpty || !aiYouTubeResources.isEmpty
+    }
+
+    // MARK: - Setup
+
     func setup(task: TaskItem) {
         self.task = task
         self.editableTitle = task.title
         self.editableNotes = task.contextNotes ?? ""
         self.estimatedMinutes = task.estimatedMinutes ?? 30
         self.appBlockingEnabled = task.enableAppBlocking
-        // Load persisted subtasks
         self.subTasks = task.subtasks
+
+        // Initialize AI prompt
+        aiPrompt = generateAIPrompt(for: task)
+    }
+
+    // MARK: - Duration Helpers
+
+    private func formatDuration(_ minutes: Int) -> String {
+        if minutes < 60 {
+            return "\(minutes) min"
+        } else if minutes % 60 == 0 {
+            return "\(minutes / 60)h"
+        } else {
+            return "\(minutes / 60)h \(minutes % 60)m"
+        }
     }
 
     func cycleDuration() {
@@ -885,8 +1530,9 @@ class TaskDetailViewModel {
 
     func cycleRecurring() {
         HapticsService.shared.selectionFeedback()
-        // TODO: Cycle through recurring options
     }
+
+    // MARK: - Sub-task Management
 
     func addSubTask() {
         guard !newSubTaskTitle.isEmpty else { return }
@@ -898,7 +1544,6 @@ class TaskDetailViewModel {
             taskId: task?.id
         )
         subTasks.append(newSubTask)
-        // Persist to task
         task?.subtasks = subTasks
         newSubTaskTitle = ""
         isAddingSubTask = false
@@ -911,92 +1556,314 @@ class TaskDetailViewModel {
             subTasks[index].status = newStatus
             subTasks[index].completedAt = newStatus == .completed ? Date() : nil
         }
-        // Persist to task
         task?.subtasks = subTasks
         HapticsService.shared.selectionFeedback()
     }
 
     func deleteSubTask(_ subTask: SubTask) {
         subTasks.removeAll { $0.id == subTask.id }
-        // Persist to task
         task?.subtasks = subTasks
         HapticsService.shared.impact()
     }
+
+    // MARK: - AI Insights (Perplexity Integration)
 
     func loadAIInsights() async {
         guard let task = task else { return }
 
         isLoadingAI = true
+        aiError = nil
         defer { isLoadingAI = false }
 
-        // Generate AI prompt
+        // Generate prompt for ChatGPT/Claude copy
         aiPrompt = generateAIPrompt(for: task)
 
-        // Simulate AI insights (replace with actual Perplexity call)
-        try? await Task.sleep(for: .seconds(1.5))
+        // Check if Perplexity is configured
+        guard PerplexityService.shared.isReady else {
+            // Use fallback insights
+            await loadFallbackInsights(for: task)
+            return
+        }
 
-        // Set sample insights
-        aiEstimatedTime = "\(estimatedMinutes)-\(estimatedMinutes + 10) min"
-        aiBestTime = generateBestTime()
-
-        // Load sample resources
-        aiResources = [
-            TaskResource(
-                title: "Getting Started Guide",
-                url: "https://example.com",
-                source: "Documentation",
-                type: .documentation
-            ),
-            TaskResource(
-                title: "Quick Tutorial",
-                url: "https://youtube.com",
-                source: "YouTube",
-                type: .youtube,
-                duration: "8 min"
+        do {
+            // Call Perplexity for comprehensive task analysis
+            let response = try await PerplexityService.shared.analyzeTask(
+                title: task.title,
+                notes: task.notes,
+                context: aiContext.isEmpty ? nil : aiContext
             )
-        ]
-    }
 
-    func generateAISubTasks() async {
-        HapticsService.shared.impact()
+            // Update AI state from response
+            aiAdvice = response.advice
+            aiThoughtProcess = response.thoughtProcess ?? ""
+            aiEstimatedMinutes = response.estimatedMinutes ?? estimatedMinutes
 
-        // Add sample AI-generated sub-tasks
-        let aiSubTasks = [
-            SubTask(id: UUID(), title: "Review requirements", estimatedMinutes: 5, status: .pending, orderIndex: subTasks.count, aiReasoning: "AI generated", taskId: task?.id),
-            SubTask(id: UUID(), title: "Break down into steps", estimatedMinutes: 10, status: .pending, orderIndex: subTasks.count + 1, aiReasoning: "AI generated", taskId: task?.id),
-            SubTask(id: UUID(), title: "Execute main action", estimatedMinutes: 15, status: .pending, orderIndex: subTasks.count + 2, aiReasoning: "AI generated", taskId: task?.id)
-        ]
+            // Parse schedule suggestion
+            if let schedule = response.scheduleSuggestion {
+                aiBestTimeReason = schedule.reasoning ?? ""
+                aiBestTime = suggestedTimeFromTimeOfDay(schedule.suggestedTimeOfDay)
+            }
 
-        subTasks.append(contentsOf: aiSubTasks)
-        // Persist to task
-        task?.subtasks = subTasks
-    }
+            // Parse sub-tasks
+            if let subTasksData = response.subTasks {
+                aiSuggestedSubTasks = subTasksData.map { st in
+                    AISuggestedSubTaskDisplay(
+                        title: st.title,
+                        estimatedMinutes: st.estimatedMinutes ?? 10,
+                        reasoning: st.reasoning ?? ""
+                    )
+                }
+            }
 
-    private func generateAIPrompt(for task: TaskItem) -> String {
-        """
-        Help me complete: "\(task.title)"
+            // Parse YouTube resources
+            if let youtube = response.youtubeResources {
+                aiYouTubeResources = youtube.map { yt in
+                    AIYouTubeResourceDisplay(from: yt)
+                }
+            }
 
-        Context: \(task.contextNotes ?? "None provided")
+            // Parse web sources from citations if available
+            if let sources = response.sources {
+                aiWebSources = sources.enumerated().map { index, url in
+                    AIWebSourceDisplay(
+                        title: "Source \(index + 1)",
+                        url: url,
+                        source: extractDomain(from: url)
+                    )
+                }
+            }
 
-        Please provide:
-        1. A step-by-step approach
-        2. Potential challenges
-        3. Time-saving tips
-        """
-    }
-
-    private func generateBestTime() -> String {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: Date())
-
-        if hour < 12 {
-            return "Today 2PM"
-        } else if hour < 17 {
-            return "Tomorrow 9AM"
-        } else {
-            return "Tomorrow 10AM"
+        } catch {
+            aiError = error.localizedDescription
+            // Fallback to basic insights
+            await loadFallbackInsights(for: task)
         }
     }
+
+    private func loadFallbackInsights(for task: TaskItem) async {
+        // Simulate thinking time
+        try? await Task.sleep(for: .milliseconds(500))
+
+        // Generate basic insights without AI
+        aiAdvice = generateFallbackAdvice(for: task)
+        aiEstimatedMinutes = estimatedMinutes > 0 ? estimatedMinutes : 30
+        aiBestTime = suggestedTimeFromTimeOfDay(suggestBestTimeOfDay())
+        aiBestTimeReason = "Based on typical productivity patterns"
+
+        // Generate basic sub-task suggestions
+        aiSuggestedSubTasks = [
+            AISuggestedSubTaskDisplay(title: "Review requirements and gather materials", estimatedMinutes: 5, reasoning: "Start with preparation"),
+            AISuggestedSubTaskDisplay(title: "Complete main action", estimatedMinutes: max(estimatedMinutes - 10, 15), reasoning: "Core task execution"),
+            AISuggestedSubTaskDisplay(title: "Review and finalize", estimatedMinutes: 5, reasoning: "Quality check before completion")
+        ]
+    }
+
+    private func generateFallbackAdvice(for task: TaskItem) -> String {
+        switch task.taskType {
+        case .create:
+            return "Block distractions and set a clear goal before starting. Creative work benefits from uninterrupted focus time."
+        case .communicate:
+            return "Prepare your key points beforehand. Be clear and concise to save everyone's time."
+        case .consume:
+            return "Take notes as you go and summarize key points. Active engagement improves retention."
+        case .coordinate:
+            return "Batch similar administrative tasks together. Set a timer to prevent scope creep."
+        }
+    }
+
+    private func suggestBestTimeOfDay() -> String {
+        guard let task = task else { return "morning" }
+        switch task.taskType {
+        case .create: return "morning"
+        case .communicate: return "afternoon"
+        case .consume: return "morning"
+        case .coordinate: return "afternoon"
+        }
+    }
+
+    private func suggestedTimeFromTimeOfDay(_ timeOfDay: String?) -> Date {
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+
+        switch timeOfDay?.lowercased() {
+        case "morning":
+            components.hour = 9
+        case "afternoon":
+            components.hour = 14
+        case "evening":
+            components.hour = 18
+        default:
+            components.hour = 9
+        }
+        components.minute = 0
+
+        // If time has passed, suggest tomorrow
+        if let suggestedDate = calendar.date(from: components),
+           suggestedDate < Date() {
+            return calendar.date(byAdding: .day, value: 1, to: suggestedDate) ?? suggestedDate
+        }
+
+        return calendar.date(from: components) ?? Date()
+    }
+
+    private func extractDomain(from urlString: String) -> String {
+        guard let url = URL(string: urlString),
+              let host = url.host else { return "Web" }
+        return host.replacingOccurrences(of: "www.", with: "")
+    }
+
+    // MARK: - AI Sub-tasks
+
+    func generateAISubTasks() async {
+        guard let task = task else { return }
+
+        HapticsService.shared.impact()
+        isLoadingAI = true
+        defer { isLoadingAI = false }
+
+        // If we already have suggestions, just add them
+        if !aiSuggestedSubTasks.isEmpty {
+            addAllAISuggestedSubTasks()
+            return
+        }
+
+        // Otherwise generate new ones via Perplexity
+        if PerplexityService.shared.isReady {
+            do {
+                let response = try await PerplexityService.shared.analyzeTask(
+                    title: task.title,
+                    notes: task.notes,
+                    context: aiContext.isEmpty ? nil : aiContext
+                )
+
+                if let subTasksData = response.subTasks {
+                    aiSuggestedSubTasks = subTasksData.map { st in
+                        AISuggestedSubTaskDisplay(
+                            title: st.title,
+                            estimatedMinutes: st.estimatedMinutes ?? 10,
+                            reasoning: st.reasoning ?? ""
+                        )
+                    }
+                    addAllAISuggestedSubTasks()
+                }
+            } catch {
+                // Fallback
+                await loadFallbackInsights(for: task)
+                addAllAISuggestedSubTasks()
+            }
+        } else {
+            // Generate basic sub-tasks
+            await loadFallbackInsights(for: task)
+            addAllAISuggestedSubTasks()
+        }
+    }
+
+    func addAllAISuggestedSubTasks() {
+        for suggestion in aiSuggestedSubTasks {
+            let newSubTask = SubTask(
+                id: UUID(),
+                title: suggestion.title,
+                estimatedMinutes: suggestion.estimatedMinutes,
+                status: .pending,
+                orderIndex: subTasks.count,
+                aiReasoning: suggestion.reasoning,
+                taskId: task?.id
+            )
+            subTasks.append(newSubTask)
+        }
+        task?.subtasks = subTasks
+        aiSuggestedSubTasks = []  // Clear suggestions after adding
+        HapticsService.shared.successFeedback()
+    }
+
+    func addSingleAISuggestedSubTask(_ suggestion: AISuggestedSubTaskDisplay) {
+        let newSubTask = SubTask(
+            id: UUID(),
+            title: suggestion.title,
+            estimatedMinutes: suggestion.estimatedMinutes,
+            status: .pending,
+            orderIndex: subTasks.count,
+            aiReasoning: suggestion.reasoning,
+            taskId: task?.id
+        )
+        subTasks.append(newSubTask)
+        task?.subtasks = subTasks
+        aiSuggestedSubTasks.removeAll { $0.id == suggestion.id }
+        HapticsService.shared.selectionFeedback()
+    }
+
+    // MARK: - AI Prompt Generation
+
+    private func generateAIPrompt(for task: TaskItem) -> String {
+        let contextSection = aiContext.isEmpty ? "" : "\nAdditional context: \(aiContext)"
+        let notesSection = task.contextNotes.map { "\nNotes: \($0)" } ?? ""
+
+        return """
+        Help me complete: "\(task.title)"
+        \(notesSection)\(contextSection)
+
+        Please provide:
+        1. A step-by-step approach to complete this efficiently
+        2. Potential challenges I might face and how to overcome them
+        3. Time-saving tips specific to this type of task
+        4. Resources or tools that could help
+        """
+    }
+
+    func copyPromptToClipboard() {
+        UIPasteboard.general.string = aiPrompt
+        HapticsService.shared.successFeedback()
+    }
+
+    func openInChatGPT() {
+        let encodedPrompt = aiPrompt.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "https://chat.openai.com/?q=\(encodedPrompt)") {
+            UIApplication.shared.open(url)
+        }
+    }
+}
+
+// MARK: - Local AI UI Models
+
+/// Local UI model for web sources (wraps URL strings with display info)
+struct AIWebSourceDisplay: Identifiable {
+    let id = UUID()
+    let title: String
+    let url: String
+    let source: String
+}
+
+/// Local UI model for YouTube resources with computed URL
+struct AIYouTubeResourceDisplay: Identifiable {
+    let id = UUID()
+    let searchQuery: String
+    let relevanceScore: Double
+    let reasoning: String
+
+    var youtubeSearchURL: URL? {
+        let query = searchQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return URL(string: "https://www.youtube.com/results?search_query=\(query)")
+    }
+
+    init(from resource: AIYouTubeResource) {
+        self.searchQuery = resource.searchQuery
+        self.relevanceScore = resource.relevanceScore ?? 0.8
+        self.reasoning = resource.reasoning ?? ""
+    }
+
+    init(searchQuery: String, relevanceScore: Double, reasoning: String) {
+        self.searchQuery = searchQuery
+        self.relevanceScore = relevanceScore
+        self.reasoning = reasoning
+    }
+}
+
+/// Local UI model for suggested sub-tasks
+struct AISuggestedSubTaskDisplay: Identifiable {
+    let id = UUID()
+    let title: String
+    let estimatedMinutes: Int
+    let reasoning: String
 }
 
 // MARK: - Supporting Views
@@ -1178,16 +2045,6 @@ extension View {
             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
     }
 
-    func sectionReveal(appeared: Bool, delay: Double) -> some View {
-        self
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 25)
-            .scaleEffect(appeared ? 1 : 0.96)
-            .animation(
-                .spring(response: 0.5, dampingFraction: 0.8).delay(delay),
-                value: appeared
-            )
-    }
 }
 
 // MARK: - Preview

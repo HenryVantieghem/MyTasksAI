@@ -13,6 +13,8 @@ import SwiftUI
 /// Universal header displayed on ALL 5 main tabs
 /// Shows total points (left), title (center), settings (right)
 struct UniversalHeaderView: View {
+    @Environment(\.responsiveLayout) private var layout
+
     let title: String
     @Binding var showStatsSheet: Bool
     @Binding var showSettingsSheet: Bool
@@ -28,10 +30,11 @@ struct UniversalHeaderView: View {
 
     var body: some View {
         ZStack {
-            // Title (absolute center) - Editorial thin typography
+            // Title (absolute center) - Ultra-thin elegant typography with Dynamic Type
             Text(title)
-                .font(Theme.Typography.displaySmall)
+                .dynamicTypeFont(base: 22, weight: .ultraLight)
                 .foregroundStyle(.white)
+                .tracking(1.5)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
@@ -41,6 +44,7 @@ struct UniversalHeaderView: View {
                 TotalPointsPill(points: gamification.totalPoints) {
                     showStatsSheet = true
                 }
+                .iPadHoverEffect(.lift)
 
                 Spacer()
 
@@ -53,9 +57,11 @@ struct UniversalHeaderView: View {
                     HapticsService.shared.selectionFeedback()
                     showSettingsSheet = true
                 }
+                .iPadHoverEffect(.lift)
             }
         }
-        .padding(.horizontal, Theme.Spacing.screenPadding)
+        .padding(.horizontal, layout.screenPadding)
+        .frame(height: layout.headerHeight)
         .opacity(showContent ? 1 : 0)
         .scaleEffect(showContent ? 1 : 0.95)
         .onAppear {
@@ -70,6 +76,8 @@ struct UniversalHeaderView: View {
 
 /// Compact header for scrolled states or tight spaces
 struct CompactHeaderView: View {
+    @Environment(\.responsiveLayout) private var layout
+
     let title: String
     @Binding var showStatsSheet: Bool
     @Binding var showSettingsSheet: Bool
@@ -81,10 +89,11 @@ struct CompactHeaderView: View {
 
     var body: some View {
         ZStack {
-            // Title (absolute center) - smaller for compact
+            // Title (absolute center) - compact variant with Dynamic Type
             Text(title)
-                .font(.system(size: 16, weight: .light))
+                .dynamicTypeFont(base: 18, weight: .light)
                 .foregroundStyle(.white)
+                .tracking(1)
                 .lineLimit(1)
 
             // Pills on sides
@@ -93,6 +102,7 @@ struct CompactHeaderView: View {
                 CompactPointsPill(points: gamification.totalPoints) {
                     showStatsSheet = true
                 }
+                .iPadHoverEffect(.lift)
 
                 Spacer()
 
@@ -104,10 +114,11 @@ struct CompactHeaderView: View {
                     HapticsService.shared.selectionFeedback()
                     showSettingsSheet = true
                 }
+                .iPadHoverEffect(.lift)
             }
         }
-        .padding(.horizontal, Theme.Spacing.screenPadding)
-        .padding(.vertical, Theme.Spacing.xs)
+        .padding(.horizontal, layout.screenPadding)
+        .padding(.vertical, layout.spacing / 4)
     }
 }
 
@@ -115,6 +126,8 @@ struct CompactHeaderView: View {
 
 /// Alternative header showing streak alongside points
 struct HeaderWithStreak: View {
+    @Environment(\.responsiveLayout) private var layout
+
     let title: String
     @Binding var showStatsSheet: Bool
     @Binding var showSettingsSheet: Bool
@@ -126,19 +139,21 @@ struct HeaderWithStreak: View {
 
     var body: some View {
         ZStack {
-            // Title (absolute center)
+            // Title (absolute center) - Ultra-thin elegant typography with Dynamic Type
             Text(title)
-                .font(Theme.Typography.displaySmall)
+                .dynamicTypeFont(base: 22, weight: .ultraLight)
                 .foregroundStyle(.white)
+                .tracking(1.5)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
             // Pills on sides
-            HStack(spacing: Theme.Spacing.sm) {
+            HStack(spacing: layout.spacing / 2) {
                 // Points pill
                 TotalPointsPill(points: gamification.totalPoints) {
                     showStatsSheet = true
                 }
+                .iPadHoverEffect(.lift)
 
                 // Streak badge (only if active)
                 if gamification.currentStreak > 0 {
@@ -156,9 +171,11 @@ struct HeaderWithStreak: View {
                     HapticsService.shared.selectionFeedback()
                     showSettingsSheet = true
                 }
+                .iPadHoverEffect(.lift)
             }
         }
-        .padding(.horizontal, Theme.Spacing.screenPadding)
+        .padding(.horizontal, layout.screenPadding)
+        .frame(height: layout.headerHeight)
     }
 }
 
@@ -166,6 +183,8 @@ struct HeaderWithStreak: View {
 
 /// Small streak badge to show alongside points
 struct StreakIndicator: View {
+    @Environment(\.responsiveLayout) private var layout
+
     let days: Int
 
     @State private var isFlaming = false
@@ -173,7 +192,7 @@ struct StreakIndicator: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "flame.fill")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [.orange, .red],
@@ -184,11 +203,11 @@ struct StreakIndicator: View {
                 .scaleEffect(isFlaming ? 1.1 : 1.0)
 
             Text("\(days)")
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .dynamicTypeFont(base: 12, weight: .bold, design: .rounded)
                 .foregroundStyle(.primary)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
+        .padding(.horizontal, layout.spacing / 2)
+        .padding(.vertical, layout.spacing / 3)
         .glassEffect(.regular, in: Capsule())
         .onAppear {
             withAnimation(

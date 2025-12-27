@@ -83,6 +83,9 @@ struct VeloceApp: App {
                     await appViewModel.initialize(context: modelContainer.mainContext)
                 }
         }
+        .commands {
+            VeloceCommands()
+        }
     }
 }
 

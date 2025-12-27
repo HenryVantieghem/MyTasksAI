@@ -15,27 +15,35 @@ import SwiftUI
 
 /// Premium floating pill tab bar with liquid glass effect
 /// Uses compatibility layer for iOS 17+ support
+/// Responsive: Scales touch targets and spacing for iPad
 struct LiquidGlassTabBar: View {
     @Binding var selectedTab: AppTab
     @Namespace private var tabBarNamespace
 
+    @Environment(\.responsiveLayout) private var layout
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
+    // Responsive spacing between tabs
+    private var tabSpacing: CGFloat {
+        layout.deviceType.isTablet ? 4 : 2
+    }
+
     var body: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: tabSpacing) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 LiquidGlassTabItem(
                     tab: tab,
                     isSelected: selectedTab == tab,
-                    namespace: tabBarNamespace
+                    namespace: tabBarNamespace,
+                    layout: layout
                 ) {
                     selectTab(tab)
                 }
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 10)
+        .padding(.horizontal, layout.spacing / 2)
+        .padding(.vertical, layout.deviceType.isTablet ? 14 : 10)
         // 🌟 LIQUID GLASS: Apple Music-style interactive glass with premium feel
         .glassEffect(
             .regular
@@ -58,19 +66,25 @@ struct LiquidGlassTabBar: View {
                     lineWidth: 0.5
                 )
         }
-        .shadow(
-            color: Color.black.opacity(0.3),
-            radius: 20,
-            x: 0,
-            y: 10
+        // Premium iridescent glow for Apple-level polish
+        .premiumGlowCapsule(
+            style: .iridescent,
+            intensity: .whisper,
+            animated: !reduceMotion
         )
         .shadow(
-            color: Color.black.opacity(0.1),
-            radius: 8,
+            color: Color.black.opacity(0.25),
+            radius: 16,
             x: 0,
-            y: 4
+            y: 8
         )
-        .padding(.horizontal, 20)
+        .shadow(
+            color: Color.black.opacity(0.08),
+            radius: 6,
+            x: 0,
+            y: 3
+        )
+        .padding(.horizontal, layout.screenPadding)
         .animation(
             reduceMotion ? .none : .spring(response: 0.35, dampingFraction: 0.8),
             value: selectedTab
@@ -83,39 +97,53 @@ struct LiquidGlassTabBar: View {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
             selectedTab = tab
         }
-        HapticsService.shared.tabSwitch()
+        // ✨ Premium magnetic snap haptic for tab switches
+        HapticsService.shared.magneticSnap()
     }
 }
 
 // MARK: - Liquid Glass Tab Item
 
 /// Individual tab item with morphing selection indicator
+/// Responsive: Scales touch targets for iPad ergonomics
 struct LiquidGlassTabItem: View {
     let tab: AppTab
     let isSelected: Bool
     let namespace: Namespace.ID
+    let layout: ResponsiveLayout
     let action: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // Dynamic width based on selection state - adjusted for 5 tabs
+    // Dynamic width based on selection state AND device - responsive for iPad
     private var itemWidth: CGFloat {
-        isSelected ? 60 : 48
+        let baseWidth = layout.tabItemWidth
+        return isSelected ? baseWidth * 1.25 : baseWidth
+    }
+
+    // Responsive icon sizes
+    private var iconSize: CGFloat {
+        layout.tabIconSize
+    }
+
+    // Responsive item height
+    private var itemHeight: CGFloat {
+        layout.minTouchTarget + (layout.deviceType.isTablet ? 8 : 0)
     }
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 3) {
-                // Icon with SF Symbol effects
+            VStack(spacing: layout.deviceType.isTablet ? 4 : 3) {
+                // Icon with SF Symbol effects - responsive sizing
                 tabIcon
-                    .font(.system(size: isSelected ? 16 : 18, weight: isSelected ? .semibold : .medium))
+                    .font(.system(size: isSelected ? iconSize - 2 : iconSize, weight: isSelected ? .semibold : .medium))
                     .foregroundStyle(isSelected ? iconGradient : AnyShapeStyle(.secondary))
                     .symbolEffect(.bounce, value: isSelected)
 
-                // Label appears when selected
+                // Label appears when selected - responsive font
                 if isSelected {
                     Text(tab.title)
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .dynamicTypeFont(base: 9, weight: .semibold, design: .rounded)
                         .foregroundStyle(Veloce.Colors.textPrimary)
                         .lineLimit(1)
                         .transition(.asymmetric(
@@ -124,7 +152,7 @@ struct LiquidGlassTabItem: View {
                         ))
                 }
             }
-            .frame(width: itemWidth, height: 44)
+            .frame(width: itemWidth, height: itemHeight)
             .background {
                 if isSelected {
                     // 🌟 LIQUID GLASS: Selected indicator with interactive glass
@@ -175,6 +203,7 @@ struct LiquidGlassTabItem: View {
             .contentShape(.capsule)
         }
         .buttonStyle(LiquidGlassItemButtonStyle())
+        .iPadHoverEffect(.highlight)
         // Accessibility
         .accessibilityLabel(tab.title)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])

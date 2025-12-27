@@ -2,13 +2,27 @@
 //  FocusMainView.swift
 //  Veloce
 //
-//  Reimagined Focus Experience
-//  Two main portals: Focus Timer & App Blocking
-//  Cosmic Observatory aesthetic with stunning glass effects
+//  Reimagined Focus Experience - Two Pillars: Timer & App Blocking
+//  Full-screen immersive timer with Tiimo-style customization
+//  App blocking with Opal-style screen time visualization
 //
 
 import SwiftUI
 import FamilyControls
+
+// MARK: - Focus Section
+
+enum FocusSection: String, CaseIterable {
+    case timer = "Timer"
+    case blocking = "Blocking"
+
+    var icon: String {
+        switch self {
+        case .timer: return "timer"
+        case .blocking: return "shield.lefthalf.filled"
+        }
+    }
+}
 
 // MARK: - Quick Focus Mode
 
@@ -16,12 +30,14 @@ enum QuickFocusMode: String, CaseIterable {
     case pomodoro = "Pomodoro"
     case deepWork = "Deep Work"
     case flow = "Flow"
+    case custom = "Custom"
 
     var duration: TimeInterval {
         switch self {
         case .pomodoro: return 25 * 60
         case .deepWork: return 90 * 60
         case .flow: return 0 // Counts up
+        case .custom: return 0 // User defined
         }
     }
 
@@ -29,7 +45,8 @@ enum QuickFocusMode: String, CaseIterable {
         switch self {
         case .pomodoro: return "clock"
         case .deepWork: return "brain.head.profile"
-        case .flow: return "bolt"
+        case .flow: return "infinity"
+        case .custom: return "slider.horizontal.3"
         }
     }
 
@@ -38,6 +55,16 @@ enum QuickFocusMode: String, CaseIterable {
         case .pomodoro: return "25m"
         case .deepWork: return "90m"
         case .flow: return "∞"
+        case .custom: return "Set"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .pomodoro: return "Classic 25 min focus blocks"
+        case .deepWork: return "Extended 90 min deep work"
+        case .flow: return "Unlimited flow state"
+        case .custom: return "Set your own duration"
         }
     }
 
@@ -46,36 +73,13 @@ enum QuickFocusMode: String, CaseIterable {
         case .pomodoro: return Theme.Colors.aiAmber
         case .deepWork: return Theme.Colors.aiPurple
         case .flow: return Theme.Colors.aiCyan
+        case .custom: return Theme.Colors.success
         }
     }
 }
 
 enum QuickTimerState {
     case idle, running, paused
-}
-
-// MARK: - Flow Section (Unified Toggle)
-
-enum FlowSection: String, CaseIterable {
-    case timer = "Timer"
-    case blocking = "Blocking"
-    case insights = "Insights"
-
-    var icon: String {
-        switch self {
-        case .timer: return "timer"
-        case .blocking: return "shield.lefthalf.filled"
-        case .insights: return "chart.bar.fill"
-        }
-    }
-
-    var accentColor: Color {
-        switch self {
-        case .timer: return Theme.Colors.aiAmber
-        case .blocking: return Theme.Colors.aiCyan
-        case .insights: return Theme.Colors.aiPurple
-        }
-    }
 }
 
 // MARK: - Focus Main View
@@ -85,19 +89,21 @@ struct FocusMainView: View {
     var taskContext: FocusTaskContext?
     var onSessionComplete: ((Bool) -> Void)?
 
+    // Section selection
+    @State private var selectedSection: FocusSection = .timer
+
     // Navigation state
     @State private var showFocusTimer = false
     @State private var showAppBlocking = false
     @State private var showActiveSession = false
-
-    // Section state (unified toggle)
-    @State private var activeSection: FlowSection = .timer
+    @State private var showCustomTimerPicker = false
 
     // Quick timer state
     @State private var selectedMode: QuickFocusMode = .pomodoro
     @State private var timerState: QuickTimerState = .idle
     @State private var timeRemaining: TimeInterval = 25 * 60
     @State private var totalTime: TimeInterval = 25 * 60
+    @State private var customMinutes: Int = 30
     @State private var timer: Timer?
 
     // Services
@@ -108,6 +114,7 @@ struct FocusMainView: View {
     @State private var portalPulse: CGFloat = 0
     @State private var backgroundRotation: Double = 0
     @State private var starsOpacity: Double = 0
+    @State private var timerBreathing: CGFloat = 1.0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -116,36 +123,19 @@ struct FocusMainView: View {
             // Cosmic background with enhanced depth
             enhancedCosmicBackground
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Header area with subtle greeting
-                    headerView
-                        .padding(.top, Theme.Spacing.universalHeaderHeight)
+            VStack(spacing: 0) {
+                // Section Selector
+                sectionSelector
+                    .padding(.top, Theme.Spacing.universalHeaderHeight)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
 
-                    // Quick Timer Section (above portal cards)
-                    quickTimerSection
-                        .padding(.top, Theme.Spacing.lg)
-
-                    // Mode Selector
-                    modeSelectorView
-                        .padding(.top, Theme.Spacing.lg)
-
-                    // Section Toggle (Timer | Blocking | Insights)
-                    FlowSectionToggle(selected: $activeSection)
-                        .padding(.top, Theme.Spacing.xl)
-
-                    // Section Content
-                    sectionContentView
-                        .padding(.top, Theme.Spacing.lg)
-
-                    // Quick stats bar
-                    quickStatsBar
-                        .padding(.top, Theme.Spacing.xl)
-                        .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
+                // Content based on section
+                if selectedSection == .timer {
+                    timerSectionContent
+                } else {
+                    appBlockingSectionContent
                 }
-                .padding(.horizontal, Theme.Spacing.screenPadding)
             }
-            .scrollIndicators(.hidden)
         }
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: $showFocusTimer) {
@@ -168,6 +158,17 @@ struct FocusMainView: View {
                 }
             )
         }
+        .sheet(isPresented: $showCustomTimerPicker) {
+            CustomTimerPickerSheet(
+                minutes: $customMinutes,
+                onStart: {
+                    showCustomTimerPicker = false
+                    timeRemaining = TimeInterval(customMinutes * 60)
+                    totalTime = TimeInterval(customMinutes * 60)
+                    startTimer()
+                }
+            )
+        }
         .onAppear {
             startAmbientAnimations()
 
@@ -183,6 +184,583 @@ struct FocusMainView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Section Selector
+
+    private var sectionSelector: some View {
+        HStack(spacing: 0) {
+            ForEach(FocusSection.allCases, id: \.self) { section in
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        selectedSection = section
+                        HapticsService.shared.selectionFeedback()
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: section.icon)
+                            .font(.system(size: 14, weight: .medium))
+
+                        Text(section.rawValue)
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .foregroundStyle(selectedSection == section ? .white : .white.opacity(0.5))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background {
+                        if selectedSection == section {
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            section == .timer ? Theme.Colors.aiAmber : Theme.Colors.aiCyan,
+                                            section == .timer ? Theme.Colors.aiOrange : Theme.Colors.aiBlue
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .matchedGeometryEffect(id: "sectionTab", in: sectionNamespace)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(4)
+        .background(
+            Capsule()
+                .fill(.ultraThinMaterial.opacity(0.5))
+        )
+    }
+
+    @Namespace private var sectionNamespace
+
+    // MARK: - Timer Section Content
+
+    private var timerSectionContent: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                // Immersive Timer Display
+                immersiveTimerDisplay
+                    .padding(.top, Theme.Spacing.xl)
+
+                // Mode Cards (Tiimo-style)
+                modeCardsSection
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
+
+                // Today's Focus Stats
+                todayFocusStats
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
+
+                // Streak Section
+                streakFlameSection
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
+
+                Spacer()
+                    .frame(height: Theme.Spacing.floatingTabBarClearance)
+            }
+        }
+        .scrollIndicators(.hidden)
+    }
+
+    // MARK: - Immersive Timer Display
+
+    private var immersiveTimerDisplay: some View {
+        ZStack {
+            // Outer glow rings
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .stroke(
+                        selectedMode.accentColor.opacity(0.1 - Double(index) * 0.03),
+                        lineWidth: 2
+                    )
+                    .frame(width: 240 + CGFloat(index) * 40, height: 240 + CGFloat(index) * 40)
+                    .scaleEffect(timerBreathing + CGFloat(index) * 0.02)
+            }
+
+            // Background ring
+            Circle()
+                .stroke(Color.white.opacity(0.08), lineWidth: 12)
+                .frame(width: 220, height: 220)
+
+            // Progress ring
+            Circle()
+                .trim(from: 0, to: timerProgress)
+                .stroke(
+                    AngularGradient(
+                        colors: [
+                            selectedMode.accentColor,
+                            selectedMode.accentColor.opacity(0.8),
+                            selectedMode.accentColor.opacity(0.5),
+                            selectedMode.accentColor.opacity(0.3),
+                            selectedMode.accentColor.opacity(0.1)
+                        ],
+                        center: .center,
+                        startAngle: .degrees(-90),
+                        endAngle: .degrees(270)
+                    ),
+                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                )
+                .frame(width: 220, height: 220)
+                .rotationEffect(.degrees(-90))
+                .animation(.linear(duration: 0.5), value: timerProgress)
+
+            // Orbiting indicator dot
+            if timerState == .running {
+                Circle()
+                    .fill(selectedMode.accentColor)
+                    .frame(width: 16, height: 16)
+                    .shadow(color: selectedMode.accentColor.opacity(0.6), radius: 8)
+                    .offset(y: -110)
+                    .rotationEffect(.degrees(-90 + 360 * timerProgress))
+                    .animation(.linear(duration: 0.5), value: timerProgress)
+            }
+
+            // Inner glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            selectedMode.accentColor.opacity(0.15),
+                            selectedMode.accentColor.opacity(0.05),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: 100
+                    )
+                )
+                .frame(width: 200, height: 200)
+                .scaleEffect(timerBreathing)
+
+            // Center content
+            VStack(spacing: 16) {
+                // Time display
+                Text(timerDisplayString)
+                    .font(.system(size: 52, weight: .thin, design: .monospaced))
+                    .foregroundStyle(.white)
+                    .contentTransition(.numericText())
+                    .animation(.spring(response: 0.3), value: timeRemaining)
+
+                // Mode label
+                HStack(spacing: 6) {
+                    Image(systemName: selectedMode.icon)
+                        .font(.system(size: 12))
+                    Text(selectedMode.rawValue)
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundStyle(selectedMode.accentColor)
+
+                // Control buttons
+                HStack(spacing: 24) {
+                    // Reset button (visible when not idle)
+                    if timerState != .idle {
+                        Button {
+                            resetTimer()
+                        } label: {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.6))
+                                .frame(width: 44, height: 44)
+                                .background(Circle().fill(.white.opacity(0.1)))
+                        }
+                        .buttonStyle(.plain)
+                        .transition(.scale.combined(with: .opacity))
+                    }
+
+                    // Play/Pause button
+                    Button {
+                        toggleTimer()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(selectedMode.accentColor)
+                                .frame(width: 56, height: 56)
+                                .shadow(color: selectedMode.accentColor.opacity(0.5), radius: 16, y: 4)
+
+                            Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .offset(x: timerState == .running ? 0 : 2)
+                        }
+                    }
+                    .buttonStyle(.plain)
+
+                    // Full screen button
+                    if timerState != .idle {
+                        Button {
+                            showActiveSession = true
+                        } label: {
+                            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.6))
+                                .frame(width: 44, height: 44)
+                                .background(Circle().fill(.white.opacity(0.1)))
+                        }
+                        .buttonStyle(.plain)
+                        .transition(.scale.combined(with: .opacity))
+                    }
+                }
+                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: timerState)
+            }
+        }
+        .frame(height: 340)
+    }
+
+    // MARK: - Mode Cards Section (Tiimo-style)
+
+    private var modeCardsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Focus Modes")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.6))
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                ForEach(QuickFocusMode.allCases, id: \.self) { mode in
+                    FocusModeCard(
+                        mode: mode,
+                        isSelected: selectedMode == mode,
+                        isDisabled: timerState != .idle
+                    ) {
+                        if mode == .custom {
+                            showCustomTimerPicker = true
+                        } else {
+                            selectMode(mode)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Today's Focus Stats
+
+    private var todayFocusStats: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Today's Focus")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.6))
+
+            HStack(spacing: 12) {
+                FocusStatCard(
+                    value: "2h 45m",
+                    label: "Total Focus",
+                    icon: "flame.fill",
+                    color: Theme.Colors.aiOrange
+                )
+
+                FocusStatCard(
+                    value: "5",
+                    label: "Sessions",
+                    icon: "checkmark.circle.fill",
+                    color: Theme.Colors.success
+                )
+
+                FocusStatCard(
+                    value: "85%",
+                    label: "Score",
+                    icon: "star.fill",
+                    color: Theme.Colors.aiAmber
+                )
+            }
+        }
+    }
+
+    // MARK: - App Blocking Section Content
+
+    private var appBlockingSectionContent: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                // Screen Time Overview (Opal-style)
+                screenTimeOverview
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
+
+                // Quick Block Actions
+                quickBlockActions
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
+
+                // App Categories Breakdown
+                appCategoriesSection
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
+
+                // Blocking Schedule
+                blockingScheduleSection
+                    .padding(.top, Theme.Spacing.xl)
+                    .padding(.horizontal, Theme.Spacing.screenPadding)
+
+                Spacer()
+                    .frame(height: Theme.Spacing.floatingTabBarClearance)
+            }
+        }
+        .scrollIndicators(.hidden)
+    }
+
+    // MARK: - Screen Time Overview (Opal-style)
+
+    private var screenTimeOverview: some View {
+        VStack(spacing: 16) {
+            // Main stat card
+            VStack(spacing: 8) {
+                Text("Today's Screen Time")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.6))
+
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text("4")
+                        .font(.system(size: 56, weight: .thin, design: .rounded))
+                        .foregroundStyle(.white)
+
+                    Text("h")
+                        .font(.system(size: 24, weight: .light))
+                        .foregroundStyle(.white.opacity(0.6))
+
+                    Text("23")
+                        .font(.system(size: 56, weight: .thin, design: .rounded))
+                        .foregroundStyle(.white)
+
+                    Text("m")
+                        .font(.system(size: 24, weight: .light))
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+
+                // Comparison
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.down.right")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Theme.Colors.success)
+
+                    Text("32min less than yesterday")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.Colors.success)
+                }
+            }
+            .padding(.vertical, 24)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(.ultraThinMaterial.opacity(0.5))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Theme.Colors.aiCyan.opacity(0.2), lineWidth: 1)
+                    )
+            )
+
+            // Hourly breakdown chart
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Usage by Hour")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.6))
+
+                HStack(alignment: .bottom, spacing: 4) {
+                    ForEach(0..<12, id: \.self) { hour in
+                        let height = screenTimeBarHeight(for: hour)
+                        VStack(spacing: 4) {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Theme.Colors.aiCyan, Theme.Colors.aiBlue],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .frame(width: 20, height: height)
+
+                            Text("\(hour + 8)")
+                                .font(.system(size: 9))
+                                .foregroundStyle(.white.opacity(0.4))
+                        }
+                    }
+                }
+                .frame(height: 80)
+                .frame(maxWidth: .infinity)
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.ultraThinMaterial.opacity(0.4))
+            )
+        }
+    }
+
+    private func screenTimeBarHeight(for hour: Int) -> CGFloat {
+        // Simulated data - in real app this would come from ScreenTime API
+        let heights: [CGFloat] = [15, 25, 45, 60, 40, 30, 55, 70, 50, 35, 20, 10]
+        return heights[hour % heights.count]
+    }
+
+    // MARK: - Quick Block Actions
+
+    private var quickBlockActions: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Quick Actions")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.6))
+
+            HStack(spacing: 12) {
+                QuickBlockButton(
+                    title: "Focus Mode",
+                    subtitle: "Block distractions",
+                    icon: "moon.fill",
+                    color: Theme.Colors.aiPurple,
+                    isActive: blockingService.isBlocking
+                ) {
+                    showAppBlocking = true
+                }
+
+                QuickBlockButton(
+                    title: "Deep Focus",
+                    subtitle: "Unbreakable session",
+                    icon: "lock.shield.fill",
+                    color: Theme.Colors.aiCyan,
+                    isActive: false
+                ) {
+                    showAppBlocking = true
+                }
+            }
+
+            HStack(spacing: 12) {
+                QuickBlockButton(
+                    title: "Social Break",
+                    subtitle: "Block social apps",
+                    icon: "person.2.slash.fill",
+                    color: Theme.Colors.warning,
+                    isActive: false
+                ) {
+                    showAppBlocking = true
+                }
+
+                QuickBlockButton(
+                    title: "Custom Block",
+                    subtitle: "Choose apps",
+                    icon: "square.grid.2x2.fill",
+                    color: Theme.Colors.success,
+                    isActive: false
+                ) {
+                    showAppBlocking = true
+                }
+            }
+        }
+    }
+
+    // MARK: - App Categories Section
+
+    private var appCategoriesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Top Categories")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.6))
+
+                Spacer()
+
+                Button {
+                    showAppBlocking = true
+                } label: {
+                    Text("See All")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Theme.Colors.aiCyan)
+                }
+                .buttonStyle(.plain)
+            }
+
+            VStack(spacing: 8) {
+                CategoryUsageRow(
+                    name: "Social",
+                    time: "1h 45m",
+                    percentage: 0.42,
+                    color: .pink,
+                    icon: "bubble.left.and.bubble.right.fill"
+                )
+
+                CategoryUsageRow(
+                    name: "Entertainment",
+                    time: "1h 12m",
+                    percentage: 0.28,
+                    color: .purple,
+                    icon: "play.tv.fill"
+                )
+
+                CategoryUsageRow(
+                    name: "Productivity",
+                    time: "52m",
+                    percentage: 0.20,
+                    color: Theme.Colors.aiBlue,
+                    icon: "doc.text.fill"
+                )
+
+                CategoryUsageRow(
+                    name: "Other",
+                    time: "34m",
+                    percentage: 0.10,
+                    color: .gray,
+                    icon: "ellipsis.circle.fill"
+                )
+            }
+        }
+    }
+
+    // MARK: - Blocking Schedule Section
+
+    private var blockingScheduleSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Scheduled Blocks")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.6))
+
+                Spacer()
+
+                Button {
+                    // Add schedule
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Theme.Colors.aiCyan)
+                }
+                .buttonStyle(.plain)
+            }
+
+            VStack(spacing: 8) {
+                ScheduleBlockRow(
+                    name: "Morning Focus",
+                    time: "6:00 AM - 9:00 AM",
+                    days: "Mon-Fri",
+                    isActive: true
+                )
+
+                ScheduleBlockRow(
+                    name: "Work Hours",
+                    time: "9:00 AM - 5:00 PM",
+                    days: "Mon-Fri",
+                    isActive: true
+                )
+
+                ScheduleBlockRow(
+                    name: "Wind Down",
+                    time: "9:00 PM - 11:00 PM",
+                    days: "Every day",
+                    isActive: false
+                )
+            }
+        }
+    }
+
+    // MARK: - Reset Timer
+
+    private func resetTimer() {
+        timer?.invalidate()
+        timer = nil
+        timerState = .idle
+        timeRemaining = selectedMode.duration
+        totalTime = selectedMode.duration
+        HapticsService.shared.impact(.medium)
     }
 
     // MARK: - Enhanced Cosmic Background
@@ -345,43 +923,65 @@ struct FocusMainView: View {
         }
     }
 
-    // MARK: - Quick Timer Section (Tiimo-Inspired)
+    // MARK: - Quick Timer Section
 
     private var quickTimerSection: some View {
-        ZStack {
-            // Tiimo-style visual timer
-            TiimoTimerCircle(
-                mode: selectedMode,
-                isActive: timerState == .running,
-                progress: timerProgress,
-                timeRemaining: timeRemaining,
-                totalTime: totalTime
-            )
+        VStack(spacing: Theme.Spacing.lg) {
+            // Timer Circle
+            ZStack {
+                // Background ring
+                Circle()
+                    .stroke(Color.white.opacity(0.1), lineWidth: 10)
+                    .frame(width: 180, height: 180)
 
-            // Play/Pause button overlay
-            VStack {
-                Spacer()
-                    .frame(height: 170)
+                // Progress ring
+                Circle()
+                    .trim(from: 0, to: timerProgress)
+                    .stroke(
+                        LinearGradient(
+                            colors: [selectedMode.accentColor, selectedMode.accentColor.opacity(0.6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                    )
+                    .frame(width: 180, height: 180)
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear(duration: 0.5), value: timerProgress)
 
-                Button {
-                    toggleTimer()
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(selectedMode.accentColor)
-                            .frame(width: 52, height: 52)
-                            .shadow(color: selectedMode.accentColor.opacity(0.5), radius: 16, y: 6)
+                // Glow effect
+                Circle()
+                    .stroke(selectedMode.accentColor.opacity(0.3), lineWidth: 20)
+                    .frame(width: 180, height: 180)
+                    .blur(radius: 15)
 
-                        Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .offset(x: timerState == .running ? 0 : 2)
+                // Time display + Play button
+                VStack(spacing: 12) {
+                    Text(timerDisplayString)
+                        .font(.system(size: 40, weight: .light, design: .monospaced))
+                        .foregroundStyle(.white)
+                        .contentTransition(.numericText())
+
+                    // Play/Pause Button
+                    Button {
+                        toggleTimer()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(selectedMode.accentColor)
+                                .frame(width: 48, height: 48)
+                                .shadow(color: selectedMode.accentColor.opacity(0.4), radius: 12, y: 4)
+
+                            Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .offset(x: timerState == .running ? 0 : 2)
+                        }
                     }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
-        .frame(height: 280)
     }
 
     // MARK: - Mode Selector
@@ -485,252 +1085,34 @@ struct FocusMainView: View {
         totalTime = mode.duration
     }
 
-    // MARK: - Section Content
+    // MARK: - Portal Cards
 
-    @ViewBuilder
-    private var sectionContentView: some View {
-        switch activeSection {
-        case .timer:
-            timerSectionContent
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal: .move(edge: .trailing).combined(with: .opacity)
-                ))
-
-        case .blocking:
-            blockingSectionContent
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal: .move(edge: .trailing).combined(with: .opacity)
-                ))
-
-        case .insights:
-            insightsSectionContent
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal: .move(edge: .trailing).combined(with: .opacity)
-                ))
-        }
-    }
-
-    // MARK: - Timer Section Content
-
-    private var timerSectionContent: some View {
-        VStack(spacing: Theme.Spacing.lg) {
-            // Configure Session Card
-            FlowSectionCard(
-                title: "Configure Session",
-                subtitle: "Customize your focus time",
-                icon: "slider.horizontal.3",
-                accentColor: Theme.Colors.aiAmber
+    private var portalCardsView: some View {
+        VStack(spacing: Theme.Spacing.xl) {
+            // Focus Timer Portal
+            FocusPortalCard(
+                title: "Focus Timer",
+                subtitle: "Set duration & start session",
+                icon: "timer",
+                accentColor: Theme.Colors.aiAmber,
+                glowIntensity: 0.7 + portalPulse * 0.2
             ) {
                 HapticsService.shared.impact()
                 showFocusTimer = true
             }
 
-            // Quick duration options
-            HStack(spacing: 12) {
-                ForEach([15, 30, 45, 60], id: \.self) { minutes in
-                    durationChip(minutes: minutes)
-                }
-            }
-
-            // Task linking hint
-            HStack(spacing: 8) {
-                Image(systemName: "link")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.Colors.aiAmber.opacity(0.7))
-
-                Text("Link a task to track progress")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.5))
-
-                Spacer()
-            }
-            .padding(.horizontal, 4)
-        }
-    }
-
-    private func durationChip(minutes: Int) -> some View {
-        Button {
-            HapticsService.shared.selectionFeedback()
-            timeRemaining = TimeInterval(minutes * 60)
-            totalTime = TimeInterval(minutes * 60)
-        } label: {
-            Text("\(minutes)m")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.8))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .glassEffect(
-                    .regular.tint(Theme.Colors.aiAmber.opacity(0.1)),
-                    in: RoundedRectangle(cornerRadius: 10)
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(.white.opacity(0.15), lineWidth: 0.5)
-                }
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - Blocking Section Content
-
-    private var blockingSectionContent: some View {
-        VStack(spacing: Theme.Spacing.lg) {
-            // Quick Block Toggle
-            FlowBlockToggleCard(isBlocking: blockingService.isBlocking) {
-                // Toggle blocking
-            }
-
-            // App Groups Grid
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                FlowAppGroupCard(name: "Social", icon: "bubble.left.and.bubble.right.fill", appCount: 5, color: Theme.Colors.aiPink)
-                FlowAppGroupCard(name: "Entertainment", icon: "play.rectangle.fill", appCount: 3, color: Theme.Colors.aiPurple)
-                FlowAppGroupCard(name: "Games", icon: "gamecontroller.fill", appCount: 8, color: Theme.Colors.aiOrange)
-                FlowAppGroupCard(name: "Custom", icon: "plus.circle.fill", appCount: 0, color: Theme.Colors.aiCyan)
-            }
-
-            // View All / Schedules Link
-            Button {
+            // App Blocking Portal
+            FocusPortalCard(
+                title: "App Blocking",
+                subtitle: "Control your digital space",
+                icon: "shield.lefthalf.filled",
+                accentColor: Theme.Colors.aiCyan,
+                glowIntensity: 0.5 + portalPulse * 0.15
+            ) {
                 HapticsService.shared.impact()
                 showAppBlocking = true
-            } label: {
-                HStack {
-                    Image(systemName: "calendar.badge.clock")
-                        .font(.system(size: 14))
-                    Text("Manage Schedules")
-                        .font(.system(size: 13, weight: .semibold))
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .opacity(0.5)
-                }
-                .foregroundStyle(Theme.Colors.aiCyan)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .glassEffect(
-                    .regular.tint(Theme.Colors.aiCyan.opacity(0.1)),
-                    in: RoundedRectangle(cornerRadius: 12)
-                )
             }
-            .buttonStyle(.plain)
         }
-    }
-
-    // MARK: - Insights Section Content
-
-    private var insightsSectionContent: some View {
-        VStack(spacing: Theme.Spacing.lg) {
-            // Streak & Gems Hero
-            StreakFlameView(
-                currentStreak: gamificationService.currentStreak,
-                bestStreak: gamificationService.longestStreak,
-                hasStreakShield: gamificationService.hasActiveStreakShield
-            )
-
-            // Gem Collection
-            GemCollectionView(gems: buildGemProgress()) { gemType in
-                // Handle gem tap - could show details
-                HapticsService.shared.selectionFeedback()
-            }
-
-            // Focus Score Hero
-            FlowFocusScoreCard(score: focusScore, trend: focusScoreTrend)
-
-            // Screen Time Summary
-            FlowScreenTimeSummary(
-                todayTime: formattedFocusTime,
-                vsYesterday: focusTimeComparison,
-                pickups: 67
-            )
-
-            // AI Insight
-            FlowAIInsightCard(
-                insight: gamificationService.latestInsight ?? "Complete a focus session to get personalized insights."
-            )
-        }
-    }
-
-    // MARK: - Gem Progress Calculation
-
-    private func buildGemProgress() -> [GemProgress] {
-        let totalMinutes = gamificationService.focusMinutesTotal
-        let streak = gamificationService.currentStreak
-        let totalHours = totalMinutes / 60
-        let sessionsCompleted = gamificationService.tasksCompleted // Using as proxy for now
-
-        return [
-            GemProgress(
-                gemType: .sapphire,
-                isEarned: sessionsCompleted >= 1,
-                progress: min(1.0, Double(sessionsCompleted) / 1.0),
-                earnedDate: sessionsCompleted >= 1 ? Date() : nil
-            ),
-            GemProgress(
-                gemType: .emerald,
-                isEarned: totalMinutes >= 90,
-                progress: min(1.0, Double(totalMinutes) / 90.0),
-                earnedDate: totalMinutes >= 90 ? Date() : nil
-            ),
-            GemProgress(
-                gemType: .ruby,
-                isEarned: streak >= 7,
-                progress: min(1.0, Double(streak) / 7.0),
-                earnedDate: streak >= 7 ? Date() : nil
-            ),
-            GemProgress(
-                gemType: .diamond,
-                isEarned: streak >= 30,
-                progress: min(1.0, Double(streak) / 30.0),
-                earnedDate: streak >= 30 ? Date() : nil
-            ),
-            GemProgress(
-                gemType: .amethyst,
-                isEarned: totalHours >= 100,
-                progress: min(1.0, Double(totalHours) / 100.0),
-                earnedDate: totalHours >= 100 ? Date() : nil
-            )
-        ]
-    }
-
-    // MARK: - Focus Analytics Computed Properties
-
-    private var focusScore: Int {
-        // Calculate focus score based on streaks, consistency, and time
-        let streakBonus = min(gamificationService.currentStreak * 5, 30)
-        let timeBonus = min(gamificationService.focusMinutesTotal / 10, 50)
-        let consistencyBonus = 20 // Base consistency
-        return min(streakBonus + timeBonus + consistencyBonus, 100)
-    }
-
-    private var focusScoreTrend: ScoreTrend {
-        // Compare this week vs last week activity
-        let thisWeek = gamificationService.weeklyActivityData.reduce(0, +)
-        let lastWeek = gamificationService.previousWeekData.reduce(0, +)
-        if thisWeek > lastWeek { return .up }
-        if thisWeek < lastWeek { return .down }
-        return .stable
-    }
-
-    private var formattedFocusTime: String {
-        let totalMinutes = gamificationService.focusMinutesTotal
-        let hours = totalMinutes / 60
-        let mins = totalMinutes % 60
-        if hours > 0 {
-            return "\(hours)h \(mins)m"
-        }
-        return "\(mins)m"
-    }
-
-    private var focusTimeComparison: String {
-        // Calculate vs yesterday comparison
-        let today = gamificationService.weeklyActivityData.last ?? 0
-        let yesterday = gamificationService.weeklyActivityData.dropLast().last ?? 0
-        guard yesterday > 0 else { return "+\(today)" }
-        let change = ((Double(today) - Double(yesterday)) / Double(yesterday)) * 100
-        let sign = change >= 0 ? "+" : ""
-        return "\(sign)\(Int(change))%"
     }
 
     // MARK: - Quick Stats Bar
@@ -787,6 +1169,16 @@ struct FocusMainView: View {
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.white.opacity(0.5))
         }
+    }
+
+    // MARK: - Streak Flame Section (Gamification)
+
+    private var streakFlameSection: some View {
+        StreakFlameView(
+            currentStreak: gamificationService.currentStreak,
+            bestStreak: gamificationService.longestStreak,
+            hasStreakShield: gamificationService.hasActiveStreakShield
+        )
     }
 
     // MARK: - Ambient Animations
@@ -1028,364 +1420,389 @@ struct SeededRandomGenerator: RandomNumberGenerator {
     }
 }
 
-// MARK: - Flow Section Card
+// MARK: - Focus Mode Card (Tiimo-style)
 
-struct FlowSectionCard: View {
+struct FocusModeCard: View {
+    let mode: QuickFocusMode
+    let isSelected: Bool
+    let isDisabled: Bool
+    let onTap: () -> Void
+
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    // Icon
+                    ZStack {
+                        Circle()
+                            .fill(mode.accentColor.opacity(0.2))
+                            .frame(width: 40, height: 40)
+
+                        Image(systemName: mode.icon)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(mode.accentColor)
+                    }
+
+                    Spacer()
+
+                    // Selected indicator
+                    if isSelected {
+                        Circle()
+                            .fill(mode.accentColor)
+                            .frame(width: 8, height: 8)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(mode.rawValue)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white)
+
+                        Spacer()
+
+                        Text(mode.label)
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(mode.accentColor)
+                    }
+
+                    Text(mode.description)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.5))
+                        .lineLimit(1)
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.ultraThinMaterial.opacity(isSelected ? 0.7 : 0.4))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(
+                                isSelected ? mode.accentColor.opacity(0.5) : .white.opacity(0.1),
+                                lineWidth: isSelected ? 1.5 : 1
+                            )
+                    )
+            )
+            .scaleEffect(isPressed ? 0.97 : 1)
+        }
+        .disabled(isDisabled)
+        .opacity(isDisabled && !isSelected ? 0.5 : 1)
+        .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in withAnimation(.spring(response: 0.2)) { isPressed = true } }
+                .onEnded { _ in withAnimation(.spring(response: 0.2)) { isPressed = false } }
+        )
+    }
+}
+
+// MARK: - Focus Stat Card
+
+struct FocusStatCard: View {
+    let value: String
+    let label: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(color)
+
+            Text(value)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+
+            Text(label)
+                .font(.system(size: 10))
+                .foregroundStyle(.white.opacity(0.5))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(.ultraThinMaterial.opacity(0.4))
+        )
+    }
+}
+
+// MARK: - Quick Block Button
+
+struct QuickBlockButton: View {
     let title: String
     let subtitle: String
     let icon: String
-    let accentColor: Color
+    let color: Color
+    let isActive: Bool
     let action: () -> Void
 
     @State private var isPressed = false
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: Theme.Spacing.md) {
-                // Icon container
+            HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(accentColor.opacity(0.2))
+                        .fill(color.opacity(isActive ? 0.3 : 0.2))
                         .frame(width: 44, height: 44)
 
                     Image(systemName: icon)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(accentColor)
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundStyle(color)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
 
                     Text(subtitle)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 11))
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Spacer()
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.4))
+                if isActive {
+                    Text("Active")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(color))
+                }
             }
-            .padding(Theme.Spacing.md)
-            .glassEffect(
-                .regular.tint(accentColor.opacity(0.08)),
-                in: RoundedRectangle(cornerRadius: 16)
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(.ultraThinMaterial.opacity(isActive ? 0.6 : 0.4))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(isActive ? color.opacity(0.3) : .white.opacity(0.1), lineWidth: 1)
+                    )
             )
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(accentColor.opacity(0.3), lineWidth: 1)
-            }
+            .scaleEffect(isPressed ? 0.98 : 1)
         }
         .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.98 : 1)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressed)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
-                .onChanged { _ in isPressed = true }
-                .onEnded { _ in isPressed = false }
+                .onChanged { _ in withAnimation(.spring(response: 0.2)) { isPressed = true } }
+                .onEnded { _ in withAnimation(.spring(response: 0.2)) { isPressed = false } }
         )
     }
 }
 
-// MARK: - Flow Block Toggle Card
+// MARK: - Category Usage Row
 
-struct FlowBlockToggleCard: View {
-    let isBlocking: Bool
-    let onToggle: () -> Void
-
-    var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            // Shield icon with status
-            ZStack {
-                Circle()
-                    .fill(isBlocking ? Theme.Colors.aiCyan.opacity(0.3) : Color.white.opacity(0.1))
-                    .frame(width: 50, height: 50)
-
-                Image(systemName: isBlocking ? "shield.checkered" : "shield")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(isBlocking ? Theme.Colors.aiCyan : .white.opacity(0.6))
-                    .symbolEffect(.pulse, options: .repeating, isActive: isBlocking)
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(isBlocking ? "Blocking Active" : "App Blocking")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-
-                Text(isBlocking ? "Distractions are blocked" : "Enable to block apps")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.5))
-            }
-
-            Spacer()
-
-            // Toggle (visual only for now)
-            Toggle("", isOn: .constant(isBlocking))
-                .labelsHidden()
-                .tint(Theme.Colors.aiCyan)
-        }
-        .padding(Theme.Spacing.md)
-        .glassEffect(
-            .regular.tint(isBlocking ? Theme.Colors.aiCyan.opacity(0.1) : Color.clear),
-            in: RoundedRectangle(cornerRadius: 16)
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    isBlocking ? Theme.Colors.aiCyan.opacity(0.4) : .white.opacity(0.15),
-                    lineWidth: isBlocking ? 1.5 : 0.5
-                )
-        }
-    }
-}
-
-// MARK: - Flow App Group Card
-
-struct FlowAppGroupCard: View {
+struct CategoryUsageRow: View {
     let name: String
-    let icon: String
-    let appCount: Int
+    let time: String
+    let percentage: Double
     let color: Color
-
-    @State private var isSelected = false
-
-    var body: some View {
-        Button {
-            HapticsService.shared.selectionFeedback()
-            isSelected.toggle()
-        } label: {
-            VStack(spacing: 8) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(color.opacity(0.2))
-                        .frame(width: 48, height: 48)
-
-                    Image(systemName: icon)
-                        .font(.system(size: 20))
-                        .foregroundStyle(color)
-                }
-
-                Text(name)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-
-                Text("\(appCount) apps")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.5))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .glassEffect(
-                .regular.tint(isSelected ? color.opacity(0.12) : Color.clear),
-                in: RoundedRectangle(cornerRadius: 16)
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isSelected ? color : .white.opacity(0.1), lineWidth: isSelected ? 1.5 : 0.5)
-            }
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Flow Focus Score Card
-
-enum ScoreTrend {
-    case up, down, stable
-
-    var icon: String {
-        switch self {
-        case .up: return "arrow.up.right"
-        case .down: return "arrow.down.right"
-        case .stable: return "arrow.right"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .up: return Theme.Colors.success
-        case .down: return Theme.Colors.error
-        case .stable: return Theme.Colors.aiAmber
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .up: return "+12% from last week"
-        case .down: return "-8% from last week"
-        case .stable: return "Same as last week"
-        }
-    }
-}
-
-struct FlowFocusScoreCard: View {
-    let score: Int
-    let trend: ScoreTrend
+    let icon: String
 
     var body: some View {
-        HStack(spacing: 20) {
-            // Score Ring
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.1), lineWidth: 8)
-                    .frame(width: 80, height: 80)
-
-                Circle()
-                    .trim(from: 0, to: Double(score) / 100)
-                    .stroke(
-                        AngularGradient(
-                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
-                            center: .center
-                        ),
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                    )
-                    .frame(width: 80, height: 80)
-                    .rotationEffect(.degrees(-90))
-
-                Text("\(score)")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-            }
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(color)
+                .frame(width: 32, height: 32)
+                .background(Circle().fill(color.opacity(0.15)))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Focus Score")
-                    .font(.system(size: 18, weight: .semibold))
+                HStack {
+                    Text(name)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    Text(time)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(.white.opacity(0.1))
+                            .frame(height: 6)
+
+                        Capsule()
+                            .fill(color)
+                            .frame(width: geometry.size.width * percentage, height: 6)
+                    }
+                }
+                .frame(height: 6)
+            }
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial.opacity(0.3))
+        )
+    }
+}
+
+// MARK: - Schedule Block Row
+
+struct ScheduleBlockRow: View {
+    let name: String
+    let time: String
+    let days: String
+    let isActive: Bool
+
+    var body: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(name)
+                    .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.white)
 
-                HStack(spacing: 4) {
-                    Image(systemName: trend.icon)
-                        .font(.system(size: 12, weight: .bold))
-                    Text(trend.description)
-                        .font(.system(size: 13, weight: .medium))
+                HStack(spacing: 8) {
+                    Text(time)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.5))
+
+                    Text("•")
+                        .foregroundStyle(.white.opacity(0.3))
+
+                    Text(days)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.5))
                 }
-                .foregroundStyle(trend.color)
             }
 
             Spacer()
+
+            Toggle("", isOn: .constant(isActive))
+                .toggleStyle(SwitchToggleStyle(tint: Theme.Colors.aiCyan))
+                .labelsHidden()
         }
-        .padding(20)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
-        .overlay {
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(
-                    LinearGradient(
-                        colors: [Theme.Colors.aiPurple.opacity(0.4), .clear],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
-        }
-    }
-}
-
-// MARK: - Flow Screen Time Summary
-
-struct FlowScreenTimeSummary: View {
-    let todayTime: String
-    let vsYesterday: String
-    let pickups: Int
-
-    var body: some View {
-        HStack(spacing: 0) {
-            summaryItem(value: todayTime, label: "Today", icon: "clock.fill", color: Theme.Colors.aiCyan)
-
-            Divider()
-                .frame(height: 40)
-                .background(.white.opacity(0.15))
-                .padding(.horizontal, 12)
-
-            summaryItem(value: vsYesterday, label: "vs Yesterday", icon: "arrow.down", color: Theme.Colors.success)
-
-            Divider()
-                .frame(height: 40)
-                .background(.white.opacity(0.15))
-                .padding(.horizontal, 12)
-
-            summaryItem(value: "\(pickups)", label: "Pickups", icon: "hand.tap.fill", color: Theme.Colors.aiOrange)
-        }
-        .padding(Theme.Spacing.md)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(.white.opacity(0.15), lineWidth: 0.5)
-        }
-    }
-
-    private func summaryItem(value: String, label: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 4) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 11))
-                    .foregroundStyle(color)
-
-                Text(value)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-            }
-
-            Text(label)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.white.opacity(0.5))
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-// MARK: - Flow AI Insight Card
-
-struct FlowAIInsightCard: View {
-    let insight: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            // AI sparkle icon
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 36, height: 36)
-
-                Image(systemName: "sparkles")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("AI Insight")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Theme.Colors.aiPurple)
-
-                Text(insight)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.8))
-                    .lineSpacing(2)
-            }
-        }
-        .padding(Theme.Spacing.md)
-        .glassEffect(
-            .regular.tint(Theme.Colors.aiPurple.opacity(0.08)),
-            in: RoundedRectangle(cornerRadius: 16)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial.opacity(0.3))
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(
-                    LinearGradient(
-                        colors: [Theme.Colors.aiPurple.opacity(0.3), Theme.Colors.aiCyan.opacity(0.2)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
-                )
+    }
+}
+
+// MARK: - Custom Timer Picker Sheet
+
+struct CustomTimerPickerSheet: View {
+    @Binding var minutes: Int
+    let onStart: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    private let presets = [5, 10, 15, 20, 25, 30, 45, 60, 90, 120]
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                VoidBackground.focus
+
+                VStack(spacing: 24) {
+                    // Custom time display
+                    VStack(spacing: 8) {
+                        Text("\(minutes)")
+                            .font(.system(size: 72, weight: .thin, design: .rounded))
+                            .foregroundStyle(.white)
+
+                        Text("minutes")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                    .padding(.top, 32)
+
+                    // Slider
+                    VStack(spacing: 8) {
+                        Slider(value: Binding(
+                            get: { Double(minutes) },
+                            set: { minutes = Int($0) }
+                        ), in: 1...180, step: 1)
+                        .tint(Theme.Colors.success)
+
+                        HStack {
+                            Text("1 min")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white.opacity(0.4))
+
+                            Spacer()
+
+                            Text("3 hours")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white.opacity(0.4))
+                        }
+                    }
+                    .padding(.horizontal, 24)
+
+                    // Presets
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Quick Select")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.6))
+
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 10) {
+                            ForEach(presets, id: \.self) { preset in
+                                Button {
+                                    minutes = preset
+                                    HapticsService.shared.selectionFeedback()
+                                } label: {
+                                    Text("\(preset)m")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundStyle(minutes == preset ? .white : .white.opacity(0.7))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 10)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(minutes == preset ? Theme.Colors.success : .white.opacity(0.1))
+                                        )
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+
+                    Spacer()
+
+                    // Start button
+                    Button {
+                        HapticsService.shared.impact(.medium)
+                        onStart()
+                    } label: {
+                        Text("Start Focus")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Theme.Colors.success)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 24)
+                }
+            }
+            .navigationTitle("Custom Timer")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+            }
         }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(.clear)
     }
 }
 

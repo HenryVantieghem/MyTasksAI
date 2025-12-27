@@ -60,6 +60,14 @@ final class Goal {
     var completedMilestoneCount: Int
     var linkedTaskCount: Int
 
+    // MARK: Psychology-Based Features
+    var actionSteps: Data?  // JSON encoded [GoalActionStep] - User's own steps
+    var goalNotes: Data?  // JSON encoded [GoalNote] - User's progress notes
+    var whyItMatters: String?  // Personal motivation (Implementation Intentions)
+    var ifThenPlans: Data?  // JSON encoded [IfThenPlan] - WOOP obstacle plans
+    var commitmentStatement: String?  // Public commitment device
+    var visualizationNotes: String?  // Mental contrasting from WOOP
+
     // MARK: Timestamps
     var createdAt: Date
     var updatedAt: Date
@@ -99,6 +107,12 @@ final class Goal {
         milestoneCount: Int = 0,
         completedMilestoneCount: Int = 0,
         linkedTaskCount: Int = 0,
+        actionSteps: Data? = nil,
+        goalNotes: Data? = nil,
+        whyItMatters: String? = nil,
+        ifThenPlans: Data? = nil,
+        commitmentStatement: String? = nil,
+        visualizationNotes: String? = nil,
         createdAt: Date = .now,
         updatedAt: Date = .now
     ) {
@@ -135,6 +149,12 @@ final class Goal {
         self.milestoneCount = milestoneCount
         self.completedMilestoneCount = completedMilestoneCount
         self.linkedTaskCount = linkedTaskCount
+        self.actionSteps = actionSteps
+        self.goalNotes = goalNotes
+        self.whyItMatters = whyItMatters
+        self.ifThenPlans = ifThenPlans
+        self.commitmentStatement = commitmentStatement
+        self.visualizationNotes = visualizationNotes
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -174,6 +194,41 @@ extension Goal {
     var decodedProgressHistory: [ProgressSnapshot] {
         guard let data = progressHistory else { return [] }
         return (try? JSONDecoder().decode([ProgressSnapshot].self, from: data)) ?? []
+    }
+
+    /// Decoded action steps
+    var decodedActionSteps: [GoalActionStep] {
+        guard let data = actionSteps else { return [] }
+        return (try? JSONDecoder().decode([GoalActionStep].self, from: data)) ?? []
+    }
+
+    /// Decoded notes
+    var decodedNotes: [GoalNote] {
+        guard let data = goalNotes else { return [] }
+        return (try? JSONDecoder().decode([GoalNote].self, from: data)) ?? []
+    }
+
+    /// Decoded if-then plans
+    var decodedIfThenPlans: [IfThenPlan] {
+        guard let data = ifThenPlans else { return [] }
+        return (try? JSONDecoder().decode([IfThenPlan].self, from: data)) ?? []
+    }
+
+    /// Action steps completion progress
+    var actionStepsProgress: Double {
+        let steps = decodedActionSteps
+        guard !steps.isEmpty else { return 0 }
+        return Double(steps.filter(\.isCompleted).count) / Double(steps.count)
+    }
+
+    /// Has personal motivation set
+    var hasPersonalMotivation: Bool {
+        whyItMatters != nil && !(whyItMatters?.isEmpty ?? true)
+    }
+
+    /// Has obstacle plans
+    var hasObstaclePlans: Bool {
+        !decodedIfThenPlans.isEmpty
     }
 
     /// Has AI analysis been completed
@@ -355,6 +410,67 @@ extension Goal {
             }
         }
 
+        updatedAt = .now
+    }
+
+    // MARK: - Psychology Features Methods
+
+    /// Add a new action step
+    func addActionStep(_ step: GoalActionStep) {
+        var steps = decodedActionSteps
+        steps.append(step)
+        actionSteps = try? JSONEncoder().encode(steps)
+        updatedAt = .now
+    }
+
+    /// Toggle action step completion
+    func toggleActionStep(_ stepId: UUID) {
+        var steps = decodedActionSteps
+        if let index = steps.firstIndex(where: { $0.id == stepId }) {
+            steps[index].isCompleted.toggle()
+            steps[index].completedAt = steps[index].isCompleted ? .now : nil
+            actionSteps = try? JSONEncoder().encode(steps)
+            updatedAt = .now
+        }
+    }
+
+    /// Remove action step
+    func removeActionStep(_ stepId: UUID) {
+        var steps = decodedActionSteps
+        steps.removeAll { $0.id == stepId }
+        actionSteps = try? JSONEncoder().encode(steps)
+        updatedAt = .now
+    }
+
+    /// Add a note
+    func addNote(_ note: GoalNote) {
+        var notes = decodedNotes
+        notes.insert(note, at: 0) // Most recent first
+        goalNotes = try? JSONEncoder().encode(notes)
+        updatedAt = .now
+    }
+
+    /// Remove a note
+    func removeNote(_ noteId: UUID) {
+        var notes = decodedNotes
+        notes.removeAll { $0.id == noteId }
+        goalNotes = try? JSONEncoder().encode(notes)
+        updatedAt = .now
+    }
+
+    /// Add an if-then plan
+    func addIfThenPlan(_ plan: IfThenPlan) {
+        var plans = decodedIfThenPlans
+        plans.append(plan)
+        ifThenPlans = try? JSONEncoder().encode(plans)
+        updatedAt = .now
+    }
+
+    /// Remove an if-then plan
+    func removeIfThenPlan(_ planId: UUID) {
+        var plans = decodedIfThenPlans
+        plans.removeAll { $0.id == planId }
+        ifThenPlans = try? JSONEncoder().encode(plans)
         updatedAt = .now
     }
 
@@ -573,5 +689,130 @@ struct SupabaseGoal: Codable, Sendable {
         case linkedTaskCount = "linked_task_count"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+    }
+}
+
+// MARK: - Psychology-Based Feature Models
+
+/// Action step for breaking down goals (Implementation Intentions)
+struct GoalActionStep: Codable, Identifiable, Sendable {
+    var id: UUID
+    var title: String
+    var isCompleted: Bool
+    var completedAt: Date?
+    var createdAt: Date
+    var sortOrder: Int
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        isCompleted: Bool = false,
+        completedAt: Date? = nil,
+        createdAt: Date = .now,
+        sortOrder: Int = 0
+    ) {
+        self.id = id
+        self.title = title
+        self.isCompleted = isCompleted
+        self.completedAt = completedAt
+        self.createdAt = createdAt
+        self.sortOrder = sortOrder
+    }
+}
+
+/// Note for tracking thoughts and progress
+struct GoalNote: Codable, Identifiable, Sendable {
+    var id: UUID
+    var content: String
+    var mood: NoteMood?
+    var createdAt: Date
+
+    init(
+        id: UUID = UUID(),
+        content: String,
+        mood: NoteMood? = nil,
+        createdAt: Date = .now
+    ) {
+        self.id = id
+        self.content = content
+        self.mood = mood
+        self.createdAt = createdAt
+    }
+
+    enum NoteMood: String, Codable, CaseIterable, Sendable {
+        case motivated = "motivated"
+        case focused = "focused"
+        case challenged = "challenged"
+        case stuck = "stuck"
+        case celebrating = "celebrating"
+
+        var icon: String {
+            switch self {
+            case .motivated: return "flame.fill"
+            case .focused: return "target"
+            case .challenged: return "figure.climbing"
+            case .stuck: return "pause.circle.fill"
+            case .celebrating: return "party.popper.fill"
+            }
+        }
+
+        var color: Color {
+            switch self {
+            case .motivated: return .orange
+            case .focused: return Theme.Colors.aiCyan
+            case .challenged: return Theme.Colors.warning
+            case .stuck: return Theme.Colors.error
+            case .celebrating: return Theme.Colors.success
+            }
+        }
+    }
+}
+
+/// If-Then Plan for obstacles (WOOP methodology)
+struct IfThenPlan: Codable, Identifiable, Sendable {
+    var id: UUID
+    var obstacle: String  // "If this happens..."
+    var response: String  // "Then I will..."
+    var timesUsed: Int
+    var lastUsedAt: Date?
+    var createdAt: Date
+
+    init(
+        id: UUID = UUID(),
+        obstacle: String,
+        response: String,
+        timesUsed: Int = 0,
+        lastUsedAt: Date? = nil,
+        createdAt: Date = .now
+    ) {
+        self.id = id
+        self.obstacle = obstacle
+        self.response = response
+        self.timesUsed = timesUsed
+        self.lastUsedAt = lastUsedAt
+        self.createdAt = createdAt
+    }
+}
+
+/// Progress snapshot for history
+struct ProgressSnapshot: Codable, Sendable {
+    var date: Date
+    var progress: Double
+    var completedMilestones: Int
+    var totalMilestones: Int
+    var notes: String?
+
+    init(
+        date: Date = .now,
+        progress: Double,
+        completedMilestones: Int = 0,
+        totalMilestones: Int = 0,
+        notes: String? = nil
+    ) {
+        self.date = date
+        self.progress = progress
+        self.completedMilestones = completedMilestones
+        self.totalMilestones = totalMilestones
+        self.notes = notes
     }
 }

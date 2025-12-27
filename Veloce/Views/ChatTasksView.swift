@@ -124,14 +124,30 @@ struct ChatTasksView: View {
     // Date selection
     @State private var selectedDate: Date = Date()
 
-    // View mode toggle
+    // View mode toggle - auto-switch to columns on iPad landscape
     @State private var viewMode: TaskViewMode = .list
+    @State private var userOverrodeViewMode = false
+    @Environment(\.responsiveLayout) private var layout
+
+    // Computed effective view mode (auto-columns on iPad landscape)
+    private var effectiveViewMode: TaskViewMode {
+        // If user manually changed view mode, respect their choice
+        if userOverrodeViewMode { return viewMode }
+        // Auto-switch to columns on iPad landscape
+        if layout.deviceType.isTablet && layout.isLandscape {
+            return .columns
+        }
+        return viewMode
+    }
 
     // Animation states
     @State private var showConfetti = false
     @State private var showAICreationAnimation = false
     @State private var pointsAnimations: [PointsAnimationState] = []
     @State private var lastCompletedPosition: CGPoint = .zero
+
+    // AI Thinking animation tracking for newly created tasks
+    @State private var newlyCreatedTaskIds: Set<UUID> = []
 
     // Staggered entry tracking
     @State private var visibleTaskIds: Set<UUID> = []
@@ -204,9 +220,8 @@ struct ChatTasksView: View {
 
     var body: some View {
         ZStack {
-            // Adaptive background
-            Color(.systemGroupedBackground)
-                .ignoresSafeArea()
+            // Cosmic void background (consistent with GrowView)
+            VoidBackground.calendar
 
             // Main content
             VStack(spacing: 0) {
@@ -219,7 +234,7 @@ struct ChatTasksView: View {
                     EmptyTasksView()
                         .padding(.top, Theme.Spacing.universalHeaderHeight - 60)
                 } else {
-                    if viewMode == .list {
+                    if effectiveViewMode == .list {
                         listTaskFeed
                     } else {
                         columnTaskFeed
@@ -236,28 +251,47 @@ struct ChatTasksView: View {
                 triggerStaggeredEntry()
             }
         }
+        .onChange(of: viewModel.sortedTasks.count) { oldCount, newCount in
+            // Detect when a new task is added
+            if newCount > oldCount {
+                // Find the newest task (most recently created)
+                if let newestTask = viewModel.sortedTasks
+                    .sorted(by: { $0.createdAt > $1.createdAt })
+                    .first {
+                    // Only trigger AI animation if task was just created (within last 2 seconds)
+                    if Date().timeIntervalSince(newestTask.createdAt) < 2 {
+                        withAnimation(.spring(response: 0.4)) {
+                            newlyCreatedTaskIds.insert(newestTask.id)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - View Mode Header
 
     private var viewModeHeader: some View {
-        HStack(spacing: 16) {
-            // Date pill
+        ZStack {
+            // Today pill (absolute center)
             TodayPillView(selectedDate: $selectedDate)
 
-            Spacer()
+            // View mode toggle (right-aligned)
+            HStack {
+                Spacer()
 
-            // View mode toggle
-            Picker("View", selection: $viewMode) {
-                ForEach(TaskViewMode.allCases, id: \.self) { mode in
-                    Image(systemName: mode.icon)
-                        .tag(mode)
+                Picker("View", selection: $viewMode) {
+                    ForEach(TaskViewMode.allCases, id: \.self) { mode in
+                        Image(systemName: mode.icon)
+                            .tag(mode)
+                    }
                 }
-            }
-            .pickerStyle(.segmented)
-            .frame(width: 100)
-            .onChange(of: viewMode) { _, _ in
-                HapticsService.shared.selectionFeedback()
+                .pickerStyle(.segmented)
+                .frame(width: 100)
+                .onChange(of: viewMode) { _, _ in
+                    userOverrodeViewMode = true  // User manually changed view mode
+                    HapticsService.shared.selectionFeedback()
+                }
             }
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
@@ -405,6 +439,11 @@ struct ChatTasksView: View {
                     },
                     onDelete: { task in
                         viewModel.deleteTask(task)
+                    },
+                    showAIThinking: newlyCreatedTaskIds.contains(task.id),
+                    onAIThinkingComplete: {
+                        // Remove from newly created set after animation completes
+                        newlyCreatedTaskIds.remove(task.id)
                     }
                 )
                 .id(task.id)
@@ -436,6 +475,11 @@ struct ChatTasksView: View {
                     },
                     onDelete: { task in
                         viewModel.deleteTask(task)
+                    },
+                    showAIThinking: newlyCreatedTaskIds.contains(task.id),
+                    onAIThinkingComplete: {
+                        // Remove from newly created set after animation completes
+                        newlyCreatedTaskIds.remove(task.id)
                     }
                 )
                 .id(task.id)
@@ -737,7 +781,18 @@ struct KanbanColumn: View {
     var onSnooze: ((TaskItem) -> Void)?
     var onDelete: ((TaskItem) -> Void)?
 
-    private let columnWidth: CGFloat = 280
+    @Environment(\.responsiveLayout) private var layout
+
+    private var columnWidth: CGFloat {
+        switch layout.deviceType {
+        case .iPhoneSE: return 240
+        case .iPhoneStandard: return 260
+        case .iPhoneProMax: return 280
+        case .iPadMini: return 300
+        case .iPad, .iPadPro11: return 320
+        case .iPadPro13: return 360
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

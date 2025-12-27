@@ -355,38 +355,39 @@ struct TaskRowView: View {
     private func handleCheckboxTap() {
         guard !task.isCompleted else { return }
 
-        // Light impact on tap
-        HapticsService.shared.impact(.light)
-
         if reduceMotion {
+            HapticsService.shared.notification(.success)
             onComplete()
             return
         }
 
+        // Phase 1: Initial press feedback
+        HapticsService.shared.impact(.soft)
+
         // Scale bounce animation
-        withAnimation(.spring(response: 0.15, dampingFraction: 0.4)) {
-            checkboxScale = 1.3
+        withAnimation(.spring(response: 0.12, dampingFraction: 0.35)) {
+            checkboxScale = 1.35
         }
 
         // Show confetti
         showConfetti = true
 
-        // Success haptic
+        // Phase 2: DOPAMINE BURST - The magic moment
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            HapticsService.shared.notification(.success)
+            HapticsService.shared.dopamineBurst()
 
-            withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+            withAnimation(.spring(response: 0.18, dampingFraction: 0.6)) {
                 checkboxScale = 1.0
             }
         }
 
-        // Trigger completion
+        // Phase 3: Trigger completion
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
             onComplete()
         }
 
-        // Hide confetti
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+        // Phase 4: Hide confetti
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
             showConfetti = false
         }
     }
@@ -490,7 +491,7 @@ private struct TaskRowConfettiPiece: Identifiable {
 
 // MARK: - Task Row List View
 
-/// Example container showing how to use TaskRowView with the CelestialTaskCard detail sheet
+/// Example container showing how to use TaskRowView with the new slidable bottom sheet
 /// Copy this pattern to integrate TaskRowView into your views
 struct TaskRowListView: View {
     let tasks: [TaskItem]
@@ -499,60 +500,68 @@ struct TaskRowListView: View {
     // Detail sheet state
     @State private var selectedTask: TaskItem?
     @State private var showDetailSheet = false
+    @State private var sheetDetent: PresentationDetent = .medium
 
     @Namespace private var taskRowNamespace
 
     var body: some View {
-        ZStack {
-            // Task list
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(tasks) { task in
-                        TaskRowView(
-                            task: task,
-                            onComplete: {
-                                // Mark task complete
-                                task.complete()
-                                HapticsService.shared.notification(.success)
-                                onTaskUpdated?(task)
-                            },
-                            onDelete: {
-                                // Handle deletion
-                                HapticsService.shared.notification(.warning)
-                            },
-                            onTap: {
-                                // Open detail sheet INSTANTLY
-                                presentDetailSheet(for: task)
-                            },
-                            transitionNamespace: taskRowNamespace
-                        )
-                    }
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(tasks) { task in
+                    TaskRowView(
+                        task: task,
+                        onComplete: {
+                            // Mark task complete
+                            task.complete()
+                            HapticsService.shared.notification(.success)
+                            onTaskUpdated?(task)
+                        },
+                        onDelete: {
+                            // Handle deletion
+                            HapticsService.shared.notification(.warning)
+                        },
+                        onTap: {
+                            // Open detail sheet
+                            presentDetailSheet(for: task)
+                        },
+                        transitionNamespace: taskRowNamespace
+                    )
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
             }
-
-            // Overlay detail sheet - appears instantly because data is preloaded
-            if showDetailSheet, let task = selectedTask {
-                CelestialTaskCard(
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+        }
+        // iOS-Native Slidable Bottom Sheet for Task Details
+        .slidableBottomSheet(
+            isPresented: $showDetailSheet,
+            selectedDetent: $sheetDetent,
+            detents: [.fraction(0.25), .medium, .fraction(0.85), .large],
+            showDragIndicator: true,
+            cornerRadius: 32,
+            backgroundStyle: .celestial
+        ) {
+            if let task = selectedTask {
+                TaskDetailBottomSheet(
                     task: task,
-                    delegate: nil,
-                    isPresented: $showDetailSheet
+                    onComplete: {
+                        task.complete()
+                        onTaskUpdated?(task)
+                    },
+                    onDuplicate: {},
+                    onSnooze: { _ in },
+                    onDelete: {},
+                    onSchedule: { _ in },
+                    onStartTimer: { _ in }
                 )
-                .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                .zIndex(100)
             }
         }
     }
 
     private func presentDetailSheet(for task: TaskItem) {
         selectedTask = task
+        sheetDetent = .medium
+        showDetailSheet = true
         HapticsService.shared.selectionFeedback()
-
-        // Super fast spring animation for instant feel
-        withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
-            showDetailSheet = true
-        }
     }
 }
 

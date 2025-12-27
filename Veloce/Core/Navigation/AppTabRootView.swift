@@ -58,7 +58,7 @@ struct AppTabRootView: View {
             )
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 0) {
-                    TaskInputBar(
+                    TaskInputBarV2(
                         text: $taskInputText,
                         isFocused: $isTaskInputFocused,
                         onSubmit: onSubmit,

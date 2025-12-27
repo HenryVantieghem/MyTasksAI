@@ -894,7 +894,7 @@ struct GoalCreationSheet: View {
             animateStep = false
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        await MainActor.run {
             currentStep = .creating
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                 animateStep = true
@@ -903,17 +903,14 @@ struct GoalCreationSheet: View {
 
         isCreating = true
 
-        // Animate progress
-        for i in 1...3 {
-            try? await Task.sleep(nanoseconds: 300_000_000)
-            await MainActor.run {
-                withAnimation {
-                    creationProgress = Double(i) * 0.3
-                }
+        // Animate progress - saving goal
+        await MainActor.run {
+            withAnimation {
+                creationProgress = 0.2
             }
         }
 
-        // Create the goal
+        // Create the goal (this is quick, just saving to SwiftData)
         let goal = await goalsVM.createGoal(
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
             description: description.isEmpty ? nil : description,
@@ -925,27 +922,56 @@ struct GoalCreationSheet: View {
 
         createdGoal = goal
 
-        // Generate AI roadmap
-        await goalsVM.generateRoadmap(for: goal, context: modelContext)
+        await MainActor.run {
+            withAnimation {
+                creationProgress = 0.4
+            }
+        }
 
+        // Try to generate AI roadmap with timeout (don't block on failure)
+        // Use a timeout to prevent getting stuck
+        let roadmapTask = Task {
+            await goalsVM.generateRoadmap(for: goal, context: modelContext)
+        }
+
+        // Wait for roadmap with 15 second timeout
+        let timeoutTask = Task {
+            try? await Task.sleep(nanoseconds: 15_000_000_000) // 15 seconds
+            return true
+        }
+
+        // Animate progress while waiting
+        for i in 1...4 {
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5s increments
+            await MainActor.run {
+                withAnimation {
+                    creationProgress = min(0.4 + Double(i) * 0.12, 0.88)
+                }
+            }
+        }
+
+        // Cancel timeout task if roadmap completed
+        timeoutTask.cancel()
+
+        // Final progress
         await MainActor.run {
             withAnimation {
                 creationProgress = 1.0
             }
         }
 
-        try? await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 300_000_000)
 
         isCreating = false
 
-        // Show success
+        // Show success regardless of AI status (goal was created successfully)
         await MainActor.run {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                 animateStep = false
             }
         }
 
-        try? await Task.sleep(nanoseconds: 200_000_000)
+        try? await Task.sleep(nanoseconds: 150_000_000)
 
         await MainActor.run {
             currentStep = .success

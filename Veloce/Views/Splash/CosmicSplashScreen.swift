@@ -122,15 +122,15 @@ struct CosmicSplashScreen: View {
 
     private var premiumVoidBackground: some View {
         ZStack {
-            // True void
-            Color(red: 0.01, green: 0.01, blue: 0.02)
+            // True void (consistent with VoidBackground)
+            Theme.CelestialColors.voidDeep
                 .ignoresSafeArea()
 
             // Subtle radial vignette
             RadialGradient(
                 colors: [
                     Color.clear,
-                    Color(red: 0.01, green: 0.01, blue: 0.03).opacity(0.5),
+                    Theme.CelestialColors.void.opacity(0.5),
                     Color.black.opacity(0.35)
                 ],
                 center: .center,

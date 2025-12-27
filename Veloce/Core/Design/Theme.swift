@@ -165,6 +165,110 @@ enum Theme {
         }
     }
 
+    // MARK: - Task Section Colors (Kanban & List Sections)
+    /// Vibrant gradient palette for task sections inspired by Apple widget designs
+    /// Creates 3D depth and premium visual hierarchy for Smart List and Kanban views
+    enum TaskSectionColors {
+        // MARK: Section Accent Colors
+        /// In Progress - Warm amber/orange energy (active work)
+        static let inProgressPrimary = Color(hex: "FBBF24")   // Amber
+        static let inProgressSecondary = Color(hex: "F97316") // Orange
+
+        /// To Do - Cosmic purple/blue nebula (pending tasks)
+        static let toDoPrimary = CelestialColors.nebulaCore   // Purple
+        static let toDoSecondary = Color(red: 0.28, green: 0.52, blue: 0.98) // AI Blue
+
+        /// Done - Success green/teal aurora (completed)
+        static let donePrimary = CelestialColors.auroraGreen  // Green
+        static let doneSecondary = Color(hex: "2DD4BF")       // Teal
+
+        // MARK: Section Gradients (Apple Widget Style)
+        /// In Progress: Amber → Orange glow (pulsing for active work)
+        static var inProgressGradient: LinearGradient {
+            LinearGradient(
+                colors: [inProgressPrimary, inProgressSecondary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// To Do: Purple → Blue nebula (cosmic depth)
+        static var toDoGradient: LinearGradient {
+            LinearGradient(
+                colors: [toDoPrimary, toDoSecondary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// Done: Green → Teal success aurora
+        static var doneGradient: LinearGradient {
+            LinearGradient(
+                colors: [donePrimary, doneSecondary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        // MARK: 3D Orb Gradients (For Section Headers)
+        /// Creates a 3D glowing orb effect for section indicators
+        static func orbGradient(primary: Color) -> RadialGradient {
+            RadialGradient(
+                colors: [.white, primary, primary.opacity(0.8)],
+                center: UnitPoint(x: 0.3, y: 0.3),
+                startRadius: 0,
+                endRadius: 8
+            )
+        }
+
+        /// Outer glow for orb (adds depth)
+        static func orbGlow(color: Color, intensity: Double = 0.4) -> Color {
+            color.opacity(intensity)
+        }
+
+        // MARK: Card Tint Backgrounds
+        /// Subtle tint for task cards based on section
+        static func cardTint(for section: String) -> Color {
+            switch section.lowercased() {
+            case "in progress", "inprogress":
+                return inProgressPrimary.opacity(0.06)
+            case "to do", "todo":
+                return toDoPrimary.opacity(0.06)
+            case "done", "completed":
+                return donePrimary.opacity(0.06)
+            default:
+                return Color.clear
+            }
+        }
+
+        // MARK: Dynamic Gradient Selection
+        static func gradient(for section: String) -> LinearGradient {
+            switch section.lowercased() {
+            case "in progress", "inprogress":
+                return inProgressGradient
+            case "to do", "todo":
+                return toDoGradient
+            case "done", "completed":
+                return doneGradient
+            default:
+                return toDoGradient
+            }
+        }
+
+        static func primaryColor(for section: String) -> Color {
+            switch section.lowercased() {
+            case "in progress", "inprogress":
+                return inProgressPrimary
+            case "to do", "todo":
+                return toDoPrimary
+            case "done", "completed":
+                return donePrimary
+            default:
+                return toDoPrimary
+            }
+        }
+    }
+
     // MARK: - Energy Core Colors (Power Meter System)
     /// Color palette for the Energy Core power visualization
     enum EnergyColors {
@@ -547,6 +651,13 @@ enum Theme {
         static let displayMedium = Font.system(size: 28, weight: .thin, design: .default)
         /// Small display text
         static let displaySmall = Font.system(size: 24, weight: .thin, design: .default)
+
+        // MARK: Page Title (Main Navigation Headers)
+        /// Page title - ultra-thin elegant typography for main page headers
+        /// Inspired by the MyTasksAI brand aesthetic: refined, modern, sophisticated
+        static let pageTitle = Font.system(size: 22, weight: .ultraLight, design: .default)
+        /// Page title compact - for scrolled/collapsed states
+        static let pageTitleCompact = Font.system(size: 18, weight: .thin, design: .default)
 
         // MARK: Living Cosmos Typography
         /// Task title - SF Pro Rounded for softer, approachable feel
