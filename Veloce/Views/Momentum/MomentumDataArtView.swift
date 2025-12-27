@@ -107,9 +107,8 @@ struct MomentumDataArtView: View {
 
     var body: some View {
         ZStack {
-            // Living substrate background
-            LivingSubstrateBackground(realm: selectedRealm)
-                .ignoresSafeArea()
+            // Cosmic void background (matches calendar)
+            VoidBackground.calendar
 
             VStack(spacing: 0) {
                 // Realm selector
