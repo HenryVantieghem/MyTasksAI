@@ -51,6 +51,7 @@ struct JournalFeedView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = JournalFeedViewModel()
     @State private var showEditor = false
+    @State private var showDetailSheet = false
     @State private var selectedEntry: JournalEntry?
     @State private var searchText = ""
     @State private var isSearching = false
@@ -144,6 +145,19 @@ struct JournalFeedView: View {
                     selectedEntry = nil
                 }
             )
+        }
+        .sheet(isPresented: $showDetailSheet) {
+            if let entry = selectedEntry {
+                JournalDetailSheet(
+                    entry: entry,
+                    onConvertToTask: { entry in
+                        convertToTask(entry)
+                    },
+                    onDelete: { entry in
+                        deleteEntry(entry)
+                    }
+                )
+            }
         }
     }
 
@@ -259,7 +273,7 @@ struct JournalFeedView: View {
                                 .onTapGesture {
                                     HapticsService.shared.selectionFeedback()
                                     selectedEntry = entry
-                                    showEditor = true
+                                    showDetailSheet = true
                                 }
                         }
                     } header: {
@@ -268,6 +282,31 @@ struct JournalFeedView: View {
                 }
             }
             .padding(.bottom, 160)
+        }
+    }
+
+    // MARK: - Convert to Task
+
+    private func convertToTask(_ entry: JournalEntry) {
+        let title = entry.title ?? String(entry.plainText.prefix(50))
+        let task = TaskItem(title: title)
+        task.contextNotes = entry.plainText
+        modelContext.insert(task)
+
+        do {
+            try modelContext.save()
+            HapticsService.shared.success()
+        } catch {
+            print("Failed to save task: \(error)")
+        }
+    }
+
+    private func deleteEntry(_ entry: JournalEntry) {
+        modelContext.delete(entry)
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to delete entry: \(error)")
         }
     }
 
@@ -391,11 +430,32 @@ struct NoteRowView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            // Title
-            Text(displayTitle.isEmpty ? "New Note" : displayTitle)
-                .font(.system(size: 17, weight: .medium))
-                .foregroundStyle(.white)
-                .lineLimit(1)
+            // Title row with optional reminder badge
+            HStack(spacing: 8) {
+                Text(displayTitle.isEmpty ? "New Note" : displayTitle)
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+
+                // Reminder badge
+                if entry.entryType == .reminder {
+                    HStack(spacing: 3) {
+                        Image(systemName: "bell.badge")
+                            .font(.system(size: 10, weight: .semibold))
+                        Text("Task")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(JournalColors.reminder)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background {
+                        Capsule()
+                            .fill(JournalColors.reminder.opacity(0.15))
+                    }
+                }
+
+                Spacer()
+            }
 
             HStack(spacing: 8) {
                 // Date

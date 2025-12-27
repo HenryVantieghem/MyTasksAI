@@ -24,26 +24,21 @@ struct AppTabRootView: View {
     // Input bar bindings (for tasks tab)
     @Binding var taskInputText: String
     @FocusState.Binding var isTaskInputFocused: Bool
-    var completedTasksToday: Int
-    var onSubmit: () -> Void
-    var onSchedule: () -> Void
-    var onPriority: () -> Void
-    var onAI: () -> Void
+    var onSubmit: (String) -> Void
 
     var body: some View {
         switch tab {
         case .tasks:
             tasksContent
 
-        case .calendar:
+        case .plan:
             EnhancedCalendarView(viewModel: calendarViewModel)
 
-        case .focus:
-            FocusTabView()
+        case .grow:
+            GrowView()
 
-        // Note: Circles removed from tabs - accessed via CirclesPill
-        case .momentum:
-            MomentumDataArtView()
+        case .flow:
+            FocusTabView()
 
         case .journal:
             JournalTabView(tasksViewModel: tasksViewModel)
@@ -63,16 +58,11 @@ struct AppTabRootView: View {
             )
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 0) {
-                    FloatingInputBar(
+                    TaskInputBar(
                         text: $taskInputText,
                         isFocused: $isTaskInputFocused,
-                        completedTasksToday: completedTasksToday,
-                        currentStreak: GamificationService.shared.currentStreak,
-                        isFirstTaskOfDay: chatTasksViewModel.tasks.filter { !$0.isCompleted }.isEmpty,
                         onSubmit: onSubmit,
-                        onSchedule: onSchedule,
-                        onPriority: onPriority,
-                        onAI: onAI
+                        onVoiceInput: nil
                     )
                     // Spacer for tab bar height
                     Spacer()
@@ -93,22 +83,21 @@ struct AppTabContentView: View {
     var body: some View {
         switch tab {
         case .tasks:
-            // Placeholder - actual implementation in MainContainerView
+            // Placeholder - actual implementation in MainTabView
             Text("Tasks")
 
-        case .calendar:
-            // Placeholder - actual implementation in MainContainerView
-            Text("Calendar")
+        case .plan:
+            // Placeholder - actual implementation in MainTabView
+            Text("Plan")
 
-        case .focus:
+        case .grow:
+            GrowView()
+
+        case .flow:
             FocusTabView()
 
-        // Note: Circles removed from tabs - accessed via CirclesPill
-        case .momentum:
-            MomentumDataArtView()
-
         case .journal:
-            // Placeholder - actual implementation in MainContainerView
+            // Placeholder - actual implementation in MainTabView
             Text("Journal")
         }
     }

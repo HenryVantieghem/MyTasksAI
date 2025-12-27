@@ -4,9 +4,9 @@
 //
 //  Premium Liquid Glass Tab Bar with Native iOS 26 APIs
 //  Inspired by Apple's Liquid Glass Design Guidelines (WWDC 2025)
-//  Now supports 5 tabs: Tasks, Calendar, Focus, Momentum, Journal
+//  5 tabs: Tasks, Plan, Grow, Flow, Journal
 //
-//  Note: Circles is no longer a tab - access via CirclesPill overlay
+//  Note: Circles is now part of Grow tab (Stats/Goals/Circles segments)
 //
 
 import SwiftUI
@@ -385,7 +385,7 @@ struct LiquidGlassTabBarMinimal: View {
 
         VStack {
             Spacer()
-            LiquidGlassTabBarMinimal(selectedTab: .constant(.focus))
+            LiquidGlassTabBarMinimal(selectedTab: .constant(.flow))
                 .padding(.bottom, 20)
         }
     }

@@ -32,14 +32,12 @@ struct MainContainerView: View {
 
     // Sheet state
     @State private var showStatsSheet = false
-    @State private var showSettingsSheet = false
+    @State private var showProfileSheet = false
     @State private var showCirclesSheet = false
 
     // Input bar state (managed at container level for proper z-ordering)
     @State private var taskInputText = ""
     @FocusState private var isTaskInputFocused: Bool
-    @State private var showSchedulePicker = false
-    @State private var showPriorityPicker = false
 
     // Task card state (managed at container level to overlay everything)
     @State private var selectedTask: TaskItem?
@@ -77,25 +75,16 @@ struct MainContainerView: View {
                         }
                     )
                         .safeAreaInset(edge: .bottom, spacing: 0) {
-                            // Input bar positioned above tab bar area
+                            // Premium Claude-inspired input bar
                             VStack(spacing: 0) {
-                                FloatingInputBar(
+                                TaskInputBar(
                                     text: $taskInputText,
                                     isFocused: $isTaskInputFocused,
-                                    completedTasksToday: completedTasksToday,
-                                    currentStreak: GamificationService.shared.currentStreak,
-                                    isFirstTaskOfDay: chatTasksViewModel.tasks.filter { !$0.isCompleted }.isEmpty,
-                                    onSubmit: {
-                                        createTask()
+                                    onSubmit: { taskText in
+                                        createTaskFromInput(taskText)
                                     },
-                                    onSchedule: {
-                                        showSchedulePicker = true
-                                    },
-                                    onPriority: {
-                                        showPriorityPicker = true
-                                    },
-                                    onAI: {
-                                        HapticsService.shared.selectionFeedback()
+                                    onVoiceInput: {
+                                        // Voice recording handled internally by TaskInputBar
                                     }
                                 )
                                 // Spacer for tab bar height
@@ -106,18 +95,17 @@ struct MainContainerView: View {
                 }
                 .tag(MainTab.tasks)
 
-                // Calendar Tab - Enhanced with Visual Timeline
+                // Plan Tab - Enhanced with Visual Timeline
                 EnhancedCalendarView(viewModel: calendarViewModel)
-                    .tag(MainTab.calendar)
+                    .tag(MainTab.plan)
 
-                // Focus Tab - Timer and App Blocking (Tiimo + Opal style)
+                // Grow Tab - Stats, Goals, and Circles
+                GrowView()
+                    .tag(MainTab.grow)
+
+                // Flow Tab - Timer and App Blocking (Tiimo + Opal style)
                 FocusTabView()
-                    .tag(MainTab.focus)
-
-                // Momentum Tab - Living Data Garden (Data Art Redesign)
-                // Two realms: Flow (stats) & Grow (goals with AI)
-                MomentumDataArtView()
-                    .tag(MainTab.momentum)
+                    .tag(MainTab.flow)
 
                 // Journal Tab - Daily reflections with Brain Dump and Reminders
                 JournalTabView(tasksViewModel: tasksViewModel)
@@ -148,12 +136,48 @@ struct MainContainerView: View {
             }
             .zIndex(50)
 
-            // Unified Celestial Task Card overlay - at container level to cover everything
+            // Unified Liquid Glass Task Detail Sheet - at container level to cover everything
             if showCelestialCard, let task = selectedTask {
-                CelestialTaskCard(
+                LiquidGlassTaskDetailSheet(
                     task: task,
-                    delegate: chatTasksViewModel,
-                    isPresented: $showCelestialCard
+                    onComplete: {
+                        chatTasksViewModel.taskDidComplete(task)
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            showCelestialCard = false
+                        }
+                    },
+                    onDuplicate: {
+                        chatTasksViewModel.taskDidDuplicate(task)
+                    },
+                    onSnooze: { snoozeDate in
+                        // Update task scheduled time for snooze
+                        task.scheduledTime = snoozeDate
+                        task.updatedAt = Date()
+                        chatTasksViewModel.taskDidSnooze(task)
+                    },
+                    onDelete: {
+                        chatTasksViewModel.taskDidDelete(task)
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            showCelestialCard = false
+                        }
+                    },
+                    onSchedule: { scheduledDate in
+                        chatTasksViewModel.updateTask(task, scheduledTime: scheduledDate)
+                    },
+                    onStartTimer: { taskItem in
+                        // Dismiss sheet then navigate to focus tab
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            showCelestialCard = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            selectedTab = .flow
+                        }
+                    },
+                    onDismiss: {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            showCelestialCard = false
+                        }
+                    }
                 )
                 .transition(.opacity)
                 .zIndex(100)
@@ -163,7 +187,7 @@ struct MainContainerView: View {
             UniversalHeaderView(
                 title: selectedTab.title,
                 showStatsSheet: $showStatsSheet,
-                showSettingsSheet: $showSettingsSheet,
+                showSettingsSheet: $showProfileSheet,
                 userName: appViewModel.currentUser?.fullName,
                 avatarUrl: nil
             )
@@ -175,26 +199,12 @@ struct MainContainerView: View {
                 .presentationCornerRadius(28)
                 .voidPresentationBackground()
         }
-        .sheet(isPresented: $showSettingsSheet) {
-            SettingsBottomSheet(viewModel: settingsViewModel)
-                .presentationDetents([.medium, .large])
+        .sheet(isPresented: $showProfileSheet) {
+            ProfileSheetView(settingsViewModel: settingsViewModel)
+                .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
-                .presentationCornerRadius(28)
+                .presentationCornerRadius(32)
                 .voidPresentationBackground()
-        }
-        .sheet(isPresented: $showSchedulePicker) {
-            ChatSchedulePickerSheet { date in
-                createTask(scheduledTime: date)
-            }
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $showPriorityPicker) {
-            PriorityPickerSheet { priority in
-                createTask(priority: priority)
-            }
-            .presentationDetents([.height(280)])
-            .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showCirclesSheet) {
             CirclesTabView()
@@ -228,6 +238,21 @@ struct MainContainerView: View {
             if let scheduledTime = scheduledTime, let lastTask = chatTasksViewModel.tasks.last {
                 chatTasksViewModel.updateTask(lastTask, scheduledTime: scheduledTime)
             }
+        }
+    }
+
+    /// Create task from TaskInputBar (receives text directly)
+    private func createTaskFromInput(_ text: String) {
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else { return }
+
+        // Dismiss keyboard
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            isTaskInputFocused = false
+        }
+
+        Task {
+            await chatTasksViewModel.createTask(title: trimmedText, priority: 2)
         }
     }
 

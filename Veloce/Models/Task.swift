@@ -77,6 +77,9 @@ final class TaskItem {
     var taskEmoji: String?       // Emoji for task personalization
     var taskColorHex: String?    // Custom color hex code override
 
+    // MARK: Sub-tasks
+    var subtasksData: Data?      // JSON-encoded [SubTask] array
+
     // MARK: Initialization
     init(
         id: UUID = UUID(),
@@ -116,7 +119,8 @@ final class TaskItem {
         blockedAppsData: Data? = nil,
         taskIcon: String? = nil,
         taskEmoji: String? = nil,
-        taskColorHex: String? = nil
+        taskColorHex: String? = nil,
+        subtasksData: Data? = nil
     ) {
         self.id = id
         self.title = title
@@ -156,6 +160,7 @@ final class TaskItem {
         self.taskIcon = taskIcon
         self.taskEmoji = taskEmoji
         self.taskColorHex = taskColorHex
+        self.subtasksData = subtasksData
     }
 }
 
@@ -245,6 +250,64 @@ extension TaskItem {
     /// Priority as star string (Sam Altman style)
     var priorityStars: String {
         String(repeating: "★", count: starRating)
+    }
+
+    // MARK: - Subtasks
+
+    /// Decoded subtasks array from persisted data
+    var subtasks: [SubTask] {
+        get {
+            guard let data = subtasksData else { return [] }
+            return (try? JSONDecoder().decode([SubTask].self, from: data)) ?? []
+        }
+        set {
+            subtasksData = try? JSONEncoder().encode(newValue)
+            updatedAt = .now
+        }
+    }
+
+    /// Add a new subtask
+    func addSubTask(_ subtask: SubTask) {
+        var current = subtasks
+        current.append(subtask)
+        subtasks = current
+    }
+
+    /// Remove a subtask by ID
+    func removeSubTask(id: UUID) {
+        var current = subtasks
+        current.removeAll { $0.id == id }
+        subtasks = current
+    }
+
+    /// Toggle subtask completion status
+    func toggleSubTask(id: UUID) {
+        var current = subtasks
+        if let index = current.firstIndex(where: { $0.id == id }) {
+            let newStatus: SubTaskStatus = current[index].status == .completed ? .pending : .completed
+            current[index].status = newStatus
+            current[index].completedAt = newStatus == .completed ? Date() : nil
+        }
+        subtasks = current
+    }
+
+    /// Update a subtask
+    func updateSubTask(_ updatedSubTask: SubTask) {
+        var current = subtasks
+        if let index = current.firstIndex(where: { $0.id == updatedSubTask.id }) {
+            current[index] = updatedSubTask
+        }
+        subtasks = current
+    }
+
+    /// Check if task has subtasks
+    var hasSubtasks: Bool {
+        !subtasks.isEmpty
+    }
+
+    /// Subtask completion progress (0.0 - 1.0)
+    var subtaskProgress: Double {
+        subtasks.progress
     }
 
     /// Energy level for power meter visualization (0.0 - 1.0)

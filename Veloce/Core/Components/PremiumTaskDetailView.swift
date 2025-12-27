@@ -1483,7 +1483,7 @@ extension View {
             .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(delay), value: appeared)
     }
 
-    func glassCard(accent: Color?) -> some View {
+    fileprivate func premiumGlassCard(accent: Color?) -> some View {
         self
             .background(
                 RoundedRectangle(cornerRadius: 20)

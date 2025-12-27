@@ -99,19 +99,19 @@ struct ChatInputBar: View {
 
     private var quickActionsMenu: some View {
         HStack(spacing: Theme.Spacing.md) {
-            QuickActionPill(icon: "calendar", label: "Schedule", color: Theme.Colors.aiBlue) {
+            ChatQuickActionPill(icon: "calendar", label: "Schedule", color: Theme.Colors.aiBlue) {
                 HapticsService.shared.selectionFeedback()
                 withAnimation { showQuickActions = false }
                 onSchedule()
             }
 
-            QuickActionPill(icon: "star.fill", label: "Priority", color: Theme.Colors.xp) {
+            ChatQuickActionPill(icon: "star.fill", label: "Priority", color: Theme.Colors.xp) {
                 HapticsService.shared.selectionFeedback()
                 withAnimation { showQuickActions = false }
                 onPriority()
             }
 
-            QuickActionPill(icon: "sparkles", label: "AI Magic", color: Theme.Colors.aiPurple) {
+            ChatQuickActionPill(icon: "sparkles", label: "AI Magic", color: Theme.Colors.aiPurple) {
                 HapticsService.shared.selectionFeedback()
                 withAnimation { showQuickActions = false }
                 onAI()
@@ -236,9 +236,9 @@ struct ChatInputBar: View {
     }
 }
 
-// MARK: - Quick Action Pill
+// MARK: - Chat Quick Action Pill
 
-struct QuickActionPill: View {
+private struct ChatQuickActionPill: View {
     let icon: String
     let label: String
     let color: Color

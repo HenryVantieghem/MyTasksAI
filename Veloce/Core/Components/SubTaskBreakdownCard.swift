@@ -232,7 +232,7 @@ struct SubTaskBreakdownCard: View {
     private var subTaskListView: some View {
         VStack(spacing: Theme.Spacing.xs) {
             ForEach(subTasks.sorted { $0.orderIndex < $1.orderIndex }) { subTask in
-                SubTaskRow(
+                BreakdownSubTaskRow(
                     subTask: subTask,
                     isExpanded: expandedSubTaskId == subTask.id,
                     isEditing: editingSubTaskId == subTask.id,
@@ -446,9 +446,9 @@ struct SubTaskBreakdownCard: View {
     }
 }
 
-// MARK: - Sub-Task Row
+// MARK: - Breakdown Sub-Task Row
 
-struct SubTaskRow: View {
+fileprivate struct BreakdownSubTaskRow: View {
     let subTask: SubTask
     let isExpanded: Bool
     let isEditing: Bool

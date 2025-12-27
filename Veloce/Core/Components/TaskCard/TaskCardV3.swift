@@ -78,6 +78,21 @@ struct TaskCardV3: View {
         return Theme.CelestialColors.urgencyCalm
     }
 
+    /// Priority stars (★★★ style - Sam Altman rating)
+    private var priorityStarsView: some View {
+        HStack(spacing: 3) {
+            ForEach(0..<3, id: \.self) { index in
+                Image(systemName: index < task.starRating ? "star.fill" : "star")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(
+                        index < task.starRating
+                            ? Theme.Colors.xp
+                            : Theme.CelestialColors.starDim.opacity(0.3)
+                    )
+            }
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -137,11 +152,18 @@ struct TaskCardV3: View {
                         }
                     }
 
-                    // Task type label
-                    Text(task.taskType.rawValue.uppercased())
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .foregroundColor(taskTypeColor)
-                        .tracking(1.2)
+                    // Task type + Priority stars row
+                    HStack(spacing: 8) {
+                        Text(task.taskType.rawValue.uppercased())
+                            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                            .foregroundColor(taskTypeColor)
+                            .tracking(1.2)
+
+                        // Priority stars (only for incomplete tasks)
+                        if !task.isCompleted {
+                            priorityStarsView
+                        }
+                    }
 
                     // AI whisper (1 line, italic)
                     if let guidance = guidanceText, !task.isCompleted {

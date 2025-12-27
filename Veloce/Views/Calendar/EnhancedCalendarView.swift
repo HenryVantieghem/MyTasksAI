@@ -2,9 +2,8 @@
 //  EnhancedCalendarView.swift
 //  Veloce
 //
-//  Notion Calendar-Inspired Visual Planner - Entry Point
-//  Clean, minimal calendar with visual timeline,
-//  swipe navigation, and Apple Calendar integration
+//  Premium Calendar - Week-centric Visual Planner
+//  Glass effects, task indicators, and connected time slots
 //
 
 import SwiftUI
@@ -12,12 +11,12 @@ import SwiftData
 
 // MARK: - Enhanced Calendar View
 
-/// Main calendar entry point - delegates to NotionCalendarView
+/// Main calendar entry point - delegates to PremiumCalendarView
 struct EnhancedCalendarView: View {
     @Bindable var viewModel: CalendarViewModel
 
     var body: some View {
-        NotionCalendarView(viewModel: viewModel)
+        PremiumCalendarView(viewModel: viewModel)
     }
 }
 

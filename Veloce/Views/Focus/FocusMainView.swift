@@ -10,6 +10,50 @@
 import SwiftUI
 import FamilyControls
 
+// MARK: - Quick Focus Mode
+
+enum QuickFocusMode: String, CaseIterable {
+    case pomodoro = "Pomodoro"
+    case deepWork = "Deep Work"
+    case flow = "Flow"
+
+    var duration: TimeInterval {
+        switch self {
+        case .pomodoro: return 25 * 60
+        case .deepWork: return 90 * 60
+        case .flow: return 0 // Counts up
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .pomodoro: return "clock"
+        case .deepWork: return "brain.head.profile"
+        case .flow: return "bolt"
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .pomodoro: return "25m"
+        case .deepWork: return "90m"
+        case .flow: return "∞"
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .pomodoro: return Theme.Colors.aiAmber
+        case .deepWork: return Theme.Colors.aiPurple
+        case .flow: return Theme.Colors.aiCyan
+        }
+    }
+}
+
+enum QuickTimerState {
+    case idle, running, paused
+}
+
 // MARK: - Focus Main View
 
 struct FocusMainView: View {
@@ -21,6 +65,13 @@ struct FocusMainView: View {
     @State private var showFocusTimer = false
     @State private var showAppBlocking = false
     @State private var showActiveSession = false
+
+    // Quick timer state
+    @State private var selectedMode: QuickFocusMode = .pomodoro
+    @State private var timerState: QuickTimerState = .idle
+    @State private var timeRemaining: TimeInterval = 25 * 60
+    @State private var totalTime: TimeInterval = 25 * 60
+    @State private var timer: Timer?
 
     // Services
     private let blockingService = FocusBlockingService.shared
@@ -37,23 +88,32 @@ struct FocusMainView: View {
             // Cosmic background with enhanced depth
             enhancedCosmicBackground
 
-            VStack(spacing: 0) {
-                // Header area with subtle greeting
-                headerView
-                    .padding(.top, Theme.Spacing.universalHeaderHeight)
+            ScrollView {
+                VStack(spacing: 0) {
+                    // Header area with subtle greeting
+                    headerView
+                        .padding(.top, Theme.Spacing.universalHeaderHeight)
 
-                Spacer()
+                    // Quick Timer Section (above portal cards)
+                    quickTimerSection
+                        .padding(.top, Theme.Spacing.lg)
 
-                // Two main portal cards
-                portalCardsView
+                    // Mode Selector
+                    modeSelectorView
+                        .padding(.top, Theme.Spacing.lg)
 
-                Spacer()
+                    // Two main portal cards
+                    portalCardsView
+                        .padding(.top, Theme.Spacing.xl)
 
-                // Quick stats bar
-                quickStatsBar
-                    .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
+                    // Quick stats bar
+                    quickStatsBar
+                        .padding(.top, Theme.Spacing.xl)
+                        .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
+                }
+                .padding(.horizontal, Theme.Spacing.screenPadding)
             }
-            .padding(.horizontal, Theme.Spacing.screenPadding)
+            .scrollIndicators(.hidden)
         }
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: $showFocusTimer) {
@@ -251,6 +311,168 @@ struct FocusMainView: View {
         case 17..<21: return "Evening Focus"
         default: return "Night Focus"
         }
+    }
+
+    // MARK: - Quick Timer Section
+
+    private var quickTimerSection: some View {
+        VStack(spacing: Theme.Spacing.lg) {
+            // Timer Circle
+            ZStack {
+                // Background ring
+                Circle()
+                    .stroke(Color.white.opacity(0.1), lineWidth: 10)
+                    .frame(width: 180, height: 180)
+
+                // Progress ring
+                Circle()
+                    .trim(from: 0, to: timerProgress)
+                    .stroke(
+                        LinearGradient(
+                            colors: [selectedMode.accentColor, selectedMode.accentColor.opacity(0.6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                    )
+                    .frame(width: 180, height: 180)
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear(duration: 0.5), value: timerProgress)
+
+                // Glow effect
+                Circle()
+                    .stroke(selectedMode.accentColor.opacity(0.3), lineWidth: 20)
+                    .frame(width: 180, height: 180)
+                    .blur(radius: 15)
+
+                // Time display + Play button
+                VStack(spacing: 12) {
+                    Text(timerDisplayString)
+                        .font(.system(size: 40, weight: .light, design: .monospaced))
+                        .foregroundStyle(.white)
+                        .contentTransition(.numericText())
+
+                    // Play/Pause Button
+                    Button {
+                        toggleTimer()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(selectedMode.accentColor)
+                                .frame(width: 48, height: 48)
+                                .shadow(color: selectedMode.accentColor.opacity(0.4), radius: 12, y: 4)
+
+                            Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .offset(x: timerState == .running ? 0 : 2)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    // MARK: - Mode Selector
+
+    private var modeSelectorView: some View {
+        HStack(spacing: 12) {
+            ForEach(QuickFocusMode.allCases, id: \.self) { mode in
+                QuickModeButton(
+                    mode: mode,
+                    isSelected: selectedMode == mode,
+                    isDisabled: timerState != .idle
+                ) {
+                    selectMode(mode)
+                }
+            }
+        }
+    }
+
+    // MARK: - Timer Computed Properties
+
+    private var timerProgress: Double {
+        guard totalTime > 0 else {
+            return selectedMode == .flow ? 1 : 0
+        }
+        return timeRemaining / totalTime
+    }
+
+    private var timerDisplayString: String {
+        let absTime = abs(timeRemaining)
+        let minutes = Int(absTime) / 60
+        let seconds = Int(absTime) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    // MARK: - Timer Actions
+
+    private func toggleTimer() {
+        HapticsService.shared.impact(.medium)
+
+        switch timerState {
+        case .idle:
+            startTimer()
+        case .running:
+            pauseTimer()
+        case .paused:
+            resumeTimer()
+        }
+    }
+
+    private func startTimer() {
+        timerState = .running
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] _ in
+            if selectedMode == .flow {
+                timeRemaining += 1
+            } else if timeRemaining > 0 {
+                timeRemaining -= 1
+            } else {
+                completeSession()
+            }
+        }
+    }
+
+    private func pauseTimer() {
+        timerState = .paused
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func resumeTimer() {
+        timerState = .running
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] _ in
+            if selectedMode == .flow {
+                timeRemaining += 1
+            } else if timeRemaining > 0 {
+                timeRemaining -= 1
+            } else {
+                completeSession()
+            }
+        }
+    }
+
+    private func completeSession() {
+        timer?.invalidate()
+        timer = nil
+        timerState = .idle
+
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+
+        // Reset to mode duration
+        timeRemaining = selectedMode.duration
+        totalTime = selectedMode.duration
+    }
+
+    private func selectMode(_ mode: QuickFocusMode) {
+        guard timerState == .idle else { return }
+
+        HapticsService.shared.selectionFeedback()
+        selectedMode = mode
+        timeRemaining = mode.duration
+        totalTime = mode.duration
     }
 
     // MARK: - Portal Cards
@@ -516,6 +738,50 @@ struct FocusPortalCard: View {
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(.white)
         }
+    }
+}
+
+// MARK: - Quick Mode Button
+
+struct QuickModeButton: View {
+    let mode: QuickFocusMode
+    let isSelected: Bool
+    let isDisabled: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 6) {
+                Image(systemName: mode.icon)
+                    .font(.system(size: 20, weight: .medium))
+
+                Text(mode.rawValue)
+                    .font(.system(size: 12, weight: .medium))
+
+                Text(mode.label)
+                    .font(.system(size: 10, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .glassEffect(
+                .regular
+                    .tint(isSelected ? mode.accentColor.opacity(0.15) : Color.clear)
+                    .interactive(true),
+                in: RoundedRectangle(cornerRadius: 14)
+            )
+            .foregroundStyle(isSelected ? mode.accentColor : .white.opacity(0.7))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(
+                        isSelected ? mode.accentColor : Color.white.opacity(0.1),
+                        lineWidth: isSelected ? 1.5 : 0.5
+                    )
+            }
+        }
+        .disabled(isDisabled)
+        .opacity(isDisabled && !isSelected ? 0.4 : 1)
+        .buttonStyle(.plain)
     }
 }
 

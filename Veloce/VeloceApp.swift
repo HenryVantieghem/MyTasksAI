@@ -111,7 +111,7 @@ struct RootView: View {
                 PaywallView()
 
             case .authenticated:
-                MainContainerView()
+                MainTabView()
                     .withOfflineOverlay()
             }
         }

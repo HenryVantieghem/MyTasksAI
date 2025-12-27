@@ -195,10 +195,8 @@ struct ChatTasksView: View {
 
                 // Task feed or cosmic void empty state
                 if filteredTasks.isEmpty && filteredRecentlyCompleted.isEmpty {
-                    EmptyTasksView {
-                        // Input bar managed at container level
-                    }
-                    .padding(.top, Theme.Spacing.universalHeaderHeight - 60)
+                    EmptyTasksView()
+                        .padding(.top, Theme.Spacing.universalHeaderHeight - 60)
                 } else {
                     cosmicTaskFeed
                 }
