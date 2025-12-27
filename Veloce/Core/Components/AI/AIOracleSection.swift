@@ -282,7 +282,7 @@ struct AIOracleSection: View {
                 // Article suggestion
                 ResourceLinkRow(
                     icon: "doc.text.fill",
-                    title: "How to complete \(task.taskTypeDisplay.lowercased()) tasks effectively",
+                    title: "How to complete \(task.taskType.displayName.lowercased()) tasks effectively",
                     subtitle: "Best practices guide",
                     color: Theme.AdaptiveColors.aiSecondary,
                     action: {

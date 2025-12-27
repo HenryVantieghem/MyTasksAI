@@ -13,6 +13,7 @@ enum RecurringTypeExtended: String, CaseIterable, Codable, Sendable {
     case once = "once"
     case daily = "daily"
     case weekdays = "weekdays"
+    case weekends = "weekends"
     case weekly = "weekly"
     case biweekly = "biweekly"
     case monthly = "monthly"
@@ -23,6 +24,7 @@ enum RecurringTypeExtended: String, CaseIterable, Codable, Sendable {
         case .once: return "Once"
         case .daily: return "Daily"
         case .weekdays: return "Weekdays"
+        case .weekends: return "Weekends"
         case .weekly: return "Weekly"
         case .biweekly: return "Biweekly"
         case .monthly: return "Monthly"
@@ -35,22 +37,11 @@ enum RecurringTypeExtended: String, CaseIterable, Codable, Sendable {
         case .once: return "1.circle"
         case .daily: return "arrow.clockwise"
         case .weekdays: return "briefcase"
+        case .weekends: return "sun.max"
         case .weekly: return "calendar.badge.clock"
         case .biweekly: return "calendar"
         case .monthly: return "calendar.badge.plus"
         case .custom: return "gearshape"
-        }
-    }
-
-    var shortLabel: String {
-        switch self {
-        case .once: return "Once"
-        case .daily: return "Daily"
-        case .weekdays: return "M-F"
-        case .weekly: return "Weekly"
-        case .biweekly: return "2 Weeks"
-        case .monthly: return "Monthly"
-        case .custom: return "Custom"
         }
     }
 }

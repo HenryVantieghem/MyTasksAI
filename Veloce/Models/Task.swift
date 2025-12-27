@@ -481,6 +481,16 @@ extension TaskItem {
             }
             return nextDate
 
+        case .weekends:
+            var nextDate = calendar.date(byAdding: .day, value: 1, to: baseDate) ?? baseDate
+            let weekday = calendar.component(.weekday, from: nextDate)
+            // Skip to Saturday if on weekday
+            if weekday >= 2 && weekday <= 6 { // Monday-Friday
+                let daysUntilSaturday = 7 - weekday
+                nextDate = calendar.date(byAdding: .day, value: daysUntilSaturday, to: nextDate) ?? nextDate
+            }
+            return nextDate
+
         case .weekly:
             return calendar.date(byAdding: .weekOfYear, value: 1, to: baseDate)
 

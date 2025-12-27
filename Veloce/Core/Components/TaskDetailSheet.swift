@@ -561,7 +561,7 @@ struct TaskDetailContentView: View {
             // Duration Picker
             HStack(spacing: 12) {
                 ForEach([15, 25, 45, 60], id: \.self) { minutes in
-                    DurationChip(
+                    TaskDetailDurationChip(
                         minutes: minutes,
                         isSelected: focusDuration == minutes,
                         onTap: {
@@ -1374,9 +1374,9 @@ struct QuickDateButton: View {
     }
 }
 
-// MARK: - Duration Chip
+// MARK: - Task Detail Duration Chip
 
-struct DurationChip: View {
+private struct TaskDetailDurationChip: View {
     let minutes: Int
     let isSelected: Bool
     let onTap: () -> Void
