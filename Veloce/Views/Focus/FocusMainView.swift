@@ -407,19 +407,22 @@ struct FocusPortalCard: View {
                         .foregroundStyle(.white.opacity(0.4))
                 }
                 .padding(Theme.Spacing.xl)
-                .background {
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(.ultraThinMaterial)
-                }
+                // 🌟 LIQUID GLASS: Interactive glass with tint for portal effect
+                .glassEffect(
+                    .regular
+                        .tint(accentColor.opacity(0.08))
+                        .interactive(true),
+                    in: RoundedRectangle(cornerRadius: 24)
+                )
                 .overlay {
                     RoundedRectangle(cornerRadius: 24)
                         .stroke(
                             LinearGradient(
                                 colors: [
                                     accentColor.opacity(0.5),
-                                    accentColor.opacity(0.2),
-                                    .white.opacity(0.1),
-                                    .clear
+                                    accentColor.opacity(0.3),
+                                    .white.opacity(0.2),
+                                    .white.opacity(0.05)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -427,6 +430,7 @@ struct FocusPortalCard: View {
                             lineWidth: 1.5
                         )
                 }
+                .shadow(color: accentColor.opacity(0.2), radius: 16, y: 8)
             }
         }
         .buttonStyle(.plain)

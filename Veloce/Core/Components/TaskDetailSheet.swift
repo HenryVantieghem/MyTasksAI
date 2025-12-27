@@ -1099,22 +1099,40 @@ struct ActionButton: View {
 // MARK: - Glass Card Modifier
 
 extension View {
+    /// 🌟 LIQUID GLASS: Premium glass card with interactive effect and optional tint
     func glassCard(tint: Color? = nil) -> some View {
         self
-            .background(
+            .background {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(.ultraThinMaterial)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(Theme.Colors.glassBorder.opacity(0.2))
-            )
-            .if(tint != nil) { view in
-                view.overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(tint!)
-                )
+                    .if(tint != nil) { view in
+                        view.overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(tint!)
+                        )
+                    }
             }
+            .glassEffect(
+                .regular
+                    .interactive(true),
+                in: RoundedRectangle(cornerRadius: 16)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(0.3),
+                                .white.opacity(0.15),
+                                .white.opacity(0.05)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            }
+            .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
     }
 }
 
