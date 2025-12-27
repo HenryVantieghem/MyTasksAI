@@ -127,23 +127,48 @@ struct LiquidGlassTabItem: View {
             .frame(width: itemWidth, height: 44)
             .background {
                 if isSelected {
-                    // Selected indicator morphs between tabs
+                    // 🌟 LIQUID GLASS: Selected indicator with interactive glass
                     Capsule()
-                        .fill(Veloce.Colors.surfaceCard.opacity(0.8))
-                        .overlay(
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Veloce.Colors.surfaceCard.opacity(0.9),
+                                    Veloce.Colors.surfaceCard.opacity(0.7)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .overlay {
+                            // Inner glass highlight
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            .white.opacity(0.15),
+                                            .clear
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .center
+                                    )
+                                )
+                        }
+                        .overlay {
+                            // Refined glass border
                             Capsule()
                                 .strokeBorder(
                                     LinearGradient(
                                         colors: [
-                                            Veloce.Colors.glassHighlight,
-                                            Veloce.Colors.glassBorder.opacity(0.5)
+                                            Veloce.Colors.glassHighlight.opacity(0.8),
+                                            Veloce.Colors.glassBorder.opacity(0.4)
                                         ],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
                                     lineWidth: 0.5
                                 )
-                        )
+                        }
+                        .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
                         .matchedGeometryEffect(id: "selectedIndicator", in: namespace)
                 }
             }
@@ -209,7 +234,26 @@ struct LiquidGlassTabBarCompact: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: Capsule())
+        // 🌟 LIQUID GLASS: Compact interactive glass
+        .glassEffect(
+            .regular.interactive(true),
+            in: Capsule()
+        )
+        .overlay {
+            Capsule()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            .white.opacity(0.3),
+                            .white.opacity(0.1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: 0.5
+                )
+        }
+        .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
     }
 }
 
@@ -239,7 +283,19 @@ struct LiquidGlassTabBarMinimal: View {
         }
         .padding(.horizontal, 24)
         .padding(.vertical, 14)
-        .glassEffect(.regular, in: Capsule())
+        // 🌟 LIQUID GLASS: Minimal interactive glass
+        .glassEffect(
+            .regular.interactive(true),
+            in: Capsule()
+        )
+        .overlay {
+            Capsule()
+                .stroke(
+                    .white.opacity(0.15),
+                    lineWidth: 0.5
+                )
+        }
+        .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
     }
 }
 
