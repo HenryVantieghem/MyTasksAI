@@ -1,10 +1,11 @@
 //
 //  CosmicSplashScreen.swift
-//  Veloce
+//  MyTasksAI
 //
-//  Cosmic Splash Screen - Living Cosmos Design
-//  A mesmerizing 3-second journey from void to brand reveal
-//  Stars coalesce into the Veloce logo with cosmic energy
+//  Ultra-Premium Splash Screen
+//  A breathtaking journey from void to brand reveal featuring
+//  the Neural Orb with prismatic holographic effects.
+//  Designed to feel like Apple paid a billion dollars for this.
 //
 
 import SwiftUI
@@ -30,56 +31,72 @@ struct CosmicSplashScreen: View {
     // MARK: - Animation States
     @State private var phase: SplashPhase = .void
     @State private var starOpacity: Double = 0
-    @State private var centralStarScale: CGFloat = 0
-    @State private var centralStarOpacity: Double = 0
-    @State private var starsCoalescing = false
+    @State private var orbScale: CGFloat = 0.3
+    @State private var orbOpacity: Double = 0
+    @State private var orbIntensity: Double = 0.5
     @State private var logoOpacity: Double = 0
-    @State private var logoScale: CGFloat = 0.8
+    @State private var logoOffset: CGFloat = 30
+    @State private var taglineOpacity: Double = 0
+    @State private var taglineOffset: CGFloat = 20
     @State private var glowIntensity: Double = 0
     @State private var particleBurst = false
-    @State private var taglineOpacity: Double = 0
     @State private var stars: [SplashStar] = []
-    @State private var coalescingStars: [CoalescingStar] = []
+    @State private var twinklePhase: Double = 0
+    @State private var nebulaPhase: Double = 0
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    // Premium prismatic colors
+    private let prismaticColors: [Color] = [
+        Color(red: 0.55, green: 0.35, blue: 1.0),
+        Color(red: 0.35, green: 0.55, blue: 1.0),
+        Color(red: 0.25, green: 0.85, blue: 0.95),
+        Color(red: 0.95, green: 0.55, blue: 0.85),
+    ]
+
     enum SplashPhase {
         case void           // 0.0s - Pure darkness
-        case centralStar    // 0.3s - Single star appears
-        case starField      // 0.5s - Stars fade in
-        case coalesce       // 1.0s - Stars move toward center
-        case logoForm       // 1.5s - Logo forms
-        case glow           // 2.0s - Amber glow
-        case burst          // 2.5s - Particle burst
-        case complete       // 3.0s - Ready to transition
+        case nebula         // 0.3s - Nebula hints appear
+        case orbAppear      // 0.6s - Neural Orb materializes
+        case orbGrow        // 1.2s - Orb pulses and grows
+        case logoForm       // 2.0s - Logo fades in
+        case tagline        // 2.5s - Tagline appears
+        case burst          // 3.0s - Particle burst
+        case complete       // 3.5s - Ready to transition
     }
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Deep void background
-                Theme.CelestialColors.voidDeep
-                    .ignoresSafeArea()
+                // Ultra-deep void background
+                premiumBackground
 
-                // Subtle nebula hint
-                nebulaBackground(in: geometry)
+                // Dynamic nebula layers
+                dynamicNebula(in: geometry)
 
-                // Star field
-                starFieldLayer(in: geometry)
+                // Premium star field
+                premiumStarField(in: geometry)
 
-                // Coalescing stars
-                coalescingStarsLayer(in: geometry)
+                // Neural Orb - the hero element
+                NeuralOrb(
+                    size: .hero,
+                    isAnimating: true,
+                    intensity: orbIntensity,
+                    showParticles: phase == .orbGrow || phase == .logoForm || phase == .tagline || phase == .burst,
+                    showNeuralNetwork: phase == .orbGrow || phase == .logoForm || phase == .tagline || phase == .burst
+                )
+                .scaleEffect(orbScale)
+                .opacity(orbOpacity)
+                .position(x: geometry.size.width / 2, y: geometry.size.height * 0.38)
 
-                // Central star
-                centralStar(in: geometry)
-
-                // Logo reveal
-                logoReveal(in: geometry)
+                // Brand reveal
+                brandReveal(in: geometry)
 
                 // Particle burst
                 if particleBurst {
-                    SplashParticleBurst(
-                        center: CGPoint(x: geometry.size.width / 2, y: geometry.size.height * 0.42)
+                    PremiumParticleBurst(
+                        center: CGPoint(x: geometry.size.width / 2, y: geometry.size.height * 0.38),
+                        colors: prismaticColors
                     )
                 }
             }
@@ -92,45 +109,83 @@ struct CosmicSplashScreen: View {
                 }
             } else {
                 generateStars()
+                startAnimations()
                 startSplashSequence()
             }
         }
     }
 
-    // MARK: - Nebula Background
+    // MARK: - Premium Background
 
-    private func nebulaBackground(in geometry: GeometryProxy) -> some View {
+    private var premiumBackground: some View {
         ZStack {
-            // Primary nebula
-            RadialGradient(
-                colors: [
-                    Theme.CelestialColors.nebulaCore.opacity(0.08 * glowIntensity),
-                    Theme.CelestialColors.nebulaEdge.opacity(0.04 * glowIntensity),
-                    Color.clear
-                ],
-                center: UnitPoint(x: 0.5, y: 0.4),
-                startRadius: 0,
-                endRadius: 300
-            )
+            // Pure void
+            Color(red: 0.01, green: 0.01, blue: 0.02)
+                .ignoresSafeArea()
 
-            // Secondary wisp
+            // Subtle vignette
             RadialGradient(
                 colors: [
-                    Theme.CelestialColors.solarFlare.opacity(0.05 * glowIntensity),
-                    Color.clear
+                    Color.clear,
+                    Color.black.opacity(0.4)
                 ],
-                center: UnitPoint(x: 0.7, y: 0.6),
-                startRadius: 0,
-                endRadius: 200
+                center: .center,
+                startRadius: 150,
+                endRadius: 500
             )
         }
     }
 
-    // MARK: - Star Field Layer
+    // MARK: - Dynamic Nebula
 
-    private func starFieldLayer(in geometry: GeometryProxy) -> some View {
+    private func dynamicNebula(in geometry: GeometryProxy) -> some View {
+        ZStack {
+            // Primary nebula - violet
+            RadialGradient(
+                colors: [
+                    prismaticColors[0].opacity(0.15 * glowIntensity),
+                    prismaticColors[1].opacity(0.08 * glowIntensity),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.3 + nebulaPhase * 0.1, y: 0.25),
+                startRadius: 0,
+                endRadius: 350
+            )
+
+            // Secondary nebula - cyan
+            RadialGradient(
+                colors: [
+                    prismaticColors[2].opacity(0.1 * glowIntensity),
+                    prismaticColors[3].opacity(0.05 * glowIntensity),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.7 - nebulaPhase * 0.1, y: 0.6),
+                startRadius: 0,
+                endRadius: 280
+            )
+
+            // Tertiary wisp - rose
+            RadialGradient(
+                colors: [
+                    prismaticColors[3].opacity(0.08 * glowIntensity),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.5, y: 0.38),
+                startRadius: 50,
+                endRadius: 400
+            )
+        }
+        .blur(radius: 40)
+    }
+
+    // MARK: - Premium Star Field
+
+    private func premiumStarField(in geometry: GeometryProxy) -> some View {
         Canvas { context, size in
             for star in stars {
+                let twinkle = sin(twinklePhase + star.twinkleOffset) * 0.5 + 0.5
+                let opacity = starOpacity * star.baseOpacity * (0.5 + twinkle * 0.5)
+
                 let rect = CGRect(
                     x: star.position.x - star.size / 2,
                     y: star.position.y - star.size / 2,
@@ -138,137 +193,67 @@ struct CosmicSplashScreen: View {
                     height: star.size
                 )
 
-                let opacity = starOpacity * star.baseOpacity * (starsCoalescing ? 0.3 : 1.0)
+                let starColor: Color
+                switch star.colorType {
+                case 0: starColor = .white
+                case 1: starColor = prismaticColors[0]
+                case 2: starColor = prismaticColors[2]
+                default: starColor = .white
+                }
 
                 context.fill(
-                    SwiftUI.Circle().path(in: rect),
-                    with: .color(Color.white.opacity(opacity))
+                    Circle().path(in: rect),
+                    with: .color(starColor.opacity(opacity))
                 )
 
                 // Glow for bright stars
-                if star.isBright && !starsCoalescing {
+                if star.isBright {
                     let glowRect = CGRect(
-                        x: star.position.x - star.size,
-                        y: star.position.y - star.size,
-                        width: star.size * 2,
-                        height: star.size * 2
+                        x: star.position.x - star.size * 1.5,
+                        y: star.position.y - star.size * 1.5,
+                        width: star.size * 3,
+                        height: star.size * 3
                     )
                     context.fill(
-                        SwiftUI.Circle().path(in: glowRect),
-                        with: .color(Color.white.opacity(opacity * 0.3))
+                        Circle().path(in: glowRect),
+                        with: .color(starColor.opacity(opacity * 0.3))
                     )
                 }
             }
         }
     }
 
-    // MARK: - Coalescing Stars Layer
+    // MARK: - Brand Reveal
 
-    private func coalescingStarsLayer(in geometry: GeometryProxy) -> some View {
-        ForEach(coalescingStars) { star in
-            SwiftUI.Circle()
-                .fill(star.color)
-                .frame(width: star.size, height: star.size)
-                .blur(radius: star.size > 3 ? 1 : 0)
-                .position(star.currentPosition)
-                .opacity(star.opacity)
-        }
-    }
+    private func brandReveal(in geometry: GeometryProxy) -> some View {
+        VStack(spacing: 16) {
+            Spacer()
+                .frame(height: geometry.size.height * 0.55)
 
-    // MARK: - Central Star
-
-    private func centralStar(in geometry: GeometryProxy) -> some View {
-        let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height * 0.42)
-
-        return ZStack {
-            // Outer glow
-            SwiftUI.Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Theme.CelestialColors.solarFlare.opacity(0.6),
-                            Theme.CelestialColors.solarFlare.opacity(0.2),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 60
-                    )
-                )
-                .frame(width: 120, height: 120)
-                .blur(radius: 20)
-
-            // Core star
-            SwiftUI.Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            .white,
-                            Theme.CelestialColors.solarFlare,
-                            Theme.CelestialColors.solarFlare.opacity(0.5)
-                        ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 15
-                    )
-                )
-                .frame(width: 30, height: 30)
-        }
-        .position(center)
-        .scaleEffect(centralStarScale)
-        .opacity(centralStarOpacity)
-    }
-
-    // MARK: - Logo Reveal
-
-    private func logoReveal(in geometry: GeometryProxy) -> some View {
-        VStack(spacing: Veloce.Spacing.lg) {
-            // App Icon/Logo - Infinity Ring
-            ZStack {
-                // Ambient glow behind logo
-                Ellipse()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Veloce.Colors.accentPrimary.opacity(0.4 * glowIntensity),
-                                Veloce.Colors.accentSecondary.opacity(0.2 * glowIntensity),
-                                Color.clear
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 120
-                        )
-                    )
-                    .frame(width: 240, height: 160)
-                    .blur(radius: 40)
-
-                // Infinity Ring Logo
-                AppLogoView(size: .large, isAnimating: true, showParticles: true)
-            }
-
-            // App Name
-            Text("Veloce")
-                .font(Veloce.Typography.displayHero)
+            // App Name - ultra-premium typography
+            Text("MyTasksAI")
+                .font(.system(size: 48, weight: .ultraLight, design: .default))
+                .tracking(4)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [
-                            Veloce.Colors.textPrimary,
-                            Veloce.Colors.accentSecondary.opacity(0.9)
-                        ],
+                        colors: [.white, .white.opacity(0.85)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
+                .opacity(logoOpacity)
+                .offset(y: logoOffset)
 
             // Tagline
-            Text("Infinite Momentum")
-                .font(Veloce.Typography.body)
-                .foregroundStyle(Veloce.Colors.textSecondary)
+            Text("INTELLIGENT PRODUCTIVITY")
+                .font(.system(size: 11, weight: .medium))
+                .tracking(5)
+                .foregroundStyle(Color.white.opacity(0.45))
                 .opacity(taglineOpacity)
+                .offset(y: taglineOffset)
+
+            Spacer()
         }
-        .position(x: geometry.size.width / 2, y: geometry.size.height * 0.45)
-        .opacity(logoOpacity)
-        .scaleEffect(logoScale)
     }
 
     // MARK: - Star Generation
@@ -276,144 +261,104 @@ struct CosmicSplashScreen: View {
     private func generateStars() {
         let screenBounds = UIApplication.screenBounds
 
-        // Generate static star field
-        stars = (0..<60).map { _ in
+        stars = (0..<70).map { _ in
             SplashStar(
                 position: CGPoint(
                     x: CGFloat.random(in: 0...screenBounds.width),
                     y: CGFloat.random(in: 0...screenBounds.height)
                 ),
-                size: CGFloat.random(in: 1...3),
-                baseOpacity: Double.random(in: 0.3...0.9),
-                isBright: Double.random(in: 0...1) < 0.15
-            )
-        }
-
-        // Generate coalescing stars
-        let center = CGPoint(x: screenBounds.width / 2, y: screenBounds.height * 0.42)
-        coalescingStars = (0..<30).map { i in
-            let angle = Double.random(in: 0...(2 * .pi))
-            let distance = CGFloat.random(in: 150...400)
-            let startPosition = CGPoint(
-                x: center.x + cos(angle) * distance,
-                y: center.y + sin(angle) * distance
-            )
-
-            return CoalescingStar(
-                id: UUID(),
-                startPosition: startPosition,
-                currentPosition: startPosition,
-                targetPosition: center,
-                size: CGFloat.random(in: 2...5),
-                color: [
-                    Color.white,
-                    Theme.CelestialColors.plasmaCore,
-                    Theme.CelestialColors.solarFlare,
-                    Theme.CelestialColors.nebulaEdge
-                ].randomElement()!,
-                opacity: 0,
-                delay: Double(i) * 0.03
+                size: CGFloat.random(in: 0.8...2.5),
+                baseOpacity: Double.random(in: 0.3...0.8),
+                twinkleOffset: Double.random(in: 0...(.pi * 2)),
+                isBright: Double.random(in: 0...1) < 0.12,
+                colorType: Int.random(in: 0...4)
             )
         }
     }
 
-    // MARK: - Animation Sequence
+    // MARK: - Continuous Animations
+
+    private func startAnimations() {
+        // Star twinkle
+        withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
+            twinklePhase = .pi * 2
+        }
+
+        // Nebula drift
+        withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
+            nebulaPhase = 1
+        }
+    }
+
+    // MARK: - Splash Sequence
 
     private func startSplashSequence() {
-        // Phase 1: Void → Central Star (0.3s)
+        // Phase 1: Nebula hints (0.3s)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            phase = .centralStar
-            withAnimation(.easeOut(duration: 0.4)) {
-                centralStarScale = 1.2
-                centralStarOpacity = 1
-            }
-            // Pulse effect
-            withAnimation(.easeInOut(duration: 0.6).repeatCount(2, autoreverses: true)) {
-                centralStarScale = 1.0
+            phase = .nebula
+            withAnimation(.easeIn(duration: 0.6)) {
+                glowIntensity = 0.4
+                starOpacity = 0.4
             }
         }
 
-        // Phase 2: Star Field Appears (0.5s)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            phase = .starField
-            withAnimation(.easeIn(duration: 0.5)) {
-                starOpacity = 1
+        // Phase 2: Orb materializes (0.6s)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            phase = .orbAppear
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                orbScale = 0.7
+                orbOpacity = 0.8
+                orbIntensity = 0.7
+            }
+            withAnimation(.easeIn(duration: 0.4)) {
+                starOpacity = 0.7
             }
         }
 
-        // Phase 3: Stars Coalesce (1.0s)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            phase = .coalesce
-
-            // Dim central star
-            withAnimation(.easeOut(duration: 0.3)) {
-                centralStarOpacity = 0.3
+        // Phase 3: Orb grows and pulses (1.2s)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            phase = .orbGrow
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
+                orbScale = 1.0
+                orbOpacity = 1.0
+                orbIntensity = 1.0
             }
-
-            // Start coalescing animation
-            withAnimation(.easeIn(duration: 0.3)) {
-                starsCoalescing = true
-            }
-
-            // Animate each coalescing star
-            for (index, star) in coalescingStars.enumerated() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + star.delay) {
-                    withAnimation(.easeIn(duration: 0.2)) {
-                        coalescingStars[index].opacity = 1
-                    }
-
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        coalescingStars[index].currentPosition = star.targetPosition
-                    }
-
-                    // Fade out as it reaches center
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            coalescingStars[index].opacity = 0
-                        }
-                    }
-                }
-            }
-        }
-
-        // Phase 4: Logo Forms (1.5s)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            phase = .logoForm
-
-            // Hide central star
-            withAnimation(.easeOut(duration: 0.2)) {
-                centralStarOpacity = 0
-            }
-
-            // Reveal logo
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                logoOpacity = 1
-                logoScale = 1.0
-            }
-        }
-
-        // Phase 5: Amber Glow (2.0s)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            phase = .glow
             withAnimation(.easeInOut(duration: 0.5)) {
                 glowIntensity = 1.0
-            }
-
-            // Tagline fade in
-            withAnimation(.easeIn(duration: 0.4).delay(0.2)) {
-                taglineOpacity = 1
+                starOpacity = 1.0
             }
         }
 
-        // Phase 6: Particle Burst (2.5s)
+        // Phase 4: Logo fades in (2.0s)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            phase = .logoForm
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                logoOpacity = 1
+                logoOffset = 0
+            }
+            withAnimation(.easeInOut(duration: 0.4)) {
+                orbIntensity = 1.2
+            }
+        }
+
+        // Phase 5: Tagline appears (2.5s)
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            phase = .tagline
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                taglineOpacity = 1
+                taglineOffset = 0
+            }
+        }
+
+        // Phase 6: Particle burst (3.0s)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
             phase = .burst
             particleBurst = true
             HapticsService.shared.impact()
         }
 
-        // Phase 7: Complete (3.0s)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+        // Phase 7: Complete (3.5s)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
             phase = .complete
             onComplete()
         }
@@ -427,57 +372,77 @@ struct SplashStar: Identifiable {
     let position: CGPoint
     let size: CGFloat
     let baseOpacity: Double
+    let twinkleOffset: Double
     let isBright: Bool
+    let colorType: Int
 }
 
-struct CoalescingStar: Identifiable {
-    let id: UUID
-    let startPosition: CGPoint
-    var currentPosition: CGPoint
-    let targetPosition: CGPoint
-    let size: CGFloat
-    let color: Color
-    var opacity: Double
-    let delay: Double
-}
+// MARK: - Premium Particle Burst
 
-// MARK: - Splash Particle Burst
-
-struct SplashParticleBurst: View {
+struct PremiumParticleBurst: View {
     let center: CGPoint
+    let colors: [Color]
 
-    @State private var particles: [SplashBurstParticle] = []
+    @State private var particles: [PremiumBurstParticle] = []
     @State private var centralFlash: CGFloat = 0
+    @State private var ringScale: CGFloat = 0.5
+    @State private var ringOpacity: Double = 1
 
     var body: some View {
         ZStack {
             // Central flash
-            SwiftUI.Circle()
+            Circle()
                 .fill(
                     RadialGradient(
                         colors: [
                             .white,
-                            Veloce.Colors.accentPrimary.opacity(0.8),
+                            colors[0].opacity(0.8),
+                            colors[1].opacity(0.4),
                             Color.clear
                         ],
                         center: .center,
                         startRadius: 0,
-                        endRadius: 80
+                        endRadius: 100
                     )
                 )
-                .frame(width: 160, height: 160)
+                .frame(width: 200, height: 200)
                 .position(center)
                 .scaleEffect(centralFlash)
-                .opacity(Double(2 - centralFlash))
+                .opacity(Double(2.5 - centralFlash) * 0.8)
+
+            // Expanding ring
+            Circle()
+                .stroke(
+                    AngularGradient(
+                        colors: colors + [colors[0]],
+                        center: .center
+                    ),
+                    lineWidth: 3
+                )
+                .frame(width: 150, height: 150)
+                .position(center)
+                .scaleEffect(ringScale)
+                .opacity(ringOpacity)
+                .blur(radius: 2)
 
             // Particles
             ForEach(particles) { particle in
-                SwiftUI.Circle()
-                    .fill(particle.color)
-                    .frame(width: particle.size, height: particle.size)
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                particle.color,
+                                particle.color.opacity(0.5),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: particle.size
+                        )
+                    )
+                    .frame(width: particle.size * 2, height: particle.size * 2)
                     .position(particle.position)
                     .opacity(particle.opacity)
-                    .blur(radius: particle.blur)
             }
         }
         .onAppear {
@@ -486,58 +451,54 @@ struct SplashParticleBurst: View {
     }
 
     private func triggerBurst() {
-        // Flash
-        withAnimation(.easeOut(duration: 0.3)) {
-            centralFlash = 2
+        // Central flash
+        withAnimation(.easeOut(duration: 0.4)) {
+            centralFlash = 2.5
+        }
+
+        // Expanding ring
+        withAnimation(.easeOut(duration: 0.6)) {
+            ringScale = 3
+            ringOpacity = 0
         }
 
         // Generate particles
-        let colors: [Color] = [
-            .white,
-            Veloce.Colors.accentPrimary,
-            Veloce.Colors.accentSecondary,
-            Veloce.Colors.accentTertiary
-        ]
-
-        for i in 0..<24 {
-            let angle = (Double(i) / 24.0) * 2 * .pi + Double.random(in: -0.2...0.2)
-            let distance = CGFloat.random(in: 80...180)
+        for i in 0..<32 {
+            let angle = (Double(i) / 32.0) * 2 * .pi + Double.random(in: -0.15...0.15)
+            let distance = CGFloat.random(in: 100...220)
             let targetPosition = CGPoint(
-                x: center.x + CGFloat(Darwin.cos(angle)) * distance,
-                y: center.y + CGFloat(Darwin.sin(angle)) * distance
+                x: center.x + CGFloat(cos(angle)) * distance,
+                y: center.y + CGFloat(sin(angle)) * distance
             )
 
-            let particle = SplashBurstParticle(
+            let particle = PremiumBurstParticle(
                 id: UUID(),
                 position: center,
                 targetPosition: targetPosition,
-                size: CGFloat.random(in: 3...7),
+                size: CGFloat.random(in: 4...10),
                 color: colors.randomElement()!,
-                opacity: 1,
-                blur: 0
+                opacity: 1
             )
 
             particles.append(particle)
 
             // Animate outward
             let index = particles.count - 1
-            withAnimation(.easeOut(duration: Double.random(in: 0.4...0.7))) {
+            withAnimation(.easeOut(duration: Double.random(in: 0.5...0.8))) {
                 particles[index].position = targetPosition
                 particles[index].opacity = 0
-                particles[index].blur = 2
             }
         }
     }
 }
 
-struct SplashBurstParticle: Identifiable {
+struct PremiumBurstParticle: Identifiable {
     let id: UUID
     var position: CGPoint
     let targetPosition: CGPoint
     let size: CGFloat
     let color: Color
     var opacity: Double
-    var blur: CGFloat
 }
 
 // MARK: - Preview

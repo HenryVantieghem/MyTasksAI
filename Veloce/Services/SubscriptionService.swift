@@ -2,13 +2,14 @@
 //  SubscriptionService.swift
 //  Veloce
 //
-//  Subscription Service - StoreKit 2 Integration
+//  Subscription Service - RevenueCat Integration
 //  Handles Pro ($9.99/mo) and Creator ($19.99/mo) subscriptions
+//  Includes local 3-day free trial (no payment required)
 //
 
 import Foundation
 import SwiftUI
-import StoreKit
+import RevenueCat
 import Supabase
 
 // MARK: - Subscription Service
@@ -25,28 +26,33 @@ final class SubscriptionService {
     private(set) var trialDaysRemaining: Int = 0
     private(set) var isLoading: Bool = false
     private(set) var error: String?
-    private(set) var products: [Product] = []
-    private(set) var purchasedSubscriptions: [Product] = []
     private(set) var currentTier: SubscriptionTier = .free
     private(set) var subscription: Subscription?
+
+    // RevenueCat state
+    private(set) var offerings: Offerings?
+    private(set) var customerInfo: CustomerInfo?
+    private(set) var isConfigured: Bool = false
 
     // Trial tracking
     private(set) var installDate: Date
 
-    // StoreKit Product IDs
+    // RevenueCat Entitlement IDs (configure these in RevenueCat dashboard)
+    static let proEntitlementId = "pro"
+    static let creatorEntitlementId = "creator"
+
+    // Product IDs (for reference - RevenueCat uses these internally)
     static let proMonthlyId = "com.veloce.pro.monthly"
     static let proYearlyId = "com.veloce.pro.yearly"
     static let creatorMonthlyId = "com.veloce.creator.monthly"
     static let creatorYearlyId = "com.veloce.creator.yearly"
-
-    private var updateListenerTask: Task<Void, Error>?
 
     // Dependencies
     private let supabase = SupabaseService.shared
 
     // MARK: Initialization
     private init() {
-        // Get or set install date
+        // Get or set install date for local trial
         if let savedDate = UserDefaults.standard.object(forKey: "veloce_install_date") as? Date {
             self.installDate = savedDate
         } else {
@@ -54,49 +60,90 @@ final class SubscriptionService {
             UserDefaults.standard.set(now, forKey: "veloce_install_date")
             self.installDate = now
         }
-
-        updateListenerTask = listenForTransactions()
     }
 
-    nonisolated func cleanup() {
-        // Note: This is called manually if needed, but Task will be deallocated naturally
+    // MARK: - Secret Loading
+
+    private func loadSecret(key: String) -> String? {
+        guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist"),
+              let plist = NSDictionary(contentsOfFile: path),
+              let value = plist[key] as? String,
+              !value.isEmpty,
+              !value.contains("YOUR_") else {
+            return nil
+        }
+        return value
     }
 
     // MARK: - Configuration
 
     func configure() async {
         #if DEBUG
-        print("[SubscriptionService] Configuring...")
+        print("[SubscriptionService] Configuring RevenueCat...")
         #endif
 
-        await loadProducts()
+        // Load API key from Secrets.plist
+        guard let apiKey = loadSecret(key: "REVENUECAT_API_KEY") else {
+            #if DEBUG
+            print("[SubscriptionService] RevenueCat API key not found in Secrets.plist")
+            print("[SubscriptionService] Add REVENUECAT_API_KEY to Secrets.plist with your appl_xxx key")
+            #endif
+            error = "RevenueCat not configured. Add REVENUECAT_API_KEY to Secrets.plist"
+
+            // Still check local trial even without RevenueCat
+            checkLocalFreeTrial()
+            return
+        }
+
+        // Configure RevenueCat SDK
+        #if DEBUG
+        Purchases.logLevel = .debug
+        #endif
+
+        Purchases.configure(
+            with: Configuration.Builder(withAPIKey: apiKey)
+                .with(storeKitVersion: .storeKit2)
+                .build()
+        )
+
+        isConfigured = true
+
+        #if DEBUG
+        print("[SubscriptionService] RevenueCat configured successfully")
+        #endif
+
+        // Start listening for customer info updates
+        listenForCustomerInfoUpdates()
+
+        // Load offerings and check subscription status
+        await loadOfferings()
         await checkSubscriptionStatus()
     }
 
-    // MARK: - Load Products
+    // MARK: - Load Offerings
 
-    func loadProducts() async {
+    func loadOfferings() async {
+        guard isConfigured else { return }
+
         isLoading = true
         defer { isLoading = false }
 
         do {
-            let productIds: Set<String> = [
-                Self.proMonthlyId,
-                Self.proYearlyId,
-                Self.creatorMonthlyId,
-                Self.creatorYearlyId
-            ]
-
-            products = try await Product.products(for: productIds)
-                .sorted { $0.price < $1.price }
+            offerings = try await Purchases.shared.offerings()
 
             #if DEBUG
-            print("[SubscriptionService] Loaded \(products.count) products")
+            if let current = offerings?.current {
+                print("[SubscriptionService] Loaded offering: \(current.identifier)")
+                print("[SubscriptionService] Available packages: \(current.availablePackages.count)")
+                for package in current.availablePackages {
+                    print("  - \(package.identifier): \(package.storeProduct.localizedPriceString)")
+                }
+            }
             #endif
         } catch {
             self.error = error.localizedDescription
             #if DEBUG
-            print("[SubscriptionService] Error loading products: \(error)")
+            print("[SubscriptionService] Error loading offerings: \(error)")
             #endif
         }
     }
@@ -111,25 +158,17 @@ final class SubscriptionService {
         print("[SubscriptionService] Checking subscription status...")
         #endif
 
-        // Reset state
-        var highestTier: SubscriptionTier = .free
-
-        // Check App Store subscriptions
-        for await result in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = result else { continue }
-
-            if transaction.productID.contains("creator") {
-                highestTier = .creator
-            } else if transaction.productID.contains("pro") && highestTier != .creator {
-                highestTier = .pro
+        // Check RevenueCat entitlements if configured
+        if isConfigured {
+            do {
+                customerInfo = try await Purchases.shared.customerInfo()
+                updateTierFromCustomerInfo()
+            } catch {
+                #if DEBUG
+                print("[SubscriptionService] Error getting customer info: \(error)")
+                #endif
             }
         }
-
-        currentTier = highestTier
-        isSubscribed = highestTier != .free
-
-        // Update purchased subscriptions list
-        await updatePurchasedSubscriptions()
 
         // Check local trial if not subscribed
         if !isSubscribed {
@@ -146,8 +185,62 @@ final class SubscriptionService {
         #endif
     }
 
+    // MARK: - Update Tier from CustomerInfo
+
+    private func updateTierFromCustomerInfo() {
+        guard let info = customerInfo else {
+            currentTier = .free
+            isSubscribed = false
+            return
+        }
+
+        // Check for Creator entitlement first (higher tier)
+        if info.entitlements[Self.creatorEntitlementId]?.isActive == true {
+            currentTier = .creator
+            isSubscribed = true
+            isInTrial = false
+        }
+        // Then check for Pro entitlement
+        else if info.entitlements[Self.proEntitlementId]?.isActive == true {
+            currentTier = .pro
+            isSubscribed = true
+            isInTrial = false
+        }
+        // No active subscription
+        else {
+            currentTier = .free
+            isSubscribed = false
+        }
+
+        #if DEBUG
+        print("[SubscriptionService] Updated tier from CustomerInfo: \(currentTier)")
+        print("[SubscriptionService] Active entitlements: \(info.entitlements.active.keys.joined(separator: ", "))")
+        #endif
+    }
+
+    // MARK: - Listen for Customer Info Updates
+
+    private func listenForCustomerInfoUpdates() {
+        Task {
+            for await info in Purchases.shared.customerInfoStream {
+                await MainActor.run {
+                    self.customerInfo = info
+                    self.updateTierFromCustomerInfo()
+
+                    #if DEBUG
+                    print("[SubscriptionService] Customer info updated via stream")
+                    #endif
+                }
+
+                // Sync with Supabase when subscription changes
+                await syncSubscriptionToSupabase()
+            }
+        }
+    }
+
     // MARK: - Local Free Trial Check
 
+    /// Local 3-day trial that doesn't require payment info
     private func checkLocalFreeTrial() {
         let daysSinceInstall = Calendar.current.dateComponents(
             [.day],
@@ -157,11 +250,15 @@ final class SubscriptionService {
 
         if daysSinceInstall <= 3 {
             isInTrial = true
-            trialDaysRemaining = 3 - daysSinceInstall
+            trialDaysRemaining = max(0, 3 - daysSinceInstall)
         } else {
             isInTrial = false
             trialDaysRemaining = 0
         }
+
+        #if DEBUG
+        print("[SubscriptionService] Local trial check - days since install: \(daysSinceInstall), in trial: \(isInTrial)")
+        #endif
     }
 
     // MARK: - Access Checks
@@ -241,39 +338,37 @@ final class SubscriptionService {
         !UserDefaults.standard.bool(forKey: "veloce_trial_used")
     }
 
-    // MARK: - Purchase
+    // MARK: - Purchase with RevenueCat
 
-    func purchase(_ product: Product) async throws -> StoreKit.Transaction? {
+    func purchase(_ package: Package) async throws -> CustomerInfo {
+        guard isConfigured else {
+            throw SubscriptionError.notConfigured
+        }
+
         isLoading = true
         defer { isLoading = false }
 
-        let result = try await product.purchase()
+        let result = try await Purchases.shared.purchase(package: package)
 
-        switch result {
-        case .success(let verification):
-            let transaction = try checkVerified(verification)
-            await updateTierFromTransaction(transaction)
-            await syncSubscriptionToSupabase()
-            await transaction.finish()
-            return transaction
-
-        case .userCancelled:
-            return nil
-
-        case .pending:
-            return nil
-
-        @unknown default:
-            return nil
+        if result.userCancelled {
+            throw SubscriptionError.purchaseCancelled
         }
+
+        customerInfo = result.customerInfo
+        updateTierFromCustomerInfo()
+        await syncSubscriptionToSupabase()
+
+        #if DEBUG
+        print("[SubscriptionService] Purchase successful for package: \(package.identifier)")
+        #endif
+
+        return result.customerInfo
     }
 
     func purchasePro(yearly: Bool = false) async throws {
-        let productId = yearly ? Self.proYearlyId : Self.proMonthlyId
-        guard let product = products.first(where: { $0.id == productId }) else {
-            // Fallback for simulator
+        guard let offering = offerings?.current else {
             #if DEBUG
-            print("[SubscriptionService] No product found - simulating purchase")
+            print("[SubscriptionService] No offering available - simulating purchase in debug")
             currentTier = .pro
             isSubscribed = true
             return
@@ -281,14 +376,33 @@ final class SubscriptionService {
             throw SubscriptionError.productNotFound
             #endif
         }
-        _ = try await purchase(product)
+
+        let packageId = yearly ? "annual" : "monthly"
+
+        // Find the Pro package
+        if let package = offering.availablePackages.first(where: {
+            $0.identifier.lowercased().contains(packageId) &&
+            $0.storeProduct.productIdentifier.contains("pro")
+        }) {
+            _ = try await purchase(package)
+        } else if let package = yearly ? offering.annual : offering.monthly {
+            // Fallback to standard package types
+            _ = try await purchase(package)
+        } else {
+            #if DEBUG
+            print("[SubscriptionService] No Pro package found - simulating purchase")
+            currentTier = .pro
+            isSubscribed = true
+            #else
+            throw SubscriptionError.productNotFound
+            #endif
+        }
     }
 
     func purchaseCreator(yearly: Bool = false) async throws {
-        let productId = yearly ? Self.creatorYearlyId : Self.creatorMonthlyId
-        guard let product = products.first(where: { $0.id == productId }) else {
+        guard let offering = offerings?.current else {
             #if DEBUG
-            print("[SubscriptionService] No product found - simulating purchase")
+            print("[SubscriptionService] No offering available - simulating purchase in debug")
             currentTier = .creator
             isSubscribed = true
             return
@@ -296,69 +410,43 @@ final class SubscriptionService {
             throw SubscriptionError.productNotFound
             #endif
         }
-        _ = try await purchase(product)
+
+        let packageId = yearly ? "annual" : "monthly"
+
+        // Find the Creator package
+        if let package = offering.availablePackages.first(where: {
+            $0.identifier.lowercased().contains(packageId) &&
+            $0.storeProduct.productIdentifier.contains("creator")
+        }) {
+            _ = try await purchase(package)
+        } else {
+            #if DEBUG
+            print("[SubscriptionService] No Creator package found - simulating purchase")
+            currentTier = .creator
+            isSubscribed = true
+            #else
+            throw SubscriptionError.productNotFound
+            #endif
+        }
     }
 
     // MARK: - Restore Purchases
 
     func restorePurchases() async throws {
+        guard isConfigured else {
+            throw SubscriptionError.notConfigured
+        }
+
         isLoading = true
         defer { isLoading = false }
 
-        try await AppStore.sync()
-        await checkSubscriptionStatus()
-    }
+        customerInfo = try await Purchases.shared.restorePurchases()
+        updateTierFromCustomerInfo()
+        await syncSubscriptionToSupabase()
 
-    // MARK: - Transaction Listener
-
-    private func listenForTransactions() -> Task<Void, Error> {
-        return Task.detached {
-            for await result in Transaction.updates {
-                do {
-                    let transaction = try await self.checkVerified(result)
-                    await self.updateTierFromTransaction(transaction)
-                    await self.syncSubscriptionToSupabase()
-                    await transaction.finish()
-                } catch {
-                    print("Transaction verification failed: \(error)")
-                }
-            }
-        }
-    }
-
-    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
-        switch result {
-        case .unverified:
-            throw SubscriptionError.verificationFailed
-        case .verified(let safe):
-            return safe
-        }
-    }
-
-    private func updateTierFromTransaction(_ transaction: StoreKit.Transaction) async {
-        if transaction.productID.contains("creator") {
-            currentTier = .creator
-            isSubscribed = true
-        } else if transaction.productID.contains("pro") {
-            currentTier = .pro
-            isSubscribed = true
-        }
-        isInTrial = false
-        await updatePurchasedSubscriptions()
-    }
-
-    private func updatePurchasedSubscriptions() async {
-        var purchased: [Product] = []
-
-        for await result in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = result else { continue }
-
-            if let product = products.first(where: { $0.id == transaction.productID }) {
-                purchased.append(product)
-            }
-        }
-
-        purchasedSubscriptions = purchased
+        #if DEBUG
+        print("[SubscriptionService] Purchases restored")
+        #endif
     }
 
     // MARK: - Supabase Sync
@@ -370,14 +458,14 @@ final class SubscriptionService {
             let client = try supabase.getClient()
             guard let userId = try await client.auth.session.user.id as UUID? else { return }
 
+            // Get transaction info from RevenueCat if available
             var appleTransactionId: String?
             var expiresAt: Date?
 
-            for await result in Transaction.currentEntitlements {
-                guard case .verified(let transaction) = result else { continue }
-                appleTransactionId = String(transaction.id)
-                expiresAt = transaction.expirationDate
-                break
+            if let info = customerInfo,
+               let activeEntitlement = info.entitlements.active.values.first {
+                appleTransactionId = activeEntitlement.originalPurchaseDate?.description
+                expiresAt = activeEntitlement.expirationDate
             }
 
             let existing: [Subscription] = try await client
@@ -447,34 +535,62 @@ final class SubscriptionService {
         return response.first
     }
 
-    // MARK: - Product Helpers
+    // MARK: - Package Helpers
 
-    func product(for tier: SubscriptionTier, yearly: Bool) -> Product? {
-        let productId: String
+    /// Get available packages from current offering
+    var availablePackages: [Package] {
+        offerings?.current?.availablePackages ?? []
+    }
+
+    /// Get a specific package by identifier
+    func package(identifier: String) -> Package? {
+        offerings?.current?.package(identifier: identifier)
+    }
+
+    /// Get monthly package for a tier
+    func monthlyPackage(for tier: SubscriptionTier) -> Package? {
+        guard let offering = offerings?.current else { return nil }
+
         switch tier {
         case .free:
             return nil
         case .pro:
-            productId = yearly ? Self.proYearlyId : Self.proMonthlyId
+            return offering.availablePackages.first {
+                $0.storeProduct.productIdentifier == Self.proMonthlyId
+            } ?? offering.monthly
         case .creator:
-            productId = yearly ? Self.creatorYearlyId : Self.creatorMonthlyId
+            return offering.availablePackages.first {
+                $0.storeProduct.productIdentifier == Self.creatorMonthlyId
+            }
         }
-        return products.first { $0.id == productId }
     }
 
-    func formattedPrice(for product: Product) -> String {
-        product.displayPrice
-    }
+    /// Get yearly package for a tier
+    func yearlyPackage(for tier: SubscriptionTier) -> Package? {
+        guard let offering = offerings?.current else { return nil }
 
-    func isSubscribed(to productId: String) -> Bool {
-        purchasedSubscriptions.contains { $0.id == productId }
+        switch tier {
+        case .free:
+            return nil
+        case .pro:
+            return offering.availablePackages.first {
+                $0.storeProduct.productIdentifier == Self.proYearlyId
+            } ?? offering.annual
+        case .creator:
+            return offering.availablePackages.first {
+                $0.storeProduct.productIdentifier == Self.creatorYearlyId
+            }
+        }
     }
 
     // MARK: - Manage Subscription
 
     func openManageSubscriptions() {
-        guard let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") else { return }
-        UIApplication.shared.open(url)
+        if let url = customerInfo?.managementURL {
+            UIApplication.shared.open(url)
+        } else if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
+            UIApplication.shared.open(url)
+        }
     }
 }
 
@@ -484,6 +600,7 @@ enum SubscriptionError: Error, LocalizedError {
     case productNotFound
     case verificationFailed
     case purchaseFailed
+    case purchaseCancelled
     case restoreFailed
     case notConfigured
     case trialExpired
@@ -496,10 +613,12 @@ enum SubscriptionError: Error, LocalizedError {
             return "Transaction verification failed"
         case .purchaseFailed:
             return "Purchase failed. Please try again."
+        case .purchaseCancelled:
+            return "Purchase was cancelled."
         case .restoreFailed:
             return "Unable to restore purchases. Please try again."
         case .notConfigured:
-            return "Subscription service not configured"
+            return "Subscription service not configured. Please add your RevenueCat API key."
         case .trialExpired:
             return "Your free trial has expired. Subscribe to continue."
         }

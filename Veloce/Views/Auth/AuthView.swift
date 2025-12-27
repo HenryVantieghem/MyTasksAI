@@ -1,10 +1,11 @@
 //
 //  AuthView.swift
-//  Veloce
+//  MyTasksAI
 //
-//  Authentication View - Living Cosmos Design
-//  Premium auth experience with celestial void background, animated logo,
-//  nebula effects, and staggered reveal animations.
+//  Authentication View - Ultra-Premium Design
+//  A breathtaking auth experience with Neural Orb, holographic components,
+//  prismatic effects, and staggered reveal animations.
+//  Designed to feel like Apple paid a billion dollars for this.
 //
 
 import SwiftUI
@@ -26,10 +27,13 @@ struct AuthView: View {
     @State private var currentScreen: AuthScreen
     @State private var showContent = false
     @State private var showError = false
-    @State private var orbState: OrbState = .dormant
+    @State private var orbIntensity: Double = 1.0
     @State private var triggerSuccessBurst = false
-    @State private var logoIntensity: Double = 1.0
+    @State private var backgroundParticles: [AuthParticle] = []
+    @State private var particlePhase: Double = 0
     @FocusState private var focusedField: AuthField?
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Initialize with optional starting screen
     init(initialScreen: AuthScreen = .signUp) {
@@ -43,45 +47,58 @@ struct AuthView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Living Cosmos void background with orb
-                VoidBackground.auth
+                // Ultra-premium void background
+                premiumBackground
 
-                // Success burst effect
-                if triggerSuccessBurst {
-                    SuccessLogoBurst(
-                        size: logoSize(for: geometry),
-                        shouldBurst: $triggerSuccessBurst
-                    )
-                    .position(
-                        x: geometry.size.width / 2,
-                        y: logoYPosition(for: geometry)
-                    )
+                // Ambient floating particles
+                if !reduceMotion {
+                    ambientParticles(in: geometry)
                 }
+
+                // Neural Orb positioned at top
+                NeuralOrb(
+                    size: orbSize(for: geometry),
+                    isAnimating: true,
+                    intensity: orbIntensity
+                )
+                .position(
+                    x: geometry.size.width / 2,
+                    y: orbYPosition(for: geometry)
+                )
+                .opacity(showContent ? 1 : 0)
+                .scaleEffect(showContent ? 1 : 0.8)
+                .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.2), value: showContent)
 
                 // Content
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: Theme.Spacing.xl) {
-                        // Spacer for logo
-                        Spacer(minLength: logoSpacerHeight(for: geometry))
+                    VStack(spacing: 28) {
+                        // Spacer for orb
+                        Spacer(minLength: orbSpacerHeight(for: geometry))
 
                         // Logo & Title
                         headerSection
-                            .staggeredReveal(index: 0, isVisible: showContent)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 20)
+                            .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.4), value: showContent)
 
-                        Spacer(minLength: Theme.Spacing.xl)
+                        Spacer(minLength: 32)
 
                         // Auth form
                         authFormSection
-                            .staggeredReveal(index: 1, isVisible: showContent)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 30)
+                            .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.5), value: showContent)
 
-                        Spacer(minLength: Theme.Spacing.lg)
+                        Spacer(minLength: 24)
 
                         // Terms
                         termsSection
-                            .staggeredReveal(index: 2, isVisible: showContent)
-                            .padding(.bottom, Theme.Spacing.xl)
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 20)
+                            .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.6), value: showContent)
+                            .padding(.bottom, 32)
                     }
-                    .padding(.horizontal, Theme.Spacing.lg)
+                    .padding(.horizontal, 24)
                 }
             }
             // Tap anywhere to dismiss keyboard
@@ -90,7 +107,9 @@ struct AuthView: View {
             }
         }
         .onAppear {
-            withAnimation(LivingCosmos.Animations.portalOpen.delay(0.3)) {
+            generateParticles()
+            startParticleAnimation()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 showContent = true
             }
         }
@@ -98,17 +117,13 @@ struct AuthView: View {
             handleAuthStateChange(newValue)
         }
         .onChange(of: focusedField) { _, newField in
-            updateOrbState(for: newField)
-            updateLogoIntensity(for: newField)
+            updateOrbIntensity(for: newField)
         }
         .alert("Error", isPresented: $showError) {
             Button("OK") {
                 viewModel.clearError()
-                if orbState == .error {
-                    orbState = .dormant
-                }
-                withAnimation(LivingCosmos.Animations.spring) {
-                    logoIntensity = 1.0
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    orbIntensity = 1.0
                 }
             }
         } message: {
@@ -123,84 +138,168 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Logo State
+    // MARK: - Premium Background
 
-    private var logoScale: CGFloat {
-        switch orbState {
-        case .processing: return 1.05
-        case .success: return 1.1
-        case .error: return 0.95
-        case .active, .aware: return 1.02
-        default: return 1.0
+    private var premiumBackground: some View {
+        ZStack {
+            // Deep void base
+            Color(red: 0.02, green: 0.02, blue: 0.04)
+                .ignoresSafeArea()
+
+            // Nebula gradient 1
+            RadialGradient(
+                colors: [
+                    Color(red: 0.55, green: 0.35, blue: 1.0).opacity(0.12),
+                    Color(red: 0.35, green: 0.55, blue: 1.0).opacity(0.06),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.3, y: 0.2),
+                startRadius: 0,
+                endRadius: 350
+            )
+
+            // Nebula gradient 2
+            RadialGradient(
+                colors: [
+                    Color(red: 0.25, green: 0.85, blue: 0.95).opacity(0.08),
+                    Color(red: 0.95, green: 0.55, blue: 0.85).opacity(0.04),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.8, y: 0.7),
+                startRadius: 0,
+                endRadius: 300
+            )
+
+            // Subtle vignette
+            RadialGradient(
+                colors: [
+                    Color.clear,
+                    Color.black.opacity(0.3)
+                ],
+                center: .center,
+                startRadius: 200,
+                endRadius: 600
+            )
+        }
+        .ignoresSafeArea()
+    }
+
+    // MARK: - Ambient Particles
+
+    private func ambientParticles(in geometry: GeometryProxy) -> some View {
+        Canvas { context, size in
+            for particle in backgroundParticles {
+                let adjustedY = particle.y + particlePhase * particle.speed * 50
+                let wrappedY = adjustedY.truncatingRemainder(dividingBy: size.height + 100) - 50
+
+                let opacity = particle.baseOpacity * (0.5 + sin(particlePhase * 2 + particle.twinkleOffset) * 0.5)
+
+                let rect = CGRect(
+                    x: particle.x - particle.size / 2,
+                    y: wrappedY - particle.size / 2,
+                    width: particle.size,
+                    height: particle.size
+                )
+
+                context.fill(
+                    Circle().path(in: rect),
+                    with: .color(particle.color.opacity(opacity))
+                )
+            }
         }
     }
 
-    private var logoOpacity: Double {
-        switch orbState {
-        case .error: return 0.7
-        default: return 1.0
+    private func generateParticles() {
+        let colors: [Color] = [
+            .white,
+            Color(red: 0.55, green: 0.35, blue: 1.0),
+            Color(red: 0.25, green: 0.85, blue: 0.95),
+            Color(red: 0.95, green: 0.55, blue: 0.85)
+        ]
+
+        backgroundParticles = (0..<40).map { _ in
+            AuthParticle(
+                x: CGFloat.random(in: 0...400),
+                y: CGFloat.random(in: 0...900),
+                size: CGFloat.random(in: 1...3),
+                baseOpacity: Double.random(in: 0.2...0.5),
+                speed: Double.random(in: 0.3...1.0),
+                twinkleOffset: Double.random(in: 0...(.pi * 2)),
+                color: colors.randomElement()!
+            )
         }
     }
 
-    private func updateLogoIntensity(for field: AuthField?) {
-        withAnimation(LivingCosmos.Animations.spring) {
+    private func startParticleAnimation() {
+        guard !reduceMotion else { return }
+        withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
+            particlePhase = 20
+        }
+    }
+
+    // MARK: - Orb State
+
+    private func updateOrbIntensity(for field: AuthField?) {
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
             if field != nil {
-                logoIntensity = 1.2
+                orbIntensity = 1.3
             } else {
-                logoIntensity = 1.0
+                orbIntensity = 1.0
             }
         }
     }
 
     // MARK: - Layout Calculations
 
-    private func logoSize(for geometry: GeometryProxy) -> LogoSize {
+    private func orbSize(for geometry: GeometryProxy) -> NeuralOrbSize {
         let height = geometry.size.height
         if height < 700 {
-            return .large // 120pt for smaller screens
+            return .large // 150pt for smaller screens
         } else {
-            return .hero // 200pt for larger screens
+            return .hero // 220pt for larger screens
         }
     }
 
-    private func logoYPosition(for geometry: GeometryProxy) -> CGFloat {
+    private func orbYPosition(for geometry: GeometryProxy) -> CGFloat {
         let height = geometry.size.height
         if height < 700 {
+            return height * 0.14
+        } else {
             return height * 0.16
-        } else {
-            return height * 0.18
         }
     }
 
-    private func logoSpacerHeight(for geometry: GeometryProxy) -> CGFloat {
+    private func orbSpacerHeight(for geometry: GeometryProxy) -> CGFloat {
         let height = geometry.size.height
         if height < 700 {
-            return 160
+            return 180
         } else if height < 850 {
-            return 200
+            return 220
         } else {
-            return 240
+            return 260
         }
     }
 
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: Theme.Spacing.sm) {
-            // Cosmic display typography
-            Text("Veloce")
-                .font(.system(size: 42, weight: .thin, design: .default))
+        VStack(spacing: 12) {
+            // Ultra-premium typography
+            Text("MyTasksAI")
+                .font(.system(size: 44, weight: .ultraLight, design: .default))
+                .tracking(3)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Theme.CelestialColors.starWhite, Theme.CelestialColors.starWhite.opacity(0.8)],
+                        colors: [.white, .white.opacity(0.85)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
 
-            Text("Infinite Momentum")
-                .font(Theme.Typography.cosmosWhisper)
-                .foregroundStyle(Theme.CelestialColors.starDim)
+            Text("INTELLIGENT PRODUCTIVITY")
+                .font(.system(size: 11, weight: .medium))
+                .tracking(4)
+                .foregroundStyle(Color.white.opacity(0.4))
         }
     }
 
@@ -224,10 +323,10 @@ struct AuthView: View {
     // MARK: - Sign In Form
 
     private var signInForm: some View {
-        VStack(spacing: Theme.Spacing.xl) {
-            VStack(spacing: Theme.Spacing.md) {
+        VStack(spacing: 24) {
+            VStack(spacing: 16) {
                 // Email field
-                CelestialTextField(
+                HolographicTextField(
                     text: $viewModel.email,
                     placeholder: "Email",
                     icon: "envelope.fill",
@@ -243,7 +342,7 @@ struct AuthView: View {
                 .focused($focusedField, equals: .email)
 
                 // Password field
-                CelestialTextField(
+                HolographicTextField(
                     text: $viewModel.password,
                     placeholder: "Password",
                     icon: "lock.fill",
@@ -260,7 +359,7 @@ struct AuthView: View {
             }
 
             // Sign in button
-            CosmicButton(
+            HolographicButton(
                 "Sign In",
                 style: .primary,
                 icon: "arrow.right",
@@ -271,21 +370,21 @@ struct AuthView: View {
             }
 
             // Secondary actions
-            VStack(spacing: Theme.Spacing.md) {
-                CosmicLinkButton("Forgot Password?", color: Theme.CelestialColors.starDim) {
-                    withAnimation(LivingCosmos.Animations.spring) {
+            VStack(spacing: 16) {
+                HolographicLinkButton("Forgot Password?", color: Color.white.opacity(0.5)) {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                         currentScreen = .forgotPassword
                     }
                 }
 
-                HStack(spacing: Theme.Spacing.xs) {
+                HStack(spacing: 6) {
                     Text("Don't have an account?")
                         .font(.system(size: 15))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .foregroundStyle(Color.white.opacity(0.45))
 
-                    CosmicLinkButton("Sign Up") {
+                    HolographicLinkButton("Sign Up") {
                         HapticsService.shared.selectionFeedback()
-                        withAnimation(LivingCosmos.Animations.spring) {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                             currentScreen = .signUp
                             viewModel.clearForm()
                         }
@@ -298,10 +397,10 @@ struct AuthView: View {
     // MARK: - Sign Up Form
 
     private var signUpForm: some View {
-        VStack(spacing: Theme.Spacing.xl) {
-            VStack(spacing: Theme.Spacing.md) {
+        VStack(spacing: 24) {
+            VStack(spacing: 16) {
                 // Name field (optional)
-                CelestialTextField(
+                HolographicTextField(
                     text: $viewModel.fullName,
                     placeholder: "Full Name (optional)",
                     icon: "person.fill",
@@ -315,7 +414,7 @@ struct AuthView: View {
                 .focused($focusedField, equals: .name)
 
                 // Username field (required for Circles)
-                CelestialTextField(
+                HolographicTextField(
                     text: $viewModel.username,
                     placeholder: "Username",
                     icon: "at",
@@ -331,7 +430,7 @@ struct AuthView: View {
                 .focused($focusedField, equals: .username)
 
                 // Email field
-                CelestialTextField(
+                HolographicTextField(
                     text: $viewModel.email,
                     placeholder: "Email",
                     icon: "envelope.fill",
@@ -347,8 +446,8 @@ struct AuthView: View {
                 .focused($focusedField, equals: .email)
 
                 // Password field with strength indicator
-                VStack(spacing: Theme.Spacing.sm) {
-                    CelestialTextField(
+                VStack(spacing: 10) {
+                    HolographicTextField(
                         text: $viewModel.password,
                         placeholder: "Password",
                         icon: "lock.fill",
@@ -363,9 +462,9 @@ struct AuthView: View {
                     )
                     .focused($focusedField, equals: .password)
 
-                    // Celestial password strength
+                    // Holographic password strength
                     if !viewModel.password.isEmpty {
-                        CelestialPasswordStrength(
+                        HolographicPasswordStrength(
                             strength: viewModel.passwordStrength,
                             password: viewModel.password
                         )
@@ -374,7 +473,7 @@ struct AuthView: View {
                 }
 
                 // Confirm password
-                CelestialTextField(
+                HolographicTextField(
                     text: $viewModel.confirmPassword,
                     placeholder: "Confirm Password",
                     icon: "lock.fill",
@@ -390,10 +489,10 @@ struct AuthView: View {
                 )
                 .focused($focusedField, equals: .confirmPassword)
             }
-            .animation(LivingCosmos.Animations.spring, value: viewModel.password.isEmpty)
+            .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.password.isEmpty)
 
             // Sign up button
-            CosmicButton(
+            HolographicButton(
                 "Create Account",
                 style: .primary,
                 icon: "sparkles",
@@ -404,14 +503,14 @@ struct AuthView: View {
             }
 
             // Back to sign in
-            HStack(spacing: Theme.Spacing.xs) {
+            HStack(spacing: 6) {
                 Text("Already have an account?")
                     .font(.system(size: 15))
-                    .foregroundStyle(Theme.CelestialColors.starDim)
+                    .foregroundStyle(Color.white.opacity(0.45))
 
-                CosmicLinkButton("Sign In") {
+                HolographicLinkButton("Sign In") {
                     HapticsService.shared.selectionFeedback()
-                    withAnimation(LivingCosmos.Animations.spring) {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                         currentScreen = .signIn
                         viewModel.clearForm()
                     }
@@ -423,47 +522,75 @@ struct AuthView: View {
     // MARK: - Forgot Password Form
 
     private var forgotPasswordForm: some View {
-        VStack(spacing: Theme.Spacing.xl) {
-            // Icon with nebula glow
+        VStack(spacing: 28) {
+            // Premium icon with holographic glow
             ZStack {
-                SwiftUI.Circle()
-                    .fill(Theme.Colors.aiPurple.opacity(0.2))
-                    .frame(width: 80, height: 80)
-                    .blur(radius: 12)
+                // Outer glow
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color(red: 0.55, green: 0.35, blue: 1.0).opacity(0.35),
+                                Color(red: 0.25, green: 0.85, blue: 0.95).opacity(0.15),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 60
+                        )
+                    )
+                    .frame(width: 120, height: 120)
+                    .blur(radius: 15)
 
-                SwiftUI.Circle()
+                // Glass circle
+                Circle()
                     .fill(.ultraThinMaterial)
-                    .frame(width: 80, height: 80)
-                    .overlay {
-                        SwiftUI.Circle()
-                            .stroke(
-                                LinearGradient(
-                                    colors: [Color.white.opacity(0.2), Theme.Colors.aiPurple.opacity(0.3)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1
-                            )
-                    }
+                    .frame(width: 88, height: 88)
 
+                // Prismatic border
+                Circle()
+                    .stroke(
+                        AngularGradient(
+                            colors: [
+                                Color(red: 0.55, green: 0.35, blue: 1.0).opacity(0.6),
+                                Color(red: 0.35, green: 0.55, blue: 1.0).opacity(0.4),
+                                Color(red: 0.25, green: 0.85, blue: 0.95).opacity(0.5),
+                                Color(red: 0.55, green: 0.35, blue: 1.0).opacity(0.6)
+                            ],
+                            center: .center
+                        ),
+                        lineWidth: 1.5
+                    )
+                    .frame(width: 88, height: 88)
+
+                // Icon
                 Image(systemName: "envelope.badge.shield.half.filled")
-                    .font(.system(size: 32, weight: .light))
-                    .foregroundStyle(Theme.Colors.aiPurple)
+                    .font(.system(size: 34, weight: .light))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.55, green: 0.35, blue: 1.0),
+                                Color(red: 0.35, green: 0.55, blue: 1.0)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
             }
 
-            VStack(spacing: Theme.Spacing.xs) {
+            VStack(spacing: 8) {
                 Text("Reset Password")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(Theme.CelestialColors.starWhite)
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(.white)
 
                 Text("Enter your email and we'll send you a link to reset your password")
                     .font(.system(size: 15))
-                    .foregroundStyle(Theme.CelestialColors.starDim)
+                    .foregroundStyle(Color.white.opacity(0.5))
                     .multilineTextAlignment(.center)
             }
 
             // Email field
-            CelestialTextField(
+            HolographicTextField(
                 text: $viewModel.email,
                 placeholder: "Email",
                 icon: "envelope.fill",
@@ -479,7 +606,7 @@ struct AuthView: View {
             .focused($focusedField, equals: .email)
 
             // Send button
-            CosmicButton(
+            HolographicButton(
                 "Send Reset Link",
                 style: .primary,
                 icon: "paperplane.fill",
@@ -490,9 +617,9 @@ struct AuthView: View {
             }
 
             // Back to sign in
-            CosmicButton("Back to Sign In", style: .ghost, icon: "arrow.left", iconPosition: .leading) {
+            HolographicButton("Back to Sign In", style: .ghost, icon: "arrow.left", iconPosition: .leading) {
                 HapticsService.shared.selectionFeedback()
-                withAnimation(LivingCosmos.Animations.spring) {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                     currentScreen = .signIn
                     viewModel.clearForm()
                 }
@@ -503,21 +630,21 @@ struct AuthView: View {
     // MARK: - Terms Section
 
     private var termsSection: some View {
-        VStack(spacing: Theme.Spacing.xs) {
+        VStack(spacing: 6) {
             Text("By continuing, you agree to our")
                 .font(.system(size: 12))
-                .foregroundStyle(Theme.CelestialColors.starGhost)
+                .foregroundStyle(Color.white.opacity(0.35))
 
-            HStack(spacing: Theme.Spacing.xs) {
-                CosmicLinkButton("Terms of Service", color: Theme.Colors.aiPurple.opacity(0.8)) {
+            HStack(spacing: 6) {
+                HolographicLinkButton("Terms of Service", color: Color(red: 0.55, green: 0.35, blue: 1.0).opacity(0.8)) {
                     // Open terms
                 }
 
                 Text("and")
                     .font(.system(size: 12))
-                    .foregroundStyle(Theme.CelestialColors.starGhost)
+                    .foregroundStyle(Color.white.opacity(0.35))
 
-                CosmicLinkButton("Privacy Policy", color: Theme.Colors.aiPurple.opacity(0.8)) {
+                HolographicLinkButton("Privacy Policy", color: Color(red: 0.55, green: 0.35, blue: 1.0).opacity(0.8)) {
                     // Open privacy
                 }
             }
@@ -528,7 +655,9 @@ struct AuthView: View {
 
     private func signIn() {
         focusedField = nil
-        orbState = .processing
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            orbIntensity = 1.5
+        }
         Task {
             await viewModel.signInWithEmail()
         }
@@ -536,7 +665,9 @@ struct AuthView: View {
 
     private func signUp() {
         focusedField = nil
-        orbState = .processing
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            orbIntensity = 1.5
+        }
         Task {
             await viewModel.signUpWithEmail()
         }
@@ -544,47 +675,39 @@ struct AuthView: View {
 
     private func resetPassword() {
         focusedField = nil
-        orbState = .processing
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            orbIntensity = 1.5
+        }
         Task {
             await viewModel.sendPasswordReset()
         }
     }
 
-    // MARK: - Orb State Management
-
-    private func updateOrbState(for field: AuthField?) {
-        withAnimation(LivingCosmos.Animations.spring) {
-            if field != nil {
-                orbState = .aware
-            } else if !viewModel.email.isEmpty || !viewModel.password.isEmpty {
-                orbState = .active
-            } else {
-                orbState = .dormant
-            }
-        }
-    }
+    // MARK: - Auth State Handling
 
     private func handleAuthStateChange(_ state: AuthState) {
         switch state {
         case .success:
-            orbState = .success
-            // Trigger the success burst animation
+            // Trigger success animation
             HapticsService.shared.celebration()
-            withAnimation(LivingCosmos.Animations.spring) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                orbIntensity = 2.0
                 triggerSuccessBurst = true
             }
         case .error(let message):
-            orbState = .error
             viewModel.error = message
             showError = true
             HapticsService.shared.error()
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                orbIntensity = 0.6
+            }
         case .signingIn, .signingUp:
-            orbState = .processing
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                orbIntensity = 1.5
+            }
         case .idle:
-            if focusedField != nil {
-                orbState = .aware
-            } else {
-                orbState = .dormant
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                orbIntensity = focusedField != nil ? 1.3 : 1.0
             }
         }
     }
@@ -600,6 +723,18 @@ struct AuthView: View {
     private func mapValidationState(_ state: ValidationState) -> ValidationState {
         return state
     }
+}
+
+// MARK: - Auth Particle
+
+struct AuthParticle {
+    let x: CGFloat
+    let y: CGFloat
+    let size: CGFloat
+    let baseOpacity: Double
+    let speed: Double
+    let twinkleOffset: Double
+    let color: Color
 }
 
 // MARK: - Preview
