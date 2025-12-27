@@ -17,19 +17,27 @@ struct PremiumCalendarHeader: View {
     let onNext: () -> Void
     let onDateTap: () -> Void
 
+    private let calendar = Calendar.current
+
+    private var isToday: Bool {
+        calendar.isDateInToday(selectedDate)
+    }
+
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 12) {
             // Navigation arrows + Month/Year
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 // Previous button
                 navigationButton(icon: "chevron.left", action: onPrevious)
 
                 // Month/Year Display
                 Button(action: onDateTap) {
                     HStack(spacing: 6) {
-                        Text(selectedDate.formatted(.dateTime.month(.wide).year()))
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                        Text(selectedDate.formatted(.dateTime.month(.abbreviated).year()))
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
 
                         Image(systemName: "chevron.down")
                             .font(.system(size: 10, weight: .bold))
@@ -44,11 +52,42 @@ struct PremiumCalendarHeader: View {
 
             Spacer()
 
+            // Today button (only show if not today)
+            if !isToday {
+                todayButton
+            }
+
             // View Mode Toggle (Glass Effect)
             viewModeToggle
         }
         .padding(.horizontal, 20)
         .frame(height: 52)
+    }
+
+    // MARK: - Today Button
+
+    private var todayButton: some View {
+        Button {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                selectedDate = Date()
+            }
+            HapticsService.shared.selectionFeedback()
+        } label: {
+            Text("Today")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Theme.Colors.aiCyan)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background {
+                    Capsule()
+                        .fill(Theme.Colors.aiCyan.opacity(0.15))
+                        .overlay {
+                            Capsule()
+                                .stroke(Theme.Colors.aiCyan.opacity(0.3), lineWidth: 0.5)
+                        }
+                }
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Navigation Button

@@ -2,10 +2,10 @@
 //  AuthView.swift
 //  MyTasksAI
 //
-//  Authentication View - Ultra-Premium Design
-//  A breathtaking auth experience with Neural Orb, holographic components,
+//  Authentication View - Celestial Luminescence Design
+//  A breathtaking auth experience with Ethereal Orb, holographic components,
 //  prismatic effects, and staggered reveal animations.
-//  Designed to feel like Apple paid a billion dollars for this.
+//  Designed with premium elegance and refined interactions.
 //
 
 import SwiftUI
@@ -28,12 +28,19 @@ struct AuthView: View {
     @State private var showContent = false
     @State private var showError = false
     @State private var orbIntensity: Double = 1.0
+    @State private var orbState: EtherealOrbState = .idle
     @State private var triggerSuccessBurst = false
-    @State private var backgroundParticles: [AuthParticle] = []
-    @State private var particlePhase: Double = 0
     @FocusState private var focusedField: AuthField?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    // Ethereal color palette
+    private let etherealColors: [Color] = [
+        Color(red: 0.75, green: 0.55, blue: 0.90), // softPurple
+        Color(red: 0.55, green: 0.85, blue: 0.95), // softCyan
+        Color(red: 0.95, green: 0.65, blue: 0.80), // softPink
+        Color(red: 0.70, green: 0.60, blue: 0.95), // softLavender
+    ]
 
     /// Initialize with optional starting screen
     init(initialScreen: AuthScreen = .signUp) {
@@ -47,27 +54,34 @@ struct AuthView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Ultra-premium void background
-                premiumBackground
+                // Celestial void background
+                celestialBackground
 
                 // Ambient floating particles
                 if !reduceMotion {
-                    ambientParticles(in: geometry)
+                    AmbientParticleField(
+                        density: .standard,
+                        colors: etherealColors,
+                        bounds: geometry.size
+                    )
+                    .opacity(showContent ? 0.6 : 0)
                 }
 
-                // Neural Orb positioned at top
-                NeuralOrb(
+                // Ethereal Orb positioned at top
+                EtherealOrb(
                     size: orbSize(for: geometry),
+                    state: orbState,
                     isAnimating: true,
-                    intensity: orbIntensity
+                    intensity: orbIntensity,
+                    showGlow: true
                 )
                 .position(
                     x: geometry.size.width / 2,
                     y: orbYPosition(for: geometry)
                 )
                 .opacity(showContent ? 1 : 0)
-                .scaleEffect(showContent ? 1 : 0.8)
-                .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.2), value: showContent)
+                .scaleEffect(showContent ? 1 : 0.85)
+                .animation(.spring(response: 0.6, dampingFraction: 0.72).delay(0.2), value: showContent)
 
                 // Content
                 ScrollView(showsIndicators: false) {
@@ -107,8 +121,6 @@ struct AuthView: View {
             }
         }
         .onAppear {
-            generateParticles()
-            startParticleAnimation()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 showContent = true
             }
@@ -138,125 +150,76 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Premium Background
+    // MARK: - Celestial Background
 
-    private var premiumBackground: some View {
+    private var celestialBackground: some View {
         ZStack {
-            // Deep void base
-            Color(red: 0.02, green: 0.02, blue: 0.04)
+            // True void base
+            Color(red: 0.01, green: 0.01, blue: 0.02)
                 .ignoresSafeArea()
 
-            // Nebula gradient 1
+            // Soft purple nebula
             RadialGradient(
                 colors: [
-                    Color(red: 0.55, green: 0.35, blue: 1.0).opacity(0.12),
-                    Color(red: 0.35, green: 0.55, blue: 1.0).opacity(0.06),
+                    etherealColors[0].opacity(0.10),
+                    etherealColors[3].opacity(0.05),
                     Color.clear
                 ],
-                center: UnitPoint(x: 0.3, y: 0.2),
+                center: UnitPoint(x: 0.32, y: 0.18),
                 startRadius: 0,
-                endRadius: 350
+                endRadius: 320
             )
+            .blur(radius: 40)
 
-            // Nebula gradient 2
+            // Soft cyan nebula
             RadialGradient(
                 colors: [
-                    Color(red: 0.25, green: 0.85, blue: 0.95).opacity(0.08),
-                    Color(red: 0.95, green: 0.55, blue: 0.85).opacity(0.04),
+                    etherealColors[1].opacity(0.08),
+                    etherealColors[2].opacity(0.04),
                     Color.clear
                 ],
-                center: UnitPoint(x: 0.8, y: 0.7),
+                center: UnitPoint(x: 0.75, y: 0.65),
                 startRadius: 0,
-                endRadius: 300
+                endRadius: 280
             )
+            .blur(radius: 35)
 
             // Subtle vignette
             RadialGradient(
                 colors: [
                     Color.clear,
-                    Color.black.opacity(0.3)
+                    Color.black.opacity(0.30)
                 ],
                 center: .center,
-                startRadius: 200,
-                endRadius: 600
+                startRadius: 180,
+                endRadius: 550
             )
         }
         .ignoresSafeArea()
     }
 
-    // MARK: - Ambient Particles
-
-    private func ambientParticles(in geometry: GeometryProxy) -> some View {
-        Canvas { context, size in
-            for particle in backgroundParticles {
-                let adjustedY = particle.y + particlePhase * particle.speed * 50
-                let wrappedY = adjustedY.truncatingRemainder(dividingBy: size.height + 100) - 50
-
-                let opacity = particle.baseOpacity * (0.5 + sin(particlePhase * 2 + particle.twinkleOffset) * 0.5)
-
-                let rect = CGRect(
-                    x: particle.x - particle.size / 2,
-                    y: wrappedY - particle.size / 2,
-                    width: particle.size,
-                    height: particle.size
-                )
-
-                context.fill(
-                    Circle().path(in: rect),
-                    with: .color(particle.color.opacity(opacity))
-                )
-            }
-        }
-    }
-
-    private func generateParticles() {
-        let colors: [Color] = [
-            .white,
-            Color(red: 0.55, green: 0.35, blue: 1.0),
-            Color(red: 0.25, green: 0.85, blue: 0.95),
-            Color(red: 0.95, green: 0.55, blue: 0.85)
-        ]
-
-        backgroundParticles = (0..<40).map { _ in
-            AuthParticle(
-                x: CGFloat.random(in: 0...400),
-                y: CGFloat.random(in: 0...900),
-                size: CGFloat.random(in: 1...3),
-                baseOpacity: Double.random(in: 0.2...0.5),
-                speed: Double.random(in: 0.3...1.0),
-                twinkleOffset: Double.random(in: 0...(.pi * 2)),
-                color: colors.randomElement()!
-            )
-        }
-    }
-
-    private func startParticleAnimation() {
-        guard !reduceMotion else { return }
-        withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
-            particlePhase = 20
-        }
-    }
-
     // MARK: - Orb State
 
     private func updateOrbIntensity(for field: AuthField?) {
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
             if field != nil {
-                orbIntensity = 1.3
+                orbIntensity = 1.35
+                orbState = .active
             } else {
                 orbIntensity = 1.0
+                orbState = .idle
             }
         }
     }
 
     // MARK: - Layout Calculations
 
-    private func orbSize(for geometry: GeometryProxy) -> NeuralOrbSize {
+    private func orbSize(for geometry: GeometryProxy) -> LogoSize {
         let height = geometry.size.height
         if height < 700 {
-            return .large // 150pt for smaller screens
+            return .large // 120pt for smaller screens
         } else {
-            return .hero // 220pt for larger screens
+            return .hero // 200pt for larger screens
         }
     }
 
@@ -283,23 +246,23 @@ struct AuthView: View {
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: 12) {
-            // Ultra-premium typography
+        VStack(spacing: 14) {
+            // Refined thin typography
             Text("MyTasksAI")
-                .font(.system(size: 44, weight: .ultraLight, design: .default))
-                .tracking(3)
+                .font(.system(size: 46, weight: .thin, design: .default))
+                .tracking(6)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [.white, .white.opacity(0.85)],
+                        colors: [.white, .white.opacity(0.88)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
 
             Text("INTELLIGENT PRODUCTIVITY")
-                .font(.system(size: 11, weight: .medium))
-                .tracking(4)
-                .foregroundStyle(Color.white.opacity(0.4))
+                .font(.system(size: 10, weight: .semibold))
+                .tracking(6)
+                .foregroundStyle(Color.white.opacity(0.38))
         }
     }
 
@@ -324,6 +287,7 @@ struct AuthView: View {
 
     private var signInForm: some View {
         VStack(spacing: 24) {
+            // Wrapped inner VStack with LiquidGlassStyle
             VStack(spacing: 16) {
                 // Email field
                 HolographicTextField(
@@ -357,6 +321,19 @@ struct AuthView: View {
                 )
                 .focused($focusedField, equals: .password)
             }
+            .padding(12)
+            .background(
+                LiquidGlassBackground(
+                    cornerRadius: 18,
+                    tint: LinearGradient(
+                        colors: [Color.white.opacity(0.04), Color.clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    strokeColors: [Color.white.opacity(0.22), Color.white.opacity(0.08), Color.clear],
+                    lineWidth: 0.75
+                )
+            )
 
             // Sign in button
             HolographicButton(
@@ -398,6 +375,7 @@ struct AuthView: View {
 
     private var signUpForm: some View {
         VStack(spacing: 24) {
+            // Wrapped inner VStack with LiquidGlassStyle
             VStack(spacing: 16) {
                 // Name field (optional)
                 HolographicTextField(
@@ -489,6 +467,19 @@ struct AuthView: View {
                 )
                 .focused($focusedField, equals: .confirmPassword)
             }
+            .padding(12)
+            .background(
+                LiquidGlassBackground(
+                    cornerRadius: 18,
+                    tint: LinearGradient(
+                        colors: [Color.white.opacity(0.04), Color.clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    strokeColors: [Color.white.opacity(0.22), Color.white.opacity(0.08), Color.clear],
+                    lineWidth: 0.75
+                )
+            )
             .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.password.isEmpty)
 
             // Sign up button
@@ -589,21 +580,36 @@ struct AuthView: View {
                     .multilineTextAlignment(.center)
             }
 
-            // Email field
-            HolographicTextField(
-                text: $viewModel.email,
-                placeholder: "Email",
-                icon: "envelope.fill",
-                validation: mapValidationState(viewModel.emailValidation),
-                keyboardType: .emailAddress,
-                textContentType: .emailAddress,
-                submitLabel: .send,
-                onFocusChange: { focused in
-                    if focused { focusedField = .email }
-                },
-                onSubmit: { resetPassword() }
+            // Wrapped email field with LiquidGlassStyle
+            VStack(spacing: 16) {
+                HolographicTextField(
+                    text: $viewModel.email,
+                    placeholder: "Email",
+                    icon: "envelope.fill",
+                    validation: mapValidationState(viewModel.emailValidation),
+                    keyboardType: .emailAddress,
+                    textContentType: .emailAddress,
+                    submitLabel: .send,
+                    onFocusChange: { focused in
+                        if focused { focusedField = .email }
+                    },
+                    onSubmit: { resetPassword() }
+                )
+                .focused($focusedField, equals: .email)
+            }
+            .padding(12)
+            .background(
+                LiquidGlassBackground(
+                    cornerRadius: 18,
+                    tint: LinearGradient(
+                        colors: [Color.white.opacity(0.04), Color.clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    strokeColors: [Color.white.opacity(0.22), Color.white.opacity(0.08), Color.clear],
+                    lineWidth: 0.75
+                )
             )
-            .focused($focusedField, equals: .email)
 
             // Send button
             HolographicButton(
@@ -690,24 +696,28 @@ struct AuthView: View {
         case .success:
             // Trigger success animation
             HapticsService.shared.celebration()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                orbIntensity = 2.0
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                orbIntensity = 1.8
+                orbState = .celebration
                 triggerSuccessBurst = true
             }
         case .error(let message):
             viewModel.error = message
             showError = true
             HapticsService.shared.error()
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                orbIntensity = 0.6
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                orbIntensity = 0.55
+                orbState = .idle
             }
         case .signingIn, .signingUp:
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                orbIntensity = 1.5
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                orbIntensity = 1.45
+                orbState = .active
             }
         case .idle:
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                orbIntensity = focusedField != nil ? 1.3 : 1.0
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                orbIntensity = focusedField != nil ? 1.35 : 1.0
+                orbState = focusedField != nil ? .active : .idle
             }
         }
     }
@@ -723,18 +733,6 @@ struct AuthView: View {
     private func mapValidationState(_ state: ValidationState) -> ValidationState {
         return state
     }
-}
-
-// MARK: - Auth Particle
-
-struct AuthParticle {
-    let x: CGFloat
-    let y: CGFloat
-    let size: CGFloat
-    let baseOpacity: Double
-    let speed: Double
-    let twinkleOffset: Double
-    let color: Color
 }
 
 // MARK: - Preview

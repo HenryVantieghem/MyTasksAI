@@ -241,6 +241,93 @@ enum Theme {
         static let ringCharged = Color(red: 0.58, green: 0.25, blue: 0.98).opacity(0.3)
     }
 
+    // MARK: - Celestial Luminescence (Ethereal Orb Palette)
+    /// Premium color palette for the EtherealOrb and ethereal UI elements
+    /// Inspired by translucent iridescent glass spheres with soft gradients
+    enum CelestialLuminescence {
+        // MARK: Core Orb Colors
+        /// Deep void indigo - the orb's inner core
+        static let voidIndigo = Color(red: 0.08, green: 0.06, blue: 0.18)
+        /// Soft pink - warm inner glow
+        static let softPink = Color(red: 0.95, green: 0.65, blue: 0.80)
+        /// Soft purple - mid-layer iridescence
+        static let softPurple = Color(red: 0.75, green: 0.55, blue: 0.90)
+        /// Soft cyan - outer layer glow
+        static let softCyan = Color(red: 0.55, green: 0.85, blue: 0.95)
+        /// Cyan rim - bright edge highlight
+        static let cyanRim = Color(red: 0.25, green: 0.85, blue: 0.95)
+
+        // MARK: Ambient Colors
+        /// Deep space background
+        static let deepSpace = Color(red: 0.01, green: 0.01, blue: 0.02)
+        /// Nebula hints for subtle background effects
+        static let nebulaHint = Color(red: 0.15, green: 0.08, blue: 0.25)
+        /// Aurora accent for backgrounds
+        static let auroraHint = Color(red: 0.08, green: 0.15, blue: 0.22)
+
+        // MARK: Success/Action Colors
+        /// Success green for launch/completion
+        static let successGreen = Color(red: 0.40, green: 0.85, blue: 0.65)
+        /// Celebration gold
+        static let celebrationGold = Color(red: 0.98, green: 0.82, blue: 0.35)
+
+        // MARK: Gradients
+        /// Main ethereal orb gradient
+        static var orbGradient: LinearGradient {
+            LinearGradient(
+                colors: [softPink, softPurple, softCyan],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// Rim highlight gradient
+        static var rimGradient: AngularGradient {
+            AngularGradient(
+                colors: [
+                    cyanRim.opacity(0.9),
+                    softPurple.opacity(0.5),
+                    Color.clear,
+                    softPink.opacity(0.3),
+                    cyanRim.opacity(0.9)
+                ],
+                center: .center
+            )
+        }
+
+        /// Cosmic background gradient
+        static var cosmicBackground: LinearGradient {
+            LinearGradient(
+                colors: [
+                    deepSpace,
+                    nebulaHint.opacity(0.3),
+                    auroraHint.opacity(0.2),
+                    deepSpace
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// CTA button gradient (cyan → purple)
+        static var ctaGradient: LinearGradient {
+            LinearGradient(
+                colors: [softCyan, softPurple],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        }
+
+        /// Launch button gradient (green → cyan)
+        static var launchGradient: LinearGradient {
+            LinearGradient(
+                colors: [successGreen, softCyan],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        }
+    }
+
     // MARK: - Input Bar Colors
     /// Color palette for the floating input bar
     enum InputBarColors {

@@ -70,28 +70,54 @@ struct FriendsArenaView: View {
     var onFriendSelected: (FriendProfile) -> Void
     var onShowLeaderboard: () -> Void
 
+    @State private var sharedTaskService = SharedTaskService.shared
     @State private var selectedRivalIndex: Int? = nil
     @State private var showVSBattle = false
     @State private var arenaRotation: Double = 0
     @State private var pulsePhase: CGFloat = 0
     @State private var selectedMetric: ArenaMetric = .xp
     @State private var selectedPeriod: ArenaPeriod = .weekly
+    @State private var isLoadingLeaderboard = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // Mock current user for demo
+    // Current user from leaderboard (find the one marked as current user)
     private var currentUser: ArenaUserProfile {
-        ArenaUserProfile(
+        if let current = sharedTaskService.leaderboard.first(where: { $0.isCurrentUser }) {
+            return ArenaUserProfile(
+                id: current.id,
+                displayName: "You",
+                avatarUrl: current.avatarUrl,
+                currentStreak: current.currentStreak,
+                currentLevel: current.currentLevel,
+                totalPoints: current.totalPoints,
+                tasksCompletedToday: current.tasksCompletedToday,
+                isActiveNow: current.isActiveToday,
+                todayFocusMinutes: nil  // Not tracked in leaderboard yet
+            )
+        }
+        // Fallback to mock data if not loaded
+        return ArenaUserProfile(
             id: UUID(),
             displayName: "You",
             avatarUrl: nil,
-            currentStreak: 12,
-            currentLevel: 24,
-            totalPoints: 9650,
-            tasksCompletedToday: 8,
+            currentStreak: 0,
+            currentLevel: 1,
+            totalPoints: 0,
+            tasksCompletedToday: 0,
             isActiveNow: true,
-            todayFocusMinutes: 145
+            todayFocusMinutes: 0
         )
+    }
+
+    // Current user's rank from leaderboard
+    private var currentUserRank: Int {
+        sharedTaskService.leaderboard.first(where: { $0.isCurrentUser })?.rank ?? 1
+    }
+
+    // Total participants count
+    private var totalParticipants: Int {
+        max(sharedTaskService.leaderboard.count, 1)
     }
 
     var body: some View {
@@ -99,20 +125,24 @@ struct FriendsArenaView: View {
             VStack(spacing: 0) {
                 // MARK: - Weekly Showdown Banner
                 WeeklyShowdownBanner(
-                    daysRemaining: 3,
-                    yourRank: 4,
-                    previousRank: 7,
-                    topRivalName: "CosmicExplorer"
+                    daysRemaining: daysRemainingInWeek,
+                    yourRank: currentUserRank,
+                    previousRank: currentUserRank + 1,  // TODO: Track historical rank
+                    topRivalName: topRivalName
                 )
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
+
+                // MARK: - Shared Tasks Section
+                SharedTasksSection()
+                    .padding(.top, 20)
 
                 // MARK: - Your Status Orb
                 YourStatusOrb(
                     user: currentUser,
                     metric: selectedMetric,
-                    rank: 4,
-                    totalParticipants: 156
+                    rank: currentUserRank,
+                    totalParticipants: totalParticipants
                 )
                 .padding(.top, 24)
 
@@ -208,6 +238,34 @@ struct FriendsArenaView: View {
         .onAppear {
             startAmbientAnimations()
         }
+        .task {
+            await loadLeaderboardData()
+        }
+        .onChange(of: selectedPeriod) { _, newPeriod in
+            Task {
+                await loadLeaderboardData()
+            }
+        }
+    }
+
+    // MARK: - Data Loading
+
+    private func loadLeaderboardData() async {
+        isLoadingLeaderboard = true
+        defer { isLoadingLeaderboard = false }
+
+        do {
+            let period: LeaderboardPeriod = {
+                switch selectedPeriod {
+                case .weekly: return .week
+                case .monthly: return .month
+                case .allTime: return .allTime
+                }
+            }()
+            try await sharedTaskService.loadLeaderboard(period: period)
+        } catch {
+            print("Error loading leaderboard: \(error)")
+        }
     }
 
     // MARK: - Data Helpers
@@ -221,24 +279,68 @@ struct FriendsArenaView: View {
     }
 
     private var topThreeProfiles: [FriendProfile] {
-        if rankedFriends.isEmpty {
-            return MockRival.samples.prefix(3).map { $0.toProfile() }
+        // Use leaderboard data if available
+        if !sharedTaskService.leaderboard.isEmpty {
+            return sharedTaskService.leaderboard.prefix(3).map { entry in
+                FriendProfile(
+                    id: entry.id,
+                    username: entry.username,
+                    fullName: entry.fullName,
+                    avatarUrl: entry.avatarUrl,
+                    currentStreak: entry.currentStreak,
+                    currentLevel: entry.currentLevel,
+                    totalPoints: entry.totalPoints,
+                    tasksCompletedToday: entry.tasksCompletedToday
+                )
+            }
         }
-        return Array(rankedFriends.prefix(3)).compactMap {
-            $0.otherUser(currentUserId: getCurrentUserId())
+        // Fallback to friends data
+        if !rankedFriends.isEmpty {
+            return Array(rankedFriends.prefix(3)).compactMap {
+                $0.otherUser(currentUserId: getCurrentUserId())
+            }
         }
+        // Fallback to mock data
+        return MockRival.samples.prefix(3).map { $0.toProfile() }
     }
 
     private var nearbyRivals: [(name: String, xp: Int, rank: Int)] {
-        if rankedFriends.isEmpty {
-            return MockRival.samples.prefix(5).enumerated().map { index, rival in
-                (rival.name, rival.xp, index + 1)
+        // Use leaderboard data if available
+        if !sharedTaskService.leaderboard.isEmpty {
+            return sharedTaskService.leaderboard.prefix(5).map { entry in
+                (entry.displayName, entry.totalPoints, entry.rank)
             }
         }
-        return rankedFriends.prefix(5).enumerated().compactMap { index, friendship in
-            guard let friend = friendship.otherUser(currentUserId: getCurrentUserId()) else { return nil }
-            return (friend.displayName, friend.totalPoints ?? 0, index + 1)
+        // Fallback to friends data
+        if !rankedFriends.isEmpty {
+            return rankedFriends.prefix(5).enumerated().compactMap { index, friendship in
+                guard let friend = friendship.otherUser(currentUserId: getCurrentUserId()) else { return nil }
+                return (friend.displayName, friend.totalPoints ?? 0, index + 1)
+            }
         }
+        // Fallback to mock data
+        return MockRival.samples.prefix(5).enumerated().map { index, rival in
+            (rival.name, rival.xp, index + 1)
+        }
+    }
+
+    // Get the top rival (next person above current user in leaderboard)
+    private var topRivalName: String {
+        guard !sharedTaskService.leaderboard.isEmpty else { return "CosmicExplorer" }
+        let currentIndex = sharedTaskService.leaderboard.firstIndex(where: { $0.isCurrentUser }) ?? 0
+        if currentIndex > 0 {
+            return sharedTaskService.leaderboard[currentIndex - 1].displayName
+        }
+        return sharedTaskService.leaderboard.first?.displayName ?? "Champion"
+    }
+
+    // Days remaining in week (for weekly showdown)
+    private var daysRemainingInWeek: Int {
+        let calendar = Calendar.current
+        let today = Date()
+        let weekday = calendar.component(.weekday, from: today)
+        // Assuming week ends on Sunday (weekday 1)
+        return (8 - weekday) % 7
     }
 
     private func metricValue(for profile: FriendProfile?) -> Int {

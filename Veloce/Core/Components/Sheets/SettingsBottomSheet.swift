@@ -147,6 +147,8 @@ struct SettingsBottomSheet: View {
         do {
             _ = try await profileImageService.uploadAvatar(image, for: userId)
             avatarImage = image
+            // Notify header to refresh avatar
+            profileImageService.notifyAvatarChanged()
             HapticsService.shared.taskComplete()
         } catch {
             viewModel.error = error.localizedDescription

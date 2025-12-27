@@ -186,6 +186,198 @@ struct DurationChip: View {
     }
 }
 
+// MARK: - Enhanced Quick Add View (with More Details option)
+
+struct EnhancedQuickAddView: View {
+    let selectedTime: Date
+    let onAdd: (String, Date, Int) -> Void
+    let onCancel: () -> Void
+    let onExpandToDetail: () -> Void
+
+    @State private var taskTitle: String = ""
+    @State private var duration: Int = 30
+    @FocusState private var isFocused: Bool
+
+    private let durationOptions = [15, 30, 45, 60, 90, 120]
+
+    var body: some View {
+        VStack(spacing: 16) {
+            // Header
+            HStack {
+                Text("Quick Add")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Spacer()
+
+                Button {
+                    HapticsService.shared.lightImpact()
+                    onCancel()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundStyle(.white.opacity(0.4))
+                }
+                .buttonStyle(.plain)
+            }
+
+            // Time display
+            HStack {
+                Image(systemName: "clock")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.Colors.aiBlue)
+
+                Text(selectedTime.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day().hour().minute()))
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.7))
+
+                Spacer()
+            }
+
+            // Task input
+            HStack(spacing: 10) {
+                TextField("What needs to be done?", text: $taskTitle)
+                    .font(.system(size: 16))
+                    .foregroundStyle(.white)
+                    .focused($isFocused)
+                    .submitLabel(.done)
+                    .onSubmit {
+                        if !taskTitle.isEmpty {
+                            addTask()
+                        }
+                    }
+
+                Image(systemName: "sparkles")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Theme.Colors.aiPurple)
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.white.opacity(0.08))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                    }
+            )
+
+            // Duration picker
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Duration")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.5))
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(durationOptions, id: \.self) { minutes in
+                            DurationChip(
+                                minutes: minutes,
+                                isSelected: duration == minutes,
+                                onTap: {
+                                    HapticsService.shared.selectionFeedback()
+                                    duration = minutes
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Action buttons
+            HStack(spacing: 12) {
+                // More Details button
+                Button {
+                    HapticsService.shared.selectionFeedback()
+                    onExpandToDetail()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "slider.horizontal.3")
+                            .font(.system(size: 14))
+                        Text("More details")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundStyle(.white.opacity(0.8))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.white.opacity(0.1))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(.white.opacity(0.15), lineWidth: 0.5)
+                            }
+                    }
+                }
+                .buttonStyle(.plain)
+
+                // Add button
+                Button {
+                    addTask()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 16))
+                        Text("Add")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                taskTitle.isEmpty
+                                    ? AnyShapeStyle(Color.white.opacity(0.15))
+                                    : AnyShapeStyle(
+                                        LinearGradient(
+                                            colors: [
+                                                Theme.Colors.aiPurple,
+                                                Theme.Colors.aiBlue
+                                            ],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                            )
+                    }
+                    .shadow(
+                        color: taskTitle.isEmpty ? .clear : Theme.Colors.aiPurple.opacity(0.3),
+                        radius: 8,
+                        y: 4
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(taskTitle.isEmpty)
+            }
+        }
+        .padding(20)
+        .background {
+            RoundedRectangle(cornerRadius: 24)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.2), .white.opacity(0.05)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+        }
+        .onAppear {
+            isFocused = true
+        }
+    }
+
+    private func addTask() {
+        guard !taskTitle.isEmpty else { return }
+        HapticsService.shared.success()
+        onAdd(taskTitle, selectedTime, duration)
+    }
+}
+
 // MARK: - Timeline Quick Add Sheet
 
 struct TimelineQuickAddSheet: View {

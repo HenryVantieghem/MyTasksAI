@@ -363,19 +363,70 @@ final class GoalsViewModel {
         }
     }
 
-    /// Perform weekly check-in for a goal
+    /// Perform weekly check-in for a goal (simple version)
     func performWeeklyCheckIn(
         for goal: Goal,
         blockers: [String]?,
         context: ModelContext
     ) async -> WeeklyCheckIn? {
-        guard perplexity.isReady else {
-            error = "AI service not available"
-            return nil
-        }
+        await performWeeklyCheckIn(
+            for: goal,
+            progressUpdate: nil,
+            blockers: blockers,
+            wins: nil,
+            notes: nil,
+            context: context
+        )
+    }
 
+    /// Perform weekly check-in for a goal (full version with all data)
+    func performWeeklyCheckIn(
+        for goal: Goal,
+        progressUpdate: Double?,
+        blockers: [String]?,
+        wins: [String]?,
+        notes: String?,
+        context: ModelContext
+    ) async -> WeeklyCheckIn? {
         isCheckingIn = true
         defer { isCheckingIn = false }
+
+        // Update progress if provided
+        if let progress = progressUpdate {
+            goal.updateProgress(progress)
+        }
+
+        // Record the check-in
+        goal.recordCheckIn()
+
+        // Build notes from all inputs
+        var allNotes: [String] = []
+        if let blockerList = blockers, !blockerList.isEmpty {
+            allNotes.append("Blockers: " + blockerList.joined(separator: ", "))
+        }
+        if let winList = wins, !winList.isEmpty {
+            allNotes.append("Wins: " + winList.joined(separator: ", "))
+        }
+        if let note = notes, !note.isEmpty {
+            allNotes.append(note)
+        }
+
+        // Add progress snapshot with combined notes
+        goal.addProgressSnapshot(notes: allNotes.isEmpty ? nil : allNotes.joined(separator: "; "))
+
+        try? context.save()
+
+        // Award points for consistent check-ins
+        if goal.checkInStreak >= 3 {
+            _ = gamification.awardPoints(10)
+        }
+
+        haptics.notification(.success)
+
+        // Try to generate AI check-in if available
+        guard perplexity.isReady else {
+            return nil
+        }
 
         do {
             let checkIn = try await perplexity.generateWeeklyCheckIn(
@@ -386,24 +437,10 @@ final class GoalsViewModel {
                 blockers: blockers
             )
 
-            // Record the check-in
-            goal.recordCheckIn()
-
-            // Add progress snapshot
-            goal.addProgressSnapshot(notes: blockers?.joined(separator: ", "))
-
-            try? context.save()
-
-            // Award points for consistent check-ins
-            if goal.checkInStreak >= 3 {
-                _ = gamification.awardPoints(10)
-            }
-
-            haptics.notification(.success)
             error = nil
             return checkIn
         } catch {
-            self.error = "Failed to generate check-in: \(error.localizedDescription)"
+            // Check-in was still saved, just no AI response
             return nil
         }
     }

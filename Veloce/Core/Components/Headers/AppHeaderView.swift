@@ -12,8 +12,15 @@ struct AppHeaderView: View {
     let title: String
     @Binding var showProfile: Bool
 
+    // Environment
+    @Environment(AppViewModel.self) private var appViewModel
+
     // Data sources
     private let gamification = GamificationService.shared
+    @StateObject private var profileImageService = ProfileImageService.shared
+
+    // Avatar state
+    @State private var headerAvatarImage: UIImage?
 
     // Sheet state
     @State private var showScoreDetail = false
@@ -30,6 +37,14 @@ struct AppHeaderView: View {
             tasksOnTime: 0, // Would need to track from tasks
             totalTasksCompleted: gamification.tasksCompleted
         )
+    }
+
+    // User initial for fallback
+    private var userInitial: String {
+        if let name = appViewModel.currentUser?.fullName, !name.isEmpty {
+            return String(name.prefix(1)).uppercased()
+        }
+        return "V"
     }
 
     var body: some View {
@@ -52,10 +67,14 @@ struct AppHeaderView: View {
 
                 Spacer()
 
-                // Right: Profile Button
-                ProfileButton(onTap: {
-                    showProfile = true
-                })
+                // Right: Profile Button with avatar
+                ProfileButton(
+                    onTap: {
+                        showProfile = true
+                    },
+                    avatarImage: headerAvatarImage,
+                    userInitial: userInitial
+                )
             }
         }
         .padding(.horizontal, 20)
@@ -71,6 +90,23 @@ struct AppHeaderView: View {
         .sheet(isPresented: $showScoreDetail) {
             VelocityScoreDetailSheet(score: velocityScore)
         }
+        .onAppear {
+            loadHeaderAvatar()
+        }
+        .onChange(of: profileImageService.lastAvatarUpdate) { _, _ in
+            // Avatar was updated in profile sheet, refresh header avatar
+            loadHeaderAvatar()
+        }
+    }
+
+    // MARK: - Avatar Loading
+
+    private func loadHeaderAvatar() {
+        Task {
+            if let userId = appViewModel.currentUser?.id.uuidString {
+                headerAvatarImage = await profileImageService.fetchAvatar(for: userId)
+            }
+        }
     }
 }
 
@@ -78,30 +114,47 @@ struct AppHeaderView: View {
 
 struct ProfileButton: View {
     let onTap: () -> Void
+    var avatarImage: UIImage? = nil
+    var userInitial: String = "V"
 
     @State private var isPressed = false
 
     var body: some View {
         Button(action: onTap) {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 36, height: 36)
-                .overlay(
-                    // User initial - would get from AppViewModel
-                    Text("U")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
-                )
-                .overlay(
+            Group {
+                if let image = avatarImage {
+                    // Show actual avatar image
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 36, height: 36)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .strokeBorder(.white.opacity(0.2), lineWidth: 1)
+                        )
+                } else {
+                    // Show gradient with user initial
                     Circle()
-                        .strokeBorder(.white.opacity(0.2), lineWidth: 1)
-                )
+                        .fill(
+                            LinearGradient(
+                                colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 36, height: 36)
+                        .overlay(
+                            Text(userInitial)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.white)
+                        )
+                        .overlay(
+                            Circle()
+                                .strokeBorder(.white.opacity(0.2), lineWidth: 1)
+                        )
+                }
+            }
         }
         .buttonStyle(.plain)
         .scaleEffect(isPressed ? 0.95 : 1.0)
@@ -115,6 +168,7 @@ struct ProfileButton: View {
 
         VStack {
             AppHeaderView(title: "Tasks", showProfile: .constant(false))
+                .environment(AppViewModel())
             Spacer()
         }
     }

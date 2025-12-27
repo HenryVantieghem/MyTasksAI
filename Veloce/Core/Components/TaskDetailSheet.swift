@@ -43,6 +43,8 @@ struct TaskDetailContentView: View {
     @State private var recurringEndDate: Date?
     @State private var showDeleteConfirmation: Bool = false
     @State private var showCalendarScheduling: Bool = false
+    @State private var showFriendPicker: Bool = false
+    @State private var sharedTaskService = SharedTaskService.shared
 
     // Get priority from task (default to medium)
     private var taskPriority: TaskPriority {
@@ -502,37 +504,64 @@ struct TaskDetailContentView: View {
     // MARK: - Actions Card
 
     private var actionsCard: some View {
-        HStack(spacing: 0) {
-            ActionButton(
-                icon: "doc.on.doc",
-                title: "Duplicate",
-                action: onDuplicate
-            )
+        VStack(spacing: 0) {
+            // Primary Actions Row
+            HStack(spacing: 0) {
+                ActionButton(
+                    icon: "person.2.badge.plus",
+                    title: "Invite",
+                    color: Theme.Colors.aiPurple,
+                    action: {
+                        HapticsService.shared.lightImpact()
+                        showFriendPicker = true
+                    }
+                )
 
-            Divider()
-                .frame(height: 40)
+                Divider()
+                    .frame(height: 40)
 
-            ActionButton(
-                icon: "clock.arrow.circlepath",
-                title: "Snooze",
-                action: onSnooze
-            )
+                ActionButton(
+                    icon: "doc.on.doc",
+                    title: "Duplicate",
+                    action: onDuplicate
+                )
 
-            Divider()
-                .frame(height: 40)
+                Divider()
+                    .frame(height: 40)
 
-            ActionButton(
-                icon: "trash",
-                title: "Delete",
-                color: Theme.Colors.destructive,
-                action: {
-                    HapticsService.shared.warning()
-                    onDelete()
-                }
-            )
+                ActionButton(
+                    icon: "clock.arrow.circlepath",
+                    title: "Snooze",
+                    action: onSnooze
+                )
+
+                Divider()
+                    .frame(height: 40)
+
+                ActionButton(
+                    icon: "trash",
+                    title: "Delete",
+                    color: Theme.Colors.destructive,
+                    action: {
+                        HapticsService.shared.warning()
+                        onDelete()
+                    }
+                )
+            }
         }
         .padding(.vertical, 4)
         .glassCard()
+        .sheet(isPresented: $showFriendPicker) {
+            FriendPickerSheet(
+                taskId: task.id,
+                taskTitle: task.title
+            ) { invitedFriendIds in
+                // Task was shared with friends
+                print("Invited \(invitedFriendIds.count) friends to task")
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     // MARK: - Helpers

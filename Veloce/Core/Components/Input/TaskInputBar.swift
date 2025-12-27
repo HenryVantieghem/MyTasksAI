@@ -222,41 +222,27 @@ struct TaskInputBar: View {
 
     private var inputBackground: some View {
         ZStack {
-            // Base liquid glass
-            Capsule()
-                .fill(.ultraThinMaterial)
-
-            // Subtle gradient tint when focused
-            if isFocused.wrappedValue {
-                Capsule()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Theme.Colors.aiPurple.opacity(0.06),
-                                Theme.Colors.aiBlue.opacity(0.03),
-                                Color.clear
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            }
-
-            // Inner highlight for glass depth
-            Capsule()
-                .stroke(
-                    LinearGradient(
-                        colors: [
-                            .white.opacity(0.12),
-                            .white.opacity(0.04),
-                            .clear
-                        ],
-                        startPoint: .top,
-                        endPoint: .center
-                    ),
-                    lineWidth: 1
-                )
-                .padding(1)
+            LiquidGlassCapsule(
+                tint: LinearGradient(
+                    colors: [
+                        (isFocused.wrappedValue ? Theme.Colors.aiPurple.opacity(0.06) : .white.opacity(0.06)),
+                        (isFocused.wrappedValue ? Theme.Colors.aiBlue.opacity(0.03) : .clear)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                strokeColors: isFocused.wrappedValue ? [
+                    Theme.Colors.aiPurple.opacity(0.5),
+                    Theme.Colors.aiBlue.opacity(0.3),
+                    Theme.Colors.aiCyan.opacity(0.2),
+                    .white.opacity(0.1)
+                ] : [
+                    .white.opacity(0.2),
+                    .white.opacity(0.08),
+                    .clear
+                ],
+                lineWidth: isFocused.wrappedValue ? 1.2 : 0.6
+            )
         }
     }
 
@@ -264,27 +250,7 @@ struct TaskInputBar: View {
 
     private var inputBorder: some View {
         ZStack {
-            // Base border
-            Capsule()
-                .stroke(
-                    LinearGradient(
-                        colors: isFocused.wrappedValue
-                            ? [
-                                Theme.Colors.aiPurple.opacity(0.5),
-                                Theme.Colors.aiBlue.opacity(0.3),
-                                Theme.Colors.aiCyan.opacity(0.2),
-                                .white.opacity(0.1)
-                            ]
-                            : [
-                                .white.opacity(0.2),
-                                .white.opacity(0.08),
-                                .clear
-                            ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: isFocused.wrappedValue ? 1.5 : 0.5
-                )
+            // Base border is handled by LiquidGlassCapsule now
 
             // Animated holographic border when recording
             if isRecording && !reduceMotion {
@@ -424,6 +390,8 @@ struct TaskInputBar: View {
                 }
             }
             .tint(Theme.Colors.aiPurple)
+            .textInputAutocapitalization(.sentences)
+            .disableAutocorrection(false)
     }
 
     private var placeholderText: Text {
@@ -1380,3 +1348,4 @@ struct QuickAddSheet: View {
     )
     .preferredColorScheme(.dark)
 }
+

@@ -527,7 +527,7 @@ extension View {
 // MARK: - Oracle Ambient Particles
 
 struct OracleAmbientParticles: View {
-    @State private var particles: [AmbientParticle] = []
+    @State private var particles: [OracleAmbientParticle] = []
 
     var body: some View {
         GeometryReader { geometry in
@@ -553,7 +553,7 @@ struct OracleAmbientParticles: View {
         ]
 
         for _ in 0..<15 {
-            let particle = AmbientParticle(
+            let particle = OracleAmbientParticle(
                 id: UUID(),
                 position: CGPoint(
                     x: CGFloat.random(in: 0...size.width),
@@ -568,7 +568,7 @@ struct OracleAmbientParticles: View {
     }
 }
 
-struct AmbientParticle: Identifiable {
+private struct OracleAmbientParticle: Identifiable {
     let id: UUID
     let position: CGPoint
     let size: CGFloat

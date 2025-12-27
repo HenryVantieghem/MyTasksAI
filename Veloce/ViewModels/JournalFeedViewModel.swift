@@ -109,8 +109,12 @@ class JournalFeedViewModel {
     // MARK: Create Entry
 
     func createEntry(type: JournalEntryType) -> JournalEntry {
+        createEntry(type: type, for: selectedDate)
+    }
+
+    func createEntry(type: JournalEntryType, for date: Date) -> JournalEntry {
         let entry = JournalEntry(
-            date: selectedDate,
+            date: date,
             entryType: type,
             userId: SupabaseService.shared.currentUserId
         )

@@ -4,9 +4,77 @@
 //
 //  Full-screen immersive focus session experience
 //  Aurora background, orbital timer, zen atmosphere
+//  Mode-specific atmospheres and gamification integration
 //
 
 import SwiftUI
+
+// MARK: - Focus Mode Atmosphere
+
+struct FocusModeAtmosphere {
+    let primaryColor: Color
+    let secondaryColor: Color
+    let tertiaryColor: Color
+    let waveAmplitude: CGFloat
+    let waveFrequency: Double
+    let particleCount: Int
+    let glowIntensity: Double
+
+    static func atmosphere(for mode: FocusTimerMode) -> FocusModeAtmosphere {
+        switch mode {
+        case .pomodoro:
+            return FocusModeAtmosphere(
+                primaryColor: Theme.Colors.aiAmber,
+                secondaryColor: Theme.Colors.aiOrange,
+                tertiaryColor: Theme.Colors.aiPink.opacity(0.5),
+                waveAmplitude: 120,
+                waveFrequency: 2.0,
+                particleCount: 50,
+                glowIntensity: 0.8
+            )
+        case .deepWork:
+            return FocusModeAtmosphere(
+                primaryColor: Theme.Colors.aiPurple,
+                secondaryColor: Theme.Colors.aiBlue,
+                tertiaryColor: Theme.Colors.aiCyan.opacity(0.4),
+                waveAmplitude: 80,
+                waveFrequency: 1.5,
+                particleCount: 35,
+                glowIntensity: 0.6
+            )
+        case .flowState:
+            return FocusModeAtmosphere(
+                primaryColor: Theme.Colors.aiCyan,
+                secondaryColor: Theme.Colors.aiPink,
+                tertiaryColor: Theme.Colors.aiPurple.opacity(0.4),
+                waveAmplitude: 60,
+                waveFrequency: 1.0,
+                particleCount: 60,
+                glowIntensity: 0.5
+            )
+        case .custom:
+            return FocusModeAtmosphere(
+                primaryColor: Theme.Colors.aiAmber,
+                secondaryColor: Theme.Colors.aiPurple,
+                tertiaryColor: Theme.Colors.aiCyan.opacity(0.3),
+                waveAmplitude: 90,
+                waveFrequency: 1.8,
+                particleCount: 45,
+                glowIntensity: 0.7
+            )
+        }
+    }
+
+    static let breakAtmosphere = FocusModeAtmosphere(
+        primaryColor: Theme.Colors.aiCyan,
+        secondaryColor: Theme.Colors.aiGreen,
+        tertiaryColor: Theme.Colors.aiBlue.opacity(0.3),
+        waveAmplitude: 100,
+        waveFrequency: 1.2,
+        particleCount: 40,
+        glowIntensity: 0.5
+    )
+}
 
 // MARK: - Immersive Focus Session View
 
@@ -30,12 +98,26 @@ struct ImmersiveFocusSessionView: View {
     @State private var breathingScale: CGFloat = 1
     @State private var showCompletion = false
     @State private var showExitConfirmation = false
+    @State private var showMilestoneCelebration = false
+    @State private var currentMilestone: MilestoneType?
+
+    // Gamification
+    @State private var xpEarned: Int = 0
 
     // Services
     private let blockingService = FocusBlockingService.shared
+    private let gamificationService = GamificationService.shared
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    // Computed atmosphere based on mode
+    private var currentAtmosphere: FocusModeAtmosphere {
+        if isBreak {
+            return FocusModeAtmosphere.breakAtmosphere
+        }
+        return FocusModeAtmosphere.atmosphere(for: session?.mode ?? .pomodoro)
+    }
 
     private var timer: Timer.TimerPublisher {
         Timer.publish(every: 1, on: .main, in: .common)
@@ -79,6 +161,14 @@ struct ImmersiveFocusSessionView: View {
             if showCompletion {
                 completionCelebrationOverlay
             }
+
+            // Milestone celebration (gem unlock)
+            if showMilestoneCelebration, let milestone = currentMilestone {
+                MilestoneCelebrationView(milestone: milestone) {
+                    showMilestoneCelebration = false
+                    currentMilestone = nil
+                }
+            }
         }
         .preferredColorScheme(.dark)
         .onAppear {
@@ -98,37 +188,37 @@ struct ImmersiveFocusSessionView: View {
             // Base void
             Color.black
 
-            // Aurora layers
+            // Aurora layers - uses mode-specific atmosphere
             GeometryReader { geometry in
                 ZStack {
                     // Primary aurora wave
                     auroraWave(
-                        color: isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber,
+                        color: currentAtmosphere.primaryColor,
                         phase: auroraPhase,
-                        amplitude: 100,
-                        frequency: 1.5
+                        amplitude: currentAtmosphere.waveAmplitude,
+                        frequency: currentAtmosphere.waveFrequency
                     )
-                    .opacity(0.3)
+                    .opacity(0.3 * currentAtmosphere.glowIntensity)
                     .offset(y: geometry.size.height * 0.3)
 
                     // Secondary aurora wave
                     auroraWave(
-                        color: isBreak ? Theme.Colors.aiPurple : Theme.Colors.aiOrange,
+                        color: currentAtmosphere.secondaryColor,
                         phase: auroraPhase + 0.5,
-                        amplitude: 80,
-                        frequency: 2
+                        amplitude: currentAtmosphere.waveAmplitude * 0.8,
+                        frequency: currentAtmosphere.waveFrequency * 1.3
                     )
-                    .opacity(0.2)
+                    .opacity(0.2 * currentAtmosphere.glowIntensity)
                     .offset(y: geometry.size.height * 0.4)
 
                     // Tertiary subtle wave
                     auroraWave(
-                        color: Theme.Colors.aiPurple,
+                        color: currentAtmosphere.tertiaryColor,
                         phase: auroraPhase + 1,
-                        amplitude: 60,
-                        frequency: 2.5
+                        amplitude: currentAtmosphere.waveAmplitude * 0.6,
+                        frequency: currentAtmosphere.waveFrequency * 1.6
                     )
-                    .opacity(0.15)
+                    .opacity(0.15 * currentAtmosphere.glowIntensity)
                     .offset(y: geometry.size.height * 0.5)
                 }
             }
@@ -190,7 +280,7 @@ struct ImmersiveFocusSessionView: View {
         Canvas { context, size in
             var generator = SeededRandomGenerator(seed: 123)
 
-            for _ in 0..<40 {
+            for _ in 0..<currentAtmosphere.particleCount {
                 let x = CGFloat.random(in: 0...size.width, using: &generator)
                 let y = CGFloat.random(in: 0...size.height, using: &generator)
                 let particleSize = CGFloat.random(in: 1...2.5, using: &generator)
@@ -258,10 +348,10 @@ struct ImmersiveFocusSessionView: View {
     private var modeIndicator: some View {
         HStack(spacing: 6) {
             Circle()
-                .fill(isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber)
+                .fill(currentAtmosphere.primaryColor)
                 .frame(width: 8, height: 8)
 
-            Text(isBreak ? "Break Time" : "Focus Session")
+            Text(isBreak ? "Break Time" : (session?.mode.rawValue ?? "Focus Session"))
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(.white.opacity(0.8))
         }
@@ -274,13 +364,13 @@ struct ImmersiveFocusSessionView: View {
 
     private var orbitalTimerView: some View {
         ZStack {
-            // Outer glow
+            // Outer glow - mode-specific atmosphere
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            (isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber).opacity(0.3),
-                            (isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber).opacity(0.1),
+                            currentAtmosphere.primaryColor.opacity(0.3 * currentAtmosphere.glowIntensity),
+                            currentAtmosphere.primaryColor.opacity(0.1 * currentAtmosphere.glowIntensity),
                             .clear
                         ],
                         center: .center,
@@ -296,15 +386,15 @@ struct ImmersiveFocusSessionView: View {
                 .stroke(.white.opacity(0.1), lineWidth: 8)
                 .frame(width: 260, height: 260)
 
-            // Progress ring
+            // Progress ring - mode-specific gradient
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
                     AngularGradient(
                         colors: [
-                            isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber,
-                            isBreak ? Theme.Colors.aiPurple : Theme.Colors.aiOrange,
-                            isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber
+                            currentAtmosphere.primaryColor,
+                            currentAtmosphere.secondaryColor,
+                            currentAtmosphere.primaryColor
                         ],
                         center: .center
                     ),
@@ -324,7 +414,7 @@ struct ImmersiveFocusSessionView: View {
                             LinearGradient(
                                 colors: [
                                     .white.opacity(0.3),
-                                    .white.opacity(0.1),
+                                    currentAtmosphere.primaryColor.opacity(0.2),
                                     .clear
                                 ],
                                 startPoint: .topLeading,
@@ -340,17 +430,18 @@ struct ImmersiveFocusSessionView: View {
                     .font(.system(size: 56, weight: .thin, design: .rounded))
                     .foregroundStyle(.white)
                     .monospacedDigit()
+                    .contentTransition(.numericText())
 
                 Text(isBreak ? "until next session" : "remaining")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.white.opacity(0.5))
             }
 
-            // Orbiting dot
+            // Orbiting dot - mode-specific
             Circle()
-                .fill(isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber)
+                .fill(currentAtmosphere.primaryColor)
                 .frame(width: 12, height: 12)
-                .shadow(color: (isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber).opacity(0.8), radius: 8)
+                .shadow(color: currentAtmosphere.primaryColor.opacity(0.8), radius: 8)
                 .offset(y: -130)
                 .rotationEffect(.degrees(360 * progress - 90))
                 .animation(.linear(duration: 1), value: progress)
@@ -460,15 +551,15 @@ struct ImmersiveFocusSessionView: View {
                             .fill(
                                 LinearGradient(
                                     colors: [
-                                        isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber,
-                                        isBreak ? Theme.Colors.aiPurple : Theme.Colors.aiOrange
+                                        currentAtmosphere.primaryColor,
+                                        currentAtmosphere.secondaryColor
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
                     }
-                    .shadow(color: (isBreak ? Theme.Colors.aiCyan : Theme.Colors.aiAmber).opacity(0.5), radius: 20)
+                    .shadow(color: currentAtmosphere.primaryColor.opacity(0.5), radius: 20)
             }
 
             // Forward 30s
@@ -589,10 +680,35 @@ struct ImmersiveFocusSessionView: View {
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(.white)
 
-                Text("Great focus! You've completed \(sessionsCompleted + 1) session\(sessionsCompleted == 0 ? "" : "s") today.")
+                Text("Great focus! You've completed \(sessionsCompleted) session\(sessionsCompleted == 1 ? "" : "s") today.")
                     .font(.system(size: 16))
                     .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
+
+                // XP Earned
+                if xpEarned > 0 {
+                    HStack(spacing: 6) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Theme.Colors.aiAmber)
+
+                        Text("+\(xpEarned) XP")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Theme.Colors.aiAmber, Theme.Colors.aiOrange],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+                    .background {
+                        Capsule()
+                            .fill(Theme.Colors.aiAmber.opacity(0.2))
+                    }
+                }
 
                 HStack(spacing: Theme.Spacing.md) {
                     Button {
@@ -685,8 +801,69 @@ struct ImmersiveFocusSessionView: View {
         } else {
             // Focus session completed
             sessionsCompleted += 1
+
+            // Award gamification XP
+            awardSessionXP()
+
+            // Check for milestone achievements
+            checkForMilestones()
+
             showCompletion = true
         }
+    }
+
+    private func awardSessionXP() {
+        let sessionMinutes = Int(totalTime / 60)
+        let baseXP = sessionMinutes * 2 // 2 XP per minute
+
+        // Bonus for longer sessions
+        let bonusXP: Int
+        if sessionMinutes >= 90 {
+            bonusXP = 100 // Deep work bonus
+        } else if sessionMinutes >= 45 {
+            bonusXP = 50
+        } else if sessionMinutes >= 25 {
+            bonusXP = 25
+        } else {
+            bonusXP = 0
+        }
+
+        xpEarned = baseXP + bonusXP
+
+        // Award points via gamification service
+        _ = gamificationService.awardPoints(xpEarned)
+
+        // Record focus time
+        gamificationService.recordFocusTime(minutes: sessionMinutes)
+    }
+
+    private func checkForMilestones() {
+        // Check for first focus session (Sapphire gem)
+        if sessionsCompleted == 1 {
+            showMilestone(.gemUnlocked(.sapphire))
+            return
+        }
+
+        // Check for 90+ minute session (Emerald gem - Deep Diver)
+        let sessionMinutes = Int(totalTime / 60)
+        if sessionMinutes >= 90 {
+            showMilestone(.gemUnlocked(.emerald))
+            return
+        }
+
+        // Check streak milestones (Ruby at 7 days, Diamond at 30 days)
+        // This would integrate with a streak tracking system
+        // For now, we'll trigger on session count as placeholder
+        if sessionsCompleted == 7 {
+            showMilestone(.streakMilestone(7))
+        } else if sessionsCompleted == 30 {
+            showMilestone(.streakMilestone(30))
+        }
+    }
+
+    private func showMilestone(_ milestone: MilestoneType) {
+        currentMilestone = milestone
+        showMilestoneCelebration = true
     }
 
     private func togglePause() {

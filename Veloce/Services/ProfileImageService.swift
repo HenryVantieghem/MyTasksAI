@@ -27,6 +27,12 @@ final class ProfileImageService: ObservableObject {
     @Published var isUploading = false
     @Published var uploadProgress: Double = 0
     @Published var error: String?
+    @Published var lastAvatarUpdate: Date = Date()
+
+    /// Notify observers that the avatar has changed (triggers header refresh)
+    func notifyAvatarChanged() {
+        lastAvatarUpdate = Date()
+    }
 
     // MARK: - Initialization
 

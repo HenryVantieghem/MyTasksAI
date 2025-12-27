@@ -1,9 +1,9 @@
 //
 //  GoalDetailSheet.swift
-//  MyTasksAI
+//  Veloce
 //
-//  Goal Detail Sheet
-//  Comprehensive goal view with Overview, Roadmap, Tasks, and Insights sections
+//  Goal Detail Sheet - Premium Full-Featured View
+//  Complete goal management with Overview, Roadmap, Tasks, and Insights
 //
 
 import SwiftUI
@@ -20,7 +20,10 @@ struct GoalDetailSheet: View {
     @State private var showCheckInSheet = false
     @State private var showRoadmapApproval = false
     @State private var showDeleteConfirmation = false
+    @State private var showEditSheet = false
+    @State private var showCompleteConfirmation = false
     @State private var isDeleting = false
+    @State private var animateIn = false
 
     var body: some View {
         NavigationStack {
@@ -32,11 +35,16 @@ struct GoalDetailSheet: View {
                         // Header with constellation orb
                         headerSection
 
+                        // Quick actions
+                        if !goal.isCompleted {
+                            quickActions
+                        }
+
                         // Tab selector
                         tabSelector
 
                         // AI Generation Banner (show if no AI content)
-                        if !goalsVM.hasAIContent(goal) && goalsVM.isAIAvailable {
+                        if !goalsVM.hasAIContent(goal) && goalsVM.isAIAvailable && !goal.isCompleted {
                             aiGenerationBanner
                         }
 
@@ -60,18 +68,34 @@ struct GoalDetailSheet: View {
 
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
-                        if goal.isCheckInDue {
-                            Button {
-                                showCheckInSheet = true
-                            } label: {
-                                Label("Weekly Check-in", systemImage: "bell.badge")
+                        if !goal.isCompleted {
+                            if goal.isCheckInDue {
+                                Button {
+                                    showCheckInSheet = true
+                                } label: {
+                                    Label("Weekly Check-in", systemImage: "bell.badge")
+                                }
                             }
-                        }
 
-                        Button {
-                            showRoadmapApproval = true
-                        } label: {
-                            Label("View Roadmap", systemImage: "map")
+                            Button {
+                                showRoadmapApproval = true
+                            } label: {
+                                Label("View Roadmap", systemImage: "map")
+                            }
+
+                            Button {
+                                showEditSheet = true
+                            } label: {
+                                Label("Edit Goal", systemImage: "pencil")
+                            }
+
+                            Divider()
+
+                            Button {
+                                showCompleteConfirmation = true
+                            } label: {
+                                Label("Mark Complete", systemImage: "checkmark.seal")
+                            }
                         }
 
                         Divider()
@@ -94,6 +118,9 @@ struct GoalDetailSheet: View {
             .sheet(isPresented: $showRoadmapApproval) {
                 AIRoadmapApprovalSheet(goal: goal, goalsVM: goalsVM)
             }
+            .sheet(isPresented: $showEditSheet) {
+                GoalEditSheet(goal: goal, goalsVM: goalsVM)
+            }
             .confirmationDialog(
                 "Delete Goal",
                 isPresented: $showDeleteConfirmation,
@@ -104,7 +131,24 @@ struct GoalDetailSheet: View {
                 }
                 Button("Cancel", role: .cancel) { }
             } message: {
-                Text("This will permanently delete \"\(goal.displayTitle)\" and all its milestones. This action cannot be undone.")
+                Text("This will permanently delete \"\(goal.displayTitle)\" and all its milestones.")
+            }
+            .confirmationDialog(
+                "Complete Goal",
+                isPresented: $showCompleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Mark Complete") {
+                    completeGoal()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Mark \"\(goal.displayTitle)\" as complete? You've made great progress!")
+            }
+            .onAppear {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    animateIn = true
+                }
             }
         }
         .presentationDetents([.large])
@@ -119,6 +163,8 @@ struct GoalDetailSheet: View {
             // Constellation orb
             GoalStatusOrb(goal: goal, size: 100)
                 .padding(.top, 20)
+                .scaleEffect(animateIn ? 1 : 0.8)
+                .opacity(animateIn ? 1 : 0)
 
             // Title
             VStack(spacing: 8) {
@@ -133,6 +179,9 @@ struct GoalDetailSheet: View {
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
+            .offset(y: animateIn ? 0 : 10)
+            .opacity(animateIn ? 1 : 0)
+            .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.1), value: animateIn)
 
             // Badges row
             HStack(spacing: 12) {
@@ -160,44 +209,98 @@ struct GoalDetailSheet: View {
                     )
                 }
             }
+            .offset(y: animateIn ? 0 : 10)
+            .opacity(animateIn ? 1 : 0)
+            .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.15), value: animateIn)
 
             // Progress bar
-            VStack(spacing: 8) {
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(Color.white.opacity(0.1))
-                            .frame(height: 8)
+            progressBar
+                .offset(y: animateIn ? 0 : 10)
+                .opacity(animateIn ? 1 : 0)
+                .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.2), value: animateIn)
+        }
+    }
 
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [goal.themeColor, goal.themeColor.opacity(0.7)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
+    private var progressBar: some View {
+        VStack(spacing: 8) {
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(height: 8)
+
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [goal.themeColor, goal.themeColor.opacity(0.7)],
+                                startPoint: .leading,
+                                endPoint: .trailing
                             )
-                            .frame(width: geometry.size.width * goal.progress, height: 8)
-                    }
+                        )
+                        .frame(width: geometry.size.width * goal.progress, height: 8)
+                        .shadow(color: goal.themeColor.opacity(0.5), radius: 8, y: 0)
                 }
-                .frame(height: 8)
+            }
+            .frame(height: 8)
 
-                HStack {
-                    Text("\(Int(goal.progress * 100))% complete")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.6))
+            HStack {
+                Text("\(Int(goal.progress * 100))% complete")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.6))
 
-                    Spacer()
+                Spacer()
 
-                    if goal.milestoneCount > 0 {
-                        Text("\(goal.completedMilestoneCount)/\(goal.milestoneCount) milestones")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white.opacity(0.5))
+                if goal.milestoneCount > 0 {
+                    Text("\(goal.completedMilestoneCount)/\(goal.milestoneCount) milestones")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+
+    // MARK: - Quick Actions
+
+    private var quickActions: some View {
+        HStack(spacing: 12) {
+            // Update Progress
+            QuickActionButton(
+                icon: "slider.horizontal.3",
+                label: "Progress",
+                color: Theme.Colors.aiCyan
+            ) {
+                // Show progress update
+            }
+
+            // Check-in
+            if goal.isCheckInDue {
+                QuickActionButton(
+                    icon: "bell.badge.fill",
+                    label: "Check-in",
+                    color: Theme.Colors.warning,
+                    showBadge: true
+                ) {
+                    showCheckInSheet = true
+                }
+            }
+
+            // Generate AI
+            if !goalsVM.hasAIContent(goal) && goalsVM.isAIAvailable {
+                QuickActionButton(
+                    icon: "sparkles",
+                    label: "AI Roadmap",
+                    color: Theme.Colors.aiPurple
+                ) {
+                    Task {
+                        await goalsVM.generateAllAIContent(for: goal, context: modelContext)
                     }
                 }
             }
-            .padding(.horizontal, 4)
         }
+        .offset(y: animateIn ? 0 : 10)
+        .opacity(animateIn ? 1 : 0)
+        .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.25), value: animateIn)
     }
 
     // MARK: - Tab Selector
@@ -235,6 +338,9 @@ struct GoalDetailSheet: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial.opacity(0.5))
         )
+        .offset(y: animateIn ? 0 : 10)
+        .opacity(animateIn ? 1 : 0)
+        .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.3), value: animateIn)
     }
 
     // MARK: - Tab Content
@@ -249,7 +355,7 @@ struct GoalDetailSheet: View {
         case .tasks:
             GoalTasksSection(goal: goal, goalsVM: goalsVM)
         case .insights:
-            GoalInsightsSection(goal: goal)
+            GoalInsightsSection(goal: goal, goalsVM: goalsVM)
         }
     }
 
@@ -259,7 +365,7 @@ struct GoalDetailSheet: View {
         VStack(spacing: 16) {
             // Icon
             ZStack {
-                SwiftUI.Circle()
+                Circle()
                     .fill(Theme.Colors.aiPurple.opacity(0.2))
                     .frame(width: 60, height: 60)
 
@@ -336,6 +442,49 @@ struct GoalDetailSheet: View {
         isDeleting = true
         goalsVM.deleteGoal(goal, context: modelContext)
         dismiss()
+    }
+
+    private func completeGoal() {
+        goalsVM.completeGoal(goal, context: modelContext)
+    }
+}
+
+// MARK: - Quick Action Button
+
+private struct QuickActionButton: View {
+    let icon: String
+    let label: String
+    let color: Color
+    var showBadge: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                ZStack(alignment: .topTrailing) {
+                    Circle()
+                        .fill(color.opacity(0.15))
+                        .frame(width: 44, height: 44)
+                        .overlay(
+                            Image(systemName: icon)
+                                .font(.system(size: 18))
+                                .foregroundStyle(color)
+                        )
+
+                    if showBadge {
+                        Circle()
+                            .fill(Theme.Colors.error)
+                            .frame(width: 10, height: 10)
+                            .offset(x: 2, y: -2)
+                    }
+                }
+
+                Text(label)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -462,9 +611,16 @@ struct GoalRoadmapSection: View {
             if milestones.isEmpty {
                 emptyState
             } else {
+                // Progress summary
+                if milestones.count > 0 {
+                    progressSummary
+                }
+
+                // Milestones list
                 ForEach(milestones) { milestone in
                     MilestoneCard(
                         milestone: milestone,
+                        goalColor: goal.themeColor,
                         onToggle: {
                             goalsVM.toggleMilestoneCompletion(milestone, context: modelContext)
                         }
@@ -472,6 +628,55 @@ struct GoalRoadmapSection: View {
                 }
             }
         }
+    }
+
+    private var progressSummary: some View {
+        HStack(spacing: 16) {
+            VStack(spacing: 4) {
+                Text("\(milestones.filter(\.isCompleted).count)")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundStyle(Theme.Colors.success)
+
+                Text("Completed")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+
+            Divider()
+                .frame(height: 40)
+                .background(.white.opacity(0.2))
+
+            VStack(spacing: 4) {
+                Text("\(milestones.filter { !$0.isCompleted }.count)")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text("Remaining")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+
+            Divider()
+                .frame(height: 40)
+                .background(.white.opacity(0.2))
+
+            VStack(spacing: 4) {
+                let totalPoints = milestones.reduce(0) { $0 + $1.pointsValue }
+                Text("\(totalPoints)")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color(hex: "FFD700"))
+
+                Text("XP Total")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial.opacity(0.5))
+        )
     }
 
     private var emptyState: some View {
@@ -489,29 +694,37 @@ struct GoalRoadmapSection: View {
                 .foregroundStyle(.white.opacity(0.5))
                 .multilineTextAlignment(.center)
 
-            Button {
-                Task {
-                    await goalsVM.generateRoadmap(for: goal, context: modelContext)
-                }
-            } label: {
-                HStack {
-                    Image(systemName: "sparkles")
-                    Text("Generate Roadmap")
-                }
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 14)
-                .background(
-                    LinearGradient(
-                        colors: [Theme.Colors.aiPurple, Theme.Colors.aiPurple.opacity(0.7)],
-                        startPoint: .leading,
-                        endPoint: .trailing
+            if goalsVM.isAIAvailable {
+                Button {
+                    Task {
+                        await goalsVM.generateRoadmap(for: goal, context: modelContext)
+                    }
+                } label: {
+                    HStack {
+                        if goalsVM.isGeneratingRoadmap {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "sparkles")
+                        }
+                        Text(goalsVM.isGeneratingRoadmap ? "Generating..." : "Generate Roadmap")
+                    }
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 14)
+                    .background(
+                        LinearGradient(
+                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiPurple.opacity(0.7)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     )
-                )
-                .clipShape(Capsule())
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .disabled(goalsVM.isGeneratingRoadmap)
             }
-            .buttonStyle(.plain)
         }
         .padding(.vertical, 40)
     }
@@ -522,6 +735,7 @@ struct GoalRoadmapSection: View {
 struct GoalTasksSection: View {
     let goal: Goal
     @Bindable var goalsVM: GoalsViewModel
+    @Environment(\.modelContext) private var modelContext
 
     private var pendingSuggestions: [PendingTaskSuggestion] {
         goalsVM.pendingTaskSuggestions
@@ -531,13 +745,13 @@ struct GoalTasksSection: View {
         VStack(spacing: 20) {
             // Pending approvals
             if !pendingSuggestions.isEmpty {
-                SectionCard(title: "Pending Approvals", icon: "sparkles") {
+                SectionCard(title: "AI Suggested Tasks", icon: "sparkles") {
                     VStack(spacing: 12) {
                         ForEach(pendingSuggestions) { suggestion in
                             PendingTaskRow(
                                 suggestion: suggestion,
                                 onApprove: {
-                                    // Would create actual task here
+                                    goalsVM.approveTaskSuggestion(suggestion, for: goal, context: modelContext)
                                 },
                                 onReject: {
                                     goalsVM.rejectTaskSuggestion(suggestion)
@@ -553,14 +767,26 @@ struct GoalTasksSection: View {
                 SectionCard(title: "Linked Tasks", icon: "link") {
                     VStack(spacing: 12) {
                         HStack {
-                            Text("\(goal.linkedTaskCount) tasks linked")
+                            Text("\(goal.linkedTaskCount) tasks connected to this goal")
                                 .font(.system(size: 14))
                                 .foregroundStyle(.white.opacity(0.7))
 
                             Spacer()
-
-                            // Progress indicator would go here
                         }
+
+                        // Progress indicator
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.1))
+                                    .frame(height: 6)
+
+                                Capsule()
+                                    .fill(Theme.Colors.success)
+                                    .frame(width: geometry.size.width * goal.progress, height: 6)
+                            }
+                        }
+                        .frame(height: 6)
                     }
                 }
             }
@@ -576,9 +802,10 @@ struct GoalTasksSection: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(.white.opacity(0.7))
 
-                    Text("Generate a roadmap to get AI-suggested tasks")
+                    Text("Generate a roadmap to get AI-suggested tasks, or link existing tasks to this goal")
                         .font(.system(size: 14))
                         .foregroundStyle(.white.opacity(0.5))
+                        .multilineTextAlignment(.center)
                 }
                 .padding(.vertical, 40)
             }
@@ -590,6 +817,7 @@ struct GoalTasksSection: View {
 
 struct GoalInsightsSection: View {
     let goal: Goal
+    @Bindable var goalsVM: GoalsViewModel
 
     var body: some View {
         VStack(spacing: 20) {
@@ -597,11 +825,17 @@ struct GoalInsightsSection: View {
             SectionCard(title: "Check-in Streak", icon: "flame") {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("\(goal.checkInStreak)")
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                        HStack(alignment: .lastTextBaseline, spacing: 4) {
+                            Text("\(goal.checkInStreak)")
+                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
 
-                        Text("Weekly check-ins")
+                            Text("weeks")
+                                .font(.system(size: 14))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+
+                        Text("\(goal.totalCheckIns) total check-ins")
                             .font(.system(size: 13))
                             .foregroundStyle(.white.opacity(0.6))
                     }
@@ -609,80 +843,154 @@ struct GoalInsightsSection: View {
                     Spacer()
 
                     if goal.checkInStreak >= 3 {
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 32))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [.orange, .yellow],
-                                    startPoint: .bottom,
-                                    endPoint: .top
+                        ZStack {
+                            Circle()
+                                .fill(Color.orange.opacity(0.2))
+                                .frame(width: 56, height: 56)
+
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.orange, .yellow],
+                                        startPoint: .bottom,
+                                        endPoint: .top
+                                    )
                                 )
-                            )
+                        }
                     }
                 }
             }
 
-            // Time invested
-            SectionCard(title: "Goal Timeline", icon: "clock") {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("Started")
-                            .font(.system(size: 13))
-                            .foregroundStyle(.white.opacity(0.6))
-                        Spacer()
-                        Text(goal.createdAt.formatted(.dateTime.month(.abbreviated).day().year()))
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(.white)
+            // Progress over time
+            SectionCard(title: "Progress Journey", icon: "chart.xyaxis.line") {
+                VStack(spacing: 12) {
+                    // Visual progress
+                    HStack(spacing: 8) {
+                        ForEach(0..<5, id: \.self) { index in
+                            let milestone = Double(index + 1) * 0.2
+                            let isReached = goal.progress >= milestone
+
+                            VStack(spacing: 4) {
+                                Circle()
+                                    .fill(isReached ? goal.themeColor : Color.white.opacity(0.2))
+                                    .frame(width: 12, height: 12)
+
+                                Text("\(Int(milestone * 100))%")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(isReached ? .white : .white.opacity(0.4))
+                            }
+
+                            if index < 4 {
+                                Capsule()
+                                    .fill(goal.progress >= milestone + 0.2 ? goal.themeColor : Color.white.opacity(0.2))
+                                    .frame(height: 3)
+                            }
+                        }
                     }
 
+                    Text("Current Progress: \(Int(goal.progress * 100))%")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+            }
+
+            // Timeline
+            SectionCard(title: "Goal Timeline", icon: "clock") {
+                VStack(alignment: .leading, spacing: 12) {
+                    TimelineRow(
+                        label: "Started",
+                        value: goal.createdAt.formatted(.dateTime.month(.abbreviated).day().year()),
+                        icon: "play.circle.fill",
+                        color: Theme.Colors.aiCyan
+                    )
+
                     if let targetDate = goal.targetDate {
-                        HStack {
-                            Text("Target")
-                                .font(.system(size: 13))
-                                .foregroundStyle(.white.opacity(0.6))
-                            Spacer()
-                            Text(targetDate.formatted(.dateTime.month(.abbreviated).day().year()))
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(.white)
-                        }
+                        TimelineRow(
+                            label: "Target",
+                            value: targetDate.formatted(.dateTime.month(.abbreviated).day().year()),
+                            icon: "flag.checkered",
+                            color: goal.isOverdue ? Theme.Colors.error : Theme.Colors.warning
+                        )
                     }
 
                     if goal.isCompleted, let completedAt = goal.completedAt {
-                        HStack {
-                            Text("Completed")
-                                .font(.system(size: 13))
-                                .foregroundStyle(.white.opacity(0.6))
-                            Spacer()
-                            Text(completedAt.formatted(.dateTime.month(.abbreviated).day().year()))
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(Theme.Colors.success)
-                        }
+                        TimelineRow(
+                            label: "Completed",
+                            value: completedAt.formatted(.dateTime.month(.abbreviated).day().year()),
+                            icon: "checkmark.seal.fill",
+                            color: Theme.Colors.success
+                        )
                     }
                 }
             }
 
             // Points
-            if goal.pointsAwarded > 0 {
-                SectionCard(title: "Points Earned", icon: "star.fill") {
-                    HStack {
-                        Text("\(goal.pointsAwarded)")
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [Color(hex: "FFD700"), Color(hex: "FFA500")],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+            if goal.pointsAwarded > 0 || goal.milestoneCount > 0 {
+                SectionCard(title: "Rewards", icon: "star.fill") {
+                    HStack(spacing: 24) {
+                        VStack(spacing: 4) {
+                            Text("\(goal.pointsAwarded)")
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color(hex: "FFD700"), Color(hex: "FFA500")],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
                                 )
-                            )
 
-                        Text("XP")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.5))
+                            Text("XP Earned")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
 
-                        Spacer()
+                        if goal.timeframeEnum != nil {
+                            Divider()
+                                .frame(height: 40)
+                                .background(.white.opacity(0.2))
+
+                            VStack(spacing: 4) {
+                                Text("\(goal.timeframeEnum?.pointsMultiplier ?? 1, specifier: "%.1f")x")
+                                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                                    .foregroundStyle(.white)
+
+                                Text("Multiplier")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+// MARK: - Timeline Row
+
+private struct TimelineRow: View {
+    let label: String
+    let value: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundStyle(color)
+                .frame(width: 24)
+
+            Text(label)
+                .font(.system(size: 14))
+                .foregroundStyle(.white.opacity(0.6))
+
+            Spacer()
+
+            Text(value)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(.white)
         }
     }
 }
@@ -746,23 +1054,25 @@ struct SMARTCriteriaRow: View {
 
 struct MilestoneCard: View {
     let milestone: GoalMilestone
+    var goalColor: Color = Theme.Colors.aiPurple
     let onToggle: () -> Void
+
+    @State private var isPressed = false
 
     var body: some View {
         Button(action: onToggle) {
             HStack(spacing: 14) {
                 // Checkbox
                 ZStack {
-                    SwiftUI.Circle()
+                    Circle()
                         .stroke(
-                            milestone.isCompleted ?
-                            Theme.Colors.success : .white.opacity(0.3),
+                            milestone.isCompleted ? Theme.Colors.success : .white.opacity(0.3),
                             lineWidth: 2
                         )
                         .frame(width: 28, height: 28)
 
                     if milestone.isCompleted {
-                        SwiftUI.Circle()
+                        Circle()
                             .fill(Theme.Colors.success)
                             .frame(width: 28, height: 28)
 
@@ -793,16 +1103,17 @@ struct MilestoneCard: View {
                                 Text(targetDate.formatted(.dateTime.month(.abbreviated).day()))
                                     .font(.system(size: 11))
                             }
-                            .foregroundStyle(.white.opacity(0.4))
+                            .foregroundStyle(milestone.isOverdue && !milestone.isCompleted ?
+                                Theme.Colors.error.opacity(0.8) : .white.opacity(0.4))
                         }
 
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 10))
                             Text("+\(milestone.pointsValue) XP")
-                                .font(.system(size: 11))
+                                .font(.system(size: 11, weight: .medium))
                         }
-                        .foregroundStyle(Color(hex: "FFD700").opacity(0.7))
+                        .foregroundStyle(Color(hex: "FFD700").opacity(milestone.isCompleted ? 0.4 : 0.8))
                     }
                 }
 
@@ -821,8 +1132,18 @@ struct MilestoneCard: View {
                             )
                     )
             )
+            .scaleEffect(isPressed ? 0.98 : 1.0)
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    withAnimation(.easeInOut(duration: 0.1)) { isPressed = true }
+                }
+                .onEnded { _ in
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { isPressed = false }
+                }
+        )
     }
 }
 
@@ -872,7 +1193,7 @@ struct PendingTaskRow: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.white.opacity(0.5))
                         .frame(width: 32, height: 32)
-                        .background(SwiftUI.Circle().fill(.white.opacity(0.1)))
+                        .background(Circle().fill(.white.opacity(0.1)))
                 }
 
                 Button(action: onApprove) {
@@ -880,7 +1201,7 @@ struct PendingTaskRow: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.white)
                         .frame(width: 32, height: 32)
-                        .background(SwiftUI.Circle().fill(Theme.Colors.success))
+                        .background(Circle().fill(Theme.Colors.success))
                 }
             }
             .buttonStyle(.plain)
@@ -893,69 +1214,125 @@ struct PendingTaskRow: View {
     }
 }
 
-// MARK: - Weekly Check-In Sheet
+// MARK: - Goal Edit Sheet
 
-/// Weekly check-in sheet for goal coaching
-struct WeeklyCheckInSheet: View {
+struct GoalEditSheet: View {
     let goal: Goal
     @Bindable var goalsVM: GoalsViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    @State private var title: String = ""
+    @State private var description: String = ""
+    @State private var selectedCategory: GoalCategory = .personal
+    @State private var targetDate: Date = Date()
+    @State private var progress: Double = 0
 
     var body: some View {
         NavigationStack {
             ZStack {
                 VoidBackground.standard
 
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 8) {
-                        Image(systemName: "calendar.badge.checkmark")
-                            .font(.system(size: 48))
-                            .foregroundStyle(Theme.Colors.aiPurple)
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        // Title
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Goal Title", systemImage: "target")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.6))
 
-                        Text("Weekly Check-In")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(.white)
+                            CrystallineTextField(text: $title, placeholder: "Goal title", icon: "target")
+                        }
 
-                        Text("How's your progress on \"\(goal.displayTitle)\"?")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.white.opacity(0.6))
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                        // Description
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Description", systemImage: "text.alignleft")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.6))
+
+                            TextEditor(text: $description)
+                                .font(.system(size: 15))
+                                .foregroundStyle(.white)
+                                .scrollContentBackground(.hidden)
+                                .frame(minHeight: 80, maxHeight: 120)
+                                .padding(12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(.ultraThinMaterial.opacity(0.5))
+                                )
+                        }
+
+                        // Progress slider
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Label("Progress", systemImage: "chart.line.uptrend.xyaxis")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(.white.opacity(0.6))
+
+                                Spacer()
+
+                                Text("\(Int(progress * 100))%")
+                                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                                    .foregroundStyle(.white)
+                            }
+
+                            Slider(value: $progress, in: 0...1, step: 0.05)
+                                .tint(goal.themeColor)
+                        }
+
+                        // Target date
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Target Date", systemImage: "calendar")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.6))
+
+                            DatePicker("Target", selection: $targetDate, displayedComponents: .date)
+                                .datePickerStyle(.compact)
+                                .tint(goal.themeColor)
+                        }
+
+                        Spacer(minLength: 40)
                     }
-                    .padding(.top, 40)
-
-                    Spacer()
-
-                    // Coming soon placeholder
-                    VStack(spacing: 12) {
-                        Text("Coming Soon")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.7))
-
-                        Text("AI-powered weekly coaching sessions will help you stay on track and adjust your approach.")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.white.opacity(0.5))
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    .voidCard()
-                    .padding(.horizontal)
-
-                    Spacer()
+                    .padding(20)
                 }
             }
+            .navigationTitle("Edit Goal")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Cancel") { dismiss() }
                         .foregroundStyle(.white.opacity(0.7))
                 }
+
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Save") {
+                        saveChanges()
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Theme.Colors.aiPurple)
+                }
+            }
+            .onAppear {
+                title = goal.title
+                description = goal.goalDescription ?? ""
+                selectedCategory = goal.categoryEnum ?? .personal
+                targetDate = goal.targetDate ?? Date()
+                progress = goal.progress
             }
         }
-        .presentationDetents([.large])
+        .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .presentationBackground(.clear)
+    }
+
+    private func saveChanges() {
+        goal.title = title
+        goal.goalDescription = description.isEmpty ? nil : description
+        goal.category = selectedCategory.rawValue
+        goal.targetDate = targetDate
+        goal.updateProgress(progress)
+        goalsVM.updateGoal(goal, context: modelContext)
+        dismiss()
     }
 }
 

@@ -16,6 +16,7 @@ struct SendChallengeSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var friendService = FriendService.shared
     @State private var circleService = CircleService.shared
+    @State private var challengeService = ChallengeService.shared
 
     // Form state
     @State private var currentStep = 0
@@ -25,6 +26,11 @@ struct SendChallengeSheet: View {
     @State private var durationHours: Int = 24
     @State private var stakes: String = ""
     @State private var customTitle: String = ""
+
+    // Loading/Error state
+    @State private var isSending = false
+    @State private var error: String?
+    @State private var showSuccess = false
 
     // Animation
     @State private var showContent = false
@@ -489,19 +495,29 @@ struct SendChallengeSheet: View {
                 }
             } label: {
                 HStack(spacing: 8) {
-                    Text(currentStep == steps.count - 1 ? "Send Challenge" : "Next")
-                        .font(.system(size: 16, weight: .bold))
+                    if isSending {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Text(currentStep == steps.count - 1 ? "Send Challenge" : "Next")
+                            .font(.system(size: 16, weight: .bold))
 
-                    Image(systemName: currentStep == steps.count - 1 ? "paperplane.fill" : "arrow.right")
-                        .font(.system(size: 14, weight: .bold))
+                        Image(systemName: currentStep == steps.count - 1 ? "paperplane.fill" : "arrow.right")
+                            .font(.system(size: 14, weight: .bold))
+                    }
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 16)
-                .background(canProceed ? selectedType.color : Color.white.opacity(0.1), in: Capsule())
-                .shadow(color: canProceed ? selectedType.color.opacity(0.4) : Color.clear, radius: 12, y: 4)
+                .background(canProceed && !isSending ? selectedType.color : Color.white.opacity(0.1), in: Capsule())
+                .shadow(color: canProceed && !isSending ? selectedType.color.opacity(0.4) : Color.clear, radius: 12, y: 4)
             }
-            .disabled(!canProceed)
+            .disabled(!canProceed || isSending)
+        }
+        .alert("Error", isPresented: .constant(error != nil)) {
+            Button("OK") { error = nil }
+        } message: {
+            Text(error ?? "")
         }
     }
 
@@ -562,12 +578,41 @@ struct SendChallengeSheet: View {
     }
 
     private func getCurrentUserId() -> UUID {
-        UUID() // TODO: Get from auth
+        UUID() // Will be resolved by ChallengeService from auth
     }
 
     private func sendChallenge() {
-        // TODO: Send via ChallengeService
-        dismiss()
+        guard !selectedRecipients.isEmpty else { return }
+
+        isSending = true
+        error = nil
+
+        Task {
+            do {
+                _ = try await challengeService.createChallenge(
+                    type: selectedType,
+                    title: challengeTitle,
+                    description: nil,
+                    targetValue: targetValue,
+                    durationHours: durationHours,
+                    stakes: stakes.isEmpty ? nil : stakes,
+                    participantIds: selectedRecipients
+                )
+
+                // Success
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                showSuccess = true
+
+                // Dismiss after showing success
+                try await Task.sleep(nanoseconds: 1_500_000_000)
+                dismiss()
+            } catch {
+                self.error = error.localizedDescription
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+            }
+
+            isSending = false
+        }
     }
 }
 

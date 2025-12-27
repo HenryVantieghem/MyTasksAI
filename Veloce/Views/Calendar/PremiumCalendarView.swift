@@ -2,8 +2,8 @@
 //  PremiumCalendarView.swift
 //  Veloce
 //
-//  Premium Calendar - Week-centric design with glass effects
-//  Refined aesthetic with connected time slots and task indicators
+//  Premium Calendar - Apple Calendar-inspired design with glass effects
+//  Day, Week (7-column), and Month views with swipe gestures
 //
 
 import SwiftUI
@@ -21,11 +21,22 @@ struct PremiumCalendarView: View {
     @State private var showQuickAdd = false
     @State private var quickAddDate: Date?
     @State private var showDatePicker = false
+    @State private var showTaskDetail = false
+    @State private var newTaskForDetail: TaskItem?
     @State private var draggedTask: TaskItem?
     @State private var dragOffset: CGSize = .zero
 
     // MARK: Animation
     @Namespace private var calendarAnimation
+
+    // Week dates for week view
+    private var currentWeekDates: [Date] {
+        let cal = Calendar.current
+        guard let weekStart = cal.dateInterval(of: .weekOfYear, for: viewModel.selectedDate)?.start else {
+            return []
+        }
+        return (0..<7).compactMap { cal.date(byAdding: .day, value: $0, to: weekStart) }
+    }
 
     var body: some View {
         ZStack {
@@ -53,21 +64,90 @@ struct PremiumCalendarView: View {
                 .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedTask) { task in
-            CalendarTaskPreviewSheet(task: task)
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
+            LiquidGlassTaskDetailSheet(
+                task: task,
+                onComplete: {
+                    completeTask(task)
+                    selectedTask = nil
+                },
+                onDuplicate: {
+                    duplicateTask(task)
+                    selectedTask = nil
+                },
+                onSnooze: { date in
+                    snoozeTask(task, to: date)
+                    selectedTask = nil
+                },
+                onDelete: {
+                    deleteTask(task)
+                    selectedTask = nil
+                },
+                onSchedule: { date in
+                    rescheduleTask(task, to: date)
+                },
+                onStartTimer: { _ in
+                    selectedTask = nil
+                },
+                onDismiss: { selectedTask = nil }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showQuickAdd) {
             if let date = quickAddDate {
-                TimelineQuickAddView(
+                EnhancedQuickAddView(
                     selectedTime: date,
                     onAdd: { title, scheduledDate, duration in
                         addNewTask(title: title, date: scheduledDate, duration: duration)
                         showQuickAdd = false
                     },
-                    onCancel: { showQuickAdd = false }
+                    onCancel: { showQuickAdd = false },
+                    onExpandToDetail: {
+                        showQuickAdd = false
+                        let task = TaskItem(title: "")
+                        task.scheduledTime = date
+                        modelContext.insert(task)
+                        newTaskForDetail = task
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            showTaskDetail = true
+                        }
+                    }
                 )
-                .presentationDetents([.medium])
+                .presentationDetents([.height(360)])
+                .presentationDragIndicator(.visible)
+            }
+        }
+        .sheet(isPresented: $showTaskDetail) {
+            if let task = newTaskForDetail {
+                LiquidGlassTaskDetailSheet(
+                    task: task,
+                    onComplete: {
+                        completeTask(task)
+                        showTaskDetail = false
+                        newTaskForDetail = nil
+                    },
+                    onDuplicate: {},
+                    onSnooze: { _ in },
+                    onDelete: {
+                        deleteTask(task)
+                        showTaskDetail = false
+                        newTaskForDetail = nil
+                    },
+                    onSchedule: { date in
+                        rescheduleTask(task, to: date)
+                    },
+                    onStartTimer: { _ in },
+                    onDismiss: {
+                        showTaskDetail = false
+                        // Keep the task if it has a title
+                        if let task = newTaskForDetail, task.title.isEmpty {
+                            modelContext.delete(task)
+                        }
+                        newTaskForDetail = nil
+                        Task { await viewModel.loadData() }
+                    }
+                )
+                .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             }
         }
@@ -88,23 +168,61 @@ struct PremiumCalendarView: View {
             .padding(.top, 8)
 
             // Content based on view mode
-            switch viewModel.viewMode {
-            case .day:
-                dayViewContent
-            case .week:
-                weekViewContent
-            case .month:
-                monthViewContent
+            Group {
+                switch viewModel.viewMode {
+                case .day:
+                    dayViewContent
+                case .week:
+                    weekAtGlanceContent
+                case .month:
+                    monthViewContent
+                }
             }
+            .gesture(
+                DragGesture(minimumDistance: 50, coordinateSpace: .local)
+                    .onEnded { value in
+                        let horizontalAmount = value.translation.width
+                        let verticalAmount = value.translation.height
+
+                        // Only handle horizontal swipes (ignore vertical scrolling)
+                        if abs(horizontalAmount) > abs(verticalAmount) {
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                if horizontalAmount < -50 {
+                                    viewModel.goToNext()
+                                } else if horizontalAmount > 50 {
+                                    viewModel.goToPrevious()
+                                }
+                            }
+                        }
+                    }
+            )
+        }
+        .safeAreaInset(edge: .bottom) {
+            quickAddButton
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
+                .background {
+                    LinearGradient(
+                        colors: [
+                            Color.clear,
+                            Color.black.opacity(0.3),
+                            Color.black.opacity(0.6)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 100)
+                    .allowsHitTesting(false)
+                }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: viewModel.viewMode)
     }
 
-    // MARK: - Day View Content
+    // MARK: - Day View Content (Full single day timeline)
 
     private var dayViewContent: some View {
         VStack(spacing: 0) {
-            // Week Strip with Task Dots
+            // Compact week strip for day navigation
             PremiumWeekStrip(
                 selectedDate: $viewModel.selectedDate,
                 tasks: viewModel.scheduledTasks,
@@ -116,14 +234,14 @@ struct PremiumCalendarView: View {
                     HapticsService.shared.selectionFeedback()
                 }
             )
-            .padding(.vertical, 12)
+            .padding(.vertical, 8)
 
             // Selected Day Label
             selectedDayLabel
                 .padding(.horizontal, 20)
                 .padding(.bottom, 8)
 
-            // Day Timeline
+            // Full Day Timeline (6am-10pm)
             PremiumDayTimeline(
                 date: viewModel.selectedDate,
                 tasks: viewModel.tasks(for: viewModel.selectedDate),
@@ -140,59 +258,40 @@ struct PremiumCalendarView: View {
                     rescheduleTask(task, to: newTime)
                 }
             )
-
-            // Quick Add Button
-            quickAddButton
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
         }
     }
 
-    // MARK: - Week View Content
+    // MARK: - Week At Glance Content (Apple Calendar-style 7 columns)
 
-    private var weekViewContent: some View {
+    private var weekAtGlanceContent: some View {
         VStack(spacing: 0) {
-            // Week Strip with Task Dots
-            PremiumWeekStrip(
+            // Week day header with date selection
+            WeekDayHeader(
+                weekDates: currentWeekDates,
                 selectedDate: $viewModel.selectedDate,
+                timeGutterWidth: 44
+            )
+            .padding(.horizontal, 8)
+            .padding(.top, 8)
+
+            // 7-column week timeline
+            WeekAtGlanceView(
+                selectedDate: $viewModel.selectedDate,
+                weekDates: currentWeekDates,
                 tasks: viewModel.scheduledTasks,
                 events: viewModel.events,
-                onDayTap: { date in
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        viewModel.selectedDate = date
-                    }
-                    HapticsService.shared.selectionFeedback()
-                }
-            )
-            .padding(.vertical, 12)
-
-            // Selected Day Label
-            selectedDayLabel
-                .padding(.horizontal, 20)
-                .padding(.bottom, 8)
-
-            // Day Timeline (for selected day in week view)
-            PremiumDayTimeline(
-                date: viewModel.selectedDate,
-                tasks: viewModel.tasks(for: viewModel.selectedDate),
-                events: viewModel.events(for: viewModel.selectedDate),
                 onTaskTap: { task in selectedTask = task },
                 onTimeSlotTap: { date in
                     quickAddDate = date
                     showQuickAdd = true
                 },
-                onTaskComplete: { task in
-                    completeTask(task)
-                },
                 onTaskDrag: { task, newTime in
                     rescheduleTask(task, to: newTime)
+                },
+                onTaskComplete: { task in
+                    completeTask(task)
                 }
             )
-
-            // Quick Add Button
-            quickAddButton
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
         }
     }
 
@@ -222,11 +321,6 @@ struct PremiumCalendarView: View {
             if !viewModel.scheduledTasks.isEmpty {
                 upcomingTasksList
             }
-
-            // Quick Add Button
-            quickAddButton
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
         }
     }
 
@@ -379,6 +473,44 @@ struct PremiumCalendarView: View {
         task.updatedAt = Date()
         try? modelContext.save()
         HapticsService.shared.success()
+
+        Task {
+            await viewModel.loadData()
+        }
+    }
+
+    private func snoozeTask(_ task: TaskItem, to date: Date) {
+        task.scheduledTime = date
+        task.updatedAt = Date()
+        try? modelContext.save()
+        HapticsService.shared.success()
+
+        Task {
+            await viewModel.loadData()
+        }
+    }
+
+    private func duplicateTask(_ task: TaskItem) {
+        let newTask = TaskItem(title: task.title)
+        newTask.taskTypeRaw = task.taskTypeRaw
+        newTask.estimatedMinutes = task.estimatedMinutes
+        newTask.duration = task.duration
+        newTask.notes = task.notes
+        newTask.contextNotes = task.contextNotes
+        newTask.starRating = task.starRating
+        modelContext.insert(newTask)
+        try? modelContext.save()
+        HapticsService.shared.success()
+
+        Task {
+            await viewModel.loadData()
+        }
+    }
+
+    private func deleteTask(_ task: TaskItem) {
+        modelContext.delete(task)
+        try? modelContext.save()
+        HapticsService.shared.impact()
 
         Task {
             await viewModel.loadData()

@@ -105,7 +105,7 @@ struct RootView: View {
                 AuthView(initialScreen: appViewModel.preferSignUp ? .signUp : .signIn)
 
             case .onboarding:
-                CosmicOnboardingContainer(viewModel: CosmicOnboardingViewModel())
+                JourneyOnboardingContainer(viewModel: JourneyOnboardingViewModel())
 
             case .paywall:
                 PaywallView()
