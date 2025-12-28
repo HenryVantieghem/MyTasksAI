@@ -273,9 +273,9 @@ struct CosmicSplashScreen: View {
 
                 // App Name - with prismatic shimmer
                 ZStack {
-                    Text("Veloce")
-                        .font(.system(size: 52, weight: .thin, design: .default))
-                        .tracking(6)
+                    Text("MyTasksAI")
+                        .font(.system(size: 46, weight: .thin, design: .default))
+                        .tracking(4)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [.white, .white.opacity(0.88)],
@@ -285,9 +285,9 @@ struct CosmicSplashScreen: View {
                         )
 
                     // Prismatic shimmer overlay
-                    Text("Veloce")
-                        .font(.system(size: 52, weight: .thin, design: .default))
-                        .tracking(6)
+                    Text("MyTasksAI")
+                        .font(.system(size: 46, weight: .thin, design: .default))
+                        .tracking(4)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
@@ -312,13 +312,13 @@ struct CosmicSplashScreen: View {
                 if taglineOpacity > 0.5 {
                     Capsule()
                         .fill(.ultraThinMaterial)
-                        .frame(width: 200, height: 24)
+                        .frame(width: 220, height: 24)
                         .opacity(taglineOpacity * 0.2)
                 }
 
-                Text("VELOCITY FOR LIFE")
+                Text("AI-POWERED PRODUCTIVITY")
                     .font(.system(size: 10, weight: .semibold))
-                    .tracking(6)
+                    .tracking(4)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [

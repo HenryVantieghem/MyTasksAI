@@ -111,9 +111,8 @@ struct LiquidGlassCalendarView: View {
 
     @ViewBuilder
     private var adaptiveBackground: some View {
-        // Use system background that adapts to light/dark mode
-        Color(.systemGroupedBackground)
-            .ignoresSafeArea()
+        // Cosmic void background matching Tasks page
+        VoidBackground.calendar
     }
 
     // MARK: - Authorized Calendar Content
@@ -200,18 +199,19 @@ struct LiquidGlassCalendarView: View {
                 )
             }
         }
-        .gesture(
-            DragGesture(minimumDistance: 80, coordinateSpace: .local)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 100, coordinateSpace: .local)
                 .onEnded { value in
                     let horizontalAmount = value.translation.width
                     let verticalAmount = value.translation.height
 
-                    // Only handle clear horizontal swipes
-                    if abs(horizontalAmount) > abs(verticalAmount) * 2 {
+                    // Only handle clear horizontal swipes (not interfering with scroll)
+                    if abs(horizontalAmount) > abs(verticalAmount) * 2.5 && abs(horizontalAmount) > 100 {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                            if horizontalAmount < -80 {
+                            if horizontalAmount < -100 {
                                 viewModel.goToNext()
-                            } else if horizontalAmount > 80 {
+                            } else if horizontalAmount > 100 {
                                 viewModel.goToPrevious()
                             }
                         }

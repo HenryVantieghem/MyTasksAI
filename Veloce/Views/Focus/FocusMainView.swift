@@ -277,145 +277,160 @@ struct FocusMainView: View {
     // MARK: - Immersive Timer Display
 
     private var immersiveTimerDisplay: some View {
-        ZStack {
-            // Outer glow rings
-            ForEach(0..<3, id: \.self) { index in
+        GeometryReader { geometry in
+            // Calculate responsive sizes based on available width
+            // Use 60% of available width as base, capped at 220px max
+            let availableWidth = geometry.size.width
+            let baseRingSize = min(availableWidth * 0.55, 220)
+            let outerRingBase = baseRingSize * 1.09 // ~240 when base is 220
+            let ringGrowth = baseRingSize * 0.18 // ~40 when base is 220
+            let innerGlowSize = baseRingSize * 0.91 // ~200 when base is 220
+            let orbitOffset = baseRingSize / 2 // Half of ring size
+            let strokeWidth: CGFloat = baseRingSize * 0.055 // ~12 when base is 220
+            let fontSizeMain = min(baseRingSize * 0.24, 52) // Timer font
+
+            ZStack {
+                // Outer glow rings
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .stroke(
+                            selectedMode.accentColor.opacity(0.1 - Double(index) * 0.03),
+                            lineWidth: 2
+                        )
+                        .frame(width: outerRingBase + CGFloat(index) * ringGrowth, height: outerRingBase + CGFloat(index) * ringGrowth)
+                        .scaleEffect(timerBreathing + CGFloat(index) * 0.02)
+                }
+
+                // Background ring
                 Circle()
+                    .stroke(Color.white.opacity(0.08), lineWidth: strokeWidth)
+                    .frame(width: baseRingSize, height: baseRingSize)
+
+                // Progress ring
+                Circle()
+                    .trim(from: 0, to: timerProgress)
                     .stroke(
-                        selectedMode.accentColor.opacity(0.1 - Double(index) * 0.03),
-                        lineWidth: 2
+                        AngularGradient(
+                            colors: [
+                                selectedMode.accentColor,
+                                selectedMode.accentColor.opacity(0.8),
+                                selectedMode.accentColor.opacity(0.5),
+                                selectedMode.accentColor.opacity(0.3),
+                                selectedMode.accentColor.opacity(0.1)
+                            ],
+                            center: .center,
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(270)
+                        ),
+                        style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round)
                     )
-                    .frame(width: 240 + CGFloat(index) * 40, height: 240 + CGFloat(index) * 40)
-                    .scaleEffect(timerBreathing + CGFloat(index) * 0.02)
-            }
-
-            // Background ring
-            Circle()
-                .stroke(Color.white.opacity(0.08), lineWidth: 12)
-                .frame(width: 220, height: 220)
-
-            // Progress ring
-            Circle()
-                .trim(from: 0, to: timerProgress)
-                .stroke(
-                    AngularGradient(
-                        colors: [
-                            selectedMode.accentColor,
-                            selectedMode.accentColor.opacity(0.8),
-                            selectedMode.accentColor.opacity(0.5),
-                            selectedMode.accentColor.opacity(0.3),
-                            selectedMode.accentColor.opacity(0.1)
-                        ],
-                        center: .center,
-                        startAngle: .degrees(-90),
-                        endAngle: .degrees(270)
-                    ),
-                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                )
-                .frame(width: 220, height: 220)
-                .rotationEffect(.degrees(-90))
-                .animation(.linear(duration: 0.5), value: timerProgress)
-
-            // Orbiting indicator dot
-            if timerState == .running {
-                Circle()
-                    .fill(selectedMode.accentColor)
-                    .frame(width: 16, height: 16)
-                    .shadow(color: selectedMode.accentColor.opacity(0.6), radius: 8)
-                    .offset(y: -110)
-                    .rotationEffect(.degrees(-90 + 360 * timerProgress))
+                    .frame(width: baseRingSize, height: baseRingSize)
+                    .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 0.5), value: timerProgress)
-            }
 
-            // Inner glow
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            selectedMode.accentColor.opacity(0.15),
-                            selectedMode.accentColor.opacity(0.05),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 100
+                // Orbiting indicator dot
+                if timerState == .running {
+                    Circle()
+                        .fill(selectedMode.accentColor)
+                        .frame(width: 16, height: 16)
+                        .shadow(color: selectedMode.accentColor.opacity(0.6), radius: 8)
+                        .offset(y: -orbitOffset)
+                        .rotationEffect(.degrees(-90 + 360 * timerProgress))
+                        .animation(.linear(duration: 0.5), value: timerProgress)
+                }
+
+                // Inner glow
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                selectedMode.accentColor.opacity(0.15),
+                                selectedMode.accentColor.opacity(0.05),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: innerGlowSize / 2
+                        )
                     )
-                )
-                .frame(width: 200, height: 200)
-                .scaleEffect(timerBreathing)
+                    .frame(width: innerGlowSize, height: innerGlowSize)
+                    .scaleEffect(timerBreathing)
 
-            // Center content
-            VStack(spacing: 16) {
-                // Time display
-                Text(timerDisplayString)
-                    .font(.system(size: 52, weight: .thin, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .contentTransition(.numericText())
-                    .animation(.spring(response: 0.3), value: timeRemaining)
+                // Center content
+                VStack(spacing: 12) {
+                    // Time display
+                    Text(timerDisplayString)
+                        .font(.system(size: fontSizeMain, weight: .thin, design: .monospaced))
+                        .foregroundStyle(.white)
+                        .contentTransition(.numericText())
+                        .animation(.spring(response: 0.3), value: timeRemaining)
+                        .minimumScaleFactor(0.7)
 
-                // Mode label
-                HStack(spacing: 6) {
-                    Image(systemName: selectedMode.icon)
-                        .font(.system(size: 12))
-                    Text(selectedMode.rawValue)
-                        .font(.system(size: 13, weight: .medium))
-                }
-                .foregroundStyle(selectedMode.accentColor)
+                    // Mode label
+                    HStack(spacing: 6) {
+                        Image(systemName: selectedMode.icon)
+                            .font(.system(size: 12))
+                        Text(selectedMode.rawValue)
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .foregroundStyle(selectedMode.accentColor)
 
-                // Control buttons
-                HStack(spacing: 24) {
-                    // Reset button (visible when not idle)
-                    if timerState != .idle {
+                    // Control buttons
+                    HStack(spacing: 20) {
+                        // Reset button (visible when not idle)
+                        if timerState != .idle {
+                            Button {
+                                resetTimer()
+                            } label: {
+                                Image(systemName: "arrow.counterclockwise")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.6))
+                                    .frame(width: 40, height: 40)
+                                    .background(Circle().fill(.white.opacity(0.1)))
+                            }
+                            .buttonStyle(.plain)
+                            .transition(.scale.combined(with: .opacity))
+                        }
+
+                        // Play/Pause button
                         Button {
-                            resetTimer()
+                            toggleTimer()
                         } label: {
-                            Image(systemName: "arrow.counterclockwise")
-                                .font(.system(size: 18, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.6))
-                                .frame(width: 44, height: 44)
-                                .background(Circle().fill(.white.opacity(0.1)))
+                            ZStack {
+                                Circle()
+                                    .fill(selectedMode.accentColor)
+                                    .frame(width: 52, height: 52)
+                                    .shadow(color: selectedMode.accentColor.opacity(0.5), radius: 16, y: 4)
+
+                                Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundStyle(.white)
+                                    .offset(x: timerState == .running ? 0 : 2)
+                            }
                         }
                         .buttonStyle(.plain)
-                        .transition(.scale.combined(with: .opacity))
-                    }
 
-                    // Play/Pause button
-                    Button {
-                        toggleTimer()
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(selectedMode.accentColor)
-                                .frame(width: 56, height: 56)
-                                .shadow(color: selectedMode.accentColor.opacity(0.5), radius: 16, y: 4)
-
-                            Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
-                                .font(.system(size: 22, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .offset(x: timerState == .running ? 0 : 2)
+                        // Full screen button
+                        if timerState != .idle {
+                            Button {
+                                showActiveSession = true
+                            } label: {
+                                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.6))
+                                    .frame(width: 40, height: 40)
+                                    .background(Circle().fill(.white.opacity(0.1)))
+                            }
+                            .buttonStyle(.plain)
+                            .transition(.scale.combined(with: .opacity))
                         }
                     }
-                    .buttonStyle(.plain)
-
-                    // Full screen button
-                    if timerState != .idle {
-                        Button {
-                            showActiveSession = true
-                        } label: {
-                            Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                .font(.system(size: 18, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.6))
-                                .frame(width: 44, height: 44)
-                                .background(Circle().fill(.white.opacity(0.1)))
-                        }
-                        .buttonStyle(.plain)
-                        .transition(.scale.combined(with: .opacity))
-                    }
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: timerState)
                 }
-                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: timerState)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(height: 340)
+        .frame(height: min(UIScreen.main.bounds.width * 0.85, 340))
     }
 
     // MARK: - Mode Cards Section (Tiimo-style)
@@ -909,62 +924,71 @@ struct FocusMainView: View {
     // MARK: - Quick Timer Section
 
     private var quickTimerSection: some View {
-        VStack(spacing: Theme.Spacing.lg) {
-            // Timer Circle
-            ZStack {
-                // Background ring
-                Circle()
-                    .stroke(Color.white.opacity(0.1), lineWidth: 10)
-                    .frame(width: 180, height: 180)
+        GeometryReader { geometry in
+            let ringSize = min(geometry.size.width * 0.5, 180)
+            let strokeWidth: CGFloat = ringSize * 0.056 // ~10 when size is 180
+            let fontSize = min(ringSize * 0.22, 40)
 
-                // Progress ring
-                Circle()
-                    .trim(from: 0, to: timerProgress)
-                    .stroke(
-                        LinearGradient(
-                            colors: [selectedMode.accentColor, selectedMode.accentColor.opacity(0.6)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        style: StrokeStyle(lineWidth: 10, lineCap: .round)
-                    )
-                    .frame(width: 180, height: 180)
-                    .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 0.5), value: timerProgress)
+            VStack(spacing: Theme.Spacing.lg) {
+                // Timer Circle
+                ZStack {
+                    // Background ring
+                    Circle()
+                        .stroke(Color.white.opacity(0.1), lineWidth: strokeWidth)
+                        .frame(width: ringSize, height: ringSize)
 
-                // Glow effect
-                Circle()
-                    .stroke(selectedMode.accentColor.opacity(0.3), lineWidth: 20)
-                    .frame(width: 180, height: 180)
-                    .blur(radius: 15)
+                    // Progress ring
+                    Circle()
+                        .trim(from: 0, to: timerProgress)
+                        .stroke(
+                            LinearGradient(
+                                colors: [selectedMode.accentColor, selectedMode.accentColor.opacity(0.6)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round)
+                        )
+                        .frame(width: ringSize, height: ringSize)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 0.5), value: timerProgress)
 
-                // Time display + Play button
-                VStack(spacing: 12) {
-                    Text(timerDisplayString)
-                        .font(.system(size: 40, weight: .light, design: .monospaced))
-                        .foregroundStyle(.white)
-                        .contentTransition(.numericText())
+                    // Glow effect
+                    Circle()
+                        .stroke(selectedMode.accentColor.opacity(0.3), lineWidth: strokeWidth * 2)
+                        .frame(width: ringSize, height: ringSize)
+                        .blur(radius: 15)
 
-                    // Play/Pause Button
-                    Button {
-                        toggleTimer()
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(selectedMode.accentColor)
-                                .frame(width: 48, height: 48)
-                                .shadow(color: selectedMode.accentColor.opacity(0.4), radius: 12, y: 4)
+                    // Time display + Play button
+                    VStack(spacing: 12) {
+                        Text(timerDisplayString)
+                            .font(.system(size: fontSize, weight: .light, design: .monospaced))
+                            .foregroundStyle(.white)
+                            .contentTransition(.numericText())
+                            .minimumScaleFactor(0.7)
 
-                            Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .offset(x: timerState == .running ? 0 : 2)
+                        // Play/Pause Button
+                        Button {
+                            toggleTimer()
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(selectedMode.accentColor)
+                                    .frame(width: 48, height: 48)
+                                    .shadow(color: selectedMode.accentColor.opacity(0.4), radius: 12, y: 4)
+
+                                Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(.white)
+                                    .offset(x: timerState == .running ? 0 : 2)
+                            }
                         }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(height: min(UIScreen.main.bounds.width * 0.6, 220))
     }
 
     // MARK: - Mode Selector

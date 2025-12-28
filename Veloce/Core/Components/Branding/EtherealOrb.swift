@@ -40,20 +40,20 @@ struct EtherealOrb: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // MARK: - Color Palette (matching reference image)
+    // MARK: - Color Palette (matching iridescent bubble reference)
 
-    // Deep background colors
-    private let voidIndigo = Color(red: 0.08, green: 0.06, blue: 0.18)
-    private let deepPurple = Color(red: 0.15, green: 0.10, blue: 0.30)
+    // Deep background colors - subtle blue undertone
+    private let voidIndigo = Color(red: 0.05, green: 0.08, blue: 0.18)
+    private let deepPurple = Color(red: 0.12, green: 0.18, blue: 0.45)
 
-    // Inner ethereal colors (soft, pastel-like)
-    private let softPink = Color(red: 0.95, green: 0.65, blue: 0.80)
-    private let softPurple = Color(red: 0.75, green: 0.55, blue: 0.90)
-    private let softCyan = Color(red: 0.55, green: 0.85, blue: 0.95)
-    private let softLavender = Color(red: 0.70, green: 0.60, blue: 0.95)
+    // Inner ethereal colors - cyan/purple/pink iridescence (bubble aesthetic)
+    private let softPink = Color(red: 0.85, green: 0.60, blue: 0.90)
+    private let softPurple = Color(red: 0.65, green: 0.55, blue: 0.95)
+    private let softCyan = Color(red: 0.45, green: 0.88, blue: 0.98)
+    private let softLavender = Color(red: 0.70, green: 0.70, blue: 0.98)
 
-    // Rim/Edge colors
-    private let cyanRim = Color(red: 0.25, green: 0.85, blue: 0.95)
+    // Rim/Edge colors - brighter cyan for bubble edge effect
+    private let cyanRim = Color(red: 0.40, green: 0.90, blue: 0.98)
     private let whiteHighlight = Color.white
 
     // Computed properties for animation
@@ -494,10 +494,10 @@ struct EtherealOrbWithBranding: View {
                     )
 
                 if showTagline {
-                    Text("INTELLIGENT PRODUCTIVITY")
-                        .font(.system(size: size.dimension * 0.052, weight: .semibold))
-                        .tracking(6)
-                        .foregroundStyle(.white.opacity(0.35))
+                    Text("AI-POWERED PRODUCTIVITY")
+                        .font(.system(size: size.dimension * 0.050, weight: .semibold))
+                        .tracking(4)
+                        .foregroundStyle(.white.opacity(0.40))
                 }
             }
         }

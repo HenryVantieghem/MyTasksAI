@@ -181,9 +181,9 @@ struct LiquidGlassAuthView: View {
 
     private var headerSection: some View {
         VStack(spacing: 14) {
-            Text("Veloce")
-                .font(.system(size: 46, weight: .thin))
-                .tracking(6)
+            Text("MyTasksAI")
+                .font(.system(size: 42, weight: .thin))
+                .tracking(4)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [.white, .white.opacity(0.88)],
@@ -192,9 +192,9 @@ struct LiquidGlassAuthView: View {
                     )
                 )
 
-            Text("INTELLIGENT PRODUCTIVITY")
+            Text("AI-POWERED PRODUCTIVITY")
                 .font(.system(size: 10, weight: .semibold))
-                .tracking(6)
+                .tracking(4)
                 .foregroundStyle(Color.white.opacity(0.38))
         }
     }

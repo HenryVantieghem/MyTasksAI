@@ -70,10 +70,12 @@ struct LiquidGlassDayView: View {
                 allDaySection
             }
 
-            // Scrollable timeline
+            // Scrollable timeline - fills remaining space
             timelineContent
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(.horizontal, horizontalPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - All Day Section
@@ -99,10 +101,10 @@ struct LiquidGlassDayView: View {
             .padding(.vertical, 12)
 
             Rectangle()
-                .fill(Color(.separator).opacity(0.3))
+                .fill(Color.white.opacity(0.1))
                 .frame(height: 0.5)
         }
-        .background(Color(.secondarySystemGroupedBackground).opacity(0.5))
+        .background(Theme.CelestialColors.abyss.opacity(0.4))
     }
 
     private func allDayPill(title: String, color: Color, isTask: Bool) -> some View {
@@ -484,17 +486,17 @@ struct DayTaskCard: View {
             .frame(height: height)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(.secondarySystemGroupedBackground))
+                    .fill(Theme.CelestialColors.abyss.opacity(0.8))
                     .overlay {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(taskColor.opacity(0.08))
+                            .fill(taskColor.opacity(0.12))
                     }
                     .overlay {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(Color(.separator).opacity(0.3), lineWidth: 0.5)
+                            .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
                     }
             )
-            .shadow(color: .black.opacity(0.06), radius: 4, y: 2)
+            .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
         }
         .buttonStyle(.plain)
     }

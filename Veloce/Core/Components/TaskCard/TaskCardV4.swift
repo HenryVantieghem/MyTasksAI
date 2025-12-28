@@ -347,9 +347,9 @@ struct TaskCardV4: View {
         } label: {
             Image(systemName: "ellipsis")
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.white.opacity(0.6))
                 .frame(width: 36, height: 36)
-                .background(Color(.tertiarySystemFill))
+                .background(Color.white.opacity(0.08))
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
@@ -359,16 +359,40 @@ struct TaskCardV4: View {
 
     private var cardBackground: some View {
         RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(Theme.AdaptiveColors.cardBackground)
+            .fill(
+                // Dark cosmic background for consistency with void theme
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.12, green: 0.12, blue: 0.18),
+                        Color(red: 0.08, green: 0.08, blue: 0.14)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .overlay {
-                // Subtle task-type tint border
+                // Glass-like inner glow
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.06),
+                                Color.clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .center
+                        )
+                    )
+            }
+            .overlay {
+                // Subtle task-type tint border with glass edge
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .strokeBorder(
                         LinearGradient(
                             colors: [
-                                taskTypeColor.opacity(0.3),
-                                taskTypeColor.opacity(0.1),
-                                Color.clear
+                                Color.white.opacity(0.12),
+                                taskTypeColor.opacity(0.20),
+                                Color.white.opacity(0.06)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing

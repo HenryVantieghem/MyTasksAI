@@ -56,10 +56,12 @@ struct LiquidGlassWeekView: View {
                 allDaySection
             }
 
-            // Scrollable time grid
+            // Scrollable time grid - fills remaining space
             timeGrid
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(.horizontal, horizontalPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Week Day Header
@@ -163,7 +165,7 @@ struct LiquidGlassWeekView: View {
             }
         }
         .frame(height: allDayHeight)
-        .background(Color(.secondarySystemGroupedBackground).opacity(0.5))
+        .background(Theme.CelestialColors.abyss.opacity(0.4))
     }
 
     private func allDayEventsForDate(_ date: Date, width: CGFloat) -> some View {
@@ -339,14 +341,14 @@ struct LiquidGlassWeekView: View {
             .frame(height: max(height, 22))
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(Color(.secondarySystemGroupedBackground))
+                    .fill(Theme.CelestialColors.abyss.opacity(0.8))
                     .overlay {
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(task.taskType.tiimoColor.opacity(0.1))
+                            .fill(task.taskType.tiimoColor.opacity(0.15))
                     }
                     .overlay {
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .stroke(Color(.separator).opacity(0.3), lineWidth: 0.5)
+                            .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
                     }
             )
         }
