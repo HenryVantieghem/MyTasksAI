@@ -388,21 +388,7 @@ struct EnhancedCustomTimerView: View {
     }
 }
 
-// MARK: - Void Background Extension
-
-extension VoidBackground {
-    static var focus: some View {
-        LinearGradient(
-            colors: [
-                Theme.CelestialColors.voidDeep,
-                Theme.CelestialColors.void,
-                Theme.CelestialColors.abyss
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-}
+// Note: Uses existing VoidBackground.focus from VoidBackground.swift
 
 // MARK: - Preview
 

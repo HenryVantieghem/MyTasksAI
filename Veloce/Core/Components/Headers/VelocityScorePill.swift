@@ -25,10 +25,8 @@ struct VelocityScorePill: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 7) {
-                // Filled icon with tier gradient
-                Image(systemName: tier.iconFilled)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(tier.gradient)
+                // Premium animated gradient orb
+                VelocityScoreOrb(tier: tier, size: 14)
 
                 // Score number
                 Text("\(score)")
