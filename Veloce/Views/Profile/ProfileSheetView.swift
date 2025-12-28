@@ -141,13 +141,18 @@ struct ProfileSheetView: View {
     // MARK: - Hero Profile Card
 
     private var profileHeroCard: some View {
-        VStack(spacing: 20) {
-            // Avatar with level ring - now tappable for editing
-            Button {
-                HapticsService.shared.selectionFeedback()
-                showImagePicker = true
-            } label: {
-                ZStack {
+        LiquidGlassCard(
+            cornerRadius: 24,
+            tint: LiquidGlassDesignSystem.VibrantAccents.plasmaPurple,
+            interactive: false
+        ) {
+            VStack(spacing: 20) {
+                // Avatar with level ring - now tappable for editing
+                Button {
+                    HapticsService.shared.selectionFeedback()
+                    showImagePicker = true
+                } label: {
+                    ZStack {
                     // Outer glow
                     Circle()
                         .fill(
@@ -254,11 +259,8 @@ struct ProfileSheetView: View {
                     .font(.system(size: 14))
                     .foregroundStyle(.white.opacity(0.6))
             }
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
-        .padding(.horizontal, 24)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 
     // MARK: - Stats Grid
@@ -289,22 +291,43 @@ struct ProfileSheetView: View {
     }
 
     private func statCard(value: String, label: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundStyle(color)
+        LiquidGlassCard(
+            cornerRadius: 20,
+            tint: color,
+            interactive: false
+        ) {
+            VStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundStyle(color)
 
-            Text(value)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                Text(value)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
 
-            Text(label)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.white.opacity(0.5))
+                Text(label)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+    
+    // MARK: - Section Header Helper
+    
+    private func sectionHeader(_ title: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(color)
+            
+            Text(title)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.white)
+            
+            Spacer()
+        }
     }
 
     // MARK: - Profile Section
@@ -413,32 +436,34 @@ struct ProfileSheetView: View {
     // MARK: - Notifications Section
 
     private var notificationsSection: some View {
-        SettingsSectionCard(title: "Notifications", icon: "bell.fill", iconColor: .orange) {
-            VStack(spacing: 0) {
-                // Reminders toggle
-                SettingsToggleRow(
-                    icon: "bell.badge.fill",
-                    iconColor: .orange,
+        VStack(spacing: 16) {
+            sectionHeader("Notifications", icon: "bell.fill", color: .orange)
+            
+            VStack(spacing: 12) {
+                // Task Reminders
+                LiquidGlassToggleRow(
                     title: "Task Reminders",
                     subtitle: "Get notified about upcoming tasks",
+                    icon: "bell.badge.fill",
+                    iconColor: .orange,
                     isOn: $settingsViewModel.notificationsEnabled
-                ) {
+                )
+                .onChange(of: settingsViewModel.notificationsEnabled) { _, _ in
                     HapticsService.shared.selectionFeedback()
                     Task {
                         await settingsViewModel.saveNotificationSettings()
                     }
                 }
-
-                SettingsDivider()
-
-                // Streak reminders
-                SettingsToggleRow(
+                
+                // Streak Alerts
+                LiquidGlassToggleRow(
+                    title: "Streak Alerts",
+                    subtitle: "Remind you to keep your streak alive",
                     icon: "flame.fill",
                     iconColor: .red,
-                    title: "Streak Alerts",
-                    subtitle: "Remind you to keep your streak",
                     isOn: .constant(true)
-                ) {
+                )
+                .onChange(of: settingsViewModel.notificationsEnabled) { _, _ in
                     HapticsService.shared.selectionFeedback()
                 }
             }
@@ -448,51 +473,77 @@ struct ProfileSheetView: View {
     // MARK: - Focus Section
 
     private var focusSection: some View {
-        SettingsSectionCard(title: "Focus Settings", icon: "timer", iconColor: Theme.Colors.success) {
-            VStack(spacing: 0) {
-                // Default timer duration
-                HStack(spacing: 14) {
-                    SettingsIconContainer(icon: "clock.fill", color: Theme.Colors.success)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Default Timer")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(.white)
-                        Text("Focus session length")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white.opacity(0.5))
+        VStack(spacing: 16) {
+            sectionHeader("Focus Settings", icon: "timer", color: Theme.Colors.success)
+            
+            LiquidGlassCard(
+                cornerRadius: 16,
+                tint: Theme.Colors.success,
+                interactive: false
+            ) {
+                VStack(spacing: 16) {
+                    // Default Timer Duration
+                    HStack(spacing: 14) {
+                        ZStack {
+                            Circle()
+                                .fill(Theme.Colors.success.opacity(0.2))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "clock.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(Theme.Colors.success)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Default Timer")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.white)
+                            Text("Focus session length")
+                                .font(.system(size: 14))
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
+                        
+                        Spacer()
+                        
+                        Text("25 min")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Theme.Colors.success)
                     }
-
-                    Spacer()
-
-                    Text("25 min")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.Colors.success)
-                }
-                .padding(16)
-
-                SettingsDivider()
-
-                // Break duration
-                HStack(spacing: 14) {
-                    SettingsIconContainer(icon: "cup.and.saucer.fill", color: Theme.Colors.aiBlue)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Break Duration")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(.white)
-                        Text("Rest between sessions")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white.opacity(0.5))
+                    
+                    Divider()
+                        .background(.white.opacity(0.1))
+                    
+                    // Break Duration
+                    HStack(spacing: 14) {
+                        ZStack {
+                            Circle()
+                                .fill(Theme.Colors.aiBlue.opacity(0.2))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "cup.and.saucer.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(Theme.Colors.aiBlue)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Break Duration")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundStyle(.white)
+                            Text("Rest between sessions")
+                                .font(.system(size: 14))
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
+                        
+                        Spacer()
+                        
+                        Text("5 min")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Theme.Colors.aiBlue)
                     }
-
-                    Spacer()
-
-                    Text("5 min")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Theme.Colors.aiBlue)
                 }
-                .padding(16)
+            }
+        }
+    }
 
                 SettingsDivider()
 

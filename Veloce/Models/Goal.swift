@@ -187,7 +187,7 @@ extension Goal {
     /// Decoded AI roadmap
     var decodedRoadmap: GoalRoadmap? {
         guard let data = aiRoadmap else { return nil }
-        return try? JSONDecoder().decode(GoalRoadmap.self, from: data)
+        return GoalRoadmap.decode(from: data)
     }
 
     /// Decoded progress history
@@ -344,7 +344,7 @@ extension Goal {
 
     /// Set AI roadmap (encodes to Data)
     func setRoadmap(_ roadmap: GoalRoadmap) throws {
-        aiRoadmap = try JSONEncoder().encode(roadmap)
+        aiRoadmap = try roadmap.encoded()
         milestoneCount = roadmap.totalMilestones
         updatedAt = .now
     }

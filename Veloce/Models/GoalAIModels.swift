@@ -97,6 +97,16 @@ struct GoalRoadmap: Codable, Sendable {
             coachingNotes: nil
         )
     }
+
+    /// Decode from Data (nonisolated for Swift 6 concurrency)
+    nonisolated static func decode(from data: Data) -> GoalRoadmap? {
+        try? JSONDecoder().decode(GoalRoadmap.self, from: data)
+    }
+
+    /// Encode to Data (nonisolated for Swift 6 concurrency)
+    nonisolated func encoded() throws -> Data {
+        try JSONEncoder().encode(self)
+    }
 }
 
 /// A phase within the goal roadmap

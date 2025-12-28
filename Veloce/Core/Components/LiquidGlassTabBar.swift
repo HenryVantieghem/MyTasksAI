@@ -45,11 +45,10 @@ struct LiquidGlassTabBar: View {
         .padding(.horizontal, layout.spacing / 2)
         .padding(.vertical, layout.deviceType.isTablet ? 14 : 10)
         // 🌟 LIQUID GLASS: Apple Music-style interactive glass with premium feel
-        .glassEffect(
-            .regular
-                .interactive(true),
-            in: Capsule()
-        )
+        .background {
+            Capsule()
+                .fill(.ultraThinMaterial)
+        }
         .overlay {
             // Premium glass highlight border
             Capsule()

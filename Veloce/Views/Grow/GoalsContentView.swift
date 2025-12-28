@@ -97,12 +97,18 @@ struct GoalsContentView: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Your Goals")
-                        .dynamicTypeFont(base: 28, weight: .bold)
-                        .foregroundStyle(.white)
+                        .font(.system(size: 34, weight: .heavy, design: .rounded))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.white, .white.opacity(0.9)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
 
                     Text(headerSubtitle)
-                        .dynamicTypeFont(base: 14, weight: .regular)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.7))
                 }
 
                 Spacer()
@@ -114,16 +120,20 @@ struct GoalsContentView: View {
                         Circle()
                             .fill(
                                 LinearGradient(
-                                    colors: [Theme.Colors.aiPurple, Theme.Colors.aiPurple.opacity(0.7)],
+                                    colors: [
+                                        Theme.Colors.aiPurple,
+                                        Theme.Colors.aiPurple.opacity(0.8),
+                                        Theme.Colors.aiBlue.opacity(0.6)
+                                    ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
                             .frame(width: addButtonSize, height: addButtonSize)
-                            .shadow(color: Theme.Colors.aiPurple.opacity(0.4), radius: 12, y: 4)
+                            .shadow(color: Theme.Colors.aiPurple.opacity(0.5), radius: 16, y: 6)
 
                         Image(systemName: "plus")
-                            .dynamicTypeFont(base: 20, weight: .semibold)
+                            .font(.system(size: 20, weight: .bold))
                             .foregroundStyle(.white)
                     }
                 }
@@ -131,6 +141,7 @@ struct GoalsContentView: View {
                 .iPadHoverEffect(.lift)
             }
             .padding(.top, layout.spacing)
+            .glassEffect(.regular.tint(Theme.Colors.aiPurple).interactive(), in: .rect(cornerRadius: 20))
 
             // Stats cards
             if !goals.isEmpty {
@@ -154,27 +165,29 @@ struct GoalsContentView: View {
     }
 
     private var statsRow: some View {
-        HStack(spacing: 12) {
-            GoalStatCard(
-                icon: "flame.fill",
-                value: "\(activeCount)",
-                label: "Active",
-                color: Theme.Colors.aiCyan
-            )
-
-            GoalStatCard(
-                icon: "checkmark.seal.fill",
-                value: "\(completedCount)",
-                label: "Completed",
-                color: Theme.Colors.success
-            )
-
-            GoalStatCard(
-                icon: "chart.line.uptrend.xyaxis",
-                value: "\(Int(averageProgress * 100))%",
-                label: "Progress",
-                color: Theme.Colors.aiPurple
-            )
+        GlassEffectContainer(spacing: 12) {
+            HStack(spacing: 12) {
+                GoalStatCard(
+                    icon: "flame.fill",
+                    value: "\(activeCount)",
+                    label: "Active",
+                    color: Theme.Colors.aiCyan
+                )
+                
+                GoalStatCard(
+                    icon: "checkmark.seal.fill",
+                    value: "\(completedCount)",
+                    label: "Completed",
+                    color: Theme.Colors.success
+                )
+                
+                GoalStatCard(
+                    icon: "chart.line.uptrend.xyaxis",
+                    value: "\(Int(averageProgress * 100))%",
+                    label: "Progress",
+                    color: Theme.Colors.aiPurple
+                )
+            }
         }
     }
 

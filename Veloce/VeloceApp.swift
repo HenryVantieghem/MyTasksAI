@@ -128,9 +128,17 @@ struct RootView: View {
             FreeTrialWelcomeView()
 
         case .unauthenticated:
-            // Ultra-premium Liquid Glass Auth with form morphing
-            LiquidGlassAuthView(
-                initialScreen: appViewModel.preferSignUp ? .signUp : .signIn
+            // Ultra-premium Liquid Glass Sign In
+            LiquidGlassSignInView(
+                onSignIn: { email, password in
+                    try await appViewModel.signIn(email: email, password: password)
+                },
+                onSignUpTapped: {
+                    appViewModel.preferSignUp = true
+                },
+                onForgotPassword: {
+                    // TODO: Implement forgot password flow
+                }
             )
 
         case .onboarding:

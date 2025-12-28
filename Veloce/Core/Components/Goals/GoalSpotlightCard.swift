@@ -171,43 +171,51 @@ struct GoalSpotlightCard: View {
     }
 
     private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(.ultraThinMaterial.opacity(0.5))
-            .overlay {
-                // Glow effect based on progress and urgency
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                goal.themeColor.opacity(0.12 * glowPulse),
-                                .clear
-                            ],
-                            center: .topLeading,
-                            startRadius: 0,
-                            endRadius: 250
-                        )
+        ZStack {
+            // Base glass
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color.clear)
+            
+            // Subtle tint overlay
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            goal.themeColor.opacity(0.12 * glowPulse),
+                            goal.themeColor.opacity(0.06 * glowPulse),
+                            .clear
+                        ],
+                        center: .topLeading,
+                        startRadius: 0,
+                        endRadius: 250
                     )
-            }
-            .overlay {
-                // Border
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                goal.themeColor.opacity(0.4),
-                                .white.opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-            .shadow(
-                color: goal.themeColor.opacity(0.2 * glowPulse),
-                radius: 20,
-                y: 10
-            )
+                )
+        }
+        .glassEffect(
+            .regular.interactive(),
+            in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+        )
+        .overlay {
+            // Premium border
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            goal.themeColor.opacity(0.4),
+                            goal.themeColor.opacity(0.2),
+                            .white.opacity(0.1)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+        }
+        .shadow(
+            color: goal.themeColor.opacity(0.2 * glowPulse),
+            radius: 20,
+            y: 10
+        )
     }
 
     // MARK: - Animations

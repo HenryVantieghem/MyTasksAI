@@ -449,7 +449,7 @@ private struct PhaseCard: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(.white)
 
-                        Text("Weeks \(phase.startWeek)-\(phase.endWeek)")
+                        Text("Weeks \(phase.startWeek ?? 1)-\(phase.endWeek ?? 1)")
                             .font(.system(size: 13))
                             .foregroundStyle(.white.opacity(0.6))
                             .lineLimit(1)

@@ -174,14 +174,15 @@ struct MainTabView: View {
             )
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 0) {
-                    TaskInputBarV2(
+                    LiquidGlassTaskInputBar(
                         text: $taskInputText,
                         isFocused: $isTaskInputFocused,
                         onSubmit: { taskText in
                             createTaskFromInput(taskText)
                         },
                         onVoiceInput: {
-                            // Voice recording handled internally by TaskInputBarV2
+                            // Voice recording handled internally
+                            HapticsService.shared.lightImpact()
                         }
                     )
                     // Spacer for tab bar height (responsive)
