@@ -9,9 +9,6 @@
 import Foundation
 import SwiftData
 import PencilKit
-#if canImport(PaperKit)
-import PaperKit
-#endif
 
 // MARK: - Journal Entry Type
 
@@ -384,34 +381,26 @@ final class JournalEntry {
 
     // MARK: PaperKit Methods (iOS 26+)
 
-    #if canImport(PaperKit)
-    /// Get PaperMarkup from stored data (iOS 26+)
-    @available(iOS 26.0, *)
-    func getPaperMarkup() -> PaperMarkup {
-        guard let data = paperMarkupData,
-              let markup = try? PaperMarkup(data: data) else {
-            return PaperMarkup()
-        }
-        return markup
+    // Note: PaperKit integration is prepared but disabled until the full API is available
+    // These methods provide placeholder functionality for future use
+
+    /// Get PaperMarkup data (iOS 26+ placeholder)
+    func getPaperMarkupData() -> Data? {
+        return paperMarkupData
     }
 
-    /// Set PaperMarkup and update metadata
-    @available(iOS 26.0, *)
-    func setPaperMarkup(_ markup: PaperMarkup) {
-        paperMarkupData = try? markup.dataRepresentation()
-        usesPaperKit = true
-        hasDrawing = !markup.isEmpty
+    /// Set PaperMarkup data and update metadata (iOS 26+ placeholder)
+    func setPaperMarkupData(_ data: Data?) {
+        paperMarkupData = data
+        usesPaperKit = data != nil
+        hasDrawing = data != nil
         updatedAt = .now
     }
 
-    /// Extract plain text from PaperMarkup for search/preview
-    @available(iOS 26.0, *)
-    func getTextFromPaperMarkup() -> String {
-        let markup = getPaperMarkup()
-        // Extract text content from markup elements
-        return markup.textContent ?? ""
+    /// Check if this entry uses PaperKit format
+    var isPaperKitEntry: Bool {
+        return usesPaperKit && paperMarkupData != nil
     }
-    #endif
 
     // MARK: Photo Methods
 

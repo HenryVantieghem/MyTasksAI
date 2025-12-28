@@ -2,18 +2,15 @@
 //  JournalCanvasView.swift
 //  Veloce
 //
-//  Version-adaptive journal canvas that uses PaperKit on iOS 26+
-//  and falls back to TextEditor + PencilKit on earlier versions
+//  Version-adaptive journal canvas
+//  Currently uses TextEditor, prepared for PaperKit integration (iOS 26+)
 //
 
 import SwiftUI
-#if canImport(PaperKit)
-import PaperKit
-#endif
 
-/// Adaptive journal canvas that automatically uses the best available framework
-/// - iOS 26+: Full PaperKit with drawing, shapes, markup
-/// - Pre-iOS 26: TextEditor with optional PencilKit drawing overlay
+/// Adaptive journal canvas
+/// Uses TextEditor for text input with clean cosmic void aesthetic
+/// PaperKit support will be added when the API becomes available
 struct JournalCanvasView: View {
     @Binding var currentText: String
     @Binding var isEditing: Bool
@@ -23,68 +20,7 @@ struct JournalCanvasView: View {
 
     @Environment(\.responsiveLayout) private var layout
 
-    // PaperKit state (iOS 26+ only)
-    #if canImport(PaperKit)
-    @State private var paperMarkup = PaperMarkup()
-    #endif
-
     var body: some View {
-        Group {
-            #if canImport(PaperKit)
-            if #available(iOS 26.0, *) {
-                paperKitCanvas
-            } else {
-                legacyCanvas
-            }
-            #else
-            legacyCanvas
-            #endif
-        }
-    }
-
-    // MARK: - PaperKit Canvas (iOS 26+)
-
-    #if canImport(PaperKit)
-    @available(iOS 26.0, *)
-    private var paperKitCanvas: some View {
-        PaperKitView(
-            paperMarkup: $paperMarkup,
-            isEditing: $isEditing,
-            backgroundColor: .clear,
-            onFocusChange: { focused in
-                withAnimation(Theme.Animation.spring) {
-                    isEditing = focused
-                }
-                onFocusChange?(focused)
-            },
-            onContentChange: { markup in
-                // Update the journal entry with PaperKit data
-                // This triggers auto-save via onChange in parent
-                onContentChange?()
-            }
-        )
-        .frame(minHeight: layout.deviceType.isTablet ? 500 : 400)
-        .onAppear {
-            loadPaperKitContent()
-        }
-    }
-
-    @available(iOS 26.0, *)
-    private func loadPaperKitContent() {
-        if let entry = journalEntry, entry.usesPaperKit {
-            paperMarkup = entry.getPaperMarkup()
-        } else if let entry = journalEntry {
-            // Migrate legacy content to PaperKit
-            // For now, just start fresh with PaperKit
-            paperMarkup = PaperMarkup()
-            // TODO: Add text content from legacy entry
-        }
-    }
-    #endif
-
-    // MARK: - Legacy Canvas (Pre-iOS 26)
-
-    private var legacyCanvas: some View {
         LegacyJournalEditor(
             text: $currentText,
             isEditing: $isEditing,
@@ -92,6 +28,9 @@ struct JournalCanvasView: View {
         )
         .onChange(of: currentText) { _, _ in
             onContentChange?()
+        }
+        .onChange(of: isEditing) { _, focused in
+            onFocusChange?(focused)
         }
     }
 }

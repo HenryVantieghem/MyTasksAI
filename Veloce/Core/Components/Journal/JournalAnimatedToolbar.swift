@@ -35,12 +35,9 @@ struct JournalAnimatedToolbar: View {
 
             Spacer()
 
-            // Markup insertion button (iOS 26+ only)
-            #if canImport(PaperKit)
-            if #available(iOS 26.0, *) {
-                markupInsertButton
-            }
-            #endif
+            // Markup insertion button (placeholder for iOS 26+ PaperKit)
+            // Currently disabled until PaperKit is available
+            // markupInsertButton
 
             // Voice input button
             micButton
@@ -72,26 +69,8 @@ struct JournalAnimatedToolbar: View {
         }
     }
 
-    #if canImport(PaperKit)
-    @available(iOS 26.0, *)
-    private var markupInsertButton: some View {
-        Button {
-            HapticsService.shared.selectionFeedback()
-            onInsertMarkup?()
-        } label: {
-            Image(systemName: "pencil.tip.crop.circle.badge.plus")
-                .dynamicTypeFont(base: 16, weight: .medium)
-                .foregroundStyle(Theme.Colors.aiPurple)
-                .frame(width: toolbarButtonSize, height: toolbarButtonSize)
-                .background {
-                    Circle()
-                        .fill(.white.opacity(0.08))
-                }
-        }
-        .buttonStyle(.plain)
-        .iPadHoverEffect(.highlight)
-    }
-    #endif
+    // Note: Markup insertion button for PaperKit will be added when iOS 26 is available
+    // private var markupInsertButton: some View { ... }
 
     private var micButton: some View {
         Button {

@@ -5,88 +5,30 @@
 //  UIViewControllerRepresentable wrapper for Apple's PaperKit framework (iOS 26+)
 //  Provides Notes-like drawing, shapes, and markup capabilities for journal entries
 //
+//  Note: PaperKit integration is prepared for iOS 26+ when the full API is available.
+//  Until then, the legacy TextEditor fallback is used.
+//
 
 import SwiftUI
+import PencilKit
 
-#if canImport(PaperKit)
-import PaperKit
+// MARK: - PaperKit Available Check
 
-/// SwiftUI wrapper for PaperMarkupViewController (iOS 26+)
-/// Provides full markup experience with drawing, shapes, text boxes, and more
-@available(iOS 26.0, *)
-struct PaperKitView: UIViewControllerRepresentable {
-    @Binding var paperMarkup: PaperMarkup
-    @Binding var isEditing: Bool
-    var backgroundColor: UIColor = .clear
-    var onFocusChange: ((Bool) -> Void)?
-    var onContentChange: ((PaperMarkup) -> Void)?
-
-    func makeUIViewController(context: Context) -> PaperMarkupViewController {
-        let controller = PaperMarkupViewController()
-        controller.delegate = context.coordinator
-        controller.paperMarkup = paperMarkup
-        controller.view.backgroundColor = backgroundColor
-
-        // Configure for journal aesthetics - dark mode cosmic theme
-        controller.overrideUserInterfaceStyle = .dark
-
-        return controller
+/// Check if PaperKit is available (iOS 26+)
+/// This is a placeholder until PaperKit becomes available
+var isPaperKitAvailable: Bool {
+    if #available(iOS 26.0, *) {
+        // PaperKit will be available in iOS 26
+        // For now, return false until we can test with actual SDK
+        return false
     }
-
-    func updateUIViewController(_ controller: PaperMarkupViewController, context: Context) {
-        // Sync markup data if externally changed
-        if controller.paperMarkup != paperMarkup {
-            controller.paperMarkup = paperMarkup
-        }
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    // MARK: - Coordinator
-
-    class Coordinator: NSObject, PaperMarkupViewControllerDelegate {
-        var parent: PaperKitView
-
-        init(_ parent: PaperKitView) {
-            self.parent = parent
-        }
-
-        func paperMarkupViewControllerDidChange(_ controller: PaperMarkupViewController) {
-            parent.paperMarkup = controller.paperMarkup
-            parent.onContentChange?(controller.paperMarkup)
-        }
-
-        func paperMarkupViewControllerDidBeginEditing(_ controller: PaperMarkupViewController) {
-            parent.isEditing = true
-            parent.onFocusChange?(true)
-        }
-
-        func paperMarkupViewControllerDidEndEditing(_ controller: PaperMarkupViewController) {
-            parent.isEditing = false
-            parent.onFocusChange?(false)
-        }
-    }
+    return false
 }
 
-// MARK: - PaperKit View Modifier
+// MARK: - Legacy Journal Editor (Pre-iOS 26 and Fallback)
 
-@available(iOS 26.0, *)
-extension View {
-    /// Apply PaperKit styling to views
-    func paperKitStyle() -> some View {
-        self
-            .preferredColorScheme(.dark)
-    }
-}
-
-#endif
-
-// MARK: - Fallback for Pre-iOS 26
-
-/// Fallback editor for iOS versions before 26
-/// Uses existing TextEditor + PencilKit combination
+/// Fallback editor using TextEditor
+/// Used for iOS versions before 26 or when PaperKit is unavailable
 struct LegacyJournalEditor: View {
     @Binding var text: String
     @Binding var isEditing: Bool
@@ -126,6 +68,68 @@ struct LegacyJournalEditor: View {
     }
 }
 
+// MARK: - Drawing Canvas (PencilKit)
+
+/// PencilKit-based drawing canvas for journal entries
+/// This provides drawing capabilities until PaperKit is available
+struct JournalDrawingOverlay: View {
+    @Binding var drawing: PKDrawing
+    @Binding var isDrawingMode: Bool
+    @Environment(\.responsiveLayout) private var layout
+
+    var body: some View {
+        if isDrawingMode {
+            DrawingCanvasRepresentable(drawing: $drawing)
+                .frame(minHeight: layout.deviceType.isTablet ? 500 : 400)
+                .transition(.opacity)
+        }
+    }
+}
+
+/// UIViewRepresentable for PKCanvasView
+struct DrawingCanvasRepresentable: UIViewRepresentable {
+    @Binding var drawing: PKDrawing
+
+    func makeUIView(context: Context) -> PKCanvasView {
+        let canvas = PKCanvasView()
+        canvas.drawing = drawing
+        canvas.delegate = context.coordinator
+        canvas.backgroundColor = .clear
+        canvas.isOpaque = false
+        canvas.overrideUserInterfaceStyle = .dark
+
+        // Configure tool picker
+        let toolPicker = PKToolPicker()
+        toolPicker.setVisible(true, forFirstResponder: canvas)
+        toolPicker.addObserver(canvas)
+        canvas.becomeFirstResponder()
+
+        return canvas
+    }
+
+    func updateUIView(_ canvas: PKCanvasView, context: Context) {
+        if canvas.drawing != drawing {
+            canvas.drawing = drawing
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, PKCanvasViewDelegate {
+        var parent: DrawingCanvasRepresentable
+
+        init(_ parent: DrawingCanvasRepresentable) {
+            self.parent = parent
+        }
+
+        func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+            parent.drawing = canvasView.drawing
+        }
+    }
+}
+
 // MARK: - Preview
 
 #Preview("Legacy Editor") {
@@ -135,6 +139,18 @@ struct LegacyJournalEditor: View {
         LegacyJournalEditor(
             text: .constant(""),
             isEditing: .constant(false)
+        )
+        .padding()
+    }
+}
+
+#Preview("Legacy Editor - With Text") {
+    ZStack {
+        Color.black.ignoresSafeArea()
+
+        LegacyJournalEditor(
+            text: .constant("Today was a great day for journaling. I've been thinking about..."),
+            isEditing: .constant(true)
         )
         .padding()
     }
