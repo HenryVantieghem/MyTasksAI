@@ -334,7 +334,8 @@ struct TaskRowView: View {
 
                     if !reduceMotion {
                         withAnimation(.easeOut(duration: 0.2)) {
-                            swipeOffset = -UIScreen.main.bounds.width
+                            // Use a large fixed value to slide off screen
+                            swipeOffset = -500
                         }
                     }
 

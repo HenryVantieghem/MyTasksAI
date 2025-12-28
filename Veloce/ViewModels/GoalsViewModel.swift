@@ -257,12 +257,20 @@ final class GoalsViewModel {
                 timeframe: goal.timeframeEnum ?? .milestone
             )
 
-            // Apply refinement to goal
+            // Apply refinement to goal (handle optional fields gracefully)
             goal.aiRefinedTitle = refinement.refinedTitle
-            goal.aiRefinedDescription = refinement.refinedDescription
-            goal.aiObstacles = refinement.potentialObstacles
-            goal.aiSuccessMetrics = refinement.successMetrics
-            goal.aiMotivationalQuote = refinement.motivationalQuote
+            if let desc = refinement.refinedDescription {
+                goal.aiRefinedDescription = desc
+            }
+            if let obstacles = refinement.potentialObstacles {
+                goal.aiObstacles = obstacles
+            }
+            if let metrics = refinement.successMetrics {
+                goal.aiSuccessMetrics = metrics
+            }
+            if let quote = refinement.motivationalQuote {
+                goal.aiMotivationalQuote = quote
+            }
             goal.aiAnalyzedAt = .now
 
             // Mark SMART criteria as met
@@ -276,6 +284,10 @@ final class GoalsViewModel {
             try? context.save()
 
             error = nil
+        } catch let parseError as DecodingError {
+            // Provide user-friendly error for parsing failures
+            print("[GoalsViewModel] Decoding error: \(parseError)")
+            self.error = "Failed to refine goal. The AI response format was unexpected. Please try again."
         } catch {
             self.error = "Failed to refine goal: \(error.localizedDescription)"
         }
@@ -329,7 +341,7 @@ final class GoalsViewModel {
                         milestoneDescription: milestone.description,
                         targetDate: targetDate,
                         sortOrder: sortOrder,
-                        pointsValue: milestone.pointsValue,
+                        pointsValue: milestone.pointsValue ?? 50,
                         aiGenerated: true,
                         aiReasoning: milestone.successIndicator,
                         successIndicator: milestone.successIndicator
@@ -339,27 +351,31 @@ final class GoalsViewModel {
                     sortOrder += 1
                 }
 
-                // Create pending task suggestions for habits and tasks
-                for habit in phase.dailyHabits {
-                    let suggestion = PendingTaskSuggestion(
-                        title: habit.title,
-                        estimatedMinutes: habit.durationMinutes,
-                        linkType: .habit,
-                        aiReasoning: habit.reasoning,
-                        suggestedSchedule: habit.bestTime
-                    )
-                    pendingTaskSuggestions.append(suggestion)
+                // Create pending task suggestions for habits and tasks (handle optional arrays)
+                if let habits = phase.dailyHabits {
+                    for habit in habits {
+                        let suggestion = PendingTaskSuggestion(
+                            title: habit.title,
+                            estimatedMinutes: habit.durationMinutes,
+                            linkType: .habit,
+                            aiReasoning: habit.reasoning,
+                            suggestedSchedule: habit.bestTime
+                        )
+                        pendingTaskSuggestions.append(suggestion)
+                    }
                 }
 
-                for task in phase.oneTimeTasks {
-                    let suggestion = PendingTaskSuggestion(
-                        title: task.title,
-                        estimatedMinutes: task.estimatedMinutes,
-                        linkType: .directAction,
-                        aiReasoning: task.reasoning,
-                        priority: task.priority
-                    )
-                    pendingTaskSuggestions.append(suggestion)
+                if let tasks = phase.oneTimeTasks {
+                    for task in tasks {
+                        let suggestion = PendingTaskSuggestion(
+                            title: task.title,
+                            estimatedMinutes: task.estimatedMinutes,
+                            linkType: .directAction,
+                            aiReasoning: task.reasoning,
+                            priority: task.priority
+                        )
+                        pendingTaskSuggestions.append(suggestion)
+                    }
                 }
             }
 
@@ -369,6 +385,10 @@ final class GoalsViewModel {
 
             haptics.notification(.success)
             error = nil
+        } catch let parseError as DecodingError {
+            print("[GoalsViewModel] Roadmap decoding error: \(parseError)")
+            self.error = "Failed to generate roadmap. The AI response format was unexpected. Please try again."
+            haptics.notification(.error)
         } catch {
             self.error = "Failed to generate roadmap: \(error.localizedDescription)"
             haptics.notification(.error)

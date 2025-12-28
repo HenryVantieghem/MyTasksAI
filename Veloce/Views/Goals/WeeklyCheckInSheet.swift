@@ -966,8 +966,8 @@ struct WeeklyCheckInSheet: View {
         goal.updateProgress(updatedProgress)
         goal.recordCheckIn()
 
-        // Perform AI check-in
-        await goalsVM.performWeeklyCheckIn(
+        // Perform AI check-in (result intentionally discarded - check-in data stored in goal)
+        _ = await goalsVM.performWeeklyCheckIn(
             for: goal,
             progressUpdate: updatedProgress,
             blockers: blockers,

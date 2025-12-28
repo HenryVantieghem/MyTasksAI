@@ -13,11 +13,11 @@ import Foundation
 /// Result of AI refining a vague goal into a SMART goal
 struct GoalRefinement: Codable, Sendable {
     let refinedTitle: String
-    let refinedDescription: String
-    let successMetrics: [String]
-    let potentialObstacles: [String]
-    let motivationalQuote: String
-    let smartAnalysis: SMARTAnalysis
+    let refinedDescription: String?
+    let successMetrics: [String]?
+    let potentialObstacles: [String]?
+    let motivationalQuote: String?
+    let smartAnalysis: SMARTAnalysis?
 
     enum CodingKeys: String, CodingKey {
         case refinedTitle = "refined_title"
@@ -27,15 +27,27 @@ struct GoalRefinement: Codable, Sendable {
         case motivationalQuote = "motivational_quote"
         case smartAnalysis = "smart_analysis"
     }
+
+    /// Create a fallback refinement when AI parsing fails
+    static func fallback(title: String) -> GoalRefinement {
+        GoalRefinement(
+            refinedTitle: title,
+            refinedDescription: nil,
+            successMetrics: nil,
+            potentialObstacles: nil,
+            motivationalQuote: nil,
+            smartAnalysis: nil
+        )
+    }
 }
 
 /// Breakdown of how goal meets SMART criteria
 struct SMARTAnalysis: Codable, Sendable {
-    let specific: String
-    let measurable: String
-    let achievable: String
-    let relevant: String
-    let timeBound: String
+    let specific: String?
+    let measurable: String?
+    let achievable: String?
+    let relevant: String?
+    let timeBound: String?
 
     enum CodingKeys: String, CodingKey {
         case specific
@@ -50,9 +62,9 @@ struct SMARTAnalysis: Codable, Sendable {
 /// Complete AI-generated roadmap for achieving a goal
 struct GoalRoadmap: Codable, Sendable {
     let phases: [RoadmapPhase]
-    let totalEstimatedHours: Double
-    let successProbability: Double
-    let coachingNotes: String
+    let totalEstimatedHours: Double?
+    let successProbability: Double?
+    let coachingNotes: String?
 
     enum CodingKeys: String, CodingKey {
         case phases
@@ -68,24 +80,34 @@ struct GoalRoadmap: Codable, Sendable {
 
     /// Total habit count across all phases
     var totalHabits: Int {
-        phases.reduce(0) { $0 + $1.dailyHabits.count }
+        phases.reduce(0) { $0 + ($1.dailyHabits?.count ?? 0) }
     }
 
     /// Total task count across all phases
     var totalTasks: Int {
-        phases.reduce(0) { $0 + $1.oneTimeTasks.count }
+        phases.reduce(0) { $0 + ($1.oneTimeTasks?.count ?? 0) }
+    }
+
+    /// Create a fallback empty roadmap
+    static func empty() -> GoalRoadmap {
+        GoalRoadmap(
+            phases: [],
+            totalEstimatedHours: nil,
+            successProbability: nil,
+            coachingNotes: nil
+        )
     }
 }
 
 /// A phase within the goal roadmap
 struct RoadmapPhase: Codable, Sendable, Identifiable {
     let name: String
-    let startWeek: Int
-    let endWeek: Int
+    let startWeek: Int?
+    let endWeek: Int?
     let milestones: [RoadmapMilestone]
-    let dailyHabits: [RoadmapHabit]
-    let oneTimeTasks: [RoadmapTask]
-    let phaseObstacles: [String]
+    let dailyHabits: [RoadmapHabit]?
+    let oneTimeTasks: [RoadmapTask]?
+    let phaseObstacles: [String]?
 
     var id: String { name }
 
@@ -101,22 +123,22 @@ struct RoadmapPhase: Codable, Sendable, Identifiable {
 
     /// Duration in weeks
     var durationWeeks: Int {
-        endWeek - startWeek + 1
+        (endWeek ?? 1) - (startWeek ?? 1) + 1
     }
 
     /// Total items in this phase
     var totalItems: Int {
-        milestones.count + dailyHabits.count + oneTimeTasks.count
+        milestones.count + (dailyHabits?.count ?? 0) + (oneTimeTasks?.count ?? 0)
     }
 }
 
 /// A milestone within a roadmap phase
 struct RoadmapMilestone: Codable, Sendable, Identifiable {
     let title: String
-    let description: String
-    let targetDaysFromStart: Int
-    let successIndicator: String
-    let pointsValue: Int
+    let description: String?
+    let targetDaysFromStart: Int?
+    let successIndicator: String?
+    let pointsValue: Int?
 
     var id: String { title }
 
@@ -130,16 +152,16 @@ struct RoadmapMilestone: Codable, Sendable, Identifiable {
 
     /// Calculate target date from goal start date
     func targetDate(from startDate: Date) -> Date {
-        Calendar.current.date(byAdding: .day, value: targetDaysFromStart, to: startDate) ?? startDate
+        Calendar.current.date(byAdding: .day, value: targetDaysFromStart ?? 7, to: startDate) ?? startDate
     }
 }
 
 /// A habit suggestion within a roadmap phase
 struct RoadmapHabit: Codable, Sendable, Identifiable {
     let title: String
-    let frequency: String  // "daily", "weekdays", "weekly"
-    let durationMinutes: Int
-    let bestTime: String  // "morning", "afternoon", "evening"
+    let frequency: String?  // "daily", "weekdays", "weekly"
+    let durationMinutes: Int?
+    let bestTime: String?  // "morning", "afternoon", "evening"
     let reasoning: String?
 
     var id: String { title }
@@ -154,7 +176,7 @@ struct RoadmapHabit: Codable, Sendable, Identifiable {
 
     /// Frequency as RecurringType
     var recurringType: String {
-        switch frequency.lowercased() {
+        switch (frequency ?? "daily").lowercased() {
         case "daily": return "daily"
         case "weekdays": return "custom"  // Mon-Fri
         case "weekly": return "weekly"
@@ -164,7 +186,7 @@ struct RoadmapHabit: Codable, Sendable, Identifiable {
 
     /// Weekdays array for custom recurring
     var weekdays: [Int]? {
-        if frequency.lowercased() == "weekdays" {
+        if (frequency ?? "").lowercased() == "weekdays" {
             return [1, 2, 3, 4, 5]  // Mon-Fri (0 = Sunday)
         }
         return nil
@@ -174,8 +196,8 @@ struct RoadmapHabit: Codable, Sendable, Identifiable {
 /// A one-time task within a roadmap phase
 struct RoadmapTask: Codable, Sendable, Identifiable {
     let title: String
-    let estimatedMinutes: Int
-    let priority: String  // "high", "medium", "low"
+    let estimatedMinutes: Int?
+    let priority: String?  // "high", "medium", "low"
     let reasoning: String?
 
     var id: String { title }
@@ -189,7 +211,7 @@ struct RoadmapTask: Codable, Sendable, Identifiable {
 
     /// Priority as star rating (1-3)
     var starRating: Int {
-        switch priority.lowercased() {
+        switch (priority ?? "medium").lowercased() {
         case "high": return 3
         case "medium": return 2
         case "low": return 1
@@ -201,13 +223,13 @@ struct RoadmapTask: Codable, Sendable, Identifiable {
 // MARK: - Weekly Check-In
 /// Result of AI weekly coaching check-in
 struct WeeklyCheckIn: Codable, Sendable {
-    let emotionalResponse: String
-    let progressAssessment: ProgressAssessment
-    let weekFocus: String
+    let emotionalResponse: String?
+    let progressAssessment: ProgressAssessment?
+    let weekFocus: String?
     let habitTweak: HabitTweak?
-    let motivation: String
-    let nextWeekObstacles: [String]
-    let celebrationWorthy: Bool
+    let motivation: String?
+    let nextWeekObstacles: [String]?
+    let celebrationWorthy: Bool?
     let actionItems: [String]?
 
     enum CodingKeys: String, CodingKey {

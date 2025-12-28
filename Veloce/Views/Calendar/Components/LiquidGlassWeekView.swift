@@ -79,7 +79,7 @@ struct LiquidGlassWeekView: View {
                 }
             }
         }
-        .frame(height: 72)
+        .frame(height: 60) // Compact header height
         .background {
             VStack {
                 Spacer()

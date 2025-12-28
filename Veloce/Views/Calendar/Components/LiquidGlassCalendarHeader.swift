@@ -2,13 +2,13 @@
 //  LiquidGlassCalendarHeader.swift
 //  Veloce
 //
-//  iOS 26 Liquid Glass Calendar Header
+//  Calendar Navigation Bar - Compact controls below AppHeaderView
 //  Native glass effects with proper HIG touch targets and typography
 //
 
 import SwiftUI
 
-// MARK: - Liquid Glass Calendar Header
+// MARK: - Liquid Glass Calendar Header (Compact Navigation Bar)
 
 struct LiquidGlassCalendarHeader: View {
     @Binding var selectedDate: Date
@@ -33,16 +33,16 @@ struct LiquidGlassCalendarHeader: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Main header row
-            HStack(spacing: 12) {
-                // Navigation group
+        VStack(spacing: 4) {
+            // Main navigation row - compact layout
+            HStack(spacing: 8) {
+                // Navigation group (prev/date/next)
                 navigationGroup
 
                 Spacer()
 
                 // Right side controls
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     // Today button (only show if not today)
                     if !isToday {
                         todayButton
@@ -53,19 +53,20 @@ struct LiquidGlassCalendarHeader: View {
                 }
             }
             .padding(.horizontal, horizontalPadding)
-            .padding(.vertical, 12)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
 
             // Context subtitle (shows week range or month context)
             contextSubtitle
                 .padding(.horizontal, horizontalPadding)
-                .padding(.bottom, 8)
+                .padding(.bottom, 6)
         }
         .background {
-            // Subtle separator at bottom
+            // Subtle separator at bottom for visual separation
             VStack {
                 Spacer()
                 Rectangle()
-                    .fill(Color(.separator).opacity(0.3))
+                    .fill(Color(.separator).opacity(0.2))
                     .frame(height: 0.5)
             }
         }
@@ -74,8 +75,8 @@ struct LiquidGlassCalendarHeader: View {
     // MARK: - Navigation Group
 
     private var navigationGroup: some View {
-        HStack(spacing: 8) {
-            // Previous button - 44pt minimum touch target
+        HStack(spacing: 4) {
+            // Previous button - 36pt visual, 44pt touch target
             Button {
                 HapticsService.shared.lightImpact()
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -83,32 +84,32 @@ struct LiquidGlassCalendarHeader: View {
                 }
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.secondary)
-                    .frame(width: 44, height: 44) // HIG minimum
+                    .frame(width: 36, height: 36)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
-            // Month/Year Display
+            // Month/Year Display - compact
             Button(action: onDateTap) {
-                HStack(spacing: 6) {
+                HStack(spacing: 4) {
                     Text(formattedDate)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
 
-                    Image(systemName: "chevron.down.circle.fill")
-                        .font(.system(size: 14))
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.tertiary)
                 }
-                .frame(height: 44) // Touch target
+                .frame(height: 36)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
-            // Next button - 44pt minimum touch target
+            // Next button - 36pt visual, 44pt touch target
             Button {
                 HapticsService.shared.lightImpact()
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -116,9 +117,9 @@ struct LiquidGlassCalendarHeader: View {
                 }
             } label: {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.secondary)
-                    .frame(width: 44, height: 44) // HIG minimum
+                    .frame(width: 36, height: 36)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -227,25 +228,25 @@ struct LiquidGlassCalendarHeader: View {
             }
         } label: {
             Text("Today")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color.accentColor)
-                .padding(.horizontal, 14)
-                .frame(height: 36)
+                .padding(.horizontal, 10)
+                .frame(height: 30)
                 .glassEffect(in: Capsule())
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: - View Mode Segment (Liquid Glass)
+    // MARK: - View Mode Segment (Compact Liquid Glass)
 
     private var viewModeSegment: some View {
-        HStack(spacing: 2) {
+        HStack(spacing: 1) {
             ForEach(CalendarViewMode.allCases, id: \.self) { mode in
                 viewModeButton(for: mode)
             }
         }
-        .padding(4)
-        .glassEffect(in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(3)
+        .glassEffect(in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private func viewModeButton(for mode: CalendarViewMode) -> some View {
@@ -259,10 +260,10 @@ struct LiquidGlassCalendarHeader: View {
             }
         } label: {
             Text(mode.displayLabel)
-                .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
                 .foregroundStyle(isSelected ? .primary : .secondary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
                 .background {
                     if isSelected {
                         Capsule()

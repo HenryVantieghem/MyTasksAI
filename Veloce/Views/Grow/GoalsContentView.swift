@@ -217,8 +217,13 @@ struct GoalsContentView: View {
 
     // MARK: - Goals Section
 
+    @State private var goalToDelete: Goal?
+    @State private var showDeleteConfirmation = false
+    @State private var showCheckInSheet = false
+    @State private var checkInGoal: Goal?
+
     private var goalsSection: some View {
-        // Use grid on iPad, list on iPhone
+        // Use grid on iPad, slidable cards on iPhone
         Group {
             if layout.deviceType.isTablet {
                 LazyVGrid(columns: goalsColumns, spacing: layout.spacing) {
@@ -241,11 +246,24 @@ struct GoalsContentView: View {
             } else {
                 LazyVStack(spacing: layout.spacing) {
                     ForEach(Array(filteredGoals.enumerated()), id: \.element.id) { index, goal in
-                        PremiumGoalCard(
+                        SlidableGoalCard(
                             goal: goal,
                             goalsVM: goalsVM,
                             onTap: {
                                 selectedGoal = goal
+                            },
+                            onGenerateAI: {
+                                Task {
+                                    await goalsVM.generateAllAIContent(for: goal, context: modelContext)
+                                }
+                            },
+                            onCheckIn: {
+                                checkInGoal = goal
+                                showCheckInSheet = true
+                            },
+                            onDelete: {
+                                goalToDelete = goal
+                                showDeleteConfirmation = true
                             }
                         )
                         .offset(y: animateIn ? 0 : 30)
@@ -256,6 +274,30 @@ struct GoalsContentView: View {
                         )
                     }
                 }
+            }
+        }
+        .confirmationDialog(
+            "Delete Goal",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let goal = goalToDelete {
+                    goalsVM.deleteGoal(goal, context: modelContext)
+                }
+                goalToDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                goalToDelete = nil
+            }
+        } message: {
+            if let goal = goalToDelete {
+                Text("This will permanently delete \"\(goal.displayTitle)\" and all its milestones.")
+            }
+        }
+        .sheet(isPresented: $showCheckInSheet) {
+            if let goal = checkInGoal {
+                WeeklyCheckInSheet(goal: goal, goalsVM: goalsVM)
             }
         }
     }

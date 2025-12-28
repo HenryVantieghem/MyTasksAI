@@ -33,9 +33,8 @@ struct MainTabView: View {
     @State private var taskInputText = ""
     @FocusState private var isTaskInputFocused: Bool
 
-    // Task card state (managed at container level)
-    @State private var selectedTask: TaskItem?
-    @State private var showTaskDetailSheet = false
+    // Task card state (managed at container level) - using optional for .sheet(item:)
+    @State private var selectedTaskForDetail: TaskItem?
 
     var body: some View {
         // Tab content with standard TabView
@@ -76,47 +75,45 @@ struct MainTabView: View {
                 .tag(AppTab.journal)
         }
         .tint(.purple)
-        // Full-featured Liquid Glass Task Detail Sheet
-        .sheet(isPresented: $showTaskDetailSheet) {
-            if let task = selectedTask {
-                LiquidGlassTaskDetailSheet(
-                    task: task,
-                    onComplete: {
-                        chatTasksViewModel.taskDidComplete(task)
-                        showTaskDetailSheet = false
-                    },
-                    onDuplicate: {
-                        chatTasksViewModel.taskDidDuplicate(task)
-                    },
-                    onSnooze: { snoozeDate in
-                        task.scheduledTime = snoozeDate
-                        task.updatedAt = Date()
-                        chatTasksViewModel.taskDidSnooze(task)
-                    },
-                    onDelete: {
-                        chatTasksViewModel.taskDidDelete(task)
-                        showTaskDetailSheet = false
-                    },
-                    onSchedule: { scheduledDate in
-                        chatTasksViewModel.updateTask(task, scheduledTime: scheduledDate)
-                    },
-                    onStartTimer: { taskItem in
-                        showTaskDetailSheet = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            selectedTab = .flow
-                        }
-                    },
-                    onDismiss: {
-                        showTaskDetailSheet = false
+        // Full-featured Liquid Glass Task Detail Sheet - using .sheet(item:) for reliable presentation
+        .sheet(item: $selectedTaskForDetail) { task in
+            LiquidGlassTaskDetailSheet(
+                task: task,
+                onComplete: {
+                    chatTasksViewModel.taskDidComplete(task)
+                    selectedTaskForDetail = nil
+                },
+                onDuplicate: {
+                    chatTasksViewModel.taskDidDuplicate(task)
+                },
+                onSnooze: { snoozeDate in
+                    task.scheduledTime = snoozeDate
+                    task.updatedAt = Date()
+                    chatTasksViewModel.taskDidSnooze(task)
+                },
+                onDelete: {
+                    chatTasksViewModel.taskDidDelete(task)
+                    selectedTaskForDetail = nil
+                },
+                onSchedule: { scheduledDate in
+                    chatTasksViewModel.updateTask(task, scheduledTime: scheduledDate)
+                },
+                onStartTimer: { taskItem in
+                    selectedTaskForDetail = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        selectedTab = .flow
                     }
-                )
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-                .presentationCornerRadius(32)
-                .presentationBackground {
-                    Theme.CelestialColors.voidDeep
-                        .ignoresSafeArea()
+                },
+                onDismiss: {
+                    selectedTaskForDetail = nil
                 }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(32)
+            .presentationBackground {
+                Theme.CelestialColors.voidDeep
+                    .ignoresSafeArea()
             }
         }
         .safeAreaInset(edge: .top) {
@@ -199,8 +196,7 @@ struct MainTabView: View {
     // MARK: - Helper Methods
 
     private func presentTaskCard(_ task: TaskItem) {
-        selectedTask = task
-        showTaskDetailSheet = true
+        selectedTaskForDetail = task
         HapticsService.shared.impact(.medium)
     }
 
@@ -225,7 +221,7 @@ struct MainTabView: View {
         chatTasksViewModel.setup(context: modelContext)
 
         Task {
-            await chatTasksViewModel.loadTasks()
+            chatTasksViewModel.loadTasks()
         }
     }
 }

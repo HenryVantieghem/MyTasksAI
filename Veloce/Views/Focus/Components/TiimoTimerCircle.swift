@@ -101,8 +101,12 @@ struct TiimoTimerCircle: View {
             return minutes // One segment per minute
         } else if minutes <= 60 {
             return minutes / 5 // One segment per 5 minutes
+        } else if minutes <= 120 {
+            return 12 // One segment per 10 minutes for 1-2 hour sessions
+        } else if minutes <= 240 {
+            return 16 // One segment per ~15 minutes for 2-4 hour sessions
         } else {
-            return 12 // One segment per ~7.5 minutes for longer sessions
+            return 24 // One segment per ~20 minutes for 4-8 hour sessions
         }
     }
 
@@ -207,8 +211,16 @@ struct TiimoTimerCircle: View {
 
     private var formattedTime: String {
         let absTime = abs(timeRemaining)
-        let minutes = Int(absTime) / 60
-        let seconds = Int(absTime) % 60
+        let totalSeconds = Int(absTime)
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+
+        // For sessions >= 1 hour, show H:MM:SS format
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+        // For sessions < 1 hour, show MM:SS format
         return String(format: "%02d:%02d", minutes, seconds)
     }
 

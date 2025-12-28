@@ -50,10 +50,13 @@ struct KanbanColumnView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
 
+    /// Column width calculated based on size class
+    /// Uses fixed widths that work well across device sizes
     private var columnWidth: CGFloat {
         switch sizeClass {
         case .compact:
-            return min(280, UIScreen.main.bounds.width - 60)
+            // For compact, use a reasonable fixed width that fits most devices
+            return 280
         case .regular:
             return 320
         default:

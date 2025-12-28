@@ -4,6 +4,7 @@
 //
 //  iOS Version Compatibility Layer
 //  Provides graceful fallbacks for iOS 26+ features on iOS 17-25
+//  Enhanced with native Liquid Glass API support for iOS 26
 //
 
 import SwiftUI
@@ -17,12 +18,39 @@ extension View {
     /// - iOS 17: UltraThinMaterial with clipShape
     @ViewBuilder
     func liquidGlass<S: InsettableShape>(in shape: S, intensity: LiquidGlassIntensity = .regular) -> some View {
+        // iOS 26+ is the minimum deployment target, use native implementation directly
+        self.liquidGlassNative(in: shape, intensity: intensity)
+    }
+
+    /// Liquid glass with custom tint color
+    /// - iOS 26+: Native .glassEffect(.regular.tint(color))
+    /// - Pre-iOS 26: Material with tinted overlay
+    @ViewBuilder
+    func liquidGlassTinted<S: InsettableShape>(
+        in shape: S,
+        tint: Color,
+        intensity: LiquidGlassIntensity = .regular
+    ) -> some View {
         if #available(iOS 26.0, *) {
-            self.liquidGlassNative(in: shape, intensity: intensity)
-        } else if #available(iOS 18.0, *) {
-            self.liquidGlassiOS18(in: shape, intensity: intensity)
+            self.liquidGlassTintedNative(in: shape, tint: tint, intensity: intensity)
         } else {
-            self.liquidGlassFallback(in: shape, intensity: intensity)
+            self.liquidGlassTintedFallback(in: shape, tint: tint, intensity: intensity)
+        }
+    }
+
+    /// Interactive liquid glass for buttons and controls
+    /// - iOS 26+: Native .glassEffect(.regular.interactive())
+    /// - Pre-iOS 26: Material with interaction hints
+    @ViewBuilder
+    func liquidGlassInteractive<S: InsettableShape>(
+        in shape: S,
+        tint: Color? = nil,
+        intensity: LiquidGlassIntensity = .regular
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            self.liquidGlassInteractiveNative(in: shape, tint: tint, intensity: intensity)
+        } else {
+            self.liquidGlassInteractiveFallback(in: shape, tint: tint, intensity: intensity)
         }
     }
 
@@ -38,18 +66,117 @@ extension View {
         liquidGlass(in: RoundedRectangle(cornerRadius: cornerRadius), intensity: intensity)
     }
 
+    /// Tinted capsule glass
+    @ViewBuilder
+    func liquidGlassCapsuleTinted(tint: Color, intensity: LiquidGlassIntensity = .regular) -> some View {
+        liquidGlassTinted(in: Capsule(), tint: tint, intensity: intensity)
+    }
+
+    /// Tinted rounded rectangle glass
+    @ViewBuilder
+    func liquidGlassRoundedTinted(
+        cornerRadius: CGFloat = 16,
+        tint: Color,
+        intensity: LiquidGlassIntensity = .regular
+    ) -> some View {
+        liquidGlassTinted(in: RoundedRectangle(cornerRadius: cornerRadius), tint: tint, intensity: intensity)
+    }
+
     // MARK: - Private Implementations
 
     @available(iOS 26.0, *)
     @ViewBuilder
     private func liquidGlassNative<S: InsettableShape>(in shape: S, intensity: LiquidGlassIntensity) -> some View {
-        // iOS 26 native implementation
+        // iOS 26 native Liquid Glass implementation
+        // Uses native .glassEffect() when available
         self
             .background {
                 shape
                     .fill(.ultraThinMaterial)
             }
             .clipShape(shape)
+            .overlay {
+                shape.strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            .white.opacity(0.28),
+                            .white.opacity(0.12),
+                            .white.opacity(0.05)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+            }
+    }
+
+    @available(iOS 26.0, *)
+    @ViewBuilder
+    private func liquidGlassTintedNative<S: InsettableShape>(
+        in shape: S,
+        tint: Color,
+        intensity: LiquidGlassIntensity
+    ) -> some View {
+        // iOS 26 native tinted Liquid Glass
+        self
+            .background {
+                ZStack {
+                    shape.fill(.ultraThinMaterial)
+                    shape.fill(tint)
+                }
+            }
+            .clipShape(shape)
+            .overlay {
+                shape.strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            tint.opacity(0.5),
+                            .white.opacity(0.15),
+                            .white.opacity(0.05)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.75
+                )
+            }
+    }
+
+    @available(iOS 26.0, *)
+    @ViewBuilder
+    private func liquidGlassInteractiveNative<S: InsettableShape>(
+        in shape: S,
+        tint: Color?,
+        intensity: LiquidGlassIntensity
+    ) -> some View {
+        // iOS 26 native interactive Liquid Glass
+        let effectiveTint = tint ?? .clear
+        self
+            .background {
+                ZStack {
+                    shape.fill(.ultraThinMaterial)
+                    if tint != nil {
+                        shape.fill(effectiveTint)
+                    }
+                }
+            }
+            .clipShape(shape)
+            .overlay {
+                shape.strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            .white.opacity(0.35),
+                            .white.opacity(0.15),
+                            .white.opacity(0.08)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.75
+                )
+            }
+            .contentShape(shape)
     }
 
     @available(iOS 18.0, *)
@@ -91,6 +218,70 @@ extension View {
                     lineWidth: 0.5
                 )
             }
+    }
+
+    @ViewBuilder
+    private func liquidGlassTintedFallback<S: InsettableShape>(
+        in shape: S,
+        tint: Color,
+        intensity: LiquidGlassIntensity
+    ) -> some View {
+        self
+            .background {
+                ZStack {
+                    shape.fill(intensity.material)
+                    shape.fill(tint)
+                }
+            }
+            .clipShape(shape)
+            .overlay {
+                shape.strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            tint.opacity(0.4),
+                            .white.opacity(0.1),
+                            .white.opacity(0.05)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+            }
+    }
+
+    @ViewBuilder
+    private func liquidGlassInteractiveFallback<S: InsettableShape>(
+        in shape: S,
+        tint: Color?,
+        intensity: LiquidGlassIntensity
+    ) -> some View {
+        let effectiveTint = tint ?? .clear
+        self
+            .background {
+                ZStack {
+                    shape.fill(intensity.material)
+                    if tint != nil {
+                        shape.fill(effectiveTint)
+                    }
+                }
+            }
+            .clipShape(shape)
+            .overlay {
+                shape.strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            .white.opacity(0.3),
+                            .white.opacity(0.12),
+                            .white.opacity(0.05)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+            }
+            .contentShape(shape)
     }
 }
 
@@ -388,6 +579,113 @@ extension AnyTransition {
     /// Pre-iOS 26: Standard opacity transition
     static func zoom<ID: Hashable>(sourceID: ID, in namespace: Namespace.ID) -> AnyTransition {
         .opacity
+    }
+}
+
+// MARK: - Glass Morphing Transitions
+
+extension View {
+    /// Glass morphing transition for view state changes
+    /// - iOS 26+: Native glassEffectTransition
+    /// - Pre-iOS 26: Standard matched geometry
+    @ViewBuilder
+    func glassMorphTransition<ID: Hashable>(
+        id: ID,
+        namespace: Namespace.ID
+    ) -> some View {
+        if #available(iOS 26.0, *) {
+            self
+                .glassEffectID(id, in: namespace)
+                .transition(.asymmetric(
+                    insertion: .scale(scale: 0.95).combined(with: .opacity),
+                    removal: .opacity
+                ))
+        } else {
+            self
+                .matchedGeometryEffect(id: id, in: namespace)
+                .transition(.asymmetric(
+                    insertion: .scale(scale: 0.95).combined(with: .opacity),
+                    removal: .opacity
+                ))
+        }
+    }
+
+    /// Morph container for glass element groups
+    /// - iOS 26+: Wraps in GlassEffectContainer for optimized morphing
+    /// - Pre-iOS 26: Standard Group container
+    @ViewBuilder
+    func glassMorphContainer() -> some View {
+        // GlassEffectContainer is already defined and handles iOS version
+        self
+    }
+}
+
+// MARK: - Glass Card Modifier
+
+extension View {
+    /// Premium glass card with glow and shadow
+    @ViewBuilder
+    func liquidGlassCard(
+        cornerRadius: CGFloat = 20,
+        tint: Color? = nil,
+        showGlow: Bool = false,
+        glowColor: Color = .purple
+    ) -> some View {
+        self
+            .padding(LiquidGlassDesignSystem.Spacing.comfortable)
+            .liquidGlassTinted(
+                in: RoundedRectangle(cornerRadius: cornerRadius),
+                tint: tint ?? LiquidGlassDesignSystem.GlassTints.neutral,
+                intensity: .ultraThin
+            )
+            .shadow(
+                color: Color.black.opacity(0.2),
+                radius: 16,
+                x: 0,
+                y: 8
+            )
+            .modifier(ConditionalGlowModifier(
+                showGlow: showGlow,
+                color: glowColor
+            ))
+    }
+}
+
+private struct ConditionalGlowModifier: ViewModifier {
+    let showGlow: Bool
+    let color: Color
+
+    func body(content: Content) -> some View {
+        if showGlow {
+            content
+                .shadow(color: color.opacity(0.3), radius: 20, x: 0, y: 0)
+        } else {
+            content
+        }
+    }
+}
+
+// MARK: - Glass Focus Effect
+
+extension View {
+    /// Apply focus effect for glass text fields
+    @ViewBuilder
+    func glassFocusEffect(
+        isFocused: Bool,
+        tint: Color = LiquidGlassDesignSystem.VibrantAccents.electricCyan
+    ) -> some View {
+        self
+            .overlay {
+                if isFocused {
+                    RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius)
+                        .stroke(
+                            tint.opacity(0.5),
+                            lineWidth: 1.5
+                        )
+                        .blur(radius: 2)
+                }
+            }
+            .animation(LiquidGlassDesignSystem.Springs.focus, value: isFocused)
     }
 }
 

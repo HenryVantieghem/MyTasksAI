@@ -10,7 +10,8 @@ import SwiftUI
 
 // MARK: - Liquid Glass Preset Styles
 
-enum LiquidGlassStyle {
+/// Visual emphasis style for liquid glass effects (distinct from LiquidGlassStyle in DesignSystem)
+enum GlassVisualStyle {
     case subtle      // Low emphasis - pills, badges
     case standard    // Medium emphasis - cards, rows
     case prominent   // High emphasis - focused states, key UI
@@ -20,7 +21,7 @@ enum LiquidGlassStyle {
 // MARK: - Liquid Glass View Modifier
 
 struct LiquidGlassModifier: ViewModifier {
-    let style: LiquidGlassStyle
+    let style: GlassVisualStyle
     let cornerRadius: CGFloat
     
     func body(content: Content) -> some View {
@@ -236,7 +237,7 @@ extension View {
     ///   - style: Preset style (subtle, standard, prominent, floating)
     ///   - cornerRadius: Corner radius for the glass shape
     func liquidGlass(
-        _ style: LiquidGlassStyle = .standard,
+        _ style: GlassVisualStyle = .standard,
         cornerRadius: CGFloat = 16
     ) -> some View {
         modifier(LiquidGlassModifier(style: style, cornerRadius: cornerRadius))
@@ -245,7 +246,7 @@ extension View {
     /// Apply Apple Liquid Glass effect to a capsule shape
     /// - Parameter style: Preset style
     func liquidGlassCapsule(
-        _ style: LiquidGlassStyle = .standard
+        _ style: GlassVisualStyle = .standard
     ) -> some View {
         modifier(LiquidGlassModifier(style: style, cornerRadius: 999))
     }
@@ -253,7 +254,7 @@ extension View {
     /// Apply Apple Liquid Glass effect to a circle shape
     /// - Parameter style: Preset style
     func liquidGlassCircle(
-        _ style: LiquidGlassStyle = .standard
+        _ style: GlassVisualStyle = .standard
     ) -> some View {
         modifier(LiquidGlassModifier(style: style, cornerRadius: 999))
     }
@@ -264,7 +265,7 @@ extension View {
 /// Helper to build custom liquid glass backgrounds
 struct LiquidGlassShape<S: InsettableShape>: View {
     let shape: S
-    let style: LiquidGlassStyle
+    let style: GlassVisualStyle
     
     var body: some View {
         ZStack {
@@ -348,16 +349,16 @@ struct LiquidGlassShape<S: InsettableShape>: View {
 
 // MARK: - Preset Glass Components
 
-/// Ready-to-use liquid glass button
-struct LiquidGlassButton<Label: View>: View {
+/// Ready-to-use liquid glass button (generic version, distinct from LiquidGlassButton)
+struct GlassButtonView<Label: View>: View {
     let action: () -> Void
-    let style: LiquidGlassStyle
+    let style: GlassVisualStyle
     @ViewBuilder let label: () -> Label
-    
+
     @State private var isPressed = false
-    
+
     init(
-        style: LiquidGlassStyle = .standard,
+        style: GlassVisualStyle = .standard,
         action: @escaping () -> Void,
         @ViewBuilder label: @escaping () -> Label
     ) {
@@ -390,12 +391,12 @@ private struct GlassButtonStyle: ButtonStyle {
 
 /// Ready-to-use liquid glass card container
 struct LiquidGlassCard<Content: View>: View {
-    let style: LiquidGlassStyle
+    let style: GlassVisualStyle
     let cornerRadius: CGFloat
     @ViewBuilder let content: () -> Content
-    
+
     init(
-        style: LiquidGlassStyle = .standard,
+        style: GlassVisualStyle = .standard,
         cornerRadius: CGFloat = 16,
         @ViewBuilder content: @escaping () -> Content
     ) {
@@ -516,17 +517,17 @@ struct LiquidGlassCard<Content: View>: View {
 #Preview("Glass Button") {
     ZStack {
         Color.black.ignoresSafeArea()
-        
+
         VStack(spacing: 20) {
-            LiquidGlassButton(style: .standard, action: {}) {
+            GlassButtonView(style: .standard, action: {}) {
                 HStack {
                     Image(systemName: "plus.circle.fill")
                     Text("Add Task")
                 }
                 .foregroundStyle(.white)
             }
-            
-            LiquidGlassButton(style: .prominent, action: {}) {
+
+            GlassButtonView(style: .prominent, action: {}) {
                 HStack {
                     Image(systemName: "sparkles")
                     Text("AI Magic")

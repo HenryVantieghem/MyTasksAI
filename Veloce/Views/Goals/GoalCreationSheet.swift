@@ -930,7 +930,8 @@ struct GoalCreationSheet: View {
 
         // Try to generate AI roadmap with timeout (don't block on failure)
         // Use a timeout to prevent getting stuck
-        let roadmapTask = Task {
+        // Fire-and-forget task - roadmap generation runs in background
+        Task {
             await goalsVM.generateRoadmap(for: goal, context: modelContext)
         }
 

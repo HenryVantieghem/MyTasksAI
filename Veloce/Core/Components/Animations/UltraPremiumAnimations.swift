@@ -756,6 +756,7 @@ struct CelebrationConfettiShower: View {
     ]
 
     @State private var confetti: [UltraConfettiPiece] = []
+    @State private var containerWidth: CGFloat = 0
 
     var body: some View {
         GeometryReader { geo in
@@ -764,10 +765,16 @@ struct CelebrationConfettiShower: View {
                     UltraConfettiPieceView(piece: piece, screenHeight: geo.size.height)
                 }
             }
+            .onAppear {
+                containerWidth = geo.size.width
+            }
+            .onChange(of: geo.size.width) { _, newWidth in
+                containerWidth = newWidth
+            }
         }
         .onChange(of: isActive) { _, newValue in
             if newValue {
-                generateConfetti()
+                generateConfetti(width: containerWidth > 0 ? containerWidth : 400)
                 HapticsService.shared.sparkleCascade()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -778,12 +785,12 @@ struct CelebrationConfettiShower: View {
         }
     }
 
-    private func generateConfetti() {
+    private func generateConfetti(width: CGFloat) {
         confetti = (0..<particleCount).map { i in
             UltraConfettiPiece(
                 id: i,
                 color: colors.randomElement() ?? .white,
-                x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
+                x: CGFloat.random(in: 0...width),
                 size: CGFloat.random(in: 4...10),
                 rotation: Double.random(in: 0...360),
                 delay: Double.random(in: 0...0.5),

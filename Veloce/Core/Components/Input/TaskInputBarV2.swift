@@ -860,7 +860,7 @@ struct TaskInputBarV2: View {
                     // Category chips
                     ForEach(Array(categories), id: \.self) { category in
                         CategoryChipView(category: category) {
-                            withAnimation(Theme.Animation.spring) {
+                            _ = withAnimation(Theme.Animation.spring) {
                                 categories.remove(category)
                             }
                             HapticsService.shared.lightImpact()
@@ -1319,7 +1319,7 @@ extension TaskInputBarV2 {
                     let suggestedCategories = try await suggestCategories(for: text)
                     await MainActor.run {
                         for category in suggestedCategories {
-                            withAnimation(Theme.Animation.springBouncy) {
+                            _ = withAnimation(Theme.Animation.springBouncy) {
                                 categories.insert(category)
                             }
                         }
@@ -1540,7 +1540,7 @@ extension TaskInputBarV2 {
                     case .category:
                         if detection.confidence > 0.9 {
                             if let cat = detection.value as? InputTemplateCategory {
-                                withAnimation(Theme.Animation.spring) {
+                                _ = withAnimation(Theme.Animation.spring) {
                                     categories.insert(cat)
                                 }
                             }

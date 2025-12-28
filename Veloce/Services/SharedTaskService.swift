@@ -391,12 +391,14 @@ final class SharedTaskService {
 
         do {
             let client = try supabase.getClient()
-            guard let userId = try await client.auth.session.user.id as UUID? else {
+            // Verify authentication (userId reserved for future push notification targeting)
+            guard (try await client.auth.session.user.id as UUID?) != nil else {
                 throw SharedTaskServiceError.notAuthenticated
             }
 
-            // Get all collaborators for this task
-            let sharedTasks: [SharedTask] = try await client
+            // Get all collaborators for this task (reserved for push notifications)
+            // The query result will be used when push notification integration is added
+            let _: [SharedTask] = try await client
                 .from("shared_tasks")
                 .select("""
                     *,

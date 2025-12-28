@@ -126,7 +126,8 @@ struct AmbientParticleField: View {
         guard bounds.width > 0, bounds.height > 0 else { return }
 
         particles = (0..<density.rawValue).map { index in
-            let seed = Double(index) * 1.618 // Golden ratio for distribution
+            // Golden ratio distribution (seed value used implicitly via index)
+            _ = Double(index) * 1.618
 
             return AmbientParticle(
                 position: CGPoint(
@@ -172,16 +173,20 @@ struct EtherealParticleBurst: View {
     }
 
     var body: some View {
-        ZStack {
-            ForEach(particles) { particle in
-                Circle()
-                    .fill(particle.color)
-                    .frame(width: particle.size, height: particle.size)
-                    .offset(x: center.x + particle.offset.width - UIScreen.main.bounds.width / 2,
-                            y: center.y + particle.offset.height - UIScreen.main.bounds.height / 2)
-                    .opacity(particle.opacity)
-                    .blur(radius: particle.size * 0.15)
+        GeometryReader { geometry in
+            let screenCenter = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
+            ZStack {
+                ForEach(particles) { particle in
+                    Circle()
+                        .fill(particle.color)
+                        .frame(width: particle.size, height: particle.size)
+                        .offset(x: center.x + particle.offset.width - screenCenter.x,
+                                y: center.y + particle.offset.height - screenCenter.y)
+                        .opacity(particle.opacity)
+                        .blur(radius: particle.size * 0.15)
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .onAppear {
             generateBurst()

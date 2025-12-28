@@ -482,6 +482,88 @@ final class HapticsService {
         playCustomPattern(.rippleWave)
     }
 
+    // MARK: - 🔮 Liquid Glass Haptic Patterns
+
+    /// Glass focus - Subtle crystalline touch when focusing text fields
+    /// Like tapping on a fine crystal glass
+    func glassFocus() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.soft)
+            return
+        }
+        playCustomPattern(.glassFocus)
+    }
+
+    /// Glass morph - Smooth transition feel for glass morphing animations
+    /// Fluid sensation like mercury flowing
+    func glassMorph() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.light)
+            return
+        }
+        playCustomPattern(.glassMorph)
+    }
+
+    /// Form submit - Anticipation → success pattern for form submissions
+    /// Builds tension then releases with confirmation
+    func formSubmit() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.formSubmit)
+    }
+
+    /// Onboarding complete - Epic cosmic celebration for completing onboarding
+    /// The ultimate journey completion feeling
+    func onboardingComplete() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.onboardingComplete)
+    }
+
+    /// Page transition - Whoosh with settle for navigation transitions
+    /// Smooth glide with satisfying landing
+    func pageTransition() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.soft)
+            return
+        }
+        playCustomPattern(.pageTransition)
+    }
+
+    /// Glass button press - Premium feedback for liquid glass buttons
+    /// Subtle but satisfying crystalline press
+    func glassButtonPress() {
+        guard hapticsEnabled, supportsHaptics else {
+            impact(.medium)
+            return
+        }
+        playCustomPattern(.glassButtonPress)
+    }
+
+    /// Success confirm - Confirmation feedback for successful actions
+    /// Clear and satisfying confirmation
+    func successConfirm() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.successConfirm)
+    }
+
+    /// Auth success - Special pattern for successful authentication
+    /// Triumphant and welcoming
+    func authSuccess() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.authSuccess)
+    }
+
     // MARK: - Premium Interaction Patterns
 
     /// Button press - Satisfying immediate feedback
@@ -676,6 +758,15 @@ final class HapticsService {
         case longPressRecognized
         // Epic Task Completion (~1.5s full sequence)
         case epicTaskComplete
+        // 🔮 Liquid Glass patterns
+        case glassFocus
+        case glassMorph
+        case formSubmit
+        case onboardingComplete
+        case pageTransition
+        case glassButtonPress
+        case successConfirm
+        case authSuccess
 
         var events: [CHHapticEvent] {
             switch self {
@@ -1328,6 +1419,218 @@ final class HapticsService {
                         CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
                         CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
                     ], relativeTime: 1.0, duration: 0.15)
+                ]
+
+            // MARK: 🔮 Liquid Glass Patterns
+
+            case .glassFocus:
+                // Subtle crystalline touch - like tapping fine crystal
+                // Delicate and refined for text field focus
+                return [
+                    // Initial crystal touch
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.85)
+                    ], relativeTime: 0),
+                    // Subtle resonance
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.1),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.03, duration: 0.06)
+                ]
+
+            case .glassMorph:
+                // Fluid sensation like mercury flowing
+                // Smooth transition for glass morphing animations
+                return [
+                    // Fluid start
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0, duration: 0.15),
+                    // Mid-morph pulse
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.35),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.08),
+                    // Settle into new form
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.15),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.25)
+                    ], relativeTime: 0.15, duration: 0.1)
+                ]
+
+            case .formSubmit:
+                // Anticipation → success for form submissions
+                // Builds tension then releases with confirmation
+                return [
+                    // Anticipation build
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0, duration: 0.12),
+                    // Rising tension
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.1),
+                    // Success burst
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.9),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0.2),
+                    // Satisfying confirmation
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.25, duration: 0.15)
+                ]
+
+            case .onboardingComplete:
+                // Epic cosmic celebration for completing onboarding
+                // The ultimate journey completion (~1.2s)
+                return [
+                    // Lift off
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0, duration: 0.2),
+                    // Rising energy
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.15),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.25),
+                    // Cosmic burst
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.35),
+                    // Starburst scatter
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.4, duration: 0.3),
+                    // Sparkle accents
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.6),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.65)
+                    ], relativeTime: 0.75),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.9),
+                    // Final cosmic settle
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 1.0, duration: 0.2)
+                ]
+
+            case .pageTransition:
+                // Whoosh with settle for navigation transitions
+                // Smooth glide with satisfying landing
+                return [
+                    // Whoosh start
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0, duration: 0.08),
+                    // Glide peak
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.35),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.05, duration: 0.1),
+                    // Settle
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.15),
+                    // Final rest
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.1),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.18, duration: 0.05)
+                ]
+
+            case .glassButtonPress:
+                // Premium feedback for liquid glass buttons
+                // Crystalline press with subtle resonance
+                return [
+                    // Initial crystalline impact
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0),
+                    // Glass resonance
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.03, duration: 0.08),
+                    // Subtle settle
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.15),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.12)
+                ]
+
+            case .successConfirm:
+                // Clear and satisfying confirmation
+                // Definitive success feeling
+                return [
+                    // Confirmation tap
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.8)
+                    ], relativeTime: 0),
+                    // Success resonance
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.4)
+                    ], relativeTime: 0.05, duration: 0.12),
+                    // Final clarity
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.18)
+                ]
+
+            case .authSuccess:
+                // Triumphant and welcoming authentication success
+                // Gateway opening feeling
+                return [
+                    // Unlock click
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0),
+                    // Gateway opening
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.05, duration: 0.15),
+                    // Welcome burst
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.15),
+                    // Warm embrace
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.35),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.25)
+                    ], relativeTime: 0.2, duration: 0.2),
+                    // Sparkle welcome
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.35)
                 ]
 
             }

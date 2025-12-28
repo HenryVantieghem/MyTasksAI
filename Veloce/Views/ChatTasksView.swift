@@ -276,7 +276,7 @@ struct ChatTasksView: View {
                     .first {
                     // Only trigger AI animation if task was just created (within last 2 seconds)
                     if Date().timeIntervalSince(newestTask.createdAt) < 2 {
-                        withAnimation(.spring(response: 0.4)) {
+                        _ = withAnimation(.spring(response: 0.4)) {
                             newlyCreatedTaskIds.insert(newestTask.id)
                         }
                     }

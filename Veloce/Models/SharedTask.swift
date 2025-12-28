@@ -143,7 +143,7 @@ struct SharedTaskInfo: Codable, Identifiable, Sendable, Hashable {
 
     var accentColor: Color {
         if let hex = taskColorHex {
-            return Color(hex: hex) ?? Theme.Colors.aiPurple
+            return Color(hex: hex)
         }
         return Theme.Colors.aiPurple
     }

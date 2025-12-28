@@ -54,18 +54,16 @@ struct LiquidGlassCalendarView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Adaptive background - respects system appearance
-                adaptiveBackground
+        ZStack {
+            // Adaptive background - respects system appearance
+            adaptiveBackground
 
-                if viewModel.isAuthorized {
-                    authorizedContent(geometry: geometry)
-                } else {
-                    CalendarPermissionRequestView(onRequest: {
-                        Task { await viewModel.requestAccess() }
-                    })
-                }
+            if viewModel.isAuthorized {
+                authorizedCalendarContent
+            } else {
+                CalendarPermissionRequestView(onRequest: {
+                    Task { await viewModel.requestAccess() }
+                })
             }
         }
         .onAppear {
@@ -118,99 +116,108 @@ struct LiquidGlassCalendarView: View {
             .ignoresSafeArea()
     }
 
-    // MARK: - Authorized Content
+    // MARK: - Authorized Calendar Content
 
-    private func authorizedContent(geometry: GeometryProxy) -> some View {
-        VStack(spacing: 0) {
-            // iOS 26 Liquid Glass Header
-            LiquidGlassCalendarHeader(
-                selectedDate: $viewModel.selectedDate,
-                viewMode: $viewModel.viewMode,
-                onPrevious: { viewModel.goToPrevious() },
-                onNext: { viewModel.goToNext() },
-                onDateTap: { showDatePicker = true },
-                onTodayTap: { viewModel.selectedDate = Date() }
-            )
+    private var authorizedCalendarContent: some View {
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                // Calendar Navigation Bar (compact, sits below AppHeaderView)
+                LiquidGlassCalendarHeader(
+                    selectedDate: $viewModel.selectedDate,
+                    viewMode: $viewModel.viewMode,
+                    onPrevious: { viewModel.goToPrevious() },
+                    onNext: { viewModel.goToNext() },
+                    onDateTap: { showDatePicker = true },
+                    onTodayTap: { viewModel.selectedDate = Date() }
+                )
 
-            // Content based on view mode
-            Group {
-                switch viewModel.viewMode {
-                case .day:
-                    LiquidGlassDayView(
-                        date: viewModel.selectedDate,
-                        tasks: viewModel.tasks(for: viewModel.selectedDate),
-                        events: viewModel.events(for: viewModel.selectedDate),
-                        onTaskTap: { task in
-                            selectedTask = task
-                            showTaskDetailSheet = true
-                        },
-                        onTimeSlotTap: { date in
-                            quickAddDate = date
-                            showQuickAdd = true
-                        },
-                        onTaskComplete: completeTask,
-                        onTaskDrag: rescheduleTask
-                    )
-
-                case .week:
-                    LiquidGlassWeekView(
-                        selectedDate: $viewModel.selectedDate,
-                        weekDates: currentWeekDates,
-                        tasks: viewModel.scheduledTasks,
-                        events: viewModel.events,
-                        onTaskTap: { task in
-                            selectedTask = task
-                            showTaskDetailSheet = true
-                        },
-                        onTimeSlotTap: { date in
-                            quickAddDate = date
-                            showQuickAdd = true
-                        },
-                        onTaskDrag: rescheduleTask,
-                        onTaskComplete: completeTask
-                    )
-
-                case .month:
-                    LiquidGlassMonthView(
-                        selectedDate: $viewModel.selectedDate,
-                        tasks: viewModel.scheduledTasks,
-                        events: viewModel.events,
-                        cellSize: dayCellSize(in: geometry),
-                        onDayTap: { date in
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                viewModel.selectedDate = date
-                                viewModel.viewMode = .day
-                            }
-                            HapticsService.shared.selectionFeedback()
-                        }
-                    )
-                }
+                // Content based on view mode
+                calendarViewContent(geometry: geometry)
             }
-            .gesture(
-                DragGesture(minimumDistance: 80, coordinateSpace: .local)
-                    .onEnded { value in
-                        let horizontalAmount = value.translation.width
-                        let verticalAmount = value.translation.height
+            .safeAreaInset(edge: .bottom) {
+                // Floating add button with Liquid Glass
+                floatingAddButton
+                    .padding(.horizontal, screenPadding)
+                    .padding(.bottom, 8)
+            }
+        }
+    }
 
-                        // Only handle clear horizontal swipes
-                        if abs(horizontalAmount) > abs(verticalAmount) * 2 {
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                if horizontalAmount < -80 {
-                                    viewModel.goToNext()
-                                } else if horizontalAmount > 80 {
-                                    viewModel.goToPrevious()
-                                }
+    // MARK: - Calendar View Content
+
+    @ViewBuilder
+    private func calendarViewContent(geometry: GeometryProxy) -> some View {
+        Group {
+            switch viewModel.viewMode {
+            case .day:
+                LiquidGlassDayView(
+                    date: viewModel.selectedDate,
+                    tasks: viewModel.tasks(for: viewModel.selectedDate),
+                    events: viewModel.events(for: viewModel.selectedDate),
+                    onTaskTap: { task in
+                        selectedTask = task
+                        showTaskDetailSheet = true
+                    },
+                    onTimeSlotTap: { date in
+                        quickAddDate = date
+                        showQuickAdd = true
+                    },
+                    onTaskComplete: completeTask,
+                    onTaskDrag: rescheduleTask
+                )
+
+            case .week:
+                LiquidGlassWeekView(
+                    selectedDate: $viewModel.selectedDate,
+                    weekDates: currentWeekDates,
+                    tasks: viewModel.scheduledTasks,
+                    events: viewModel.events,
+                    onTaskTap: { task in
+                        selectedTask = task
+                        showTaskDetailSheet = true
+                    },
+                    onTimeSlotTap: { date in
+                        quickAddDate = date
+                        showQuickAdd = true
+                    },
+                    onTaskDrag: rescheduleTask,
+                    onTaskComplete: completeTask
+                )
+
+            case .month:
+                LiquidGlassMonthView(
+                    selectedDate: $viewModel.selectedDate,
+                    tasks: viewModel.scheduledTasks,
+                    events: viewModel.events,
+                    cellSize: dayCellSize(in: geometry),
+                    onDayTap: { date in
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                            viewModel.selectedDate = date
+                            viewModel.viewMode = .day
+                        }
+                        HapticsService.shared.selectionFeedback()
+                    }
+                )
+            }
+        }
+        .gesture(
+            DragGesture(minimumDistance: 80, coordinateSpace: .local)
+                .onEnded { value in
+                    let horizontalAmount = value.translation.width
+                    let verticalAmount = value.translation.height
+
+                    // Only handle clear horizontal swipes
+                    if abs(horizontalAmount) > abs(verticalAmount) * 2 {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                            if horizontalAmount < -80 {
+                                viewModel.goToNext()
+                            } else if horizontalAmount > 80 {
+                                viewModel.goToPrevious()
                             }
                         }
                     }
-            )
-        }
-        .safeAreaInset(edge: .bottom) {
-            // Floating add button with Liquid Glass
-            floatingAddButton
-                .padding(.horizontal, screenPadding)
-                .padding(.bottom, 8)
-        }
+                }
+        )
     }
 
     // MARK: - Floating Add Button (Liquid Glass)

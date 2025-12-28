@@ -136,7 +136,7 @@ struct TaskCardV4: View {
                 if let insight = aiInsight, !task.isCompleted {
                     Text(insight)
                         .dynamicTypeFont(base: 14, weight: .regular)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.6))
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, layout.cardPadding)
@@ -184,7 +184,7 @@ struct TaskCardV4: View {
             // Title - Dynamic Type for accessibility
             Text(task.title)
                 .dynamicTypeFont(base: 16, weight: .medium)
-                .foregroundStyle(.primary)
+                .foregroundStyle(.white)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
 

@@ -95,30 +95,56 @@ struct RootView: View {
     @Environment(AppViewModel.self) private var appViewModel
     @Environment(\.modelContext) private var modelContext
 
+    // Track if we should show cosmic splash
+    @State private var showCosmicSplash = true
+    @State private var splashComplete = false
+
     var body: some View {
         Group {
-            switch appViewModel.appState {
-            case .loading:
-                LoadingView()
-
-            case .freeTrialWelcome:
-                FreeTrialWelcomeView()
-
-            case .unauthenticated:
-                AuthView(initialScreen: appViewModel.preferSignUp ? .signUp : .signIn)
-
-            case .onboarding:
-                JourneyOnboardingContainer(viewModel: JourneyOnboardingViewModel())
-
-            case .paywall:
-                PaywallView()
-
-            case .authenticated:
-                MainTabView()
-                    .withOfflineOverlay()
+            if showCosmicSplash && !splashComplete {
+                // Ultra-premium 9-phase Liquid Glass splash
+                CosmicSplashScreen {
+                    withAnimation(LiquidGlassDesignSystem.Springs.focus) {
+                        splashComplete = true
+                    }
+                }
+            } else {
+                // Main app flow
+                mainContent
             }
         }
-        .animation(Theme.Animation.standard, value: appViewModel.appState)
+        .animation(LiquidGlassDesignSystem.Springs.focus, value: appViewModel.appState)
+        .animation(LiquidGlassDesignSystem.Springs.focus, value: splashComplete)
+    }
+
+    @ViewBuilder
+    private var mainContent: some View {
+        switch appViewModel.appState {
+        case .loading:
+            // Show minimal loading after splash
+            LoadingView()
+
+        case .freeTrialWelcome:
+            FreeTrialWelcomeView()
+
+        case .unauthenticated:
+            // Ultra-premium Liquid Glass Auth with form morphing
+            LiquidGlassAuthView(
+                authViewModel: AuthViewModel(),
+                initialScreen: appViewModel.preferSignUp ? .signUp : .signIn
+            )
+
+        case .onboarding:
+            // Ultra-premium Liquid Glass Onboarding with constellation progress
+            LiquidGlassOnboardingContainer(viewModel: CosmicOnboardingViewModel())
+
+        case .paywall:
+            PaywallView()
+
+        case .authenticated:
+            MainTabView()
+                .withOfflineOverlay()
+        }
     }
 }
 

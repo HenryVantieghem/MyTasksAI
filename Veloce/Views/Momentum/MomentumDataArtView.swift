@@ -513,10 +513,9 @@ struct VelocityBlobVisualization: View {
         let colors = LivingDataColors.velocityGradient
         let index = normalizedScore * Double(colors.count - 1)
         let lowerIndex = Int(floor(index))
-        let upperIndex = min(lowerIndex + 1, colors.count - 1)
         let fraction = index - Double(lowerIndex)
 
-        // Simple interpolation
+        // Simple interpolation (upperIndex would be used for full interpolation)
         return colors[lowerIndex].opacity(1 - fraction)
     }
 

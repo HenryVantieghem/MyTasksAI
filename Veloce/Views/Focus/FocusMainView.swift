@@ -98,12 +98,12 @@ struct FocusMainView: View {
     @State private var showActiveSession = false
     @State private var showCustomTimerPicker = false
 
-    // Quick timer state
-    @State private var selectedMode: QuickFocusMode = .pomodoro
+    // Quick timer state - Default to Custom for Tiimo-style experience
+    @State private var selectedMode: QuickFocusMode = .custom
     @State private var timerState: QuickTimerState = .idle
-    @State private var timeRemaining: TimeInterval = 25 * 60
-    @State private var totalTime: TimeInterval = 25 * 60
-    @State private var customMinutes: Int = 30
+    @State private var timeRemaining: TimeInterval = 30 * 60  // Default custom: 30 min
+    @State private var totalTime: TimeInterval = 30 * 60
+    @AppStorage("lastCustomDuration") private var customMinutes: Int = 30
     @State private var timer: Timer?
 
     // Services
@@ -124,10 +124,10 @@ struct FocusMainView: View {
             enhancedCosmicBackground
 
             VStack(spacing: 0) {
-                // Section Selector
-                sectionSelector
-                    .padding(.top, Theme.Spacing.universalHeaderHeight)
-                    .padding(.horizontal, Theme.Spacing.screenPadding)
+                // Section Selector - Compact Liquid Glass Pill
+                CompactFlowPill(selected: $selectedSection)
+                    .padding(.top, Theme.Spacing.universalHeaderHeight + 8)
+                    .padding(.horizontal, 24)  // Proper margin from edges
 
                 // Content based on section
                 if selectedSection == .timer {
@@ -159,15 +159,22 @@ struct FocusMainView: View {
             )
         }
         .sheet(isPresented: $showCustomTimerPicker) {
-            CustomTimerPickerSheet(
-                minutes: $customMinutes,
+            EnhancedCustomTimerView(
+                selectedMinutes: $customMinutes,
+                accentColor: Theme.Colors.success,
                 onStart: {
                     showCustomTimerPicker = false
                     timeRemaining = TimeInterval(customMinutes * 60)
                     totalTime = TimeInterval(customMinutes * 60)
                     startTimer()
+                },
+                onDismiss: {
+                    showCustomTimerPicker = false
                 }
             )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(.clear)
         }
         .onAppear {
             startAmbientAnimations()
@@ -473,33 +480,9 @@ struct FocusMainView: View {
     // MARK: - App Blocking Section Content
 
     private var appBlockingSectionContent: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                // Screen Time Overview (Opal-style)
-                screenTimeOverview
-                    .padding(.top, Theme.Spacing.xl)
-                    .padding(.horizontal, Theme.Spacing.screenPadding)
-
-                // Quick Block Actions
-                quickBlockActions
-                    .padding(.top, Theme.Spacing.xl)
-                    .padding(.horizontal, Theme.Spacing.screenPadding)
-
-                // App Categories Breakdown
-                appCategoriesSection
-                    .padding(.top, Theme.Spacing.xl)
-                    .padding(.horizontal, Theme.Spacing.screenPadding)
-
-                // Blocking Schedule
-                blockingScheduleSection
-                    .padding(.top, Theme.Spacing.xl)
-                    .padding(.horizontal, Theme.Spacing.screenPadding)
-
-                Spacer()
-                    .frame(height: Theme.Spacing.floatingTabBarClearance)
-            }
-        }
-        .scrollIndicators(.hidden)
+        // Inline blocking with Overview/Schedules/Groups tabs
+        InlineBlockingSection()
+            .padding(.top, Theme.Spacing.lg)
     }
 
     // MARK: - Screen Time Overview (Opal-style)
@@ -1011,8 +994,16 @@ struct FocusMainView: View {
 
     private var timerDisplayString: String {
         let absTime = abs(timeRemaining)
-        let minutes = Int(absTime) / 60
-        let seconds = Int(absTime) % 60
+        let totalSeconds = Int(absTime)
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+
+        // For sessions >= 1 hour, show H:MM:SS format
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+        // For sessions < 1 hour, show MM:SS format
         return String(format: "%02d:%02d", minutes, seconds)
     }
 

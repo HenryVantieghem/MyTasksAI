@@ -1080,7 +1080,49 @@ extension PerplexityService {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
-        return try decoder.decode(GoalRefinement.self, from: data)
+        do {
+            return try decoder.decode(GoalRefinement.self, from: data)
+        } catch {
+            // Try fallback parsing for partial responses
+            logError("GoalRefinement decode failed: \(error). Attempting fallback parsing...")
+            return try parsePartialGoalRefinement(jsonResponse, originalTitle: title)
+        }
+    }
+
+    /// Fallback parser for GoalRefinement when standard decoding fails
+    private func parsePartialGoalRefinement(_ json: String, originalTitle: String) throws -> GoalRefinement {
+        guard let data = json.data(using: .utf8),
+              let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw PerplexityError.parsingFailed
+        }
+
+        // Extract what we can from the response
+        let refinedTitle = dict["refined_title"] as? String ?? originalTitle
+        let refinedDescription = dict["refined_description"] as? String
+        let successMetrics = dict["success_metrics"] as? [String]
+        let potentialObstacles = dict["potential_obstacles"] as? [String]
+        let motivationalQuote = dict["motivational_quote"] as? String
+
+        // Try to parse SMART analysis
+        var smartAnalysis: SMARTAnalysis? = nil
+        if let smartDict = dict["smart_analysis"] as? [String: Any] {
+            smartAnalysis = SMARTAnalysis(
+                specific: smartDict["specific"] as? String,
+                measurable: smartDict["measurable"] as? String,
+                achievable: smartDict["achievable"] as? String,
+                relevant: smartDict["relevant"] as? String,
+                timeBound: smartDict["time_bound"] as? String
+            )
+        }
+
+        return GoalRefinement(
+            refinedTitle: refinedTitle,
+            refinedDescription: refinedDescription,
+            successMetrics: successMetrics,
+            potentialObstacles: potentialObstacles,
+            motivationalQuote: motivationalQuote,
+            smartAnalysis: smartAnalysis
+        )
     }
 
     /// Generate a comprehensive roadmap with milestones for achieving a goal

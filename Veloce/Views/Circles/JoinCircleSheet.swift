@@ -209,27 +209,11 @@ struct JoinCircleSheet: View {
         isValidating = true
         validationError = nil
 
-        // Format the code with dash for lookup
-        let formattedCode = String(inviteCode.prefix(3)) + "-" + String(inviteCode.suffix(3))
+        // Format the code with dash for lookup (reserved for future validation endpoint)
+        _ = String(inviteCode.prefix(3)) + "-" + String(inviteCode.suffix(3))
 
-        Task {
-            do {
-                // Try to join to validate - CircleService will throw if invalid
-                // For now, we proceed to join directly
-                await MainActor.run {
-                    isValidating = false
-                    // If we had a validation endpoint, we'd set foundCircle here
-                    // For now, we'll attempt to join directly
-                }
-            } catch {
-                await MainActor.run {
-                    validationError = "Invalid invite code"
-                    isValidating = false
-                }
-            }
-        }
-
-        // For now, just stop validating and allow join attempt
+        // Validation would use circleService.validateInviteCode(formattedCode) when available
+        // For now, we proceed to join directly without pre-validation
         isValidating = false
     }
 

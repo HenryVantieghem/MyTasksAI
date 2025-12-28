@@ -142,7 +142,7 @@ struct LiquidGlassMonthView: View {
         let isToday = calendar.isDateInToday(date)
         let taskCount = tasksForDate(date).count
         let eventCount = eventsForDate(date).count
-        let totalCount = taskCount + eventCount
+        // totalCount used implicitly for indicator logic
         let isWeekend = calendar.isDateInWeekend(date)
 
         return Button {

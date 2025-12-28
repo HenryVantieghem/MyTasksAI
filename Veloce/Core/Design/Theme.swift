@@ -98,6 +98,93 @@ enum Theme {
         }
     }
 
+    // MARK: - Vibrant Celestial Colors (Enhanced "Pop" Palette)
+    /// Ultra-vibrant colors that "pop" against dark void backgrounds
+    /// Used for premium UI elements, CTAs, and emphasis
+    enum VibrantCelestial {
+        // MARK: Primary Vibrant Accents
+        /// Electric Cyan - Ultra-bright primary action color
+        static let electricCyan = Color(red: 0.0, green: 0.95, blue: 1.0)
+        /// Plasma Purple - Rich vivid purple for AI/premium elements
+        static let plasmaPurple = Color(red: 0.65, green: 0.25, blue: 1.0)
+        /// Aurora Neon - Vibrant success green
+        static let auroraGreen = Color(red: 0.15, green: 1.0, blue: 0.65)
+        /// Solar Gold - Warm achievement gold
+        static let solarGold = Color(red: 1.0, green: 0.85, blue: 0.25)
+        /// Nebula Pink - Celebration/energy pink
+        static let nebulaPink = Color(red: 1.0, green: 0.45, blue: 0.75)
+        /// Cosmic Blue - Deep interactive blue
+        static let cosmicBlue = Color(red: 0.25, green: 0.55, blue: 1.0)
+        /// Stellar White - Pure highlight
+        static let stellarWhite = Color(red: 1.0, green: 0.98, blue: 0.95)
+
+        // MARK: Semantic Vibrant Colors
+        /// Primary action color
+        static let actionPrimary = electricCyan
+        /// Success vibrant
+        static let successVibrant = auroraGreen
+        /// AI/Premium accent
+        static let aiVibrant = plasmaPurple
+        /// Warning vibrant
+        static let warningVibrant = solarGold
+        /// Error vibrant
+        static let errorVibrant = Color(red: 1.0, green: 0.35, blue: 0.40)
+
+        // MARK: Vibrant Gradients
+        /// Primary CTA gradient (cyan → purple)
+        static var ctaGradient: LinearGradient {
+            LinearGradient(
+                colors: [electricCyan, plasmaPurple],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// Success gradient (green → cyan)
+        static var successGradient: LinearGradient {
+            LinearGradient(
+                colors: [auroraGreen, Color(red: 0.0, green: 0.85, blue: 0.95)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        }
+
+        /// Premium AI gradient (purple → blue)
+        static var aiGradient: LinearGradient {
+            LinearGradient(
+                colors: [plasmaPurple, Color(red: 0.35, green: 0.45, blue: 1.0)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        /// Celebration gradient (gold → pink)
+        static var celebrationGradient: LinearGradient {
+            LinearGradient(
+                colors: [solarGold, nebulaPink],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        }
+
+        /// Prismatic border gradient (rotating iridescent)
+        static func prismaticGradient(rotation: Double = 0) -> AngularGradient {
+            AngularGradient(
+                colors: [
+                    Color(red: 0.55, green: 0.35, blue: 1.0),   // Deep violet
+                    Color(red: 0.35, green: 0.55, blue: 1.0),   // Electric blue
+                    Color(red: 0.25, green: 0.85, blue: 0.95),  // Cyan plasma
+                    Color(red: 0.55, green: 0.95, blue: 0.85),  // Seafoam
+                    Color(red: 0.95, green: 0.55, blue: 0.85),  // Rose quartz
+                    Color(red: 0.55, green: 0.35, blue: 1.0)    // Back to violet
+                ],
+                center: .center,
+                startAngle: .degrees(rotation),
+                endAngle: .degrees(rotation + 360)
+            )
+        }
+    }
+
     // MARK: - Task Card Colors (Genius Card System)
     /// Color palette for the revolutionary task card experience
     /// Each color is carefully chosen for emotional impact and visual hierarchy
