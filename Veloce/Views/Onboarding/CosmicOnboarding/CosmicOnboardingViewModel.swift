@@ -11,6 +11,24 @@ import EventKit
 import UserNotifications
 import FamilyControls
 
+// MARK: - Cosmic Onboarding Step
+
+enum CosmicOnboardingStep: Int, CaseIterable, Identifiable, Hashable {
+    case welcome = 0
+    case calendarPermission = 1
+    case notificationPermission = 2
+    case screenTimePermission = 3
+    case featureTasks = 4
+    case featureFocus = 5
+    case featureMomentum = 6
+    case featureAI = 7
+    case goalSetup = 8
+    case trialInfo = 9
+    case readyToLaunch = 10
+
+    var id: Int { rawValue }
+}
+
 // MARK: - Onboarding Goal Category
 
 enum OnboardingGoalCategory: String, CaseIterable, Identifiable {

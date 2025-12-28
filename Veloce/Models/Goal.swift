@@ -187,12 +187,7 @@ extension Goal {
     /// Decoded AI roadmap
     var decodedRoadmap: GoalRoadmap? {
         guard let data = aiRoadmap else { return nil }
-        return Goal.decodeRoadmap(from: data)
-    }
-
-    /// Nonisolated helper to decode roadmap (Swift 6 concurrency safe)
-    nonisolated private static func decodeRoadmap(from data: Data) -> GoalRoadmap? {
-        try? JSONDecoder().decode(GoalRoadmap.self, from: data)
+        return try? JSONDecoder().decode(GoalRoadmap.self, from: data)
     }
 
     /// Decoded progress history
@@ -349,14 +344,9 @@ extension Goal {
 
     /// Set AI roadmap (encodes to Data)
     func setRoadmap(_ roadmap: GoalRoadmap) throws {
-        aiRoadmap = try Self.encodeRoadmap(roadmap)
+        aiRoadmap = try JSONEncoder().encode(roadmap)
         milestoneCount = roadmap.totalMilestones
         updatedAt = .now
-    }
-
-    /// Helper to encode roadmap (nonisolated for Swift 6 concurrency)
-    nonisolated private static func encodeRoadmap(_ roadmap: GoalRoadmap) throws -> Data {
-        try JSONEncoder().encode(roadmap)
     }
 
     /// Add progress snapshot

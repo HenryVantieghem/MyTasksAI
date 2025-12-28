@@ -130,7 +130,6 @@ struct RootView: View {
         case .unauthenticated:
             // Ultra-premium Liquid Glass Auth with form morphing
             LiquidGlassAuthView(
-                authViewModel: AuthViewModel(),
                 initialScreen: appViewModel.preferSignUp ? .signUp : .signIn
             )
 

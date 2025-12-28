@@ -177,8 +177,8 @@ struct AIRoadmapApprovalSheet: View {
                 }
 
                 // Coaching notes
-                if !roadmap.coachingNotes.isEmpty {
-                    coachingNotesCard(roadmap.coachingNotes)
+                if let notes = roadmap.coachingNotes, !notes.isEmpty {
+                    coachingNotesCard(notes)
                 }
 
                 // Approval button
@@ -204,7 +204,7 @@ struct AIRoadmapApprovalSheet: View {
                     .frame(width: 100, height: 100)
 
                 SwiftUI.Circle()
-                    .trim(from: 0, to: roadmap.successProbability)
+                    .trim(from: 0, to: roadmap.successProbability ?? 0)
                     .stroke(
                         LinearGradient(
                             colors: [Theme.Colors.success, Theme.Colors.aiCyan],
@@ -217,7 +217,7 @@ struct AIRoadmapApprovalSheet: View {
                     .rotationEffect(.degrees(-90))
 
                 VStack(spacing: 2) {
-                    Text("\(Int(roadmap.successProbability * 100))%")
+                    Text("\(Int((roadmap.successProbability ?? 0) * 100))%")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
 
@@ -231,7 +231,7 @@ struct AIRoadmapApprovalSheet: View {
             HStack(spacing: 24) {
                 StatPill(
                     icon: "clock",
-                    value: "\(Int(roadmap.totalEstimatedHours))h",
+                    value: "\(Int(roadmap.totalEstimatedHours ?? 0))h",
                     label: "Total Time"
                 )
 
@@ -488,16 +488,16 @@ private struct PhaseCard: View {
                 }
 
                 // Daily habits
-                if !phase.dailyHabits.isEmpty {
+                if let habits = phase.dailyHabits, !habits.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Daily Habits", systemImage: "repeat")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(.white.opacity(0.5))
 
-                        ForEach(phase.dailyHabits, id: \.title) { habit in
+                        ForEach(habits, id: \.title) { habit in
                             TaskSuggestionRow(
                                 title: habit.title,
-                                duration: "\(habit.durationMinutes)min",
+                                duration: "\(habit.durationMinutes ?? 0)min",
                                 icon: "repeat.circle",
                                 isSelected: isSuggestionSelected(habit.title),
                                 onToggle: { toggleSuggestion(habit.title) }
@@ -507,16 +507,16 @@ private struct PhaseCard: View {
                 }
 
                 // One-time tasks
-                if !phase.oneTimeTasks.isEmpty {
+                if let tasks = phase.oneTimeTasks, !tasks.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Tasks", systemImage: "checklist")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(.white.opacity(0.5))
 
-                        ForEach(phase.oneTimeTasks, id: \.title) { task in
+                        ForEach(tasks, id: \.title) { task in
                             TaskSuggestionRow(
                                 title: task.title,
-                                duration: "\(task.estimatedMinutes)min",
+                                duration: "\(task.estimatedMinutes ?? 0)min",
                                 icon: "circle",
                                 isSelected: isSuggestionSelected(task.title),
                                 onToggle: { toggleSuggestion(task.title) }

@@ -9,6 +9,14 @@
 
 import SwiftUI
 
+// MARK: - Auth Screen
+
+enum AuthScreen: Equatable {
+    case signIn
+    case signUp
+    case forgotPassword
+}
+
 // MARK: - Liquid Glass Auth View
 
 struct LiquidGlassAuthView: View {

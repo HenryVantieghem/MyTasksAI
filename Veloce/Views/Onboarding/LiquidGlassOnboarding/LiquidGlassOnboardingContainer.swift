@@ -173,8 +173,7 @@ struct LiquidGlassOnboardingContainer: View {
                         .foregroundStyle(.white.opacity(0.8))
                         .frame(width: 40, height: 40)
                 }
-                .liquidGlassInteractive()
-                .clipShape(Circle())
+                .liquidGlassInteractive(in: Circle())
                 .transition(.scale.combined(with: .opacity))
             } else {
                 Spacer().frame(width: 40)
@@ -202,8 +201,7 @@ struct LiquidGlassOnboardingContainer: View {
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
                 }
-                .liquidGlassInteractive()
-                .clipShape(Capsule())
+                .liquidGlassInteractive(in: Capsule())
             } else {
                 Spacer().frame(width: 40)
             }
@@ -518,7 +516,7 @@ struct LiquidGlassWelcomePage: View {
 
             // CTA Button
             LiquidGlassButton.primary(
-                title: "Begin Journey",
+                "Begin Journey",
                 icon: "arrow.right",
                 action: onContinue
             )
@@ -573,14 +571,14 @@ struct LiquidGlassPermissionPage: View {
                 if isGranted {
                     // Already granted
                     LiquidGlassButton.success(
-                        title: "Enabled",
+                        "Enabled",
                         icon: "checkmark",
                         action: onContinue
                     )
                 } else {
                     // Request permission
                     LiquidGlassButton.primary(
-                        title: "Allow Access",
+                        "Allow Access",
                         icon: nil,
                         action: {
                             Task { await onAllow() }
@@ -653,7 +651,7 @@ struct LiquidGlassFeaturePage: View {
             Spacer()
 
             LiquidGlassButton.primary(
-                title: "Continue",
+                "Continue",
                 icon: "arrow.right",
                 action: onContinue
             )
@@ -699,7 +697,7 @@ struct LiquidGlassGoalSetupPage: View {
 
                 if viewModel.canProceedFromGoal {
                     LiquidGlassButton.primary(
-                        title: "Continue",
+                        "Continue",
                         icon: "arrow.right",
                         action: onContinue
                     )
@@ -798,7 +796,7 @@ struct LiquidGlassTrialInfoPage: View {
             Spacer()
 
             LiquidGlassButton.primary(
-                title: "Start Free Trial",
+                "Start Free Trial",
                 icon: "sparkles",
                 action: onContinue
             )
@@ -868,7 +866,7 @@ struct LiquidGlassLaunchPage: View {
             Spacer()
 
             LiquidGlassButton.primary(
-                title: "Launch",
+                "Launch",
                 icon: "arrow.up.forward",
                 action: onLaunch
             )
