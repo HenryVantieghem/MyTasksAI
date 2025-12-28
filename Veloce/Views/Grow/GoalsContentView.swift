@@ -433,30 +433,49 @@ private struct GoalFilterPill: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Text(filter.rawValue)
-                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                    .font(.system(size: 15, weight: isSelected ? .bold : .semibold))
 
                 if count > 0 {
                     Text("\(count)")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
+                        .font(.system(size: 12, weight: .heavy, design: .rounded))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(isSelected ? .white.opacity(0.2) : .white.opacity(0.1))
+                                .fill(isSelected ? .white.opacity(0.3) : .white.opacity(0.15))
                         )
                 }
             }
-            .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
+            .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
+            .padding(.horizontal, 18)
+            .padding(.vertical, 12)
             .background(
-                Capsule()
-                    .fill(isSelected ? Theme.Colors.aiPurple : .white.opacity(0.08))
+                Group {
+                    if isSelected {
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Theme.Colors.aiPurple,
+                                        Theme.Colors.aiPurple.opacity(0.8),
+                                        Theme.Colors.aiBlue.opacity(0.6)
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .shadow(color: Theme.Colors.aiPurple.opacity(0.5), radius: 12, y: 4)
+                    } else {
+                        Capsule()
+                            .fill(.white.opacity(0.1))
+                    }
+                }
             )
         }
         .buttonStyle(.plain)
+        .glassEffect(isSelected ? .regular.tint(Theme.Colors.aiPurple).interactive() : .regular, in: .capsule)
     }
 }
 
@@ -469,31 +488,44 @@ private struct GoalStatCard: View {
     let color: Color
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(color)
 
                 Text(value)
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 24, weight: .heavy, design: .rounded))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.white, .white.opacity(0.9)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
             }
 
             Text(label)
-                .font(.system(size: 11))
-                .foregroundStyle(.white.opacity(0.5))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.7))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
+        .padding(.vertical, 18)
         .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(color.opacity(0.2), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            color.opacity(0.15),
+                            color.opacity(0.08)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
+                .shadow(color: color.opacity(0.4), radius: 12, y: 6)
         )
+        .glassEffect(.regular.tint(color).interactive(), in: .rect(cornerRadius: 18))
     }
 }
 
@@ -504,239 +536,11 @@ struct PremiumGoalCard: View {
     @Bindable var goalsVM: GoalsViewModel
     let onTap: () -> Void
 
-    @State private var isPressed = false
-    @State private var glowPulse: Double = 0.5
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var daysRemaining: Int {
-        guard let targetDate = goal.targetDate else { return 0 }
-        return max(0, Calendar.current.dateComponents([.day], from: Date(), to: targetDate).day ?? 0)
-    }
-
-    private var themeColor: Color {
-        goal.timeframeEnum?.color ?? goal.categoryEnum?.color ?? Theme.Colors.aiPurple
-    }
-
     var body: some View {
         Button(action: onTap) {
-            VStack(alignment: .leading, spacing: 16) {
-                // Header row
-                HStack(spacing: 12) {
-                    // Progress orb
-                    GoalStatusOrb(goal: goal, size: 52)
-
-                    // Title and category
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(goal.displayTitle)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-
-                        HStack(spacing: 8) {
-                            if let category = goal.categoryEnum {
-                                HStack(spacing: 4) {
-                                    Image(systemName: category.icon)
-                                        .font(.system(size: 10))
-                                    Text(category.displayName)
-                                        .font(.system(size: 11, weight: .medium))
-                                }
-                                .foregroundStyle(category.color.opacity(0.8))
-                            }
-
-                            if let timeframe = goal.timeframeEnum {
-                                Text("•")
-                                    .foregroundStyle(.white.opacity(0.3))
-
-                                HStack(spacing: 3) {
-                                    Image(systemName: timeframe.icon)
-                                        .font(.system(size: 9))
-                                    Text(timeframe.displayName)
-                                        .font(.system(size: 11))
-                                }
-                                .foregroundStyle(timeframe.color.opacity(0.7))
-                            }
-                        }
-                    }
-
-                    Spacer(minLength: 0)
-
-                    // Days badge or completed
-                    if goal.isCompleted {
-                        completedBadge
-                    } else {
-                        daysBadge
-                    }
-                }
-
-                // Progress bar
-                progressSection
-
-                // Bottom info row
-                bottomRow
-            }
-            .padding(18)
-            .background(cardBackground)
-            .scaleEffect(isPressed ? 0.98 : 1.0)
+            GoalCardView(goal: goal)
         }
         .buttonStyle(.plain)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in
-                    withAnimation(.easeInOut(duration: 0.1)) { isPressed = true }
-                }
-                .onEnded { _ in
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { isPressed = false }
-                }
-        )
-        .onAppear { startAnimations() }
-    }
-
-    private var completedBadge: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 12))
-            Text("Done")
-                .font(.system(size: 12, weight: .semibold))
-        }
-        .foregroundStyle(Theme.Colors.success)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(
-            Capsule()
-                .fill(Theme.Colors.success.opacity(0.15))
-        )
-    }
-
-    private var daysBadge: some View {
-        VStack(spacing: 2) {
-            Text("\(daysRemaining)")
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(daysRemaining <= 3 ? Theme.Colors.warning : .white)
-
-            Text("days")
-                .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.5))
-        }
-        .frame(width: 44)
-    }
-
-    private var progressSection: some View {
-        VStack(spacing: 6) {
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    // Background track
-                    Capsule()
-                        .fill(Color.white.opacity(0.1))
-                        .frame(height: 6)
-
-                    // Progress fill
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [themeColor, themeColor.opacity(0.6)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: max(6, geometry.size.width * goal.progress), height: 6)
-                        .shadow(color: themeColor.opacity(0.5), radius: 4, y: 0)
-                }
-            }
-            .frame(height: 6)
-
-            HStack {
-                Text("\(Int(goal.progress * 100))% complete")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.white.opacity(0.5))
-
-                Spacer()
-
-                if goal.milestoneCount > 0 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "flag.checkered")
-                            .font(.system(size: 9))
-                        Text("\(goal.completedMilestoneCount)/\(goal.milestoneCount)")
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .foregroundStyle(.white.opacity(0.5))
-                }
-            }
-        }
-    }
-
-    private var bottomRow: some View {
-        HStack(spacing: 12) {
-            // Check-in indicator
-            if goal.isCheckInDue {
-                HStack(spacing: 4) {
-                    Image(systemName: "bell.badge.fill")
-                        .font(.system(size: 10))
-                    Text("Check-in due")
-                        .font(.system(size: 11, weight: .medium))
-                }
-                .foregroundStyle(Theme.Colors.warning)
-            }
-
-            // AI status
-            if goal.hasRoadmap {
-                HStack(spacing: 4) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 10))
-                    Text("AI Roadmap")
-                        .font(.system(size: 11))
-                }
-                .foregroundStyle(Theme.Colors.aiPurple.opacity(0.7))
-            }
-
-            Spacer()
-
-            // Arrow
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.3))
-        }
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(.ultraThinMaterial.opacity(0.5))
-            .overlay {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                themeColor.opacity(0.1 * glowPulse),
-                                .clear
-                            ],
-                            center: .topLeading,
-                            startRadius: 0,
-                            endRadius: 200
-                        )
-                    )
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                themeColor.opacity(0.3),
-                                .white.opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            }
-    }
-
-    private func startAnimations() {
-        guard !reduceMotion else { return }
-
-        withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-            glowPulse = 1.0
-        }
     }
 }
 
