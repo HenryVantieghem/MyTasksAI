@@ -26,7 +26,7 @@ struct ElegantCheckBubble: View {
     @State private var rippleScale: CGFloat = 0
     @State private var rippleOpacity: Double = 0
     @State private var glowOpacity: Double = 0
-    @State private var sparkles: [SparkleParticle] = []
+    @State private var sparkles: [ElegantSparkleParticle] = []
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -40,7 +40,9 @@ struct ElegantCheckBubble: View {
     }
 
     var body: some View {
-        Button(action: handleTap) {
+        Button {
+            handleTap()
+        } label: {
             ZStack {
                 // Layer 0: Outer glow (success state)
                 Circle()
@@ -155,7 +157,7 @@ struct ElegantCheckBubble: View {
     // MARK: - Checkmark
 
     private var checkmark: some View {
-        CheckmarkShape()
+        ElegantCheckmarkShape()
             .trim(from: 0, to: checkmarkProgress)
             .stroke(
                 checkmarkColor,
@@ -295,8 +297,8 @@ struct ElegantCheckBubble: View {
                 size: CGFloat.random(in: 3...6),
                 offset: .zero,
                 targetOffset: CGSize(
-                    width: cos(angle) * distance,
-                    height: sin(angle) * distance
+                    width: CGFloat(cos(angle)) * distance,
+                    height: CGFloat(sin(angle)) * distance
                 ),
                 opacity: 1.0
             )
@@ -323,19 +325,19 @@ struct ElegantCheckBubble: View {
         guard !reduceMotion else { return }
 
         let sparkleCount = 8
-        var newSparkles: [SparkleParticle] = []
+        var newSparkles: [ElegantSparkleParticle] = []
 
         for i in 0..<sparkleCount {
             let angle = (Double(i) / Double(sparkleCount)) * 2 * .pi + .pi / Double(sparkleCount)
             let distance = CGFloat.random(in: 18...30)
-            let sparkle = SparkleParticle(
+            let sparkle = ElegantSparkleParticle(
                 id: UUID(),
                 color: .white,
                 size: CGFloat.random(in: 2...4),
                 offset: .zero,
                 targetOffset: CGSize(
-                    width: cos(angle) * distance,
-                    height: sin(angle) * distance
+                    width: CGFloat(cos(angle)) * distance,
+                    height: CGFloat(sin(angle)) * distance
                 ),
                 opacity: 1.0,
                 delay: Double.random(in: 0...0.08)
@@ -358,9 +360,9 @@ struct ElegantCheckBubble: View {
     }
 }
 
-// MARK: - Checkmark Shape
+// MARK: - Elegant Checkmark Shape
 
-struct CheckmarkShape: Shape {
+struct ElegantCheckmarkShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let width = rect.width
@@ -386,9 +388,9 @@ struct BubbleParticle: Identifiable {
     var opacity: Double
 }
 
-// MARK: - Sparkle Particle
+// MARK: - Elegant Sparkle Particle
 
-struct SparkleParticle: Identifiable {
+struct ElegantSparkleParticle: Identifiable {
     let id: UUID
     let color: Color
     let size: CGFloat

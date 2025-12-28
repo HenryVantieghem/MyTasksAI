@@ -474,7 +474,7 @@ struct DayTaskCard: View {
                     } label: {
                         Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
                             .font(.system(size: 24, weight: .light))
-                            .foregroundStyle(task.isCompleted ? Color.green : .tertiary)
+                            .foregroundStyle(task.isCompleted ? Color.green : Color.secondary)
                     }
                     .buttonStyle(.plain)
                     .padding(.trailing, 12)

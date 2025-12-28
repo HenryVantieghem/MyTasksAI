@@ -795,7 +795,8 @@ struct IfThenPlan: Codable, Identifiable, Sendable {
 }
 
 /// Progress snapshot for history
-struct ProgressSnapshot: Codable, Sendable {
+struct ProgressSnapshot: Codable, Sendable, Identifiable {
+    var id: UUID
     var date: Date
     var progress: Double
     var completedMilestones: Int
@@ -803,12 +804,14 @@ struct ProgressSnapshot: Codable, Sendable {
     var notes: String?
 
     init(
+        id: UUID = UUID(),
         date: Date = .now,
         progress: Double,
         completedMilestones: Int = 0,
         totalMilestones: Int = 0,
         notes: String? = nil
     ) {
+        self.id = id
         self.date = date
         self.progress = progress
         self.completedMilestones = completedMilestones

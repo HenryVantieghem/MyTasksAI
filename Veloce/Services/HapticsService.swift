@@ -371,6 +371,17 @@ final class HapticsService {
 
     // MARK: - ✨ Ultra-Premium Haptic Patterns
 
+    /// Epic Task Complete - The ultimate ~1.5s celebration sequence
+    /// Full 7-phase crescendo: anticipation → confirmation → crescendo → burst → afterglow → sparkles → settle
+    /// Perfectly synchronized with TaskCardV5's epic celebration animation
+    func epicTaskComplete() {
+        guard hapticsEnabled, supportsHaptics else {
+            notification(.success)
+            return
+        }
+        playCustomPattern(.epicTaskComplete)
+    }
+
     /// Dopamine burst - The ultimate task completion feeling
     /// A euphoric cascade that feels like pure accomplishment
     func dopamineBurst() {
@@ -663,6 +674,8 @@ final class HapticsService {
         case rippleWave
         case sheetPresent
         case longPressRecognized
+        // Epic Task Completion (~1.5s full sequence)
+        case epicTaskComplete
 
         var events: [CHHapticEvent] {
             switch self {
@@ -1245,6 +1258,76 @@ final class HapticsService {
                         CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.85),
                         CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
                     ], relativeTime: 0.1)
+                ]
+
+            case .epicTaskComplete:
+                // ✨ EPIC TASK COMPLETION - The Ultimate Celebration (~1.5s)
+                // A crescendo of euphoria culminating in pure accomplishment
+                return [
+                    // Phase 1: Soft anticipation (T+0ms)
+                    // The moment of intention, the finger touches down
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.4),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 0),
+
+                    // Phase 2: Medium confirmation (T+100ms)
+                    // The checkbox starts to fill, momentum building
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.1),
+
+                    // Phase 3: Rising crescendo (T+200ms, T+280ms, T+360ms)
+                    // Energy builds exponentially toward climax
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.6),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.2),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.8),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.28),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.85)
+                    ], relativeTime: 0.36),
+
+                    // Phase 4: Particle burst accent (T+400ms)
+                    // The visual explosion triggers haptic starburst
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.9),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.9)
+                    ], relativeTime: 0.4),
+
+                    // Phase 5: Satisfying resonant tail (T+450ms, 0.25s duration)
+                    // The warm afterglow of accomplishment
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.5),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.3)
+                    ], relativeTime: 0.45, duration: 0.25),
+
+                    // Phase 6: XP sparkle accents (T+700ms, T+800ms, T+900ms)
+                    // Light touches as XP flies upward
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.35),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                    ], relativeTime: 0.7),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.25),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.6)
+                    ], relativeTime: 0.8),
+                    CHHapticEvent(eventType: .hapticTransient, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.15),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+                    ], relativeTime: 0.9),
+
+                    // Phase 7: Final settle (T+1000ms)
+                    // The gentle landing, task complete, pure satisfaction
+                    CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                        CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.2),
+                        CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.2)
+                    ], relativeTime: 1.0, duration: 0.15)
                 ]
 
             }

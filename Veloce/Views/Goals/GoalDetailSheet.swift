@@ -1961,7 +1961,7 @@ struct IfThenInputSheet: View {
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(.white.opacity(0.5))
 
-                        FlowLayout(spacing: 8) {
+                        GoalTagFlowLayout(spacing: 8) {
                             ForEach(commonObstacles, id: \.self) { obs in
                                 Button {
                                     obstacle = obs
@@ -2282,7 +2282,7 @@ struct NoteRow: View {
 
 // MARK: - Flow Layout for Tags
 
-struct FlowLayout: Layout {
+struct GoalTagFlowLayout: Layout {
     var spacing: CGFloat = 8
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {

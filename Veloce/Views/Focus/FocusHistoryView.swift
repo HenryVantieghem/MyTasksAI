@@ -87,7 +87,7 @@ struct FocusHistoryView: View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
                 // Total Focus Time
-                FocusStatCard(
+                HistoryStatCard(
                     title: "Total Focus",
                     value: formatDuration(statistics.totalMinutesFocused),
                     icon: "timer",
@@ -95,7 +95,7 @@ struct FocusHistoryView: View {
                 )
 
                 // Sessions Completed
-                FocusStatCard(
+                HistoryStatCard(
                     title: "Sessions",
                     value: "\(statistics.totalSessionsCompleted)",
                     icon: "checkmark.circle.fill",
@@ -105,7 +105,7 @@ struct FocusHistoryView: View {
 
             HStack(spacing: 12) {
                 // Deep Focus Sessions
-                FocusStatCard(
+                HistoryStatCard(
                     title: "Deep Focus",
                     value: "\(statistics.deepFocusSessionsCompleted)",
                     icon: "lock.fill",
@@ -113,7 +113,7 @@ struct FocusHistoryView: View {
                 )
 
                 // Average Duration
-                FocusStatCard(
+                HistoryStatCard(
                     title: "Avg Duration",
                     value: "\(statistics.averageSessionDuration)m",
                     icon: "chart.bar.fill",
@@ -364,9 +364,9 @@ struct DailyFocusData: Identifiable {
     let sessionCount: Int
 }
 
-// MARK: - Focus Stat Card
+// MARK: - History Stat Card
 
-struct FocusStatCard: View {
+struct HistoryStatCard: View {
     let title: String
     let value: String
     let icon: String

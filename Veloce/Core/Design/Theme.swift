@@ -854,7 +854,14 @@ enum Theme {
         static let parallaxShift = SwiftUI.Animation.interactiveSpring(response: 0.15, dampingFraction: 0.8)
         /// Stagger delay base - for orchestrated entry animations
         static let staggerDelay: Double = 0.06
+
+        /// Cosmic spring - premium fluid animation for cosmic UI
+        static let cosmicSpring = SwiftUI.Animation.spring(response: 0.4, dampingFraction: 0.7)
     }
+
+    // MARK: - Animations Alias
+    /// Alias for Animation to support both naming conventions
+    typealias Animations = Animation
 }
 
 // MARK: - Shadow Style

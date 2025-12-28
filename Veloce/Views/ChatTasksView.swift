@@ -3,12 +3,12 @@
 //  Veloce
 //
 //  Living Cosmos Tasks View - iOS 26 Ultrathink Edition
-//  Features: List/Column toggle, TaskCardV4, staggered animations
+//  Features: List/Kanban toggle, TaskCardV5 Floating Glass Island, staggered animations
 //
 
 import SwiftUI
 
-// MARK: - View Mode
+// MARK: - View Mode (Legacy - now uses TasksDisplayMode)
 
 /// Display mode for tasks list
 enum TaskViewMode: String, CaseIterable {
@@ -19,6 +19,14 @@ enum TaskViewMode: String, CaseIterable {
         switch self {
         case .list: return "list.bullet"
         case .columns: return "rectangle.split.3x1"
+        }
+    }
+
+    /// Convert to new TasksDisplayMode
+    var displayMode: TasksDisplayMode {
+        switch self {
+        case .list: return .smartList
+        case .columns: return .kanban
         }
     }
 }
@@ -124,20 +132,28 @@ struct ChatTasksView: View {
     // Date selection
     @State private var selectedDate: Date = Date()
 
-    // View mode toggle - auto-switch to columns on iPad landscape
-    @State private var viewMode: TaskViewMode = .list
+    // View mode toggle - persisted with AppStorage
+    @AppStorage("tasksDisplayMode") private var displayMode: TasksDisplayMode = .smartList
     @State private var userOverrodeViewMode = false
     @Environment(\.responsiveLayout) private var layout
 
-    // Computed effective view mode (auto-columns on iPad landscape)
-    private var effectiveViewMode: TaskViewMode {
+    // Legacy view mode (for compatibility)
+    @State private var viewMode: TaskViewMode = .list
+
+    // Computed effective view mode (auto-kanban on iPad landscape)
+    private var effectiveDisplayMode: TasksDisplayMode {
         // If user manually changed view mode, respect their choice
-        if userOverrodeViewMode { return viewMode }
-        // Auto-switch to columns on iPad landscape
+        if userOverrodeViewMode { return displayMode }
+        // Auto-switch to kanban on iPad landscape
         if layout.deviceType.isTablet && layout.isLandscape {
-            return .columns
+            return .kanban
         }
-        return viewMode
+        return displayMode
+    }
+
+    // Legacy computed property for backward compatibility
+    private var effectiveViewMode: TaskViewMode {
+        effectiveDisplayMode == .smartList ? .list : .columns
     }
 
     // Animation states
@@ -234,10 +250,10 @@ struct ChatTasksView: View {
                     EmptyTasksView()
                         .padding(.top, Theme.Spacing.universalHeaderHeight - 60)
                 } else {
-                    if effectiveViewMode == .list {
+                    if effectiveDisplayMode == .smartList {
                         listTaskFeed
                     } else {
-                        columnTaskFeed
+                        kanbanTaskFeed
                     }
                 }
             }
@@ -276,22 +292,14 @@ struct ChatTasksView: View {
             // Today pill (absolute center)
             TodayPillView(selectedDate: $selectedDate)
 
-            // View mode toggle (right-aligned)
+            // View mode toggle (right-aligned) - New Liquid Glass Toggle
             HStack {
                 Spacer()
 
-                Picker("View", selection: $viewMode) {
-                    ForEach(TaskViewMode.allCases, id: \.self) { mode in
-                        Image(systemName: mode.icon)
-                            .tag(mode)
+                TasksViewModeToggleCompact(mode: $displayMode)
+                    .onChange(of: displayMode) { _, _ in
+                        userOverrodeViewMode = true  // User manually changed view mode
                     }
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 100)
-                .onChange(of: viewMode) { _, _ in
-                    userOverrodeViewMode = true  // User manually changed view mode
-                    HapticsService.shared.selectionFeedback()
-                }
             }
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
@@ -351,7 +359,96 @@ struct ChatTasksView: View {
         }
     }
 
-    // MARK: - Column Task Feed
+    // MARK: - Kanban Task Feed (New Premium Edition)
+
+    private var kanbanTaskFeed: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(alignment: .top, spacing: layout.spacing * 1.5) {
+                // In Progress Column
+                KanbanColumnView(
+                    section: .inProgress,
+                    tasks: inProgressTasks,
+                    onTaskTap: { task in
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onToggleComplete: { task in
+                        completeTask(task)
+                    },
+                    onTaskDrop: handleTaskDrop,
+                    onStartFocus: onStartFocus,
+                    onSnooze: { task in
+                        viewModel.snoozeTask(task)
+                    },
+                    onDelete: { task in
+                        viewModel.deleteTask(task)
+                    }
+                )
+
+                // To Do Column
+                KanbanColumnView(
+                    section: .toDo,
+                    tasks: toDoTasks,
+                    onTaskTap: { task in
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onToggleComplete: { task in
+                        completeTask(task)
+                    },
+                    onTaskDrop: handleTaskDrop,
+                    onStartFocus: onStartFocus,
+                    onSnooze: { task in
+                        viewModel.snoozeTask(task)
+                    },
+                    onDelete: { task in
+                        viewModel.deleteTask(task)
+                    }
+                )
+
+                // Done Column
+                KanbanColumnView(
+                    section: .done,
+                    tasks: filteredRecentlyCompleted,
+                    onTaskTap: { task in
+                        HapticsService.shared.selectionFeedback()
+                        onTaskSelected?(task)
+                    },
+                    onToggleComplete: { task in
+                        viewModel.uncompleteTask(task)
+                    },
+                    onTaskDrop: handleTaskDrop,
+                    onStartFocus: nil,
+                    onSnooze: nil,
+                    onDelete: nil
+                )
+            }
+            .padding(.horizontal, layout.cardPadding)
+            .padding(.top, layout.spacing)
+            .padding(.bottom, 120)
+        }
+        .scrollTargetBehavior(.viewAligned)
+    }
+
+    // MARK: - Handle Task Drop (Drag & Drop)
+
+    private func handleTaskDrop(task: TaskItem, targetSection: TaskSection) {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+            switch targetSection {
+            case .inProgress:
+                task.isCompleted = false
+                task.isInProgress = true
+            case .toDo:
+                task.isCompleted = false
+                task.isInProgress = false
+            case .done:
+                // Use the completeTask function to trigger celebration
+                completeTask(task)
+            }
+        }
+    }
+
+    // MARK: - Column Task Feed (Legacy)
 
     private var columnTaskFeed: some View {
         ScrollView(.horizontal, showsIndicators: false) {

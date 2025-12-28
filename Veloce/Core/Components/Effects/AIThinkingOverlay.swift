@@ -43,8 +43,14 @@ enum AIThinkingPhase: Int, CaseIterable {
 /// Shows animated thinking dots, phase text, and premium glow
 struct AIThinkingOverlay: View {
     let isActive: Bool
-    var duration: TimeInterval = 3.0
+    var duration: TimeInterval
     var onComplete: (() -> Void)?
+
+    init(isActive: Bool, duration: TimeInterval = 3.0, onComplete: (() -> Void)? = nil) {
+        self.isActive = isActive
+        self.duration = duration
+        self.onComplete = onComplete
+    }
 
     @State private var currentPhase: AIThinkingPhase = .analyzing
     @State private var dotPhase: Int = 0

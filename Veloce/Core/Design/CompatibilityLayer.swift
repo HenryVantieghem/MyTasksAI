@@ -328,67 +328,9 @@ struct GlassEffectContainer<Content: View>: View {
 // MARK: - GlassEffectStyle (iOS 26+)
 // Chainable style for glassEffect modifier
 
-struct GlassEffectStyle {
-    enum Variant {
-        case regular
-        case clear
-    }
-
-    let variant: Variant
-    let isInteractive: Bool
-
-    static var regular: GlassEffectStyle {
-        GlassEffectStyle(variant: .regular, isInteractive: false)
-    }
-
-    static var clear: GlassEffectStyle {
-        GlassEffectStyle(variant: .clear, isInteractive: false)
-    }
-
-    /// Makes the glass effect interactive (responds to touch)
-    func interactive(_ enabled: Bool = true) -> GlassEffectStyle {
-        GlassEffectStyle(variant: self.variant, isInteractive: enabled)
-    }
-}
-
-// MARK: - GlassEffect Modifier with Style
-
-extension View {
-    /// iOS 26: Applies Liquid Glass effect with specified style and shape
-    /// Pre-iOS 26: Fallback to ultraThinMaterial with border
-    @ViewBuilder
-    func glassEffect(_ style: GlassEffectStyle = .regular, in shape: some Shape = Capsule()) -> some View {
-        if #available(iOS 26.0, *) {
-            // Native glassEffect would go here
-            // self.glassEffect(style.variant == .regular ? .regular : .clear, in: shape)
-            self
-                .background(shape.fill(.ultraThinMaterial))
-                .overlay {
-                    shape.stroke(
-                        LinearGradient(
-                            colors: [.white.opacity(0.2), .white.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.5
-                    )
-                }
-        } else {
-            self
-                .background(shape.fill(.ultraThinMaterial))
-                .overlay {
-                    shape.stroke(
-                        LinearGradient(
-                            colors: [.white.opacity(0.2), .white.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.5
-                    )
-                }
-        }
-    }
-}
+// MARK: - GlassEffectStyle (REMOVED)
+// iOS 26+ uses native SwiftUI.Glass API directly
+// All .glassEffect(.regular, in: Shape) calls now use SwiftUI's native implementation
 
 // MARK: - Circle Shape for Convenience
 
@@ -412,21 +354,8 @@ extension View {
     }
 }
 
-// MARK: - Sheet Morphing Transitions
-
-extension View {
-    /// iOS 26: Marks view as source for sheet morphing transition
-    /// Pre-iOS 26: No-op
-    @ViewBuilder
-    func matchedTransitionSource<ID: Hashable>(id: ID, in namespace: Namespace.ID) -> some View {
-        if #available(iOS 26.0, *) {
-            // Native matchedTransitionSource would go here
-            self
-        } else {
-            self
-        }
-    }
-}
+// MARK: - Sheet Morphing Transitions (REMOVED)
+// iOS 26+ uses native SwiftUI .matchedTransitionSource() API directly
 
 // MARK: - Navigation Transition Extension
 

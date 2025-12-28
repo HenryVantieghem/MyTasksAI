@@ -9,9 +9,9 @@
 import SwiftUI
 import FamilyControls
 
-// MARK: - Focus Section
+// MARK: - Focus Tab Section
 
-enum FocusSection: String, CaseIterable {
+enum FocusTabSection: String, CaseIterable {
     case timer = "Timer"
     case schedules = "Schedules"
     case history = "History"
@@ -388,7 +388,7 @@ struct FocusAppBlockingConfigSheet: View {
 // MARK: - Focus Section Pill (Liquid Glass)
 
 struct FocusSectionPill: View {
-    let section: FocusSection
+    let section: FocusTabSection
     let isSelected: Bool
     let action: () -> Void
 

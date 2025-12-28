@@ -755,13 +755,13 @@ struct CelebrationConfettiShower: View {
         Color(hex: "FFD700")
     ]
 
-    @State private var confetti: [ConfettiPiece] = []
+    @State private var confetti: [UltraConfettiPiece] = []
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 ForEach(confetti) { piece in
-                    ConfettiPieceView(piece: piece, screenHeight: geo.size.height)
+                    UltraConfettiPieceView(piece: piece, screenHeight: geo.size.height)
                 }
             }
         }
@@ -780,7 +780,7 @@ struct CelebrationConfettiShower: View {
 
     private func generateConfetti() {
         confetti = (0..<particleCount).map { i in
-            ConfettiPiece(
+            UltraConfettiPiece(
                 id: i,
                 color: colors.randomElement() ?? .white,
                 x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
@@ -794,7 +794,7 @@ struct CelebrationConfettiShower: View {
     }
 }
 
-struct ConfettiPiece: Identifiable {
+struct UltraConfettiPiece: Identifiable {
     let id: Int
     let color: Color
     let x: CGFloat
@@ -805,8 +805,8 @@ struct ConfettiPiece: Identifiable {
     let wobbleAmplitude: CGFloat
 }
 
-struct ConfettiPieceView: View {
-    let piece: ConfettiPiece
+struct UltraConfettiPieceView: View {
+    let piece: UltraConfettiPiece
     let screenHeight: CGFloat
 
     @State private var yOffset: CGFloat = -50

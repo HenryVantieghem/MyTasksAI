@@ -264,33 +264,6 @@ struct HabitTweak: Codable, Sendable {
     let reasoning: String?
 }
 
-// MARK: - Progress Snapshot
-/// A point-in-time snapshot of goal progress
-struct ProgressSnapshot: Codable, Sendable, Identifiable {
-    let id: UUID
-    let date: Date
-    let progress: Double  // 0.0 - 1.0
-    let completedMilestones: Int
-    let totalMilestones: Int
-    let notes: String?
-
-    init(
-        id: UUID = UUID(),
-        date: Date = .now,
-        progress: Double,
-        completedMilestones: Int,
-        totalMilestones: Int,
-        notes: String? = nil
-    ) {
-        self.id = id
-        self.date = date
-        self.progress = progress
-        self.completedMilestones = completedMilestones
-        self.totalMilestones = totalMilestones
-        self.notes = notes
-    }
-}
-
 // MARK: - Goal Check-In Record
 /// Record of a weekly check-in for a goal
 struct GoalCheckInRecord: Codable, Sendable, Identifiable {

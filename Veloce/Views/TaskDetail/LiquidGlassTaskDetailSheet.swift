@@ -338,7 +338,7 @@ struct LiquidGlassTaskDetailSheet: View {
                     // Update calendar event if exists
                     if let eventId = task.calendarEventId {
                         Task {
-                            await CalendarService.shared.updateEvent(
+                            try? await CalendarService.shared.updateEvent(
                                 eventId: eventId,
                                 title: nil,
                                 startDate: nil,
@@ -1288,7 +1288,7 @@ struct LiquidGlassTaskDetailSheet: View {
                     // Invite each friend via SharedTaskService
                     Task {
                         for friendId in friendIds {
-                            await SharedTaskService.shared.inviteFriendToTask(
+                            try? await SharedTaskService.shared.inviteFriendToTask(
                                 taskId: task.id,
                                 friendId: friendId
                             )

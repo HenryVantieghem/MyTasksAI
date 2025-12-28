@@ -534,148 +534,158 @@ struct TaskDetailBottomSheet: View {
 
     // MARK: - AI Insights Section
 
+    private var aiInsightsHeader: some View {
+        HStack {
+            Image(systemName: "sparkles")
+                .font(.system(size: 16))
+                .foregroundStyle(Theme.CelestialColors.nebulaCore)
+
+            Text("AI Insights")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.white)
+
+            Spacer()
+
+            Button {
+                HapticsService.shared.impact()
+                Task { await viewModel.loadAIInsights() }
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                    .rotationEffect(.degrees(viewModel.isLoadingAI ? 360 : 0))
+                    .animation(
+                        viewModel.isLoadingAI ? .linear(duration: 1).repeatForever(autoreverses: false) : .default,
+                        value: viewModel.isLoadingAI
+                    )
+            }
+            .disabled(viewModel.isLoadingAI)
+        }
+    }
+
+    private var aiLoadingView: some View {
+        HStack(spacing: 8) {
+            ProgressView()
+                .tint(Theme.CelestialColors.nebulaCore)
+            Text("Analyzing task...")
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.CelestialColors.starDim)
+        }
+        .padding(.vertical, 12)
+    }
+
+    private var aiPromptSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("AI Assistant Prompt")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.white.opacity(0.9))
+
+            Text(viewModel.aiPrompt)
+                .font(.system(size: 13))
+                .foregroundStyle(.white.opacity(0.75))
+                .lineLimit(3)
+                .padding(12)
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.05)))
+
+            Button {
+                UIPasteboard.general.string = viewModel.aiPrompt
+                HapticsService.shared.successFeedback()
+                withAnimation { showCopiedToast = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    withAnimation { showCopiedToast = false }
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "doc.on.doc")
+                        .font(.system(size: 12))
+                    Text("Copy Prompt")
+                        .font(.system(size: 13, weight: .medium))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Theme.Colors.aiPurple.opacity(0.3), in: Capsule())
+            }
+        }
+    }
+
+    private var aiTimeEstimates: some View {
+        HStack(spacing: 12) {
+            aiEstimatedTimeCard
+            aiBestTimeCard
+        }
+    }
+
+    private var aiEstimatedTimeCard: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "timer")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.Colors.aiAmber)
+                Text("Estimated")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.CelestialColors.starDim)
+            }
+            Text(viewModel.aiEstimatedTimeDisplay)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.05)))
+    }
+
+    private var aiBestTimeCard: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "calendar.badge.clock")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                Text("Best Time")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.CelestialColors.starDim)
+            }
+            Text(viewModel.aiBestTimeDisplay)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.05)))
+    }
+
+    private var aiInsightsSectionBackground: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Theme.CelestialColors.abyss.opacity(0.5))
+            .overlay {
+                RoundedRectangle(cornerRadius: 20)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                Theme.CelestialColors.nebulaCore.opacity(0.25),
+                                Theme.CelestialColors.nebulaEdge.opacity(0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            }
+    }
+
     private var aiInsightsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header
-            HStack {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 16))
-                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
-
-                Text("AI Insights")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-
-                Spacer()
-
-                // Refresh button
-                Button {
-                    HapticsService.shared.impact()
-                    Task { await viewModel.loadAIInsights() }
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
-                        .rotationEffect(.degrees(viewModel.isLoadingAI ? 360 : 0))
-                        .animation(
-                            viewModel.isLoadingAI ? .linear(duration: 1).repeatForever(autoreverses: false) : .default,
-                            value: viewModel.isLoadingAI
-                        )
-                }
-                .disabled(viewModel.isLoadingAI)
-            }
+            aiInsightsHeader
 
             if viewModel.isLoadingAI {
-                // Loading state
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .tint(Theme.CelestialColors.nebulaCore)
-                    Text("Analyzing task...")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
-                }
-                .padding(.vertical, 12)
+                aiLoadingView
             } else {
-                // AI Prompt
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("AI Assistant Prompt")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.9))
-
-                    Text(viewModel.aiPrompt)
-                        .font(.system(size: 13))
-                        .foregroundStyle(.white.opacity(0.75))
-                        .lineLimit(3)
-                        .padding(12)
-                        .background {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.05))
-                        }
-
-                    Button {
-                        UIPasteboard.general.string = viewModel.aiPrompt
-                        HapticsService.shared.successFeedback()
-                        withAnimation { showCopiedToast = true }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation { showCopiedToast = false }
-                        }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "doc.on.doc")
-                                .font(.system(size: 12))
-                            Text("Copy Prompt")
-                                .font(.system(size: 13, weight: .medium))
-                        }
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Theme.Colors.aiPurple.opacity(0.3), in: Capsule())
-                    }
-                }
-
-                // Time estimates
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "timer")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.Colors.aiAmber)
-                            Text("Estimated")
-                                .font(.system(size: 11))
-                                .foregroundStyle(Theme.CelestialColors.starDim)
-                        }
-                        Text(viewModel.aiEstimatedTime)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.05))
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "calendar.badge.clock")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.CelestialColors.auroraGreen)
-                            Text("Best Time")
-                                .font(.system(size: 11))
-                                .foregroundStyle(Theme.CelestialColors.starDim)
-                        }
-                        Text(viewModel.aiBestTime)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.05))
-                    }
-                }
+                aiPromptSection
+                aiTimeEstimates
             }
         }
         .padding(20)
-        .background {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Theme.CelestialColors.abyss.opacity(0.5))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20)
-                        .strokeBorder(
-                            LinearGradient(
-                                colors: [
-                                    Theme.CelestialColors.nebulaCore.opacity(0.25),
-                                    Theme.CelestialColors.nebulaEdge.opacity(0.1)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-        }
+        .background { aiInsightsSectionBackground }
         .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
     }
 
