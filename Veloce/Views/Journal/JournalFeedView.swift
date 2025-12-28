@@ -3,8 +3,8 @@
 //  Veloce
 //
 //  Free-Form Daily Journal - Amy-style open canvas experience
-//  VoidBackground aesthetic matching Tasks page, TodayPillView navigation,
-//  direct TextEditor for each day, auto-save with debounce
+//  Full-screen VoidBackground aesthetic, PaperKit integration (iOS 26+),
+//  animated toolbar that appears only when editing
 //
 
 import SwiftUI
@@ -61,7 +61,7 @@ struct JournalFeedView: View {
     @State private var currentText = ""
     @State private var currentEntry: JournalEntry?
     @State private var autoSaveTask: Task<Void, Never>?
-    @FocusState private var isEditing: Bool
+    @State private var isEditing = false
 
     // Word count
     private var wordCount: Int {
@@ -70,23 +70,36 @@ struct JournalFeedView: View {
 
     var body: some View {
         ZStack {
-            // Cosmic void background (matches Calendar page styling)
+            // Full-screen cosmic void background
             VoidBackground.calendar
+                .ignoresSafeArea(.all)
 
+            // Main content layer
             VStack(spacing: 0) {
-                // Today pill with date navigation (matches ChatTasksView pattern)
+                // Today pill with date navigation
                 dateNavigationPill
                     .padding(.top, layout.headerHeight)
                     .padding(.bottom, layout.spacing)
 
-                // Free-form editor
+                // Journal canvas area
                 editorArea
 
-                // Minimal toolbar
-                journalToolbar
+                Spacer(minLength: 0)
+            }
+
+            // Floating animated toolbar (only visible when editing)
+            VStack {
+                Spacer()
+                JournalAnimatedToolbar(
+                    isVisible: isEditing,
+                    wordCount: wordCount,
+                    onMicTap: handleMicTap,
+                    onKeyboardDismiss: dismissEditing,
+                    onInsertMarkup: handleInsertMarkup
+                )
             }
         }
-        .ignoresSafeArea(.container, edges: .bottom)
+        .ignoresSafeArea(.keyboard)
         .preferredColorScheme(.dark)
         .onAppear {
             viewModel.setup(context: modelContext)
@@ -127,97 +140,62 @@ struct JournalFeedView: View {
                     .padding(.top, layout.spacing)
                     .padding(.bottom, layout.spacing)
 
-                // Free-form text editor
-                ZStack(alignment: .topLeading) {
-                    // Placeholder
-                    if currentText.isEmpty {
-                        Text("What's on your mind?")
-                            .dynamicTypeFont(base: 18, weight: .regular, design: .serif)
-                            .foregroundStyle(.white.opacity(0.25))
-                            .padding(.top, 8)
-                    }
-
-                    // Editor
-                    TextEditor(text: $currentText)
-                        .font(.system(size: layout.deviceType.isTablet ? 20 : 18, weight: .regular, design: .serif))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .scrollContentBackground(.hidden)
-                        .focused($isEditing)
-                        .frame(minHeight: layout.deviceType.isTablet ? 500 : 400)
-                        .lineSpacing(layout.deviceType.isTablet ? 10 : 8)
-                }
+                // Tap-to-focus journal canvas (uses PaperKit on iOS 26+)
+                journalCanvas
             }
             .padding(.horizontal, layout.screenPadding)
-            .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
+            .padding(.bottom, Theme.Spacing.floatingTabBarClearance + (isEditing ? 80 : 0))
             .maxWidthConstrained()
         }
-    }
-
-    // MARK: - Minimal Toolbar
-
-    // Responsive toolbar button size
-    private var toolbarButtonSize: CGFloat {
-        layout.deviceType.isTablet ? 48 : 40
-    }
-
-    private var journalToolbar: some View {
-        HStack(spacing: layout.spacing) {
-            // Word count (left side)
-            if wordCount > 0 {
-                Text("\(wordCount) words")
-                    .dynamicTypeFont(base: 12, weight: .regular)
-                    .foregroundStyle(.white.opacity(0.35))
-            }
-
-            Spacer()
-
-            // Voice input button
-            Button {
+        .contentShape(Rectangle())
+        .onTapGesture {
+            // Tap anywhere on the canvas area to start editing
+            if !isEditing {
                 HapticsService.shared.selectionFeedback()
-                // Voice input action (placeholder)
-            } label: {
-                Image(systemName: "mic.fill")
-                    .dynamicTypeFont(base: 16, weight: .medium)
-                    .foregroundStyle(Theme.Colors.aiBlue)
-                    .frame(width: toolbarButtonSize, height: toolbarButtonSize)
-                    .background {
-                        Circle()
-                            .fill(.white.opacity(0.08))
-                    }
+                withAnimation(Theme.Animation.spring) {
+                    isEditing = true
+                }
             }
-            .buttonStyle(.plain)
-            .iPadHoverEffect(.highlight)
-
-            // Keyboard dismiss button
-            Button {
-                HapticsService.shared.selectionFeedback()
-                isEditing = false
-            } label: {
-                Image(systemName: "keyboard.chevron.compact.down")
-                    .dynamicTypeFont(base: 16, weight: .medium)
-                    .foregroundStyle(.white.opacity(0.5))
-                    .frame(width: toolbarButtonSize, height: toolbarButtonSize)
-                    .background {
-                        Circle()
-                            .fill(.white.opacity(0.08))
-                    }
-            }
-            .buttonStyle(.plain)
-            .iPadHoverEffect(.highlight)
         }
-        .padding(.horizontal, layout.screenPadding)
-        .padding(.vertical, layout.spacing)
-        .padding(.bottom, Theme.Spacing.floatingTabBarClearance)
-        .background(
-            LinearGradient(
-                colors: [
-                    Theme.CelestialColors.void.opacity(0.95),
-                    Theme.CelestialColors.void
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+    }
+
+    // MARK: - Journal Canvas
+
+    @ViewBuilder
+    private var journalCanvas: some View {
+        JournalCanvasView(
+            currentText: $currentText,
+            isEditing: $isEditing,
+            journalEntry: currentEntry,
+            onFocusChange: { focused in
+                withAnimation(Theme.Animation.spring) {
+                    isEditing = focused
+                }
+            },
+            onContentChange: {
+                scheduleAutoSave()
+            }
         )
+    }
+
+    // MARK: - Toolbar Actions
+
+    private func handleMicTap() {
+        // Voice input action (placeholder)
+        HapticsService.shared.selectionFeedback()
+    }
+
+    private func dismissEditing() {
+        withAnimation(Theme.Animation.spring) {
+            isEditing = false
+        }
+        // Dismiss keyboard
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    private func handleInsertMarkup() {
+        // PaperKit markup insertion (iOS 26+ only)
+        HapticsService.shared.selectionFeedback()
     }
 
     // MARK: - Computed Properties

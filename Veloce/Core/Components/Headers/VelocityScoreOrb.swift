@@ -1,17 +1,17 @@
 //
-//  VelocityScoreOrb.swift
+//  VelocityTierOrb.swift
 //  Veloce
 //
-//  Premium animated gradient orb for Velocity Score display
+//  Premium animated gradient orb for Velocity Score tier display
 //  A mesmerizing visual "jewel" with tier-based colors and dopamine-inducing animations
 //
 
 import SwiftUI
 
-/// Premium animated orb for Velocity Score display
+/// Premium animated orb for Velocity Score tier display
 /// Features: 5-layer visual system with tier gradients, inner glow rotation,
 /// prismatic color shifts, breathing scale, and micro-particles (Legendary tier)
-struct VelocityScoreOrb: View {
+struct VelocityTierOrb: View {
     let tier: ScoreTier
     var size: CGFloat = 14
     var isAnimating: Bool = true
@@ -355,7 +355,7 @@ struct VelocityScoreOrb: View {
         VStack(spacing: 24) {
             ForEach(ScoreTier.allCases, id: \.self) { tier in
                 HStack(spacing: 20) {
-                    VelocityScoreOrb(tier: tier, size: 14)
+                    VelocityTierOrb(tier: tier, size: 14)
                     Text(tier.label)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.white.opacity(0.7))
@@ -374,7 +374,7 @@ struct VelocityScoreOrb: View {
         VStack(spacing: 40) {
             ForEach(ScoreTier.allCases, id: \.self) { tier in
                 HStack(spacing: 24) {
-                    VelocityScoreOrb(tier: tier, size: 40)
+                    VelocityTierOrb(tier: tier, size: 40)
                     VStack(alignment: .leading) {
                         Text(tier.label)
                             .font(.system(size: 16, weight: .semibold))
@@ -395,6 +395,6 @@ struct VelocityScoreOrb: View {
     ZStack {
         Color.black.ignoresSafeArea()
 
-        VelocityScoreOrb(tier: .legendary, size: 80)
+        VelocityTierOrb(tier: .legendary, size: 80)
     }
 }

@@ -26,7 +26,7 @@ struct VelocityScorePill: View {
         Button(action: onTap) {
             HStack(spacing: 7) {
                 // Premium animated gradient orb
-                VelocityScoreOrb(tier: tier, size: 14)
+                VelocityTierOrb(tier: tier, size: 14)
 
                 // Score number
                 Text("\(score)")

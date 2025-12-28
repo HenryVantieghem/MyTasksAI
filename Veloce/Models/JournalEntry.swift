@@ -9,6 +9,9 @@
 import Foundation
 import SwiftData
 import PencilKit
+#if canImport(PaperKit)
+import PaperKit
+#endif
 
 // MARK: - Journal Entry Type
 
@@ -195,6 +198,12 @@ final class JournalEntry {
     /// PencilKit drawing data
     var drawingData: Data?
 
+    /// PaperKit markup data (iOS 26+) - replaces richTextData + drawingData when available
+    var paperMarkupData: Data?
+
+    /// Whether this entry uses PaperKit format (iOS 26+)
+    var usesPaperKit: Bool
+
     /// Photo attachments as JSON-encoded array
     var photoAttachmentsData: Data?
 
@@ -240,6 +249,8 @@ final class JournalEntry {
         mood: JournalMood? = nil,
         richTextData: Data? = nil,
         drawingData: Data? = nil,
+        paperMarkupData: Data? = nil,
+        usesPaperKit: Bool = false,
         photoAttachmentsData: Data? = nil,
         voiceRecordingsData: Data? = nil,
         title: String? = nil,
@@ -267,6 +278,8 @@ final class JournalEntry {
         self.moodRaw = mood?.rawValue
         self.richTextData = richTextData
         self.drawingData = drawingData
+        self.paperMarkupData = paperMarkupData
+        self.usesPaperKit = usesPaperKit
         self.photoAttachmentsData = photoAttachmentsData
         self.voiceRecordingsData = voiceRecordingsData
         self.title = title
@@ -368,6 +381,37 @@ final class JournalEntry {
         hasDrawing = !drawing.bounds.isEmpty
         updatedAt = .now
     }
+
+    // MARK: PaperKit Methods (iOS 26+)
+
+    #if canImport(PaperKit)
+    /// Get PaperMarkup from stored data (iOS 26+)
+    @available(iOS 26.0, *)
+    func getPaperMarkup() -> PaperMarkup {
+        guard let data = paperMarkupData,
+              let markup = try? PaperMarkup(data: data) else {
+            return PaperMarkup()
+        }
+        return markup
+    }
+
+    /// Set PaperMarkup and update metadata
+    @available(iOS 26.0, *)
+    func setPaperMarkup(_ markup: PaperMarkup) {
+        paperMarkupData = try? markup.dataRepresentation()
+        usesPaperKit = true
+        hasDrawing = !markup.isEmpty
+        updatedAt = .now
+    }
+
+    /// Extract plain text from PaperMarkup for search/preview
+    @available(iOS 26.0, *)
+    func getTextFromPaperMarkup() -> String {
+        let markup = getPaperMarkup()
+        // Extract text content from markup elements
+        return markup.textContent ?? ""
+    }
+    #endif
 
     // MARK: Photo Methods
 
@@ -571,6 +615,8 @@ struct SupabaseJournalEntry: Codable, Sendable {
     let mood: String?
     let richTextData: Data?
     let drawingData: Data?
+    let paperMarkupData: Data?
+    let usesPaperKit: Bool
     let photoAttachmentsData: Data?
     let voiceRecordingsData: Data?
     let title: String?
@@ -599,6 +645,8 @@ struct SupabaseJournalEntry: Codable, Sendable {
         case mood
         case richTextData = "rich_text_data"
         case drawingData = "drawing_data"
+        case paperMarkupData = "paper_markup_data"
+        case usesPaperKit = "uses_paper_kit"
         case photoAttachmentsData = "photo_attachments_data"
         case voiceRecordingsData = "voice_recordings_data"
         case title
@@ -628,6 +676,8 @@ struct SupabaseJournalEntry: Codable, Sendable {
         self.mood = entry.mood?.rawValue
         self.richTextData = entry.richTextData
         self.drawingData = entry.drawingData
+        self.paperMarkupData = entry.paperMarkupData
+        self.usesPaperKit = entry.usesPaperKit
         self.photoAttachmentsData = entry.photoAttachmentsData
         self.voiceRecordingsData = entry.voiceRecordingsData
         self.title = entry.title
