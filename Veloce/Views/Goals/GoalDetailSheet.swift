@@ -267,7 +267,7 @@ struct GoalDetailSheet: View {
             // Update Progress
             GoalQuickActionButton(
                 icon: "slider.horizontal.3",
-                label: "Progress",
+                title: "Progress",
                 color: Theme.Colors.aiCyan
             ) {
                 // Show progress update
@@ -277,9 +277,8 @@ struct GoalDetailSheet: View {
             if goal.isCheckInDue {
                 GoalQuickActionButton(
                     icon: "bell.badge.fill",
-                    label: "Check-in",
-                    color: Theme.Colors.warning,
-                    showBadge: true
+                    title: "Check-in",
+                    color: Theme.Colors.warning
                 ) {
                     showCheckInSheet = true
                 }
@@ -289,7 +288,7 @@ struct GoalDetailSheet: View {
             if !goalsVM.hasAIContent(goal) && goalsVM.isAIAvailable {
                 GoalQuickActionButton(
                     icon: "sparkles",
-                    label: "AI Roadmap",
+                    title: "AI Roadmap",
                     color: Theme.Colors.aiPurple
                 ) {
                     Task {
@@ -526,45 +525,6 @@ struct GoalDetailSheet: View {
 
     private func completeGoal() {
         goalsVM.completeGoal(goal, context: modelContext)
-    }
-}
-
-// MARK: - Goal Quick Action Button
-
-private struct GoalQuickActionButton: View {
-    let icon: String
-    let label: String
-    let color: Color
-    var showBadge: Bool = false
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 6) {
-                ZStack(alignment: .topTrailing) {
-                    Circle()
-                        .fill(color.opacity(0.15))
-                        .frame(width: 44, height: 44)
-                        .overlay(
-                            Image(systemName: icon)
-                                .font(.system(size: 18))
-                                .foregroundStyle(color)
-                        )
-
-                    if showBadge {
-                        Circle()
-                            .fill(Theme.Colors.error)
-                            .frame(width: 10, height: 10)
-                            .offset(x: 2, y: -2)
-                    }
-                }
-
-                Text(label)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.7))
-            }
-        }
-        .buttonStyle(.plain)
     }
 }
 

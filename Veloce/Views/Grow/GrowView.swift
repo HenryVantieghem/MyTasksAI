@@ -2,8 +2,9 @@
 //  GrowView.swift
 //  Veloce
 //
+//  Aurora Design System - Energy Core Dashboard
 //  Grow Tab - Contains 3 segments: Stats, Goals, Circles
-//  Replaces MomentumDataArtView and absorbs Circles functionality
+//  Energy visualization with aurora particles and prismatic glass
 //
 
 import SwiftUI
@@ -23,12 +24,21 @@ enum GrowSegment: String, CaseIterable {
         case .circles: return "person.2.fill"
         }
     }
+
+    var auroraColor: Color {
+        switch self {
+        case .stats: return Aurora.Colors.electricCyan
+        case .goals: return Aurora.Colors.prismaticGreen
+        case .circles: return Aurora.Colors.stellarMagenta
+        }
+    }
 }
 
 // MARK: - Grow View
 
 struct GrowView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query private var tasks: [TaskItem]
     @Query(sort: \Goal.targetDate) private var goals: [Goal]
 
@@ -39,15 +49,28 @@ struct GrowView: View {
 
     var body: some View {
         ZStack {
-            // Cosmic void background
-            VoidBackground.calendar
+            // Aurora cosmic void background
+            Aurora.Colors.voidCosmos
+                .ignoresSafeArea()
+
+            // Subtle aurora waves responding to segment
+            if !reduceMotion {
+                AuroraAnimatedWaveBackground(
+                    colors: [
+                        selectedSegment.auroraColor.opacity(0.3),
+                        Aurora.Colors.borealisViolet.opacity(0.2)
+                    ]
+                )
+                .ignoresSafeArea()
+                .opacity(0.4)
+            }
 
             VStack(spacing: 0) {
-                // Segmented Picker
-                segmentPicker
+                // Aurora Segmented Picker
+                auroraSegmentPicker
                     .padding(.top, 80) // Below universal header
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 16)
+                    .padding(.horizontal, Aurora.Spacing.screenPadding)
+                    .padding(.bottom, Aurora.Spacing.lg)
 
                 // Content
                 TabView(selection: $selectedSegment) {
@@ -83,64 +106,89 @@ struct GrowView: View {
         }
     }
 
-    // MARK: - Segment Picker
+    // MARK: - Aurora Segment Picker
 
-    private var segmentPicker: some View {
+    private var auroraSegmentPicker: some View {
         HStack(spacing: 0) {
             ForEach(GrowSegment.allCases, id: \.self) { segment in
-                segmentTab(segment)
+                auroraSegmentTab(segment)
             }
         }
-        .padding(4)
-        .background(
+        .padding(Aurora.Spacing.xs)
+        .background {
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color(red: 0.04, green: 0.05, blue: 0.06))
-                .overlay(
+                .fill(Aurora.Colors.voidNebula.opacity(0.8))
+                .overlay {
                     RoundedRectangle(cornerRadius: 24)
-                        .stroke(
+                        .strokeBorder(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(0.1),
-                                    Color.white.opacity(0.03)
+                                    Aurora.Colors.electricCyan.opacity(0.2),
+                                    Aurora.Colors.borealisViolet.opacity(0.1),
+                                    Color.clear
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
                             lineWidth: 1
                         )
-                )
-        )
+                }
+        }
+        .auroraGlass(in: RoundedRectangle(cornerRadius: 24))
     }
 
-    private func segmentTab(_ segment: GrowSegment) -> some View {
+    private func auroraSegmentTab(_ segment: GrowSegment) -> some View {
         let isSelected = selectedSegment == segment
 
         return Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            withAnimation(AuroraMotion.Spring.ui) {
                 selectedSegment = segment
             }
-            HapticsService.shared.impact(.light)
+            AuroraHaptics.light()
+            AuroraSoundEngine.shared.play(.tabSwitch)
         } label: {
-            HStack(spacing: 6) {
-                Image(systemName: segment.icon)
-                    .font(.system(size: 12, weight: .semibold))
+            HStack(spacing: Aurora.Spacing.sm) {
+                ZStack {
+                    // Glow behind icon when selected
+                    if isSelected {
+                        Image(systemName: segment.icon)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(segment.auroraColor)
+                            .blur(radius: 4)
+                    }
+
+                    Image(systemName: segment.icon)
+                        .font(.system(size: 12, weight: .semibold))
+                }
 
                 Text(segment.rawValue)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(Aurora.Typography.subheadline)
+                    .fontWeight(.semibold)
             }
-            .foregroundStyle(isSelected ? .white : .white.opacity(0.5))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(
-                isSelected
-                    ? RoundedRectangle(cornerRadius: 20)
-                        .fill(Theme.Colors.aiPurple.opacity(0.3))
-                        .overlay(
+            .foregroundStyle(isSelected ? Aurora.Colors.textPrimary : Aurora.Colors.textTertiary)
+            .padding(.horizontal, Aurora.Spacing.lg)
+            .padding(.vertical, Aurora.Spacing.md)
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(segment.auroraColor.opacity(0.2))
+                        .overlay {
                             RoundedRectangle(cornerRadius: 20)
-                                .stroke(Theme.Colors.aiPurple.opacity(0.5), lineWidth: 1)
-                        )
-                    : nil
-            )
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [
+                                            segment.auroraColor.opacity(0.5),
+                                            segment.auroraColor.opacity(0.2)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1
+                                )
+                        }
+                        .shadow(color: segment.auroraColor.opacity(0.3), radius: 8, y: 2)
+                }
+            }
         }
         .buttonStyle(.plain)
     }

@@ -2,8 +2,9 @@
 //  LiquidGlassTaskDetailSheet.swift
 //  Veloce
 //
-//  Ultra-Premium Task Detail Sheet with Liquid Glass Design
-//  iOS 26+ Liquid Glass styling with Perplexity AI integration
+//  Aurora Design System - Cosmic Task Codex
+//  Mystical tome unfolding with prismatic glass, constellation
+//  stepping stones, AI oracle insights, and portal vortex effects.
 //
 
 import SwiftUI
@@ -115,14 +116,23 @@ struct LiquidGlassTaskDetailSheet: View {
 
     private var backgroundLayer: some View {
         ZStack {
-            Theme.CelestialColors.voidDeep
+            // Deep cosmic void
+            Aurora.Colors.voidCosmos
                 .ignoresSafeArea()
+
+            // Aurora wave background - responds to task state
+            AuroraAnimatedWaveBackground.forProductivityState(
+                taskCount: viewModel.subTasks.count,
+                completedToday: viewModel.subTasks.filter { $0.status == .completed }.count
+            )
+            .ignoresSafeArea()
+            .opacity(0.4)
 
             // Subtle gradient from task type
             RadialGradient(
                 colors: [
-                    task.taskType.color.opacity(0.12),
-                    Theme.CelestialColors.voidDeep.opacity(0.5),
+                    taskCategoryColor.opacity(0.15),
+                    Aurora.Colors.voidNebula.opacity(0.5),
                     Color.clear
                 ],
                 center: .top,
@@ -131,11 +141,28 @@ struct LiquidGlassTaskDetailSheet: View {
             )
             .ignoresSafeArea()
 
-            // Ambient particles
+            // Aurora firefly field
             if !reduceMotion {
-                AmbientParticleField()
-                    .opacity(0.3)
+                AuroraFireflyField(
+                    particleCount: 30,
+                    colors: [
+                        Aurora.Colors.electricCyan.opacity(0.4),
+                        Aurora.Colors.borealisViolet.opacity(0.3),
+                        Aurora.Colors.stellarMagenta.opacity(0.2)
+                    ]
+                )
+                .opacity(0.5)
             }
+        }
+    }
+
+    /// Category color for task
+    private var taskCategoryColor: Color {
+        switch task.taskType {
+        case .create: return Aurora.Colors.categoryCreative
+        case .communicate: return Aurora.Colors.categoryPersonal
+        case .consume: return Aurora.Colors.categoryLearning
+        case .coordinate: return Aurora.Colors.categoryWork
         }
     }
 
@@ -143,54 +170,97 @@ struct LiquidGlassTaskDetailSheet: View {
 
     private var headerBar: some View {
         HStack {
-            // Close button
+            // Close button with aurora glow
             Button {
-                HapticsService.shared.selectionFeedback()
+                AuroraHaptics.light()
+                AuroraSoundEngine.shared.play(.buttonTap)
                 onDismiss()
             } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.8))
-                    .frame(width: 32, height: 32)
+                ZStack {
+                    // Ambient glow
+                    Circle()
+                        .fill(Aurora.Colors.electricCyan.opacity(0.15))
+                        .frame(width: 36, height: 36)
+                        .blur(radius: 4)
+
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .frame(width: 32, height: 32)
+                }
             }
-            .glassEffect(.regular, in: Circle())
+            .auroraGlass(in: Circle())
 
             Spacer()
 
-            Text("Task Details")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
+            // Title with mystical typography
+            Text("Cosmic Codex")
+                .font(Aurora.Typography.headline)
+                .foregroundStyle(Aurora.Colors.textPrimary)
 
             Spacer()
 
-            // Menu button
+            // Menu button with aurora styling
             Menu {
-                Button(action: { onDuplicate() }) {
+                Button(action: {
+                    AuroraHaptics.light()
+                    onDuplicate()
+                }) {
                     Label("Duplicate", systemImage: "doc.on.doc")
                 }
-                Button(action: { showSnoozeOptions = true }) {
+                Button(action: {
+                    AuroraHaptics.light()
+                    showSnoozeOptions = true
+                }) {
                     Label("Snooze", systemImage: "clock.arrow.circlepath")
                 }
                 Divider()
-                Button(role: .destructive, action: { showDeleteConfirm = true }) {
+                Button(role: .destructive, action: {
+                    AuroraHaptics.medium()
+                    showDeleteConfirm = true
+                }) {
                     Label("Delete", systemImage: "trash")
                 }
             } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.8))
-                    .frame(width: 32, height: 32)
+                ZStack {
+                    // Ambient glow
+                    Circle()
+                        .fill(Aurora.Colors.borealisViolet.opacity(0.15))
+                        .frame(width: 36, height: 36)
+                        .blur(radius: 4)
+
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .frame(width: 32, height: 32)
+                }
             }
-            .glassEffect(.regular, in: Circle())
+            .auroraGlass(in: Circle())
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, Aurora.Spacing.lg)
+        .padding(.vertical, Aurora.Spacing.md)
         .background {
             Rectangle()
-                .fill(.ultraThinMaterial)
-                .opacity(0.5)
+                .fill(Aurora.Colors.voidNebula.opacity(0.6))
+                .overlay {
+                    // Top edge prismatic highlight
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Aurora.Colors.electricCyan.opacity(0.2),
+                                    Aurora.Colors.borealisViolet.opacity(0.1),
+                                    Color.clear
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 1)
+                        .offset(y: -6)
+                }
         }
-        .glassEffect(.regular, in: Rectangle())
+        .auroraGlass(in: Rectangle())
         .confirmationDialog("Snooze Task", isPresented: $showSnoozeOptions) {
             Button("1 Hour") { snoozeFor(hours: 1) }
             Button("3 Hours") { snoozeFor(hours: 3) }
@@ -208,20 +278,29 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - Task Title + Quick Actions
 
     private var taskTitleSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Title row with checkbox and edit
-            HStack(alignment: .top, spacing: 14) {
-                // Completion checkbox
+        VStack(alignment: .leading, spacing: Aurora.Spacing.lg) {
+            // Title row with aurora checkbox and edit
+            HStack(alignment: .top, spacing: Aurora.Spacing.md) {
+                // Completion checkbox with aurora glow
                 Button {
-                    HapticsService.shared.successFeedback()
+                    AuroraHaptics.dopamineBurst()
+                    AuroraSoundEngine.shared.play(.taskComplete)
                     onComplete()
                 } label: {
                     ZStack {
+                        // Aurora glow ring
+                        if task.isCompleted {
+                            Circle()
+                                .fill(Aurora.Colors.prismaticGreen.opacity(0.3))
+                                .frame(width: 36, height: 36)
+                                .blur(radius: 6)
+                        }
+
                         Circle()
                             .strokeBorder(
                                 task.isCompleted
-                                    ? Theme.CelestialColors.auroraGreen
-                                    : Theme.CelestialColors.starDim.opacity(0.4),
+                                    ? Aurora.Colors.prismaticGreen
+                                    : Aurora.Colors.textTertiary.opacity(0.4),
                                 lineWidth: 2
                             )
                             .frame(width: 28, height: 28)
@@ -229,57 +308,74 @@ struct LiquidGlassTaskDetailSheet: View {
                         if task.isCompleted {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                                .foregroundStyle(Aurora.Colors.prismaticGreen)
                         }
                     }
                 }
 
-                // Editable title
-                VStack(alignment: .leading, spacing: 8) {
+                // Editable title with aurora typography
+                VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
                     if viewModel.isEditingTitle {
                         TextField("Task title", text: $viewModel.editableTitle)
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .font(Aurora.Typography.title2)
+                            .foregroundStyle(Aurora.Colors.textPrimary)
                             .submitLabel(.done)
                             .onSubmit { viewModel.isEditingTitle = false }
                     } else {
                         Text(viewModel.editableTitle)
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .strikethrough(task.isCompleted, color: Theme.CelestialColors.starDim)
+                            .font(Aurora.Typography.title2)
+                            .foregroundStyle(Aurora.Colors.textPrimary)
+                            .strikethrough(task.isCompleted, color: Aurora.Colors.textTertiary)
                     }
                 }
 
                 Spacer()
 
-                // Edit button
+                // Edit button with aurora glow
                 Button {
-                    HapticsService.shared.selectionFeedback()
+                    AuroraHaptics.light()
                     viewModel.isEditingTitle.toggle()
                 } label: {
-                    Image(systemName: "pencil")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
-                        .frame(width: 32, height: 32)
+                    ZStack {
+                        Circle()
+                            .fill(Aurora.Colors.electricCyan.opacity(0.1))
+                            .frame(width: 36, height: 36)
+                            .blur(radius: 4)
+
+                        Image(systemName: "pencil")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Aurora.Colors.electricCyan)
+                            .frame(width: 32, height: 32)
+                    }
                 }
-                .glassEffect(.regular, in: Circle())
+                .auroraGlass(in: Circle())
             }
 
-            // Divider
+            // Prismatic divider
             Rectangle()
-                .fill(Theme.CelestialColors.starDim.opacity(0.15))
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Aurora.Colors.electricCyan.opacity(0.3),
+                            Aurora.Colors.borealisViolet.opacity(0.2),
+                            Aurora.Colors.stellarMagenta.opacity(0.1)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
                 .frame(height: 1)
 
-            // Quick Action Buttons - Interactive Snippets Design (WWDC 2025)
-            VStack(spacing: 12) {
+            // Quick Action Buttons - Aurora Interactive Snippets
+            VStack(spacing: Aurora.Spacing.md) {
                 // Time of Day Button
                 InteractiveSnippetButton(
                     icon: "clock.fill",
                     label: "Time of Day",
                     value: task.scheduledTimeFormatted ?? "Not Set",
-                    accentColor: Theme.Colors.aiBlue
+                    accentColor: Aurora.Colors.electricCyan
                 ) {
-                    HapticsService.shared.selectionFeedback()
+                    AuroraHaptics.light()
                     showSchedulePicker = true
                 }
 
@@ -288,9 +384,9 @@ struct LiquidGlassTaskDetailSheet: View {
                     icon: "timer",
                     label: "Duration",
                     value: viewModel.estimatedMinutes > 0 ? "\(viewModel.estimatedMinutes) min" : "Set Duration",
-                    accentColor: Theme.CelestialColors.nebulaCore
+                    accentColor: Aurora.Colors.borealisViolet
                 ) {
-                    HapticsService.shared.selectionFeedback()
+                    AuroraHaptics.light()
                     showDurationPicker = true
                 }
 
@@ -299,15 +395,15 @@ struct LiquidGlassTaskDetailSheet: View {
                     icon: "arrow.trianglehead.2.clockwise.rotate.90",
                     label: "Recurring",
                     value: selectedRecurringType.displayName,
-                    accentColor: Theme.Colors.aiAmber
+                    accentColor: Aurora.Colors.cosmicGold
                 ) {
-                    HapticsService.shared.selectionFeedback()
+                    AuroraHaptics.light()
                     showRecurringPicker = true
                 }
             }
         }
-        .padding(20)
-        .glassCard()
+        .padding(Aurora.Spacing.lg)
+        .auroraGlassCard()
         // Schedule Picker Sheet
         .sheet(isPresented: $showSchedulePicker) {
             CalendarSchedulingSheet(task: task) { scheduledDate, duration in
@@ -348,7 +444,8 @@ struct LiquidGlassTaskDetailSheet: View {
                     }
 
                     showDurationPicker = false
-                    HapticsService.shared.successFeedback()
+                    AuroraHaptics.medium()
+                    AuroraSoundEngine.shared.play(.buttonTap)
                 }
             )
             .presentationDetents([.medium])
@@ -369,7 +466,8 @@ struct LiquidGlassTaskDetailSheet: View {
                     )
                     task.updatedAt = Date()
                     showRecurringPicker = false
-                    HapticsService.shared.successFeedback()
+                    AuroraHaptics.medium()
+                    AuroraSoundEngine.shared.play(.buttonTap)
                 }
             )
             .presentationDetents([.medium])
@@ -378,63 +476,92 @@ struct LiquidGlassTaskDetailSheet: View {
         }
     }
 
-    // MARK: - Sub-tasks Section
+    // MARK: - Sub-tasks Section (Constellation Stepping Stones)
 
     private var subTasksSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Header with progress
+        VStack(alignment: .leading, spacing: Aurora.Spacing.lg) {
+            // Header with aurora progress ring
             HStack {
-                Text("Sub-tasks")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.white)
+                HStack(spacing: Aurora.Spacing.sm) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Aurora.Colors.electricCyan)
+
+                    Text("Constellation Path")
+                        .font(Aurora.Typography.headline)
+                        .foregroundStyle(Aurora.Colors.textPrimary)
+                }
 
                 Spacer()
 
-                // Progress indicator
-                HStack(spacing: 8) {
+                // Progress indicator with aurora glow
+                HStack(spacing: Aurora.Spacing.sm) {
                     Text(viewModel.subTasks.progressString)
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(Aurora.Typography.callout)
+                        .foregroundStyle(Aurora.Colors.textSecondary)
 
-                    // Mini progress ring
+                    // Aurora progress ring
                     ZStack {
                         Circle()
-                            .stroke(Theme.CelestialColors.starDim.opacity(0.3), lineWidth: 2)
-                            .frame(width: 20, height: 20)
+                            .stroke(Aurora.Colors.textTertiary.opacity(0.3), lineWidth: 2)
+                            .frame(width: 24, height: 24)
 
                         Circle()
                             .trim(from: 0, to: viewModel.subTasks.progress)
                             .stroke(
-                                Theme.CelestialColors.auroraGreen,
-                                style: StrokeStyle(lineWidth: 2, lineCap: .round)
+                                AngularGradient(
+                                    colors: Aurora.Gradients.auroraSpectrum,
+                                    center: .center
+                                ),
+                                style: StrokeStyle(lineWidth: 2.5, lineCap: .round)
                             )
-                            .frame(width: 20, height: 20)
+                            .frame(width: 24, height: 24)
                             .rotationEffect(.degrees(-90))
+
+                        // Inner glow for completed
+                        if viewModel.subTasks.progress > 0 {
+                            Circle()
+                                .fill(Aurora.Colors.prismaticGreen.opacity(0.3))
+                                .frame(width: 16, height: 16)
+                                .blur(radius: 4)
+                        }
                     }
                 }
             }
 
-            // Sub-task list
+            // Sub-task constellation list
             if viewModel.subTasks.isEmpty {
-                // Empty state
+                // Empty state with cosmic messaging
                 HStack {
                     Spacer()
-                    VStack(spacing: 8) {
-                        Image(systemName: "list.bullet.indent")
-                            .font(.system(size: 24))
-                            .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.5))
-                        Text("No sub-tasks yet")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.7))
+                    VStack(spacing: Aurora.Spacing.md) {
+                        ZStack {
+                            Circle()
+                                .fill(Aurora.Colors.borealisViolet.opacity(0.1))
+                                .frame(width: 60, height: 60)
+                                .blur(radius: 8)
+
+                            Image(systemName: "star.circle")
+                                .font(.system(size: 32))
+                                .foregroundStyle(Aurora.Colors.textTertiary.opacity(0.5))
+                        }
+                        Text("No stepping stones yet")
+                            .font(Aurora.Typography.callout)
+                            .foregroundStyle(Aurora.Colors.textTertiary)
+                        Text("Break your task into constellation points")
+                            .font(Aurora.Typography.caption)
+                            .foregroundStyle(Aurora.Colors.textTertiary.opacity(0.7))
                     }
-                    .padding(.vertical, 20)
+                    .padding(.vertical, Aurora.Spacing.xl)
                     Spacer()
                 }
             } else {
-                VStack(spacing: 10) {
+                VStack(spacing: Aurora.Spacing.sm) {
                     ForEach(Array(viewModel.subTasks.enumerated()), id: \.element.id) { index, subTask in
-                        SubTaskRow(
+                        AuroraSubTaskRow(
                             subTask: subTask,
+                            index: index,
+                            totalCount: viewModel.subTasks.count,
                             onToggle: { viewModel.toggleSubTask(subTask) },
                             onDelete: { viewModel.deleteSubTask(subTask) }
                         )
@@ -442,12 +569,12 @@ struct LiquidGlassTaskDetailSheet: View {
                 }
             }
 
-            // Add sub-task input
+            // Add sub-task input with aurora styling
             if viewModel.isAddingSubTask {
-                HStack(spacing: 12) {
-                    TextField("Add a step...", text: $viewModel.newSubTaskTitle)
-                        .font(.system(size: 14))
-                        .foregroundStyle(.white)
+                HStack(spacing: Aurora.Spacing.md) {
+                    TextField("Add a stepping stone...", text: $viewModel.newSubTaskTitle)
+                        .font(Aurora.Typography.body)
+                        .foregroundStyle(Aurora.Colors.textPrimary)
                         .submitLabel(.done)
                         .onSubmit {
                             viewModel.addSubTask()
@@ -459,78 +586,80 @@ struct LiquidGlassTaskDetailSheet: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(Theme.CelestialColors.starDim)
+                            .foregroundStyle(Aurora.Colors.textTertiary)
                     }
                 }
-                .padding(14)
+                .padding(Aurora.Spacing.md)
                 .background {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white.opacity(0.05))
+                        .fill(Aurora.Colors.voidNebula.opacity(0.5))
                         .overlay {
                             RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(Theme.CelestialColors.nebulaCore.opacity(0.3), lineWidth: 1)
+                                .strokeBorder(Aurora.Colors.electricCyan.opacity(0.3), lineWidth: 1)
                         }
                 }
             }
 
-            // Action buttons
-            HStack(spacing: 12) {
+            // Action buttons with aurora styling
+            HStack(spacing: Aurora.Spacing.md) {
                 Button {
-                    HapticsService.shared.selectionFeedback()
+                    AuroraHaptics.light()
                     viewModel.isAddingSubTask = true
                 } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: Aurora.Spacing.xs) {
                         Image(systemName: "plus")
                             .font(.system(size: 12, weight: .bold))
                         Text("Add Step")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(Aurora.Typography.callout)
                     }
-                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    .foregroundStyle(Aurora.Colors.electricCyan)
+                    .padding(.horizontal, Aurora.Spacing.md)
+                    .padding(.vertical, Aurora.Spacing.sm)
                 }
-                .glassEffect(.regular, in: Capsule())
+                .auroraGlass(in: Capsule())
 
                 Button {
-                    HapticsService.shared.impact()
+                    AuroraHaptics.medium()
+                    AuroraSoundEngine.shared.play(.aiActivate)
                     Task { await viewModel.generateAISubTasks() }
                 } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: Aurora.Spacing.xs) {
                         Image(systemName: "wand.and.stars")
                             .font(.system(size: 12, weight: .bold))
+                            .symbolEffect(.pulse, options: .repeating.speed(0.5))
                         Text("AI Generate")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(Aurora.Typography.callout)
                     }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .padding(.horizontal, Aurora.Spacing.md)
+                    .padding(.vertical, Aurora.Spacing.sm)
+                    .background(Aurora.Gradients.aiGradient)
+                    .clipShape(Capsule())
                 }
-                .glassEffect(.regular, in: Capsule())
-                .tint(Theme.CelestialColors.nebulaCore)
             }
         }
-        .padding(20)
-        .glassCard()
+        .padding(Aurora.Spacing.lg)
+        .auroraGlassCard(accent: Aurora.Colors.electricCyan)
     }
 
-    // MARK: - AI Genius Section (Perplexity Powered)
+    // MARK: - AI Oracle Section (Violet Void + Mystical Insights)
 
     private var aiGeniusSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
-            // Header with sparkle
-            aiGeniusHeader
+        VStack(alignment: .leading, spacing: Aurora.Spacing.lg) {
+            // Mystical header with oracle styling
+            aiOracleHeader
 
-            // Context Input Section
+            // Context Input Section with aurora styling
             aiContextInputSection
 
             // Loading or Content
             if viewModel.isLoadingAI {
-                aiLoadingState
+                aiOracleLoadingState
             } else {
-                VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
-                    // AI Advice Card
+                VStack(alignment: .leading, spacing: Aurora.Spacing.lg) {
+                    // AI Oracle Advice Card (violet void styling)
                     if !viewModel.aiAdvice.isEmpty {
-                        aiAdviceCard
+                        aiOracleAdviceCard
                     }
 
                     // Web Sources (Inline Link Chips)
@@ -561,41 +690,69 @@ struct LiquidGlassTaskDetailSheet: View {
                 aiErrorCard(error)
             }
         }
-        .padding(20)
-        .glassCard(accent: Theme.CelestialColors.nebulaCore)
+        .padding(Aurora.Spacing.lg)
+        .background {
+            // Violet void background for oracle section
+            RoundedRectangle(cornerRadius: 20)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Aurora.Colors.deepPlasma.opacity(0.3),
+                            Aurora.Colors.borealisViolet.opacity(0.2),
+                            Aurora.Colors.voidNebula.opacity(0.4)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        }
+        .auroraGlassCard(accent: Aurora.Colors.borealisViolet)
     }
 
-    // MARK: - AI Genius Header
+    // MARK: - AI Oracle Header
 
-    private var aiGeniusHeader: some View {
+    private var aiOracleHeader: some View {
         HStack {
-            HStack(spacing: Theme.Spacing.sm) {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 16))
-                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
-                    .symbolEffect(.pulse, options: .repeating, value: viewModel.isLoadingAI)
+            HStack(spacing: Aurora.Spacing.sm) {
+                // Mystical oracle icon with glow
+                ZStack {
+                    Circle()
+                        .fill(Aurora.Colors.borealisViolet.opacity(0.2))
+                        .frame(width: 28, height: 28)
+                        .blur(radius: 4)
 
-                Text("AI Insights")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.white)
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                        .symbolEffect(.pulse, options: .repeating, value: viewModel.isLoadingAI)
+                }
 
-                // Powered by Perplexity badge
+                Text("AI Oracle")
+                    .font(Aurora.Typography.headline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
+
+                // Powered by Perplexity badge with aurora styling
                 Text("Perplexity")
                     .font(.system(size: 9, weight: .medium))
-                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                    .foregroundStyle(Aurora.Colors.borealisViolet)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background {
                         Capsule()
-                            .fill(Theme.CelestialColors.nebulaCore.opacity(0.15))
+                            .fill(Aurora.Colors.borealisViolet.opacity(0.15))
+                            .overlay {
+                                Capsule()
+                                    .strokeBorder(Aurora.Colors.borealisViolet.opacity(0.3), lineWidth: 0.5)
+                            }
                     }
             }
 
             Spacer()
 
-            // Update Insights button
+            // Update Insights button with aurora glow
             Button {
-                HapticsService.shared.impact()
+                AuroraHaptics.medium()
+                AuroraSoundEngine.shared.play(.aiActivate)
                 Task { await viewModel.loadAIInsights() }
             } label: {
                 HStack(spacing: 4) {
@@ -606,14 +763,14 @@ struct LiquidGlassTaskDetailSheet: View {
                             viewModel.isLoadingAI ? .linear(duration: 1).repeatForever(autoreverses: false) : .default,
                             value: viewModel.isLoadingAI
                         )
-                    Text("Update")
-                        .font(.system(size: 12, weight: .medium))
+                    Text("Consult")
+                        .font(Aurora.Typography.caption)
                 }
-                .foregroundStyle(Theme.CelestialColors.nebulaCore)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .foregroundStyle(Aurora.Colors.borealisViolet)
+                .padding(.horizontal, Aurora.Spacing.sm)
+                .padding(.vertical, Aurora.Spacing.xs)
             }
-            .glassEffect(.regular, in: Capsule())
+            .auroraGlass(in: Capsule())
             .disabled(viewModel.isLoadingAI)
         }
     }
@@ -621,96 +778,145 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - AI Context Input
 
     private var aiContextInputSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            Text("Add Context")
-                .font(Theme.Typography.cosmosMeta)
-                .foregroundStyle(Theme.CelestialColors.starDim)
+        VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
+            Text("Oracle Context")
+                .font(Aurora.Typography.caption)
+                .foregroundStyle(Aurora.Colors.textTertiary)
 
-            HStack(spacing: Theme.Spacing.sm) {
-                TextField("e.g., first time doing this, deadline is Friday...", text: $viewModel.aiContext)
-                    .font(.system(size: 14))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
+            HStack(spacing: Aurora.Spacing.sm) {
+                TextField("Share details to enhance the oracle's wisdom...", text: $viewModel.aiContext)
+                    .font(Aurora.Typography.body)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .padding(.horizontal, Aurora.Spacing.md)
+                    .padding(.vertical, Aurora.Spacing.md)
                     .background {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.05))
+                            .fill(Aurora.Colors.voidNebula.opacity(0.4))
                             .overlay {
                                 RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(Theme.CelestialColors.starDim.opacity(0.2), lineWidth: 1)
+                                    .strokeBorder(
+                                        LinearGradient(
+                                            colors: [
+                                                Aurora.Colors.borealisViolet.opacity(0.3),
+                                                Aurora.Colors.stellarMagenta.opacity(0.2)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 1
+                                    )
                             }
                     }
             }
         }
     }
 
-    // MARK: - AI Loading State
+    // MARK: - AI Oracle Loading State
 
-    private var aiLoadingState: some View {
-        VStack(spacing: Theme.Spacing.md) {
-            HStack(spacing: 8) {
+    private var aiOracleLoadingState: some View {
+        VStack(spacing: Aurora.Spacing.lg) {
+            // Aurora pulsing orbs
+            HStack(spacing: Aurora.Spacing.md) {
                 ForEach(0..<3, id: \.self) { index in
-                    Circle()
-                        .fill(Theme.CelestialColors.nebulaCore)
-                        .frame(width: 8, height: 8)
-                        .scaleEffect(viewModel.isLoadingAI ? 1.2 : 0.8)
-                        .animation(
-                            .easeInOut(duration: 0.6)
-                            .repeatForever()
-                            .delay(Double(index) * 0.2),
-                            value: viewModel.isLoadingAI
-                        )
+                    ZStack {
+                        Circle()
+                            .fill(Aurora.Gradients.auroraSpectrum[index % Aurora.Gradients.auroraSpectrum.count].opacity(0.3))
+                            .frame(width: 16, height: 16)
+                            .blur(radius: 4)
+
+                        Circle()
+                            .fill(Aurora.Gradients.auroraSpectrum[index % Aurora.Gradients.auroraSpectrum.count])
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(viewModel.isLoadingAI ? 1.3 : 0.7)
+                            .animation(
+                                .easeInOut(duration: 0.6)
+                                .repeatForever()
+                                .delay(Double(index) * 0.2),
+                                value: viewModel.isLoadingAI
+                            )
+                    }
                 }
             }
 
-            Text("Analyzing with Perplexity AI...")
-                .font(.system(size: 13))
-                .foregroundStyle(Theme.CelestialColors.starDim)
+            Text("The oracle is contemplating...")
+                .font(Aurora.Typography.callout)
+                .foregroundStyle(Aurora.Colors.textSecondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
+        .padding(.vertical, Aurora.Spacing.xl)
     }
 
-    // MARK: - AI Advice Card
+    // MARK: - AI Oracle Advice Card
 
-    private var aiAdviceCard: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-            HStack(spacing: Theme.Spacing.sm) {
-                Image(systemName: "lightbulb.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Theme.Colors.aiAmber)
+    private var aiOracleAdviceCard: some View {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
+            HStack(spacing: Aurora.Spacing.sm) {
+                ZStack {
+                    Circle()
+                        .fill(Aurora.Colors.cosmicGold.opacity(0.2))
+                        .frame(width: 28, height: 28)
+                        .blur(radius: 4)
 
-                Text("AI Advice")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
+                    Image(systemName: "lightbulb.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                }
+
+                Text("Oracle Wisdom")
+                    .font(Aurora.Typography.subheadline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
             }
 
+            // Advice text with typewriter-style appearance
             Text(viewModel.aiAdvice)
-                .font(.system(size: 14))
-                .foregroundStyle(.white.opacity(0.9))
+                .font(Aurora.Typography.body)
+                .foregroundStyle(Aurora.Colors.textPrimary.opacity(0.9))
                 .lineSpacing(4)
 
             if !viewModel.aiThoughtProcess.isEmpty {
                 DisclosureGroup {
                     Text(viewModel.aiThoughtProcess)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
-                        .padding(.top, 8)
+                        .font(Aurora.Typography.caption)
+                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .padding(.top, Aurora.Spacing.sm)
                 } label: {
-                    Text("Show reasoning")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                    HStack(spacing: Aurora.Spacing.xs) {
+                        Image(systemName: "brain")
+                            .font(.system(size: 10))
+                        Text("Oracle's reasoning")
+                            .font(Aurora.Typography.caption)
+                    }
+                    .foregroundStyle(Aurora.Colors.borealisViolet)
                 }
-                .tint(Theme.CelestialColors.nebulaCore)
+                .tint(Aurora.Colors.borealisViolet)
             }
         }
-        .padding(Theme.Spacing.lg)
+        .padding(Aurora.Spacing.lg)
         .background {
             RoundedRectangle(cornerRadius: 14)
-                .fill(Theme.Colors.aiAmber.opacity(0.08))
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Aurora.Colors.cosmicGold.opacity(0.1),
+                            Aurora.Colors.cosmicGold.opacity(0.05)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Theme.Colors.aiAmber.opacity(0.2), lineWidth: 1)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Aurora.Colors.cosmicGold.opacity(0.3),
+                                    Aurora.Colors.cosmicGold.opacity(0.1)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
                 }
         }
     }
@@ -718,22 +924,23 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - Web Sources Section (Inline Link Chips)
 
     private var aiWebSourcesSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            HStack(spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
+            HStack(spacing: Aurora.Spacing.sm) {
                 Image(systemName: "link")
                     .font(.system(size: 12))
-                    .foregroundStyle(Theme.Colors.aiBlue)
+                    .foregroundStyle(Aurora.Colors.electricCyan)
 
-                Text("Web Sources")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white)
+                Text("Cosmic Sources")
+                    .font(Aurora.Typography.subheadline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
             }
 
-            // Inline link chips (horizontal scroll)
+            // Inline link chips with aurora styling
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: Theme.Spacing.sm) {
+                HStack(spacing: Aurora.Spacing.sm) {
                     ForEach(viewModel.aiWebSources) { source in
                         Button {
+                            AuroraHaptics.light()
                             if let url = URL(string: source.url) {
                                 UIApplication.shared.open(url)
                             }
@@ -743,21 +950,21 @@ struct LiquidGlassTaskDetailSheet: View {
                                     .font(.system(size: 10))
 
                                 Text(source.source)
-                                    .font(.system(size: 12, weight: .medium))
+                                    .font(Aurora.Typography.caption)
                                     .lineLimit(1)
 
                                 Image(systemName: "arrow.up.right")
                                     .font(.system(size: 8))
                             }
-                            .foregroundStyle(Theme.Colors.aiBlue)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .foregroundStyle(Aurora.Colors.electricCyan)
+                            .padding(.horizontal, Aurora.Spacing.md)
+                            .padding(.vertical, Aurora.Spacing.sm)
                             .background {
                                 Capsule()
-                                    .fill(Theme.Colors.aiBlue.opacity(0.12))
+                                    .fill(Aurora.Colors.electricCyan.opacity(0.1))
                                     .overlay {
                                         Capsule()
-                                            .strokeBorder(Theme.Colors.aiBlue.opacity(0.25), lineWidth: 1)
+                                            .strokeBorder(Aurora.Colors.electricCyan.opacity(0.3), lineWidth: 1)
                                     }
                             }
                         }
@@ -770,69 +977,75 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - YouTube Resources Section
 
     private var aiYouTubeSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-            HStack(spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
+            HStack(spacing: Aurora.Spacing.sm) {
                 Image(systemName: "play.rectangle.fill")
                     .font(.system(size: 14))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Aurora.Colors.stellarMagenta)
 
-                Text("YouTube Resources")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
+                Text("Learning Portals")
+                    .font(Aurora.Typography.subheadline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
             }
 
-            VStack(spacing: Theme.Spacing.sm) {
+            VStack(spacing: Aurora.Spacing.sm) {
                 ForEach(viewModel.aiYouTubeResources) { resource in
                     Button {
+                        AuroraHaptics.light()
                         if let url = resource.youtubeSearchURL {
                             UIApplication.shared.open(url)
                         }
                     } label: {
-                        HStack(spacing: Theme.Spacing.md) {
-                            // YouTube icon
+                        HStack(spacing: Aurora.Spacing.md) {
+                            // YouTube icon with aurora glow
                             ZStack {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(.red.opacity(0.15))
+                                    .fill(Aurora.Colors.stellarMagenta.opacity(0.15))
+                                    .frame(width: 44, height: 44)
+                                    .blur(radius: 2)
+
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Aurora.Colors.stellarMagenta.opacity(0.1))
                                     .frame(width: 44, height: 44)
 
                                 Image(systemName: "play.fill")
                                     .font(.system(size: 16))
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(Aurora.Colors.stellarMagenta)
                             }
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(resource.searchQuery)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundStyle(.white)
+                                    .font(Aurora.Typography.body)
+                                    .foregroundStyle(Aurora.Colors.textPrimary)
                                     .lineLimit(1)
 
                                 Text(resource.reasoning)
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(Theme.CelestialColors.starDim)
+                                    .font(Aurora.Typography.caption)
+                                    .foregroundStyle(Aurora.Colors.textSecondary)
                                     .lineLimit(1)
                             }
 
                             Spacer()
 
-                            // Relevance indicator
+                            // Relevance indicator with aurora styling
                             Text("\(Int(resource.relevanceScore * 100))%")
                                 .font(.system(size: 11, weight: .medium))
-                                .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                                .foregroundStyle(Aurora.Colors.prismaticGreen)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
                                 .background {
                                     Capsule()
-                                        .fill(Theme.CelestialColors.auroraGreen.opacity(0.15))
+                                        .fill(Aurora.Colors.prismaticGreen.opacity(0.15))
                                 }
 
                             Image(systemName: "arrow.up.right")
                                 .font(.system(size: 12))
-                                .foregroundStyle(Theme.CelestialColors.starDim)
+                                .foregroundStyle(Aurora.Colors.textTertiary)
                         }
-                        .padding(Theme.Spacing.md)
+                        .padding(Aurora.Spacing.md)
                         .background {
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.03))
+                                .fill(Aurora.Colors.voidNebula.opacity(0.3))
                         }
                     }
                 }
@@ -843,24 +1056,24 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - Time Estimate Cards
 
     private var aiTimeEstimateCards: some View {
-        HStack(spacing: Theme.Spacing.md) {
-            // Estimated Time Card
+        HStack(spacing: Aurora.Spacing.md) {
+            // Estimated Time Card with aurora styling
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Image(systemName: "timer")
                         .font(.system(size: 12))
-                        .foregroundStyle(Theme.Colors.aiAmber)
+                        .foregroundStyle(Aurora.Colors.cosmicGold)
 
                     Text("Estimated")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(Aurora.Typography.caption)
+                        .foregroundStyle(Aurora.Colors.textTertiary)
                 }
 
                 Text(viewModel.aiEstimatedTimeDisplay)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(Aurora.Typography.title3)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
 
-                // Confidence indicator
+                // Confidence indicator with aurora colors
                 HStack(spacing: 4) {
                     Circle()
                         .fill(confidenceColor(viewModel.aiEstimateConfidence))
@@ -868,17 +1081,17 @@ struct LiquidGlassTaskDetailSheet: View {
 
                     Text(viewModel.aiEstimateConfidence.capitalized)
                         .font(.system(size: 10))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .foregroundStyle(Aurora.Colors.textTertiary)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(Theme.Spacing.lg)
+            .padding(Aurora.Spacing.lg)
             .background {
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(Aurora.Colors.voidNebula.opacity(0.4))
                     .overlay {
                         RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Theme.Colors.aiAmber.opacity(0.2), lineWidth: 1)
+                            .strokeBorder(Aurora.Colors.cosmicGold.opacity(0.25), lineWidth: 1)
                     }
             }
 
@@ -887,19 +1100,19 @@ struct LiquidGlassTaskDetailSheet: View {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar.badge.clock")
                         .font(.system(size: 12))
-                        .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                        .foregroundStyle(Aurora.Colors.prismaticGreen)
 
                     Text("Best Time")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(Aurora.Typography.caption)
+                        .foregroundStyle(Aurora.Colors.textTertiary)
                 }
 
                 Text(viewModel.aiBestTimeDisplay)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .font(Aurora.Typography.subheadline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
                     .lineLimit(1)
 
-                // Schedule Now button
+                // Schedule Now button with aurora styling
                 if viewModel.aiBestTime != nil {
                     Button {
                         if let bestTime = viewModel.aiBestTime {
@@ -908,27 +1121,28 @@ struct LiquidGlassTaskDetailSheet: View {
                             Task {
                                 await syncToCalendar(date: bestTime, duration: viewModel.aiEstimatedMinutes > 0 ? viewModel.aiEstimatedMinutes : viewModel.estimatedMinutes)
                             }
-                            HapticsService.shared.successFeedback()
+                            AuroraHaptics.dopamineBurst()
+                            AuroraSoundEngine.shared.play(.taskComplete)
                         }
                     } label: {
                         Text("Schedule")
                             .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(Aurora.Colors.voidCosmos)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Theme.CelestialColors.auroraGreen)
+                            .background(Aurora.Colors.prismaticGreen)
                             .clipShape(Capsule())
                     }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(Theme.Spacing.lg)
+            .padding(Aurora.Spacing.lg)
             .background {
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(Aurora.Colors.voidNebula.opacity(0.4))
                     .overlay {
                         RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Theme.CelestialColors.auroraGreen.opacity(0.2), lineWidth: 1)
+                            .strokeBorder(Aurora.Colors.prismaticGreen.opacity(0.25), lineWidth: 1)
                     }
             }
         }
@@ -936,42 +1150,43 @@ struct LiquidGlassTaskDetailSheet: View {
 
     private func confidenceColor(_ confidence: String) -> Color {
         switch confidence.lowercased() {
-        case "high": return Theme.CelestialColors.auroraGreen
-        case "medium": return Theme.Colors.aiAmber
-        case "low": return .orange
-        default: return Theme.CelestialColors.starDim
+        case "high": return Aurora.Colors.prismaticGreen
+        case "medium": return Aurora.Colors.cosmicGold
+        case "low": return Aurora.Colors.warning
+        default: return Aurora.Colors.textTertiary
         }
     }
 
     // MARK: - AI Suggested Sub-tasks Section
 
     private var aiSuggestedSubTasksSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
             HStack {
-                HStack(spacing: Theme.Spacing.sm) {
+                HStack(spacing: Aurora.Spacing.sm) {
                     Image(systemName: "list.bullet.clipboard")
                         .font(.system(size: 14))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                        .foregroundStyle(Aurora.Colors.electricCyan)
 
-                    Text("AI Suggested Steps")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.white)
+                    Text("Oracle's Suggested Steps")
+                        .font(Aurora.Typography.subheadline)
+                        .foregroundStyle(Aurora.Colors.textPrimary)
 
                     Text("\(viewModel.aiSuggestedSubTasks.count)")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                        .foregroundStyle(Aurora.Colors.electricCyan)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background {
                             Capsule()
-                                .fill(Theme.CelestialColors.nebulaCore.opacity(0.15))
+                                .fill(Aurora.Colors.electricCyan.opacity(0.15))
                         }
                 }
 
                 Spacer()
 
-                // Add All button
+                // Add All button with aurora styling
                 Button {
+                    AuroraHaptics.dopamineBurst()
                     viewModel.addAllAISuggestedSubTasks()
                 } label: {
                     HStack(spacing: 4) {
@@ -980,41 +1195,42 @@ struct LiquidGlassTaskDetailSheet: View {
                         Text("Add All")
                             .font(.system(size: 12, weight: .semibold))
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Aurora.Colors.voidCosmos)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Theme.CelestialColors.auroraGreen)
+                    .background(Aurora.Colors.prismaticGreen)
                     .clipShape(Capsule())
                 }
             }
 
-            // Sub-task suggestions
-            VStack(spacing: Theme.Spacing.sm) {
+            // Sub-task suggestions with aurora styling
+            VStack(spacing: Aurora.Spacing.sm) {
                 ForEach(viewModel.aiSuggestedSubTasks) { suggestion in
-                    HStack(spacing: Theme.Spacing.md) {
-                        // Add button
+                    HStack(spacing: Aurora.Spacing.md) {
+                        // Add button with aurora glow
                         Button {
+                            AuroraHaptics.light()
                             viewModel.addSingleAISuggestedSubTask(suggestion)
                         } label: {
                             Image(systemName: "plus.circle")
                                 .font(.system(size: 18))
-                                .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                                .foregroundStyle(Aurora.Colors.electricCyan)
                         }
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(suggestion.title)
-                                .font(.system(size: 14))
-                                .foregroundStyle(.white)
+                                .font(Aurora.Typography.body)
+                                .foregroundStyle(Aurora.Colors.textPrimary)
 
                             HStack(spacing: 8) {
                                 Text("\(suggestion.estimatedMinutes) min")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(Theme.Colors.aiAmber)
+                                    .font(Aurora.Typography.caption)
+                                    .foregroundStyle(Aurora.Colors.cosmicGold)
 
                                 if !suggestion.reasoning.isEmpty {
                                     Text(suggestion.reasoning)
-                                        .font(.system(size: 11))
-                                        .foregroundStyle(Theme.CelestialColors.starDim)
+                                        .font(Aurora.Typography.caption)
+                                        .foregroundStyle(Aurora.Colors.textSecondary)
                                         .lineLimit(1)
                                 }
                             }
@@ -1022,10 +1238,10 @@ struct LiquidGlassTaskDetailSheet: View {
 
                         Spacer()
                     }
-                    .padding(Theme.Spacing.md)
+                    .padding(Aurora.Spacing.md)
                     .background {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.03))
+                            .fill(Aurora.Colors.voidNebula.opacity(0.3))
                     }
                 }
             }
@@ -1035,33 +1251,38 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - AI Prompt Section
 
     private var aiPromptSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-            HStack(spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
+            HStack(spacing: Aurora.Spacing.sm) {
                 Image(systemName: "bubble.left.and.text.bubble.right")
                     .font(.system(size: 14))
-                    .foregroundStyle(Theme.Colors.aiPurple)
+                    .foregroundStyle(Aurora.Colors.borealisViolet)
 
-                Text("AI Prompt")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
+                Text("Cosmic Prompt")
+                    .font(Aurora.Typography.subheadline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
             }
 
-            // Prompt preview
+            // Prompt preview with aurora styling
             Text(viewModel.aiPrompt)
-                .font(.system(size: 13))
-                .foregroundStyle(.white.opacity(0.85))
+                .font(Aurora.Typography.body)
+                .foregroundStyle(Aurora.Colors.textPrimary.opacity(0.85))
                 .lineLimit(4)
-                .padding(Theme.Spacing.md)
+                .padding(Aurora.Spacing.md)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white.opacity(0.05))
+                        .fill(Aurora.Colors.voidNebula.opacity(0.3))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Aurora.Colors.borealisViolet.opacity(0.2), lineWidth: 1)
+                        }
                 }
 
-            // Action buttons
-            HStack(spacing: Theme.Spacing.md) {
+            // Action buttons with aurora styling
+            HStack(spacing: Aurora.Spacing.md) {
                 // Copy button
                 Button {
+                    AuroraHaptics.light()
                     viewModel.copyPromptToClipboard()
                     showCopiedToast = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -1072,33 +1293,34 @@ struct LiquidGlassTaskDetailSheet: View {
                         Image(systemName: "doc.on.doc")
                             .font(.system(size: 12))
                         Text("Copy")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(Aurora.Typography.callout)
                     }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .padding(.horizontal, Aurora.Spacing.lg)
+                    .padding(.vertical, Aurora.Spacing.sm)
                 }
-                .glassEffect(.regular, in: Capsule())
+                .auroraGlass(in: Capsule())
 
                 // Open in ChatGPT button
                 Button {
+                    AuroraHaptics.light()
                     viewModel.openInChatGPT()
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.up.right.circle.fill")
                             .font(.system(size: 12))
                         Text("ChatGPT")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(Aurora.Typography.callout)
                     }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .padding(.horizontal, Aurora.Spacing.lg)
+                    .padding(.vertical, Aurora.Spacing.sm)
                     .background {
                         Capsule()
-                            .fill(Theme.Colors.aiPurple.opacity(0.3))
+                            .fill(Aurora.Colors.borealisViolet.opacity(0.3))
                     }
                 }
-                .glassEffect(.regular, in: Capsule())
+                .auroraGlass(in: Capsule())
             }
         }
     }
@@ -1106,33 +1328,34 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - AI Error Card
 
     private func aiErrorCard(_ error: String) -> some View {
-        HStack(spacing: Theme.Spacing.md) {
+        HStack(spacing: Aurora.Spacing.md) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 14))
-                .foregroundStyle(.orange)
+                .foregroundStyle(Aurora.Colors.warning)
 
             Text(error)
-                .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.8))
+                .font(Aurora.Typography.caption)
+                .foregroundStyle(Aurora.Colors.textPrimary.opacity(0.8))
                 .lineLimit(2)
 
             Spacer()
 
             Button {
+                AuroraHaptics.light()
                 Task { await viewModel.loadAIInsights() }
             } label: {
                 Text("Retry")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Aurora.Colors.warning)
             }
         }
-        .padding(Theme.Spacing.md)
+        .padding(Aurora.Spacing.md)
         .background {
             RoundedRectangle(cornerRadius: 12)
-                .fill(.orange.opacity(0.1))
+                .fill(Aurora.Colors.warning.opacity(0.1))
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(.orange.opacity(0.3), lineWidth: 1)
+                        .strokeBorder(Aurora.Colors.warning.opacity(0.3), lineWidth: 1)
                 }
         }
     }
@@ -1140,146 +1363,192 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - Notes Section
 
     private var notesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
             HStack {
                 Image(systemName: "note.text")
                     .font(.system(size: 14))
-                    .foregroundStyle(Theme.CelestialColors.nebulaCore)
+                    .foregroundStyle(Aurora.Colors.electricCyan)
 
-                Text("Notes")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.white)
+                Text("Cosmic Notes")
+                    .font(Aurora.Typography.headline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Spacer()
             }
 
             TextEditor(text: $viewModel.editableNotes)
-                .font(.system(size: 14))
-                .foregroundStyle(.white.opacity(0.9))
+                .font(Aurora.Typography.body)
+                .foregroundStyle(Aurora.Colors.textPrimary.opacity(0.9))
                 .scrollContentBackground(.hidden)
                 .frame(minHeight: 80, maxHeight: 150)
-                .padding(12)
+                .padding(Aurora.Spacing.md)
                 .background {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white.opacity(0.05))
+                        .fill(Aurora.Colors.voidNebula.opacity(0.4))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Aurora.Colors.electricCyan.opacity(0.2), lineWidth: 1)
+                        }
                 }
                 .overlay(alignment: .topLeading) {
                     if viewModel.editableNotes.isEmpty {
-                        Text("Add notes to help focus...")
-                            .font(.system(size: 14))
-                            .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.6))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 20)
+                        Text("Add notes to guide your focus...")
+                            .font(Aurora.Typography.body)
+                            .foregroundStyle(Aurora.Colors.textTertiary.opacity(0.6))
+                            .padding(.horizontal, Aurora.Spacing.lg)
+                            .padding(.vertical, Aurora.Spacing.lg)
                             .allowsHitTesting(false)
                     }
                 }
         }
-        .padding(20)
-        .glassCard()
+        .padding(Aurora.Spacing.lg)
+        .auroraGlassCard()
     }
 
-    // MARK: - Focus Mode Section
+    // MARK: - Focus Mode Section (Portal Preview)
 
     private var focusModeSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Focus Mode")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
+        VStack(alignment: .leading, spacing: Aurora.Spacing.lg) {
+            HStack(spacing: Aurora.Spacing.sm) {
+                // Portal vortex icon
+                ZStack {
+                    Circle()
+                        .fill(Aurora.Gradients.aiGradient)
+                        .frame(width: 32, height: 32)
+                        .blur(radius: 4)
 
-            // Focus mode options
-            HStack(spacing: 10) {
-                FocusModeOption(
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Aurora.Colors.textPrimary)
+                }
+
+                Text("Focus Portal")
+                    .font(Aurora.Typography.headline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
+            }
+
+            // Focus mode options with aurora styling
+            HStack(spacing: Aurora.Spacing.sm) {
+                AuroraFocusModeOption(
                     icon: "brain.head.profile",
                     title: "Deep Work",
                     isSelected: viewModel.selectedFocusMode == .deepWork,
-                    onTap: { viewModel.selectedFocusMode = .deepWork }
+                    color: Aurora.Colors.borealisViolet,
+                    onTap: {
+                        AuroraHaptics.light()
+                        viewModel.selectedFocusMode = .deepWork
+                    }
                 )
 
-                FocusModeOption(
+                AuroraFocusModeOption(
                     icon: "timer",
                     title: "Pomodoro",
                     isSelected: viewModel.selectedFocusMode == .pomodoro,
-                    onTap: { viewModel.selectedFocusMode = .pomodoro }
+                    color: Aurora.Colors.electricCyan,
+                    onTap: {
+                        AuroraHaptics.light()
+                        viewModel.selectedFocusMode = .pomodoro
+                    }
                 )
 
-                FocusModeOption(
+                AuroraFocusModeOption(
                     icon: "bolt.fill",
                     title: "Flow",
                     isSelected: viewModel.selectedFocusMode == .flowState,
-                    onTap: { viewModel.selectedFocusMode = .flowState }
+                    color: Aurora.Colors.cosmicGold,
+                    onTap: {
+                        AuroraHaptics.light()
+                        viewModel.selectedFocusMode = .flowState
+                    }
                 )
             }
 
-            // App blocking toggle
+            // App blocking toggle with aurora styling
             HStack {
                 Image(systemName: "shield.fill")
                     .font(.system(size: 14))
-                    .foregroundStyle(Theme.Colors.aiAmber)
+                    .foregroundStyle(Aurora.Colors.cosmicGold)
 
                 Text("Block Apps")
-                    .font(.system(size: 14))
-                    .foregroundStyle(.white)
+                    .font(Aurora.Typography.body)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Spacer()
 
                 Toggle("", isOn: $viewModel.appBlockingEnabled)
                     .labelsHidden()
-                    .tint(Theme.Colors.aiAmber)
+                    .tint(Aurora.Colors.cosmicGold)
             }
-            .padding(12)
+            .padding(Aurora.Spacing.md)
             .background {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(Aurora.Colors.voidNebula.opacity(0.4))
             }
 
             Text("Select apps to block during focus")
-                .font(.system(size: 12))
-                .foregroundStyle(Theme.CelestialColors.starDim)
+                .font(Aurora.Typography.caption)
+                .foregroundStyle(Aurora.Colors.textTertiary)
         }
-        .padding(20)
-        .glassCard()
+        .padding(Aurora.Spacing.lg)
+        .auroraGlassCard(accent: Aurora.Colors.electricCyan)
     }
 
     // MARK: - Collaboration Section
 
     private var collaborationSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Do it together")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
+        VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
+            HStack(spacing: Aurora.Spacing.sm) {
+                Image(systemName: "person.2.circle.fill")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Aurora.Colors.stellarMagenta)
+
+                Text("Cosmic Circles")
+                    .font(Aurora.Typography.headline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
+            }
 
             Button {
-                HapticsService.shared.selectionFeedback()
+                AuroraHaptics.light()
                 showFriendPicker = true
             } label: {
                 HStack {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Theme.Colors.aiBlue)
+                    ZStack {
+                        Circle()
+                            .fill(Aurora.Colors.stellarMagenta.opacity(0.15))
+                            .frame(width: 32, height: 32)
+
+                        Image(systemName: "plus")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(Aurora.Colors.stellarMagenta)
+                    }
 
                     Text("Add from Circles")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.white)
+                        .font(Aurora.Typography.body)
+                        .foregroundStyle(Aurora.Colors.textPrimary)
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
                         .font(.system(size: 12))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .foregroundStyle(Aurora.Colors.textTertiary)
                 }
-                .padding(14)
+                .padding(Aurora.Spacing.md)
                 .background {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white.opacity(0.05))
+                        .fill(Aurora.Colors.voidNebula.opacity(0.4))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Aurora.Colors.stellarMagenta.opacity(0.2), lineWidth: 1)
+                        }
                 }
             }
 
             Text("Tap to invite friends for accountability")
-                .font(.system(size: 12))
-                .foregroundStyle(Theme.CelestialColors.starDim)
+                .font(Aurora.Typography.caption)
+                .foregroundStyle(Aurora.Colors.textTertiary)
         }
-        .padding(20)
-        .glassCard()
+        .padding(Aurora.Spacing.lg)
+        .auroraGlassCard()
         .sheet(isPresented: $showFriendPicker) {
             FriendPickerSheet(
                 taskId: task.id,
@@ -1294,7 +1563,7 @@ struct LiquidGlassTaskDetailSheet: View {
                             )
                         }
                     }
-                    HapticsService.shared.successFeedback()
+                    AuroraHaptics.celebration()
                 }
             )
             .presentationDetents([.large])
@@ -1305,72 +1574,121 @@ struct LiquidGlassTaskDetailSheet: View {
     // MARK: - Action Bar (Sticky Bottom)
 
     private var actionBar: some View {
-        HStack(spacing: 16) {
-            // Complete button (primary)
+        HStack(spacing: Aurora.Spacing.lg) {
+            // Complete button (primary) with aurora glow
             Button {
-                HapticsService.shared.successFeedback()
+                AuroraHaptics.dopamineBurst()
+                AuroraSoundEngine.shared.play(.taskComplete)
                 onComplete()
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: Aurora.Spacing.sm) {
                     Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "checkmark")
                         .font(.system(size: 16, weight: .bold))
                     Text(task.isCompleted ? "Completed" : "Complete")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Aurora.Typography.headline)
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(Aurora.Colors.voidCosmos)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, Aurora.Spacing.lg)
             }
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
-            .tint(Theme.CelestialColors.auroraGreen)
             .background {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Theme.CelestialColors.auroraGreen)
+                    .fill(Aurora.Colors.prismaticGreen)
+                    .shadow(color: Aurora.Colors.prismaticGreen.opacity(0.4), radius: 8, y: 2)
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
 
-            // Start Focus button
+            // Start Focus button with aurora styling
             Button {
-                HapticsService.shared.impact()
+                AuroraHaptics.portalOpen()
+                AuroraSoundEngine.shared.play(.aiActivate)
                 onStartTimer(task)
                 onDismiss()
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: Aurora.Spacing.sm) {
                     Image(systemName: "play.fill")
                         .font(.system(size: 14))
                     Text("Focus")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(Aurora.Typography.headline)
                 }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
+                .foregroundStyle(Aurora.Colors.textPrimary)
+                .padding(.horizontal, Aurora.Spacing.xl)
+                .padding(.vertical, Aurora.Spacing.lg)
             }
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+            .background {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Aurora.Gradients.aiGradient)
+                    .shadow(color: Aurora.Colors.electricCyan.opacity(0.3), radius: 8, y: 2)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
+        .padding(.horizontal, Aurora.Spacing.lg)
+        .padding(.vertical, Aurora.Spacing.lg)
         .background {
             Rectangle()
-                .fill(.ultraThinMaterial)
+                .fill(Aurora.Colors.voidNebula.opacity(0.8))
+                .overlay {
+                    // Top edge prismatic highlight
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Aurora.Colors.electricCyan.opacity(0.3),
+                                    Aurora.Colors.borealisViolet.opacity(0.2),
+                                    Color.clear
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 1)
+                        .offset(y: -24)
+                }
         }
-        .glassEffect(.regular, in: Rectangle())
+        .auroraGlass(in: Rectangle())
     }
 
-    // MARK: - Toast
+    // MARK: - Cosmic Toast
 
     private var copiedToast: some View {
         VStack {
-            HStack(spacing: 8) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+            HStack(spacing: Aurora.Spacing.sm) {
+                ZStack {
+                    Circle()
+                        .fill(Aurora.Colors.prismaticGreen.opacity(0.3))
+                        .frame(width: 24, height: 24)
+                        .blur(radius: 4)
 
-                Text("Copied to clipboard!")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.white)
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Aurora.Colors.prismaticGreen)
+                }
+
+                Text("Copied to cosmic clipboard!")
+                    .font(Aurora.Typography.subheadline)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .glassEffect(.regular, in: Capsule())
+            .padding(.horizontal, Aurora.Spacing.xl)
+            .padding(.vertical, Aurora.Spacing.md)
+            .background {
+                Capsule()
+                    .fill(Aurora.Colors.voidNebula.opacity(0.9))
+                    .overlay {
+                        Capsule()
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Aurora.Colors.prismaticGreen.opacity(0.4),
+                                        Aurora.Colors.electricCyan.opacity(0.2)
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ),
+                                lineWidth: 1
+                            )
+                    }
+            }
+            .auroraGlass(in: Capsule())
             .padding(.top, 60)
 
             Spacer()
@@ -1382,7 +1700,8 @@ struct LiquidGlassTaskDetailSheet: View {
     private func snoozeFor(hours: Int) {
         let snoozeDate = Calendar.current.date(byAdding: .hour, value: hours, to: Date())!
         onSnooze(snoozeDate)
-        HapticsService.shared.successFeedback()
+        AuroraHaptics.medium()
+        AuroraSoundEngine.shared.play(.buttonTap)
     }
 
     private func snoozeTomorrowMorning() {
@@ -1390,7 +1709,8 @@ struct LiquidGlassTaskDetailSheet: View {
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date())!
         let snoozeDate = calendar.date(bySettingHour: 9, minute: 0, second: 0, of: tomorrow)!
         onSnooze(snoozeDate)
-        HapticsService.shared.successFeedback()
+        AuroraHaptics.medium()
+        AuroraSoundEngine.shared.play(.buttonTap)
     }
 
     // MARK: - Calendar Sync
@@ -1525,11 +1845,11 @@ class TaskDetailViewModel {
         } else {
             estimatedMinutes = 30
         }
-        HapticsService.shared.selectionFeedback()
+        AuroraHaptics.light()
     }
 
     func cycleRecurring() {
-        HapticsService.shared.selectionFeedback()
+        AuroraHaptics.light()
     }
 
     // MARK: - Sub-task Management
@@ -1547,7 +1867,8 @@ class TaskDetailViewModel {
         task?.subtasks = subTasks
         newSubTaskTitle = ""
         isAddingSubTask = false
-        HapticsService.shared.selectionFeedback()
+        AuroraHaptics.light()
+        AuroraSoundEngine.shared.play(.buttonTap)
     }
 
     func toggleSubTask(_ subTask: SubTask) {
@@ -1557,13 +1878,18 @@ class TaskDetailViewModel {
             subTasks[index].completedAt = newStatus == .completed ? Date() : nil
         }
         task?.subtasks = subTasks
-        HapticsService.shared.selectionFeedback()
+        if subTask.status != .completed {
+            AuroraHaptics.dopamineBurst()
+            AuroraSoundEngine.shared.play(.taskComplete)
+        } else {
+            AuroraHaptics.light()
+        }
     }
 
     func deleteSubTask(_ subTask: SubTask) {
         subTasks.removeAll { $0.id == subTask.id }
         task?.subtasks = subTasks
-        HapticsService.shared.impact()
+        AuroraHaptics.medium()
     }
 
     // MARK: - AI Insights (Perplexity Integration)
@@ -1717,7 +2043,8 @@ class TaskDetailViewModel {
     func generateAISubTasks() async {
         guard let task = task else { return }
 
-        HapticsService.shared.impact()
+        AuroraHaptics.medium()
+        AuroraSoundEngine.shared.play(.aiActivate)
         isLoadingAI = true
         defer { isLoadingAI = false }
 
@@ -1773,7 +2100,8 @@ class TaskDetailViewModel {
         }
         task?.subtasks = subTasks
         aiSuggestedSubTasks = []  // Clear suggestions after adding
-        HapticsService.shared.successFeedback()
+        AuroraHaptics.celebration()
+        AuroraSoundEngine.shared.play(.aiComplete)
     }
 
     func addSingleAISuggestedSubTask(_ suggestion: AISuggestedSubTaskDisplay) {
@@ -1789,7 +2117,8 @@ class TaskDetailViewModel {
         subTasks.append(newSubTask)
         task?.subtasks = subTasks
         aiSuggestedSubTasks.removeAll { $0.id == suggestion.id }
-        HapticsService.shared.selectionFeedback()
+        AuroraHaptics.light()
+        AuroraSoundEngine.shared.play(.buttonTap)
     }
 
     // MARK: - AI Prompt Generation
@@ -1812,7 +2141,8 @@ class TaskDetailViewModel {
 
     func copyPromptToClipboard() {
         UIPasteboard.general.string = aiPrompt
-        HapticsService.shared.successFeedback()
+        AuroraHaptics.medium()
+        AuroraSoundEngine.shared.play(.buttonTap)
     }
 
     func openInChatGPT() {
@@ -1890,20 +2220,30 @@ struct QuickActionPill: View {
     }
 }
 
+/// Aurora-styled sub-task row - constellation stepping stone
 struct SubTaskRow: View {
     let subTask: SubTask
     let onToggle: () -> Void
     let onDelete: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Aurora.Spacing.md) {
+            // Aurora checkbox with glow
             Button(action: onToggle) {
                 ZStack {
+                    // Glow layer
+                    if subTask.status == .completed {
+                        Circle()
+                            .fill(Aurora.Colors.prismaticGreen.opacity(0.3))
+                            .frame(width: 26, height: 26)
+                            .blur(radius: 4)
+                    }
+
                     Circle()
                         .strokeBorder(
                             subTask.status == .completed
-                                ? Theme.CelestialColors.auroraGreen
-                                : Theme.CelestialColors.starDim.opacity(0.4),
+                                ? Aurora.Colors.prismaticGreen
+                                : Aurora.Colors.textTertiary.opacity(0.4),
                             lineWidth: 1.5
                         )
                         .frame(width: 22, height: 22)
@@ -1911,47 +2251,65 @@ struct SubTaskRow: View {
                     if subTask.status == .completed {
                         Image(systemName: "checkmark")
                             .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                            .foregroundStyle(Aurora.Colors.prismaticGreen)
                     }
                 }
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(subTask.title)
-                    .font(.system(size: 14))
-                    .foregroundStyle(subTask.status == .completed ? Theme.CelestialColors.starDim : .white)
-                    .strikethrough(subTask.status == .completed, color: Theme.CelestialColors.starDim)
+                    .font(Aurora.Typography.body)
+                    .foregroundStyle(subTask.status == .completed ? Aurora.Colors.textTertiary : Aurora.Colors.textPrimary)
+                    .strikethrough(subTask.status == .completed, color: Aurora.Colors.textTertiary)
 
                 if let minutes = subTask.estimatedMinutes {
                     Text("\(minutes)m")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.CelestialColors.starDim)
+                        .font(Aurora.Typography.caption)
+                        .foregroundStyle(Aurora.Colors.textTertiary)
                 }
             }
 
             Spacer()
 
+            // AI-generated indicator with aurora sparkle
             if subTask.isAIGenerated {
-                Image(systemName: "sparkle")
-                    .font(.system(size: 10))
-                    .foregroundStyle(Theme.CelestialColors.nebulaCore.opacity(0.7))
+                ZStack {
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.5))
+                        .blur(radius: 2)
+
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.8))
+                }
             }
 
             Button(action: onDelete) {
                 Image(systemName: "trash")
                     .font(.system(size: 12))
-                    .foregroundStyle(.red.opacity(0.7))
+                    .foregroundStyle(Aurora.Colors.error.opacity(0.7))
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, Aurora.Spacing.lg)
+        .padding(.vertical, Aurora.Spacing.md)
         .background {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.03))
+                .fill(Aurora.Colors.voidNebula.opacity(0.3))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(
+                            subTask.status == .completed
+                                ? Aurora.Colors.prismaticGreen.opacity(0.2)
+                                : Aurora.Colors.textTertiary.opacity(0.1),
+                            lineWidth: 1
+                        )
+                }
         }
     }
 }
 
+/// Aurora-styled AI insight row with cosmic styling
 struct AIInsightRow<Content: View>: View {
     let icon: String
     let title: String
@@ -1959,15 +2317,23 @@ struct AIInsightRow<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 12))
-                    .foregroundStyle(color)
+        VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
+            HStack(spacing: Aurora.Spacing.sm) {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.2))
+                        .frame(width: 20, height: 20)
+                        .blur(radius: 3)
+
+                    Image(systemName: icon)
+                        .font(.system(size: 12))
+                        .foregroundStyle(color)
+                }
 
                 Text(title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .font(Aurora.Typography.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Aurora.Colors.textPrimary.opacity(0.9))
             }
 
             content()
@@ -1975,32 +2341,55 @@ struct AIInsightRow<Content: View>: View {
     }
 }
 
-struct FocusModeOption: View {
+/// Aurora-styled focus mode option with glow effects
+struct AuroraFocusModeOption: View {
     let icon: String
     let title: String
     let isSelected: Bool
+    let color: Color
     let onTap: () -> Void
 
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 18))
-                    .foregroundStyle(isSelected ? Theme.Colors.aiAmber : Theme.CelestialColors.starDim)
+            VStack(spacing: Aurora.Spacing.sm) {
+                ZStack {
+                    // Glow layer when selected
+                    if isSelected {
+                        Circle()
+                            .fill(color.opacity(0.3))
+                            .frame(width: 32, height: 32)
+                            .blur(radius: 6)
+                    }
+
+                    Image(systemName: icon)
+                        .font(.system(size: 18))
+                        .foregroundStyle(isSelected ? color : Aurora.Colors.textTertiary)
+                }
 
                 Text(title)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(isSelected ? .white : Theme.CelestialColors.starDim)
+                    .font(Aurora.Typography.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(isSelected ? Aurora.Colors.textPrimary : Aurora.Colors.textTertiary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
+            .padding(.vertical, Aurora.Spacing.lg)
             .background {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Theme.Colors.aiAmber.opacity(0.2) : Color.white.opacity(0.03))
+                    .fill(isSelected ? color.opacity(0.15) : Aurora.Colors.voidNebula.opacity(0.3))
                     .overlay {
                         RoundedRectangle(cornerRadius: 12)
                             .strokeBorder(
-                                isSelected ? Theme.Colors.aiAmber.opacity(0.5) : Color.clear,
+                                isSelected
+                                    ? LinearGradient(
+                                        colors: [color.opacity(0.5), color.opacity(0.2)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                      )
+                                    : LinearGradient(
+                                        colors: [Aurora.Colors.textTertiary.opacity(0.1)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                      ),
                                 lineWidth: 1
                             )
                     }
@@ -2019,21 +2408,22 @@ private struct TaskDetailParticleData: Identifiable {
     let opacity: Double
 }
 
-// MARK: - View Extensions
+// MARK: - Aurora Glass Card Extension
 
 extension View {
-    func glassCard(accent: Color? = nil) -> some View {
+    /// Aurora-styled glass card with optional accent color
+    func auroraGlassCard(accent: Color? = nil) -> some View {
         self
             .background {
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Theme.CelestialColors.voidDeep.opacity(0.5))
+                    .fill(Aurora.Colors.voidNebula.opacity(0.5))
                     .overlay {
                         RoundedRectangle(cornerRadius: 20)
                             .strokeBorder(
                                 LinearGradient(
                                     colors: [
-                                        (accent ?? Theme.CelestialColors.starDim).opacity(0.25),
-                                        (accent ?? Theme.CelestialColors.starDim).opacity(0.1)
+                                        (accent ?? Aurora.Colors.textTertiary).opacity(0.25),
+                                        (accent ?? Aurora.Colors.textTertiary).opacity(0.1)
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -2042,9 +2432,62 @@ extension View {
                             )
                     }
             }
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .auroraGlass(in: RoundedRectangle(cornerRadius: 20))
     }
+}
 
+// MARK: - Aurora SubTask Row
+
+struct AuroraSubTaskRow: View {
+    let subTask: SubTask
+    let index: Int
+    let totalCount: Int
+    let onToggle: () -> Void
+    let onDelete: () -> Void
+
+    var body: some View {
+        HStack(spacing: Aurora.Spacing.md) {
+            // Completion checkbox with aurora styling
+            Button(action: onToggle) {
+                ZStack {
+                    Circle()
+                        .strokeBorder(
+                            subTask.isCompleted ? Aurora.Colors.prismaticGreen : Aurora.Colors.glassBorder,
+                            lineWidth: 2
+                        )
+                        .frame(width: 22, height: 22)
+
+                    if subTask.isCompleted {
+                        Circle()
+                            .fill(Aurora.Colors.prismaticGreen)
+                            .frame(width: 14, height: 14)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+
+            // Sub-task title
+            Text(subTask.title)
+                .font(Aurora.Typography.body)
+                .foregroundStyle(subTask.isCompleted ? Aurora.Colors.textTertiary : Aurora.Colors.textPrimary)
+                .strikethrough(subTask.isCompleted)
+
+            Spacer()
+
+            // Delete button
+            Button(action: onDelete) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Aurora.Colors.textTertiary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(Aurora.Spacing.md)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Aurora.Colors.voidNebula.opacity(0.3))
+        }
+    }
 }
 
 // MARK: - Preview

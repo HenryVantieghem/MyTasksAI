@@ -636,6 +636,8 @@ enum Theme {
 
         // MARK: Gamification Colors
         static let streakOrange = Color(red: 0.98, green: 0.48, blue: 0.12)
+        static let streakGold = Color(red: 1.0, green: 0.84, blue: 0.0)
+        static let completionMint = Color(red: 0.22, green: 0.88, blue: 0.58)
         static let xp = Color(red: 0.92, green: 0.78, blue: 0.22)
         static let gold = Color(red: 1.0, green: 0.84, blue: 0.0)
         static let fire = Color(red: 0.98, green: 0.32, blue: 0.12)

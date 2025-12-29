@@ -16,7 +16,7 @@ struct ConfettiBurst: View {
     let colors: [Color]
     let duration: Double
 
-    @State private var particles: [ConfettiParticle] = []
+    @State private var particles: [BurstConfettiParticle] = []
     @State private var isAnimating = false
 
     init(
@@ -52,7 +52,7 @@ struct ConfettiBurst: View {
 
     private func createParticles(in size: CGSize) {
         particles = (0..<particleCount).map { _ in
-            ConfettiParticle(
+            BurstConfettiParticle(
                 x: CGFloat.random(in: 0...size.width),
                 y: -50,
                 targetY: size.height + 100,
@@ -75,9 +75,9 @@ struct ConfettiBurst: View {
     }
 }
 
-// MARK: - Confetti Particle
+// MARK: - Confetti Particle (Burst version)
 
-struct ConfettiParticle: Identifiable {
+struct BurstConfettiParticle: Identifiable {
     let id = UUID()
     var x: CGFloat
     var y: CGFloat
@@ -101,7 +101,7 @@ enum ConfettiShape: CaseIterable {
 // MARK: - Confetti Piece View
 
 struct ConfettiPiece: View {
-    let particle: ConfettiParticle
+    let particle: BurstConfettiParticle
 
     @State private var offset: CGSize = .zero
     @State private var rotation: Double = 0
@@ -145,7 +145,7 @@ struct ConfettiPiece: View {
             Triangle()
                 .fill(particle.color)
         case .star:
-            Star(points: 4, innerRatio: 0.4)
+            ConfettiStar(points: 4, innerRatio: 0.4)
                 .fill(particle.color)
         }
     }
@@ -164,9 +164,9 @@ struct Triangle: Shape {
     }
 }
 
-// MARK: - Star Shape
+// MARK: - Star Shape (Confetti version)
 
-struct Star: Shape {
+struct ConfettiStar: Shape {
     let points: Int
     let innerRatio: CGFloat
 

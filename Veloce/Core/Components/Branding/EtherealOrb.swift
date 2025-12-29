@@ -2,9 +2,9 @@
 //  EtherealOrb.swift
 //  Veloce
 //
-//  Premium Ethereal Orb Logo
-//  A clean, translucent iridescent sphere with soft ethereal glow
-//  Inspired by the reference image - no neural patterns, pure elegance
+//  Cosmic Widget Ethereal Orb - AMPLIFIED Electric Cyan Glow
+//  AI-powered orb with ultra-saturated cyan accent
+//  Uses CosmicWidget design system colors
 //
 
 import SwiftUI
@@ -19,8 +19,8 @@ enum EtherealOrbState {
 
 // MARK: - Ethereal Orb
 
-/// Premium ethereal orb logo - clean, translucent, iridescent
-/// Matches the reference image aesthetic with soft pink/purple/cyan colors
+/// Premium ethereal orb with AMPLIFIED electric cyan glow
+/// Uses CosmicWidget ultra-saturated colors
 struct EtherealOrb: View {
     let size: LogoSize
     var state: EtherealOrbState = .idle
@@ -40,20 +40,20 @@ struct EtherealOrb: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // MARK: - Color Palette (matching iridescent bubble reference)
+    // MARK: - Color Palette (CosmicWidget ULTRA SATURATED)
 
-    // Deep background colors - subtle blue undertone
-    private let voidIndigo = Color(red: 0.05, green: 0.08, blue: 0.18)
-    private let deepPurple = Color(red: 0.12, green: 0.18, blue: 0.45)
+    // Deep void core - dark cosmic background
+    private var voidCore: Color { CosmicWidget.Void.deepSpace }
+    private var voidDeep: Color { Color(red: 0.04, green: 0.06, blue: 0.14) }
 
-    // Inner ethereal colors - cyan/purple/pink iridescence (bubble aesthetic)
-    private let softPink = Color(red: 0.85, green: 0.60, blue: 0.90)
-    private let softPurple = Color(red: 0.65, green: 0.55, blue: 0.95)
-    private let softCyan = Color(red: 0.45, green: 0.88, blue: 0.98)
-    private let softLavender = Color(red: 0.70, green: 0.70, blue: 0.98)
+    // AMPLIFIED Electric Cyan - Primary AI accent (ULTRA BRIGHT)
+    private var electricCyan: Color { CosmicWidget.Widget.electricCyan }
 
-    // Rim/Edge colors - brighter cyan for bubble edge effect
-    private let cyanRim = Color(red: 0.40, green: 0.90, blue: 0.98)
+    // Supporting colors from CosmicWidget
+    private var violet: Color { CosmicWidget.Widget.violet }
+    private var magenta: Color { CosmicWidget.Widget.magenta }
+
+    // Highlight colors
     private let whiteHighlight = Color.white
 
     // Computed properties for animation
@@ -114,34 +114,34 @@ struct EtherealOrb: View {
         }
     }
 
-    // MARK: - Layer 1: Outer Atmospheric Glow
+    // MARK: - Layer 1: Outer Atmospheric Glow (AMPLIFIED CYAN)
 
     private func outerAtmosphericGlow(size: CGFloat) -> some View {
         ZStack {
-            // Primary soft purple glow
+            // Primary ELECTRIC CYAN glow - AMPLIFIED
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            softPurple.opacity(0.35 * effectiveIntensity * glowPulsePhase),
-                            softCyan.opacity(0.20 * effectiveIntensity),
+                            electricCyan.opacity(0.50 * effectiveIntensity * glowPulsePhase),
+                            electricCyan.opacity(0.25 * effectiveIntensity),
                             Color.clear
                         ],
                         center: .center,
-                        startRadius: size * 0.25,
-                        endRadius: size * 0.85
+                        startRadius: size * 0.20,
+                        endRadius: size * 0.90
                     )
                 )
-                .frame(width: size * 1.5, height: size * 1.5)
-                .blur(radius: size * 0.15)
+                .frame(width: size * 1.6, height: size * 1.6)
+                .blur(radius: size * 0.18)
 
-            // Secondary pink accent glow
+            // Secondary violet accent glow
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            softPink.opacity(0.25 * effectiveIntensity),
-                            softLavender.opacity(0.12 * effectiveIntensity),
+                            violet.opacity(0.30 * effectiveIntensity),
+                            violet.opacity(0.12 * effectiveIntensity),
                             Color.clear
                         ],
                         center: UnitPoint(x: 0.55, y: 0.40),
@@ -153,23 +153,23 @@ struct EtherealOrb: View {
                 .blur(radius: size * 0.12)
                 .offset(x: size * 0.03)
 
-            // Cyan rim glow
+            // Outer cyan ring glow - SUPER BRIGHT
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
                             Color.clear,
-                            cyanRim.opacity(0.15 * effectiveIntensity),
-                            cyanRim.opacity(0.25 * effectiveIntensity * glowPulsePhase),
+                            electricCyan.opacity(0.20 * effectiveIntensity),
+                            electricCyan.opacity(0.40 * effectiveIntensity * glowPulsePhase),
                             Color.clear
                         ],
                         center: .center,
-                        startRadius: size * 0.30,
-                        endRadius: size * 0.52
+                        startRadius: size * 0.28,
+                        endRadius: size * 0.55
                     )
                 )
-                .frame(width: size * 1.1, height: size * 1.1)
-                .blur(radius: size * 0.05)
+                .frame(width: size * 1.2, height: size * 1.2)
+                .blur(radius: size * 0.06)
         }
     }
 
@@ -177,14 +177,14 @@ struct EtherealOrb: View {
 
     private func coreGlassSphere(size: CGFloat) -> some View {
         ZStack {
-            // Deep translucent base with depth gradient
+            // Deep void core with subtle violet tint
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            (tintColor ?? deepPurple).opacity(0.85),
-                            voidIndigo.opacity(0.92),
-                            voidIndigo
+                            (tintColor ?? voidDeep).opacity(0.90),
+                            voidCore.opacity(0.95),
+                            voidCore
                         ],
                         center: UnitPoint(x: 0.35, y: 0.35),
                         startRadius: size * 0.05,
@@ -199,8 +199,8 @@ struct EtherealOrb: View {
                     LinearGradient(
                         colors: [
                             Color.clear,
-                            voidIndigo.opacity(0.3),
-                            voidIndigo.opacity(0.5)
+                            voidCore.opacity(0.3),
+                            voidCore.opacity(0.5)
                         ],
                         startPoint: UnitPoint(x: 0.5, y: 0.35),
                         endPoint: .bottom
@@ -211,20 +211,20 @@ struct EtherealOrb: View {
         .scaleEffect(1.0 + breathePhase * 0.025)
     }
 
-    // MARK: - Layer 3: Inner Color Field (Animated)
+    // MARK: - Layer 3: Inner Color Field (Animated - Cyan + Violet)
 
     private func innerColorField(size: CGFloat) -> some View {
         let colorProgress = sin(colorShiftPhase * .pi / 4)
         let colorProgress2 = cos(colorShiftPhase * .pi / 4)
 
         return ZStack {
-            // Pink glow - upper region
+            // Magenta glow - upper region
             Ellipse()
                 .fill(
                     RadialGradient(
                         colors: [
-                            softPink.opacity(0.40 * effectiveIntensity * (0.7 + colorProgress * 0.3)),
-                            softPink.opacity(0.15 * effectiveIntensity),
+                            magenta.opacity(0.35 * effectiveIntensity * (0.7 + colorProgress * 0.3)),
+                            magenta.opacity(0.12 * effectiveIntensity),
                             Color.clear
                         ],
                         center: UnitPoint(x: 0.45, y: 0.35),
@@ -236,31 +236,31 @@ struct EtherealOrb: View {
                 .offset(x: -size * 0.06, y: -size * 0.08)
                 .blur(radius: size * 0.06)
 
-            // Cyan glow - lower right
+            // ELECTRIC CYAN glow - lower right (AMPLIFIED)
             Ellipse()
                 .fill(
                     RadialGradient(
                         colors: [
-                            softCyan.opacity(0.35 * effectiveIntensity * (0.8 + colorProgress2 * 0.2)),
-                            softCyan.opacity(0.12 * effectiveIntensity),
+                            electricCyan.opacity(0.50 * effectiveIntensity * (0.8 + colorProgress2 * 0.2)),
+                            electricCyan.opacity(0.20 * effectiveIntensity),
                             Color.clear
                         ],
                         center: UnitPoint(x: 0.55, y: 0.55),
                         startRadius: 0,
-                        endRadius: size * 0.18
+                        endRadius: size * 0.20
                     )
                 )
-                .frame(width: size * 0.40, height: size * 0.30)
+                .frame(width: size * 0.45, height: size * 0.35)
                 .offset(x: size * 0.08, y: size * 0.06)
                 .blur(radius: size * 0.05)
 
-            // Purple center blend
+            // Violet center blend
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            softPurple.opacity(0.30 * effectiveIntensity),
-                            softLavender.opacity(0.15 * effectiveIntensity),
+                            violet.opacity(0.35 * effectiveIntensity),
+                            violet.opacity(0.15 * effectiveIntensity),
                             Color.clear
                         ],
                         center: .center,
@@ -271,13 +271,13 @@ struct EtherealOrb: View {
                 .frame(width: size * 0.45, height: size * 0.45)
                 .blur(radius: size * 0.04)
 
-            // Central white luminescence
+            // Central cyan luminescence - BRIGHT
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            whiteHighlight.opacity(0.35 * effectiveIntensity * glowPulsePhase),
-                            whiteHighlight.opacity(0.15 * effectiveIntensity),
+                            electricCyan.opacity(0.45 * effectiveIntensity * glowPulsePhase),
+                            whiteHighlight.opacity(0.20 * effectiveIntensity),
                             Color.clear
                         ],
                         center: UnitPoint(x: 0.42, y: 0.40),
@@ -291,29 +291,29 @@ struct EtherealOrb: View {
         .blendMode(.screen)
     }
 
-    // MARK: - Layer 4: Rim Highlight
+    // MARK: - Layer 4: Rim Highlight (Electric Cyan)
 
     private func rimHighlight(size: CGFloat) -> some View {
         ZStack {
-            // Primary cyan rim glow
+            // Primary ELECTRIC CYAN rim glow - AMPLIFIED
             Circle()
                 .stroke(
                     AngularGradient(
                         colors: [
-                            cyanRim.opacity(0.55 * effectiveIntensity),
+                            electricCyan.opacity(0.65 * effectiveIntensity),
                             Color.clear,
-                            softPurple.opacity(0.25 * effectiveIntensity),
+                            violet.opacity(0.30 * effectiveIntensity),
                             Color.clear,
-                            cyanRim.opacity(0.45 * effectiveIntensity),
+                            electricCyan.opacity(0.55 * effectiveIntensity),
                             Color.clear,
-                            softPink.opacity(0.20 * effectiveIntensity),
-                            cyanRim.opacity(0.55 * effectiveIntensity)
+                            magenta.opacity(0.25 * effectiveIntensity),
+                            electricCyan.opacity(0.65 * effectiveIntensity)
                         ],
                         center: .center,
                         startAngle: .degrees(-60 + rimRotation),
                         endAngle: .degrees(300 + rimRotation)
                     ),
-                    lineWidth: size * 0.025
+                    lineWidth: size * 0.028
                 )
                 .frame(width: size * 0.68, height: size * 0.68)
                 .blur(radius: size * 0.012)
@@ -323,9 +323,9 @@ struct EtherealOrb: View {
                 .stroke(
                     LinearGradient(
                         colors: [
-                            whiteHighlight.opacity(0.30 * effectiveIntensity),
+                            whiteHighlight.opacity(0.35 * effectiveIntensity),
                             Color.clear,
-                            cyanRim.opacity(0.15 * effectiveIntensity),
+                            electricCyan.opacity(0.20 * effectiveIntensity),
                             Color.clear
                         ],
                         startPoint: .topLeading,
@@ -346,8 +346,8 @@ struct EtherealOrb: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            whiteHighlight.opacity(0.90),
-                            whiteHighlight.opacity(0.50),
+                            whiteHighlight.opacity(0.95),
+                            whiteHighlight.opacity(0.55),
                             Color.clear
                         ],
                         center: .center,
@@ -361,26 +361,26 @@ struct EtherealOrb: View {
 
             // Secondary specular (smaller, above primary)
             Ellipse()
-                .fill(whiteHighlight.opacity(0.55))
+                .fill(whiteHighlight.opacity(0.60))
                 .frame(width: size * 0.055, height: size * 0.028)
                 .offset(x: -size * 0.10, y: -size * 0.21)
                 .blur(radius: 1)
 
-            // Sparkle point (for larger sizes)
+            // Cyan sparkle point (for larger sizes) - AMPLIFIED
             if size >= 80 {
                 Circle()
-                    .fill(whiteHighlight.opacity(0.85 * shimmerPhase))
-                    .frame(width: size * 0.022)
+                    .fill(electricCyan.opacity(0.90 * shimmerPhase))
+                    .frame(width: size * 0.025)
                     .offset(x: -size * 0.155, y: -size * 0.145)
                     .blur(radius: 0.5)
             }
 
-            // Subtle lower reflection
+            // Subtle lower cyan reflection
             Ellipse()
                 .fill(
                     RadialGradient(
                         colors: [
-                            cyanRim.opacity(0.20 * effectiveIntensity),
+                            electricCyan.opacity(0.30 * effectiveIntensity),
                             Color.clear
                         ],
                         center: .center,
@@ -508,7 +508,7 @@ struct EtherealOrbWithBranding: View {
 
 #Preview("Ethereal Orb - Hero") {
     ZStack {
-        Color(red: 0.01, green: 0.01, blue: 0.02)
+        CosmicWidget.Void.deepSpace
             .ignoresSafeArea()
 
         EtherealOrb(size: .hero)
@@ -517,7 +517,7 @@ struct EtherealOrbWithBranding: View {
 
 #Preview("Ethereal Orb - Sizes") {
     ZStack {
-        Color(red: 0.01, green: 0.01, blue: 0.02)
+        CosmicWidget.Void.deepSpace
             .ignoresSafeArea()
 
         VStack(spacing: 40) {
@@ -538,23 +538,29 @@ struct EtherealOrbWithBranding: View {
 
 #Preview("Ethereal Orb - States") {
     ZStack {
-        Color(red: 0.01, green: 0.01, blue: 0.02)
+        CosmicWidget.Void.deepSpace
             .ignoresSafeArea()
 
         VStack(spacing: 50) {
             VStack(spacing: 8) {
                 EtherealOrb(size: .large, state: .idle)
-                Text("Idle").font(.caption).foregroundStyle(.white.opacity(0.5))
+                Text("Idle")
+                    .font(CosmicWidget.Typography.caption)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
             }
 
             VStack(spacing: 8) {
                 EtherealOrb(size: .large, state: .active)
-                Text("Active").font(.caption).foregroundStyle(.white.opacity(0.5))
+                Text("Active")
+                    .font(CosmicWidget.Typography.caption)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
             }
 
             VStack(spacing: 8) {
                 EtherealOrb(size: .large, state: .celebration)
-                Text("Celebration").font(.caption).foregroundStyle(.white.opacity(0.5))
+                Text("Celebration")
+                    .font(CosmicWidget.Typography.caption)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
             }
         }
     }
@@ -562,7 +568,7 @@ struct EtherealOrbWithBranding: View {
 
 #Preview("Ethereal Orb With Branding") {
     ZStack {
-        Color(red: 0.01, green: 0.01, blue: 0.02)
+        CosmicWidget.Void.deepSpace
             .ignoresSafeArea()
 
         EtherealOrbWithBranding(size: .hero)

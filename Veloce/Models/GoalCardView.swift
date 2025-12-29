@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import WidgetKit
+import AppIntents
 
 struct GoalCardView: View {
     let goal: Goal
@@ -376,9 +378,9 @@ struct StatBadge: View {
             category: GoalCategory.career.rawValue,
             timeframe: GoalTimeframe.horizon.rawValue,
             progress: 0.67,
+            checkInStreak: 12,
             milestoneCount: 8,
-            completedMilestoneCount: 5,
-            checkInStreak: 12
+            completedMilestoneCount: 5
         )
     )
     .frame(width: 350)
@@ -409,9 +411,9 @@ struct StatBadge: View {
                 category: GoalCategory.health.rawValue,
                 timeframe: GoalTimeframe.horizon.rawValue,
                 progress: 0.34,
+                checkInStreak: 7,
                 milestoneCount: 10,
-                completedMilestoneCount: 3,
-                checkInStreak: 7
+                completedMilestoneCount: 3
             )
         )
         .padding()

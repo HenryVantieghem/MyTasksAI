@@ -76,25 +76,25 @@ struct GoalDashboardView: View {
             // Stats row with glass containers
             GlassEffectContainer(spacing: 12) {
                 HStack(spacing: 12) {
-                    StatCard(
+                    GoalStatCard(
                         icon: "target",
                         value: "\(goals.count)",
                         label: "Active Goals",
-                        color: .blue
+                        iconColor: .blue
                     )
-                    
-                    StatCard(
+
+                    GoalStatCard(
                         icon: "chart.line.uptrend.xyaxis",
                         value: "\(Int(averageProgress * 100))%",
                         label: "Avg Progress",
-                        color: .green
+                        iconColor: .green
                     )
-                    
-                    StatCard(
+
+                    GoalStatCard(
                         icon: "flame.fill",
                         value: "\(longestStreak)",
                         label: "Best Streak",
-                        color: .orange
+                        iconColor: .orange
                     )
                 }
             }
@@ -144,23 +144,23 @@ struct GoalDashboardView: View {
             
             GlassEffectContainer(spacing: 12) {
                 HStack(spacing: 12) {
-                    QuickActionButton(
+                    GoalQuickActionButton(
                         icon: "plus.circle.fill",
                         title: "New Goal",
                         color: .blue
                     ) {
                         // Add new goal
                     }
-                    
-                    QuickActionButton(
+
+                    GoalQuickActionButton(
                         icon: "checkmark.circle.fill",
                         title: "Check In",
                         color: .green
                     ) {
                         // Check in
                     }
-                    
-                    QuickActionButton(
+
+                    GoalQuickActionButton(
                         icon: "chart.bar.fill",
                         title: "Analytics",
                         color: .purple
@@ -192,22 +192,22 @@ struct GoalDashboardView: View {
 
 // MARK: - Supporting Views
 
-struct StatCard: View {
+struct GoalStatCard: View {
     let icon: String
     let value: String
     let label: String
-    let color: Color
+    let iconColor: Color
     
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.title2)
-                .foregroundStyle(color)
-            
+                .foregroundStyle(iconColor)
+
             Text(value)
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.primary)
-            
+
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -216,9 +216,9 @@ struct StatCard: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 16)
-                .fill(color.opacity(0.1))
+                .fill(iconColor.opacity(0.1))
         }
-        .glassEffect(.regular.tint(color), in: .rect(cornerRadius: 16))
+        .glassEffect(.regular.tint(iconColor), in: .rect(cornerRadius: 16))
     }
 }
 
@@ -266,7 +266,7 @@ struct TimeframeChip: View {
     @Namespace private var glassNamespace
 }
 
-struct QuickActionButton: View {
+struct GoalQuickActionButton: View {
     let icon: String
     let title: String
     let color: Color

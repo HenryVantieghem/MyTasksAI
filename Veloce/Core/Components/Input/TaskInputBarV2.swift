@@ -2,8 +2,9 @@
 //  TaskInputBarV2.swift
 //  Veloce
 //
-//  Floating Island Task Input Bar
-//  Revolutionary redesign with NLP, inline chips, and AI-forward interactions
+//  Aurora Design System - Cosmic Command Center
+//  Floating glass portal to AI companion with prismatic
+//  borders, particle effects, and cosmic sound feedback.
 //
 
 import SwiftUI
@@ -37,9 +38,9 @@ enum InputTaskPriority: Int, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
-        case .low: return Theme.Colors.aiGreen
-        case .medium: return Theme.Colors.aiOrange
-        case .high: return Color.red
+        case .low: return Aurora.Colors.prismaticGreen
+        case .medium: return Aurora.Colors.cosmicGold
+        case .high: return Aurora.Colors.error
         }
     }
 
@@ -81,13 +82,13 @@ enum InputTemplateCategory: String, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
-        case .work: return Theme.Colors.aiBlue
-        case .personal: return Theme.Colors.aiPurple
-        case .health: return Theme.Colors.aiGreen
-        case .errands: return Theme.Colors.aiOrange
-        case .learning: return Theme.Colors.aiCyan
-        case .creative: return Theme.Colors.aiPink
-        case .custom: return Theme.CelestialColors.nebulaCore
+        case .work: return Aurora.Colors.categoryWork
+        case .personal: return Aurora.Colors.categoryPersonal
+        case .health: return Aurora.Colors.categoryHealth
+        case .errands: return Aurora.Colors.cosmicGold
+        case .learning: return Aurora.Colors.categoryLearning
+        case .creative: return Aurora.Colors.categoryCreative
+        case .custom: return Aurora.Colors.cosmicGold
         }
     }
 }
@@ -291,10 +292,10 @@ struct TaskInputBarV2: View {
             // Main floating island container
             floatingIslandContainer
         }
-        .animation(Theme.Animation.springBouncy, value: effectiveMode)
-        .animation(Theme.Animation.springBouncy, value: showCategoryBadge)
-        .animation(Theme.Animation.springBouncy, value: showChipsRow)
-        .animation(Theme.Animation.spring, value: canSend)
+        .animation(AuroraMotion.Spring.ui, value: effectiveMode)
+        .animation(AuroraMotion.Spring.elasticBounce, value: showCategoryBadge)
+        .animation(AuroraMotion.Spring.ui, value: showChipsRow)
+        .animation(AuroraMotion.Spring.liquidSnap, value: canSend)
 
         // Sheets
         .sheet(isPresented: $showTemplatePicker) {
@@ -351,6 +352,11 @@ struct TaskInputBarV2: View {
         .padding(.vertical, isFocused.wrappedValue ? 14 : 8)
         .frame(minHeight: currentHeight)
         .background { floatingIslandBackground }
+        // 🌟 iOS 26 LIQUID GLASS: Proper navigation layer glass
+        .glassEffect(
+            .regular.interactive(true),
+            in: Capsule()
+        )
         .overlay { floatingIslandBorder }
         .floatingIslandShadow(mode: effectiveMode, canSend: canSend)
         .overlay {
@@ -395,65 +401,31 @@ struct TaskInputBarV2: View {
         }
     }
 
-    // MARK: - Floating Island Background
+    // MARK: - Aurora Floating Island Background
+    // iOS 26 Liquid Glass: Navigation layer gets glass, content doesn't
 
     private var floatingIslandBackground: some View {
-        ZStack {
-            // iOS 26 Liquid Glass
-            Capsule()
-                .fill(.clear)
-                .adaptiveGlassCapsule()
-
-            // Focused state tint overlay
-            if isFocused.wrappedValue {
-                Capsule()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Theme.Colors.aiPurple.opacity(0.04),
-                                Theme.Colors.aiBlue.opacity(0.02)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .allowsHitTesting(false)
-            }
-
-            // Recording state red tint
-            if isRecording {
-                Capsule()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Color.red.opacity(0.08),
-                                Color.clear
-                            ],
-                            center: .leading,
-                            startRadius: 0,
-                            endRadius: 200
-                        )
-                    )
-                    .allowsHitTesting(false)
-            }
-        }
+        // Recording state gets a subtle red tint, otherwise pure aurora glass
+        Capsule()
+            .fill(isRecording ? Aurora.Colors.error.opacity(0.08) : Color.clear)
     }
 
-    // MARK: - Floating Island Border
+    // MARK: - Aurora Prismatic Border
+    // Aurora-styled borders with prismatic effects
 
     @ViewBuilder
     private var floatingIslandBorder: some View {
         if isRecording && !reduceMotion {
-            // Animated holographic border when recording
+            // Aurora recording border - prismatic red pulse
             Capsule()
                 .stroke(
                     AngularGradient(
                         colors: [
-                            Color.red.opacity(0.7),
-                            Theme.Colors.aiPink.opacity(0.5),
-                            Color.red.opacity(0.4),
-                            Theme.Colors.aiPurple.opacity(0.5),
-                            Color.red.opacity(0.7)
+                            Aurora.Colors.error.opacity(0.7),
+                            Aurora.Colors.stellarMagenta.opacity(0.5),
+                            Aurora.Colors.error.opacity(0.4),
+                            Aurora.Colors.borealisViolet.opacity(0.5),
+                            Aurora.Colors.error.opacity(0.7)
                         ],
                         center: .center,
                         angle: .degrees(borderRotation)
@@ -462,43 +434,29 @@ struct TaskInputBarV2: View {
                 )
                 .blur(radius: 0.5)
         } else if isFocused.wrappedValue {
-            // Focus gradient border
+            // Focused: Aurora AI gradient border (Cyan → Violet)
             Capsule()
                 .stroke(
                     LinearGradient(
                         colors: [
-                            Theme.Colors.aiPurple.opacity(0.5),
-                            Theme.Colors.aiBlue.opacity(0.3),
-                            Theme.Colors.aiCyan.opacity(0.2)
+                            Aurora.Colors.electricCyan.opacity(0.6),
+                            Aurora.Colors.borealisViolet.opacity(0.4)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
-                )
-        } else {
-            // Default subtle border
-            Capsule()
-                .stroke(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.35),
-                            Color.white.opacity(0.15),
-                            Color.white.opacity(0.05)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.5
+                    lineWidth: 1.5
                 )
         }
+        // Collapsed: No border (Liquid Glass handles it)
     }
 
     // MARK: - Voice Input Button
 
     private var voiceInputButton: some View {
         Button {
-            HapticsService.shared.impact()
+            AuroraSoundEngine.shared.play(.buttonTap)
+            AuroraHaptics.medium()
             toggleVoiceRecording()
         } label: {
             ZStack {
@@ -519,7 +477,7 @@ struct TaskInputBarV2: View {
                 // Transcribing pulse
                 if isTranscribing && !reduceMotion {
                     Circle()
-                        .stroke(Theme.Colors.aiPurple.opacity(0.3), lineWidth: 2)
+                        .stroke(CosmicWidget.Widget.violet.opacity(0.3), lineWidth: 2)
                         .frame(width: FloatingIslandMetrics.buttonSize + 8, height: FloatingIslandMetrics.buttonSize + 8)
                         .scaleEffect(recordingPulse)
                 }
@@ -552,15 +510,15 @@ struct TaskInputBarV2: View {
     private var voiceButtonBackground: some View {
         if isRecording {
             Circle()
-                .fill(Color.red)
+                .fill(Aurora.Colors.error)
                 .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
         } else if isTranscribing {
             Circle()
-                .fill(Theme.Colors.aiPurple.opacity(0.2))
+                .fill(Aurora.Colors.borealisViolet.opacity(0.3))
                 .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
         } else {
             Circle()
-                .fill(Color(.tertiarySystemFill))
+                .fill(Aurora.Colors.voidNebula)
                 .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
         }
     }
@@ -570,12 +528,12 @@ struct TaskInputBarV2: View {
         if isTranscribing {
             Image(systemName: "waveform")
                 .font(.system(size: FloatingIslandMetrics.micIconSize, weight: .medium))
-                .foregroundStyle(Theme.Colors.aiPurple)
+                .foregroundStyle(Aurora.Colors.borealisViolet)
                 .symbolEffect(.variableColor.iterative.reversing, options: .repeating)
         } else {
             Image(systemName: isRecording ? "stop.fill" : "mic.fill")
                 .font(.system(size: FloatingIslandMetrics.micIconSize, weight: .medium))
-                .foregroundStyle(isRecording ? .white : .secondary)
+                .foregroundStyle(isRecording ? .white : Aurora.Colors.textSecondary)
                 .scaleEffect(isRecording ? 0.85 : 1.0)
         }
     }
@@ -604,7 +562,7 @@ struct TaskInputBarV2: View {
                     submitTask()
                 }
             }
-            .tint(Theme.Colors.aiPurple)
+            .tint(CosmicWidget.Widget.electricCyan)
             .textInputAutocapitalization(.sentences)
             .disableAutocorrection(false)
             .toolbar {
@@ -624,36 +582,38 @@ struct TaskInputBarV2: View {
 
     private var placeholderText: Text {
         Text("What's on your mind?")
-            .font(.system(size: 16, weight: .light))
+            .font(Aurora.Typography.body)
             .italic()
-            .foregroundStyle(.secondary.opacity(0.6))
+            .foregroundStyle(Aurora.Colors.textTertiary)
     }
 
-    // MARK: - AI Sparkles Button
+    // MARK: - Aurora AI Sparkles Button
 
     private var aiSparklesButton: some View {
         Button {
-            HapticsService.shared.selectionFeedback()
+            AuroraSoundEngine.shared.play(.buttonTap)
+            AuroraHaptics.light()
             if canSend {
                 showAISheet = true
             } else {
-                withAnimation(Theme.Animation.springBouncy) {
+                withAnimation(AuroraMotion.Spring.elasticBounce) {
                     aiModeEnabled.toggle()
                 }
                 if aiModeEnabled {
-                    HapticsService.shared.success()
+                    AuroraSoundEngine.shared.play(.aiActivate)
+                    AuroraHaptics.dopamineBurst()
                 }
             }
         } label: {
             ZStack {
-                // Glow when enabled
+                // Aurora glow when enabled
                 if aiModeEnabled || isAIEnhancing {
                     Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Theme.Colors.aiPurple.opacity(0.4),
-                                    Theme.Colors.aiCyan.opacity(0.2),
+                                    Aurora.Colors.electricCyan.opacity(0.5),
+                                    Aurora.Colors.borealisViolet.opacity(0.3),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -666,17 +626,17 @@ struct TaskInputBarV2: View {
                         .scaleEffect(isAIEnhancing ? 1.2 : 1.0)
                 }
 
-                // Button background
+                // Aurora button background
                 Circle()
                     .fill(
                         aiModeEnabled
                             ? LinearGradient(
-                                colors: [Theme.Colors.aiPurple.opacity(0.3), Theme.Colors.aiCyan.opacity(0.2)],
+                                colors: [Aurora.Colors.electricCyan.opacity(0.35), Aurora.Colors.borealisViolet.opacity(0.25)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                             : LinearGradient(
-                                colors: [Theme.Colors.aiPurple.opacity(0.12)],
+                                colors: [Aurora.Colors.electricCyan.opacity(0.15)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -684,15 +644,11 @@ struct TaskInputBarV2: View {
                     .frame(width: FloatingIslandMetrics.buttonSize - 4, height: FloatingIslandMetrics.buttonSize - 4)
                     .overlay {
                         if aiModeEnabled && !reduceMotion {
+                            // Aurora prismatic rotating border
                             Circle()
                                 .stroke(
                                     AngularGradient(
-                                        colors: [
-                                            Theme.Colors.aiPurple,
-                                            Theme.Colors.aiCyan,
-                                            Theme.Colors.aiPink,
-                                            Theme.Colors.aiPurple
-                                        ],
+                                        colors: Aurora.Gradients.auroraSpectrum,
                                         center: .center,
                                         angle: .degrees(sparkleRotation)
                                     ),
@@ -705,24 +661,16 @@ struct TaskInputBarV2: View {
                 if isAIEnhancing {
                     ProgressView()
                         .scaleEffect(0.8)
-                        .tint(Theme.Colors.aiPurple)
+                        .tint(Aurora.Colors.electricCyan)
                 } else {
                     Image(systemName: "sparkles")
                         .font(.system(size: FloatingIslandMetrics.aiIconSize, weight: .semibold))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: aiModeEnabled
-                                    ? [Theme.Colors.aiPurple, Theme.Colors.aiCyan, Theme.Colors.aiPink]
-                                    : [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
+                        .foregroundStyle(Aurora.Gradients.aiGradient)
                         .symbolEffect(.bounce, value: aiModeEnabled)
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cosmicTap)
         .contentShape(Circle())
         .disabled(isAIEnhancing)
         .accessibilityLabel(canSend ? "Enhance with AI" : (aiModeEnabled ? "AI mode enabled" : "Enable AI mode"))
@@ -733,38 +681,42 @@ struct TaskInputBarV2: View {
         .matchedTransitionSource(id: "aiSheet", in: sheetNamespace)
         .onAppear {
             if !reduceMotion {
-                withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                withAnimation(
+                    .linear(duration: AuroraMotion.Duration.prismaticRotation)
+                    .repeatForever(autoreverses: false)
+                ) {
                     sparkleRotation = 360
                 }
             }
         }
     }
 
-    // MARK: - Plus Button (Action Tray Trigger)
+    // MARK: - Aurora Plus Button (Action Tray Trigger)
 
     private var plusButton: some View {
         Button {
-            HapticsService.shared.selectionFeedback()
+            AuroraSoundEngine.shared.play(.buttonTap)
+            AuroraHaptics.light()
             if text.isEmpty {
                 showTemplatePicker = true
             } else {
-                withAnimation(Theme.Animation.springBouncy) {
+                withAnimation(AuroraMotion.Spring.elasticBounce) {
                     showActionTray.toggle()
                 }
             }
         } label: {
             ZStack {
                 Circle()
-                    .fill(Color.white.opacity(0.08))
+                    .fill(Aurora.Colors.voidNebula)
                     .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
 
                 Image(systemName: showActionTray ? "xmark" : "plus")
                     .font(.system(size: FloatingIslandMetrics.iconSize, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Aurora.Colors.textSecondary)
                     .rotationEffect(.degrees(showActionTray ? 90 : 0))
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cosmicTap)
         .contentShape(Circle())
         .accessibilityLabel(showActionTray ? "Close menu" : "Quick add")
         // iOS 26: Glass effect with morphing ID
@@ -774,31 +726,32 @@ struct TaskInputBarV2: View {
         .matchedTransitionSource(id: "templatePicker", in: sheetNamespace)
     }
 
-    // MARK: - Send Button
+    // MARK: - Aurora Send Button
 
     private var sendButton: some View {
         Button {
+            AuroraSoundEngine.shared.play(.taskCreate)
             submitTask()
         } label: {
             ZStack {
-                // Ambient glow
+                // Aurora ambient glow
                 if !reduceMotion {
                     Circle()
-                        .fill(Theme.AdaptiveColors.aiPrimary.opacity(0.4))
+                        .fill(Aurora.Colors.electricCyan.opacity(0.5))
                         .frame(width: 48, height: 48)
                         .blur(radius: 8)
                         .scaleEffect(sendPulse)
                 }
 
-                // Main button with iOS 26 glass prominent styling
+                // Main button with Aurora AI gradient
                 Circle()
-                    .fill(Theme.AdaptiveColors.aiGradient)
+                    .fill(Aurora.Gradients.aiGradient)
                     .frame(width: FloatingIslandMetrics.sendButtonSize, height: FloatingIslandMetrics.sendButtonSize)
                     .overlay {
                         Circle()
                             .fill(
                                 RadialGradient(
-                                    colors: [Color.white.opacity(0.3), Color.clear],
+                                    colors: [Aurora.Colors.stellarWhite.opacity(0.4), Color.clear],
                                     center: UnitPoint(x: 0.3, y: 0.3),
                                     startRadius: 0,
                                     endRadius: 16
@@ -812,7 +765,7 @@ struct TaskInputBarV2: View {
                     .foregroundStyle(.white)
             }
         }
-        .buttonStyle(OrbButtonStyle())
+        .buttonStyle(.cosmicCelebrate)
         .accessibilityLabel("Send task")
         // iOS 26: Glass effect with morphing ID for send button
         .glassEffect(.regular.interactive(), in: .circle)
@@ -837,11 +790,11 @@ struct TaskInputBarV2: View {
                             time: selectedTime,
                             onTap: { showDatePicker = true },
                             onRemove: {
-                                withAnimation(Theme.Animation.spring) {
+                                withAnimation(AuroraMotion.Spring.ui) {
                                     selectedDate = nil
                                     selectedTime = nil
                                 }
-                                HapticsService.shared.lightImpact()
+                                AuroraHaptics.light()
                             }
                         )
                         .transition(.scale.combined(with: .opacity))
@@ -860,10 +813,10 @@ struct TaskInputBarV2: View {
                     // Category chips
                     ForEach(Array(categories), id: \.self) { category in
                         CategoryChipView(category: category) {
-                            _ = withAnimation(Theme.Animation.spring) {
+                            _ = withAnimation(AuroraMotion.Spring.ui) {
                                 categories.remove(category)
                             }
-                            HapticsService.shared.lightImpact()
+                            AuroraHaptics.light()
                         }
                         .transition(.scale.combined(with: .opacity))
                         .glassEffectID("category_\(category.id)", in: glassNamespace)
@@ -882,10 +835,10 @@ struct TaskInputBarV2: View {
                     // Duration chip (if estimated)
                     if let minutes = estimatedMinutes {
                         DurationChipView(minutes: minutes) {
-                            withAnimation(Theme.Animation.spring) {
+                            withAnimation(AuroraMotion.Spring.ui) {
                                 estimatedMinutes = nil
                             }
-                            HapticsService.shared.lightImpact()
+                            AuroraHaptics.light()
                         }
                         .transition(.scale.combined(with: .opacity))
                         .glassEffectID("durationChip", in: glassNamespace)
@@ -922,16 +875,16 @@ struct TaskInputBarV2: View {
         .padding(.top, 12)
     }
 
-    // MARK: - AI Processing Overlay
+    // MARK: - Aurora AI Processing Overlay
 
     private var aiProcessingOverlay: some View {
         Capsule()
             .fill(
                 LinearGradient(
                     colors: [
-                        Theme.Colors.aiPurple.opacity(0.08),
-                        Theme.Colors.aiCyan.opacity(0.05),
-                        Theme.Colors.aiPurple.opacity(0.08)
+                        Aurora.Colors.borealisViolet.opacity(0.1),
+                        Aurora.Colors.electricCyan.opacity(0.06),
+                        Aurora.Colors.borealisViolet.opacity(0.1)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
@@ -941,7 +894,11 @@ struct TaskInputBarV2: View {
                 HStack(spacing: 6) {
                     ForEach(0..<3, id: \.self) { index in
                         Circle()
-                            .fill(Theme.Colors.aiPurple)
+                            .fill(
+                                index == aiDotPhase
+                                    ? Aurora.Colors.electricCyan
+                                    : Aurora.Colors.borealisViolet
+                            )
                             .frame(width: 8, height: 8)
                             .opacity(aiDotPhase == index ? 1.0 : 0.3)
                             .scaleEffect(aiDotPhase == index ? 1.2 : 0.8)
@@ -951,7 +908,7 @@ struct TaskInputBarV2: View {
             .allowsHitTesting(false)
     }
 
-    // MARK: - Category Badge
+    // MARK: - Aurora Category Badge
 
     private var categoryBadgeView: some View {
         HStack(spacing: 6) {
@@ -961,15 +918,22 @@ struct TaskInputBarV2: View {
             Text(categoryText)
                 .font(.system(size: 11, weight: .medium))
         }
-        .foregroundStyle(Theme.Colors.aiPurple)
+        .foregroundStyle(Aurora.Colors.electricCyan)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background {
             Capsule()
-                .fill(Theme.Colors.aiPurple.opacity(0.12))
+                .fill(Aurora.Colors.electricCyan.opacity(0.12))
                 .overlay {
                     Capsule()
-                        .stroke(Theme.Colors.aiPurple.opacity(0.25), lineWidth: 0.5)
+                        .stroke(
+                            LinearGradient(
+                                colors: [Aurora.Colors.electricCyan.opacity(0.4), Aurora.Colors.borealisViolet.opacity(0.2)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            lineWidth: 0.5
+                        )
                 }
         }
     }
@@ -1160,13 +1124,13 @@ extension TaskInputBarV2 {
         audioLevelTimer = nil
     }
 
-    // MARK: - Task Submission
+    // MARK: - Aurora Task Submission
 
     private func submitTask() {
         guard canSend else { return }
 
         let taskText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        HapticsService.shared.impact()
+        AuroraHaptics.medium()
 
         startAIProcessing()
 
@@ -1198,11 +1162,12 @@ extension TaskInputBarV2 {
         nlpDetections = []
     }
 
-    // MARK: - AI Processing
+    // MARK: - Aurora AI Processing
 
     private func startAIProcessing() {
         isAIProcessing = true
         aiDotPhase = 0
+        AuroraSoundEngine.shared.play(.aiThinking)
 
         Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { timer in
             if !isAIProcessing {
@@ -1214,24 +1179,25 @@ extension TaskInputBarV2 {
             }
         }
 
-        HapticsService.shared.aiProcessingStart()
+        AuroraHaptics.light()
     }
 
     private func stopAIProcessing() {
         isAIProcessing = false
-        HapticsService.shared.aiProcessingComplete()
+        AuroraSoundEngine.shared.play(.aiComplete)
+        AuroraHaptics.dopamineBurst()
     }
 
     private func showCategoryResult() {
         let detectedCategories = ["Work", "Personal", "Health", "Learning", "Creative"]
         categoryText = detectedCategories.randomElement() ?? "Task"
 
-        withAnimation(Theme.Animation.springBouncy) {
+        withAnimation(AuroraMotion.Spring.elasticBounce) {
             showCategoryBadge = true
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            withAnimation(Theme.Animation.spring) {
+            withAnimation(AuroraMotion.Spring.ui) {
                 showCategoryBadge = false
             }
         }
@@ -1267,13 +1233,13 @@ extension TaskInputBarV2 {
                     await MainActor.run {
                         categoryText = priorityResult.label
                         isAIEnhancing = false
-                        withAnimation(Theme.Animation.springBouncy) {
+                        withAnimation(CosmicMotion.Springs.uiBouncy) {
                             showCategoryBadge = true
                         }
                         HapticsService.shared.success()
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            withAnimation(Theme.Animation.spring) {
+                            withAnimation(CosmicMotion.Springs.ui) {
                                 showCategoryBadge = false
                             }
                         }
@@ -1303,13 +1269,13 @@ extension TaskInputBarV2 {
                     await MainActor.run {
                         categoryText = "Finding similar..."
                         isAIEnhancing = false
-                        withAnimation(Theme.Animation.springBouncy) {
+                        withAnimation(CosmicMotion.Springs.uiBouncy) {
                             showCategoryBadge = true
                         }
                         HapticsService.shared.success()
 
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation(Theme.Animation.spring) {
+                            withAnimation(CosmicMotion.Springs.ui) {
                                 showCategoryBadge = false
                             }
                         }
@@ -1319,7 +1285,7 @@ extension TaskInputBarV2 {
                     let suggestedCategories = try await suggestCategories(for: text)
                     await MainActor.run {
                         for category in suggestedCategories {
-                            _ = withAnimation(Theme.Animation.springBouncy) {
+                            _ = withAnimation(CosmicMotion.Springs.uiBouncy) {
                                 categories.insert(category)
                             }
                         }
@@ -1514,7 +1480,7 @@ extension TaskInputBarV2 {
                     case .date:
                         if detection.confidence > 0.8, selectedDate == nil {
                             if let date = detection.value as? Date {
-                                withAnimation(Theme.Animation.springBouncy) {
+                                withAnimation(CosmicMotion.Springs.uiBouncy) {
                                     selectedDate = date
                                 }
                                 HapticsService.shared.selectionFeedback()
@@ -1523,7 +1489,7 @@ extension TaskInputBarV2 {
                     case .time:
                         if detection.confidence > 0.8 {
                             if let time = detection.value as? Date {
-                                withAnimation(Theme.Animation.springBouncy) {
+                                withAnimation(CosmicMotion.Springs.uiBouncy) {
                                     selectedTime = time
                                 }
                                 HapticsService.shared.selectionFeedback()
@@ -1532,7 +1498,7 @@ extension TaskInputBarV2 {
                     case .priority:
                         if detection.confidence > 0.9 {
                             if let p = detection.value as? InputTaskPriority {
-                                withAnimation(Theme.Animation.spring) {
+                                withAnimation(CosmicMotion.Springs.ui) {
                                     priority = p
                                 }
                             }
@@ -1540,7 +1506,7 @@ extension TaskInputBarV2 {
                     case .category:
                         if detection.confidence > 0.9 {
                             if let cat = detection.value as? InputTemplateCategory {
-                                _ = withAnimation(Theme.Animation.spring) {
+                                _ = withAnimation(CosmicMotion.Springs.ui) {
                                     categories.insert(cat)
                                 }
                             }
@@ -1548,7 +1514,7 @@ extension TaskInputBarV2 {
                     case .duration:
                         if detection.confidence > 0.9 {
                             if let mins = detection.value as? Int {
-                                withAnimation(Theme.Animation.spring) {
+                                withAnimation(CosmicMotion.Springs.ui) {
                                     estimatedMinutes = mins
                                 }
                             }
@@ -1760,20 +1726,20 @@ enum TaskNLPService {
     }
 }
 
-// MARK: - Floating Island Shadow Modifier
+// MARK: - Aurora Floating Island Shadow Modifier
 
 extension View {
     func floatingIslandShadow(mode: TaskInputBarMode, canSend: Bool) -> some View {
         self
-            // Layer 1: Deep void shadow
+            // Layer 1: Deep aurora void shadow
             .shadow(
-                color: Color.black.opacity(0.50),
+                color: Color.black.opacity(0.55),
                 radius: 40,
                 y: 20
             )
-            // Layer 2: Nebula glow
+            // Layer 2: Aurora AI glow when can send
             .shadow(
-                color: canSend ? Theme.Colors.aiPurple.opacity(0.25) : Color.clear,
+                color: canSend ? Aurora.Colors.electricCyan.opacity(0.35) : Color.clear,
                 radius: 24,
                 y: 8
             )
@@ -1786,13 +1752,13 @@ extension View {
     }
 }
 
-// MARK: - Orb Button Style
+// MARK: - Orb Button Style (Legacy - use .cosmicCelebrate instead)
 
 private struct OrbButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.88 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.6), value: configuration.isPressed)
+            .animation(CosmicMotion.Springs.celebrate, value: configuration.isPressed)
     }
 }
 
@@ -1817,10 +1783,10 @@ enum ActionTrayItemType: String, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
-        case .templates: return Theme.Colors.aiPurple
-        case .voice: return Color.red
-        case .calendar: return Theme.Colors.aiBlue
-        case .category: return Theme.Colors.aiOrange
+        case .templates: return Aurora.Colors.borealisViolet
+        case .voice: return Aurora.Colors.error
+        case .calendar: return Aurora.Colors.electricCyan
+        case .category: return Aurora.Colors.cosmicGold
         }
     }
 }
@@ -1831,14 +1797,20 @@ struct InputV2ActionTrayButton: View {
 
     var body: some View {
         Button(action: {
-            HapticsService.shared.selectionFeedback()
+            AuroraSoundEngine.shared.play(.buttonTap)
+            AuroraHaptics.light()
             action()
         }) {
             VStack(spacing: 6) {
                 ZStack {
+                    // Aurora glow background
                     Circle()
                         .fill(item.color.opacity(0.15))
                         .frame(width: 44, height: 44)
+                        .overlay {
+                            Circle()
+                                .strokeBorder(item.color.opacity(0.25), lineWidth: 0.5)
+                        }
 
                     Image(systemName: item.icon)
                         .font(.system(size: 18, weight: .medium))
@@ -1846,8 +1818,8 @@ struct InputV2ActionTrayButton: View {
                 }
 
                 Text(item.rawValue)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .font(Aurora.Typography.meta)
+                    .foregroundStyle(Aurora.Colors.textSecondary)
             }
         }
         .buttonStyle(.plain)
@@ -1884,7 +1856,7 @@ extension TaskInputBarV2 {
 
         var body: some View {
             ZStack {
-                Color.black.ignoresSafeArea()
+                CosmicWidget.Void.cosmos.ignoresSafeArea()
 
                 VStack {
                     Spacer()
@@ -1913,7 +1885,7 @@ extension TaskInputBarV2 {
 
         var body: some View {
             ZStack {
-                Color.black.ignoresSafeArea()
+                CosmicWidget.Void.cosmos.ignoresSafeArea()
 
                 VStack {
                     Spacer()

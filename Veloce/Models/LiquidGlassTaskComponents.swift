@@ -48,7 +48,7 @@ struct LiquidGlassTaskCard: View {
                         }
                         
                         // Priority indicator
-                        if task.priority > 0 {
+                        if task.priority.rawValue > 0 {
                             LiquidGlassPill(
                                 text: priorityText,
                                 icon: "flag.fill",
@@ -57,12 +57,10 @@ struct LiquidGlassTaskCard: View {
                         }
                         
                         // Task type
-                        if let taskType = task.taskType {
-                            LiquidGlassPill(
-                                text: taskType,
-                                color: taskTypeColor(taskType)
-                            )
-                        }
+                        LiquidGlassPill(
+                            text: task.taskType.rawValue,
+                            color: taskTypeColor(task.taskType.rawValue)
+                        )
                     }
                 }
                 
@@ -146,27 +144,25 @@ struct LiquidGlassTaskCard: View {
         if task.isOverdue {
             return LiquidGlassDesignSystem.VibrantAccents.nebulaPink
         }
-        if task.priority > 2 {
+        if task.priority == .high {
             return LiquidGlassDesignSystem.VibrantAccents.solarGold
         }
         return LiquidGlassDesignSystem.VibrantAccents.electricCyan
     }
-    
+
     private var priorityText: String {
         switch task.priority {
-        case 0: return "Low"
-        case 1: return "Low"
-        case 2: return "Medium"
-        case 3: return "High"
-        default: return "Urgent"
+        case .low: return "Low"
+        case .medium: return "Medium"
+        case .high: return "High"
         }
     }
-    
+
     private var priorityColor: Color {
         switch task.priority {
-        case 0...1: return LiquidGlassDesignSystem.VibrantAccents.cosmicBlue
-        case 2: return LiquidGlassDesignSystem.VibrantAccents.solarGold
-        default: return LiquidGlassDesignSystem.VibrantAccents.nebulaPink
+        case .low: return LiquidGlassDesignSystem.VibrantAccents.cosmicBlue
+        case .medium: return LiquidGlassDesignSystem.VibrantAccents.solarGold
+        case .high: return LiquidGlassDesignSystem.VibrantAccents.nebulaPink
         }
     }
     
@@ -196,12 +192,15 @@ struct LiquidGlassTaskInputBar: View {
     var body: some View {
         HStack(spacing: 12) {
             // Plus button for quick actions
-            LiquidGlassButton.icon(
-                systemName: "plus.circle.fill",
-                size: 40
-            ) {
-                // Quick actions menu
+            Button {
                 HapticsService.shared.lightImpact()
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
+                    .frame(width: 40, height: 40)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
             }
             
             // Input field container
@@ -380,7 +379,7 @@ struct LiquidGlassTaskSection: View {
 // MARK: - Liquid Glass Empty State
 
 /// Empty state view with glass styling
-struct LiquidGlassEmptyState: View {
+struct TaskComponentsEmptyState: View {
     let icon: String
     let title: String
     let message: String
@@ -565,19 +564,19 @@ struct LiquidGlassQuickActionMenu: View {
                 id: UUID(),
                 title: "Complete project proposal",
                 isCompleted: false,
-                priority: 3,
+                aiPriority: "high",
                 scheduledTime: Date().addingTimeInterval(3600)
             ),
             onTap: {},
             onComplete: {}
         )
-        
+
         LiquidGlassTaskCard(
             task: TaskItem(
                 id: UUID(),
                 title: "Team meeting",
                 isCompleted: true,
-                priority: 2
+                aiPriority: "medium"
             ),
             onTap: {},
             onComplete: {}

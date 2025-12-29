@@ -321,9 +321,9 @@ struct MilestoneBadge: View {
     }
 }
 
-// MARK: - Streak Badge
+// MARK: - Goal Streak Badge
 
-struct StreakBadge: View {
+struct GoalStreakBadge: View {
     let streak: Int
     let color: Color
     
@@ -462,7 +462,7 @@ struct CategoryTag: View {
         
         MilestoneBadge(completed: 5, total: 8, color: .blue)
         
-        StreakBadge(streak: 12, color: .orange)
+        GoalStreakBadge(streak: 12, color: .orange)
         
         CategoryTag(category: .health)
     }

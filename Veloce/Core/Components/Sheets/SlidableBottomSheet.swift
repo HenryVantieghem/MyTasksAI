@@ -933,6 +933,40 @@ extension View {
     }
 }
 
+// MARK: - Focus Mode Option
+
+struct FocusModeOption: View {
+    let icon: String
+    let title: String
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundStyle(isSelected ? Theme.Colors.accent : .white.opacity(0.7))
+
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Theme.Colors.accent.opacity(0.2) : Color.white.opacity(0.05))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(isSelected ? Theme.Colors.accent.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1)
+                    }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 // MARK: - Preview
 
 #Preview {

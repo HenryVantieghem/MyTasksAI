@@ -2,14 +2,14 @@
 //  TaskCardV4.swift
 //  Veloce
 //
-//  Apple-like Task Card - iOS 26 Ultrathink Design
-//  Clean hierarchy, adaptive colors, inline Focus button
-//  Solid backgrounds for content layer, glass for interactive elements
+//  Cosmic Widget Task Card - Bold Category Colors + Dark Void
+//  4px category color bar on left edge with glow halo
+//  Solid void background - NO glass on content layer
 //
 
 import SwiftUI
 
-// MARK: - Task Card V4 (Apple Ultrathink Edition)
+// MARK: - Task Card V4 (Cosmic Widget Edition)
 
 struct TaskCardV4: View {
     let task: TaskItem
@@ -39,16 +39,24 @@ struct TaskCardV4: View {
     private let swipeCompleteThreshold: CGFloat = 80
     private let swipeSnoozeThreshold: CGFloat = 80
     private let swipeDeleteThreshold: CGFloat = 150
+    private let categoryBarWidth: CGFloat = 4
 
     // MARK: - Computed Properties
 
-    private var taskTypeColor: Color {
+    /// Category color based on task type - ULTRA SATURATED
+    private var categoryColor: Color {
+        // Map task type to CosmicWidget category colors
         switch task.taskType {
-        case .create: return Theme.TaskCardColors.create
-        case .communicate: return Theme.TaskCardColors.communicate
-        case .consume: return Theme.TaskCardColors.consume
-        case .coordinate: return Theme.TaskCardColors.coordinate
+        case .create: return CosmicWidget.Category.creative      // Magenta
+        case .communicate: return CosmicWidget.Category.personal // Orange
+        case .consume: return CosmicWidget.Category.learning     // Violet
+        case .coordinate: return CosmicWidget.Category.work      // Teal
         }
+    }
+
+    /// Legacy taskTypeColor for backward compatibility
+    private var taskTypeColor: Color {
+        categoryColor
     }
 
     private var isHighPriority: Bool {
@@ -132,11 +140,11 @@ struct TaskCardV4: View {
                     .padding(.horizontal, layout.cardPadding)
                     .padding(.top, layout.cardPadding - 2)
 
-                // AI insight whisper
+                // AI insight whisper - distinctive italic serif
                 if let insight = aiInsight, !task.isCompleted {
                     Text(insight)
-                        .dynamicTypeFont(base: 14, weight: .regular)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .font(CosmicWidget.Typography.aiWhisper)
+                        .foregroundStyle(CosmicWidget.Text.tertiary)
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, layout.cardPadding)
@@ -184,7 +192,7 @@ struct TaskCardV4: View {
             // Title - Dynamic Type for accessibility
             Text(task.title)
                 .dynamicTypeFont(base: 16, weight: .medium)
-                .foregroundStyle(.white)
+                .foregroundStyle(CosmicWidget.Text.primary)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
 
@@ -206,8 +214,8 @@ struct TaskCardV4: View {
                     .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(
                         index < task.starRating
-                            ? Theme.AdaptiveColors.warning
-                            : Color(.tertiaryLabel)
+                            ? CosmicWidget.Widget.gold
+                            : CosmicWidget.Text.disabled
                     )
             }
         }
@@ -253,7 +261,7 @@ struct TaskCardV4: View {
         }
     }
 
-    // MARK: - Points Badge
+    // MARK: - Points Badge (Mint Success)
 
     private var pointsBadge: some View {
         let points = task.pointsEarned > 0 ? task.pointsEarned : 25
@@ -263,14 +271,14 @@ struct TaskCardV4: View {
                 .dynamicTypeFont(base: 9, weight: .bold)
 
             Text("+\(points)")
-                .dynamicTypeFont(base: 12, weight: .bold, design: .rounded)
+                .font(CosmicWidget.Typography.caption)
         }
-        .foregroundStyle(Theme.AdaptiveColors.success)
+        .foregroundStyle(CosmicWidget.Semantic.success)
         .padding(.horizontal, layout.spacing / 2)
         .padding(.vertical, layout.spacing / 4)
         .background(
             Capsule()
-                .fill(Theme.AdaptiveColors.success.opacity(0.12))
+                .fill(CosmicWidget.Semantic.success.opacity(0.15))
         )
     }
 
@@ -288,7 +296,7 @@ struct TaskCardV4: View {
         }
     }
 
-    // MARK: - Focus Button
+    // MARK: - Focus Button (AI Accent - Electric Cyan)
 
     private var focusButton: some View {
         Button {
@@ -302,18 +310,15 @@ struct TaskCardV4: View {
                 Text("Focus")
                     .dynamicTypeFont(base: 14, weight: .medium)
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(CosmicWidget.Text.inverse)
             .padding(.horizontal, layout.cardPadding - 2)
             .padding(.vertical, layout.spacing / 2)
-            .background(Theme.AdaptiveColors.aiGradient)
+            .background(CosmicWidget.Gradient.ai)
             .clipShape(Capsule())
-            .premiumGlowCapsule(
-                style: .aiAccent,
-                intensity: .whisper,
-                animated: !reduceMotion
-            )
+            // AI glow effect
+            .shadow(color: CosmicWidget.Widget.electricCyan.opacity(0.5), radius: 12, x: 0, y: 0)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cosmicTap)
     }
 
     // MARK: - More Menu Button
@@ -347,60 +352,49 @@ struct TaskCardV4: View {
         } label: {
             Image(systemName: "ellipsis")
                 .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.6))
+                .foregroundStyle(CosmicWidget.Text.tertiary)
                 .frame(width: 36, height: 36)
-                .background(Color.white.opacity(0.08))
+                .background(CosmicWidget.Void.interactive)
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: - Card Background
+    // MARK: - Card Background (Cosmic Widget Style)
 
     private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(
-                // Dark cosmic background for consistency with void theme
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.12, green: 0.12, blue: 0.18),
-                        Color(red: 0.08, green: 0.08, blue: 0.14)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+        ZStack(alignment: .leading) {
+            // Solid void background - NO GLASS on content layer
+            RoundedRectangle(cornerRadius: CosmicWidget.Radius.card, style: .continuous)
+                .fill(CosmicWidget.Void.nebula)
+
+            // Subtle top highlight for depth
+            RoundedRectangle(cornerRadius: CosmicWidget.Radius.card, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.04),
+                            Color.clear
+                        ],
+                        startPoint: .top,
+                        endPoint: .center
+                    )
                 )
+
+            // BOLD 4px Category Color Bar on left edge
+            UnevenRoundedRectangle(
+                topLeadingRadius: CosmicWidget.Radius.card,
+                bottomLeadingRadius: CosmicWidget.Radius.card,
+                bottomTrailingRadius: 0,
+                topTrailingRadius: 0
             )
-            .overlay {
-                // Glass-like inner glow
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.06),
-                                Color.clear
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .center
-                        )
-                    )
-            }
-            .overlay {
-                // Subtle task-type tint border with glass edge
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.12),
-                                taskTypeColor.opacity(0.20),
-                                Color.white.opacity(0.06)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.5
-                    )
-            }
-            .shadow(color: urgencyShadowColor, radius: 8, y: 4)
+            .fill(categoryColor)
+            .frame(width: categoryBarWidth)
+        }
+        // Category glow halo - makes the color POP
+        .shadow(color: categoryColor.opacity(0.35), radius: 16, x: 0, y: 0)
+        // Depth shadow
+        .shadow(color: Color.black.opacity(0.3), radius: 8, y: 4)
     }
 
     // MARK: - Swipe Backgrounds
@@ -555,9 +549,10 @@ extension RecurringTypeExtended {
 
 // MARK: - Preview
 
-#Preview("TaskCardV4 - Light") {
+#Preview("TaskCardV4 - Cosmic Widget") {
     ScrollView {
         VStack(spacing: 16) {
+            // Work task - Teal
             TaskCardV4(
                 task: {
                     let t = TaskItem(title: "Write quarterly report for Q4 2024 review meeting")
@@ -565,6 +560,7 @@ extension RecurringTypeExtended {
                     t.estimatedMinutes = 45
                     t.starRating = 3
                     t.scheduledTime = Date().addingTimeInterval(3600)
+                    t.taskType = .coordinate
                     return t
                 }(),
                 onTap: {},
@@ -574,13 +570,14 @@ extension RecurringTypeExtended {
                 onDelete: { _ in }
             )
 
+            // Personal task - Orange
             TaskCardV4(
                 task: {
-                    let t = TaskItem(title: "Review design mockups")
-                    t.aiQuickTip = "Focus on mobile-first layouts"
+                    let t = TaskItem(title: "Call mom for birthday")
+                    t.aiQuickTip = "She mentioned wanting that cookbook"
                     t.estimatedMinutes = 20
                     t.starRating = 2
-                    t.setRecurringExtended(type: .daily, customDays: nil, endDate: nil)
+                    t.taskType = .communicate
                     return t
                 }(),
                 onTap: {},
@@ -590,12 +587,47 @@ extension RecurringTypeExtended {
                 onDelete: { _ in }
             )
 
+            // Creative task - Magenta
+            TaskCardV4(
+                task: {
+                    let t = TaskItem(title: "Design new app icon concepts")
+                    t.aiAdvice = "Try 3 variations: minimal, bold, playful"
+                    t.estimatedMinutes = 60
+                    t.starRating = 3
+                    t.taskType = .create
+                    return t
+                }(),
+                onTap: {},
+                onToggleComplete: {},
+                onStartFocus: { _, _ in },
+                onSnooze: { _ in },
+                onDelete: { _ in }
+            )
+
+            // Learning task - Violet
+            TaskCardV4(
+                task: {
+                    let t = TaskItem(title: "Read SwiftUI documentation")
+                    t.estimatedMinutes = 30
+                    t.starRating = 1
+                    t.taskType = .consume
+                    return t
+                }(),
+                onTap: {},
+                onToggleComplete: {},
+                onStartFocus: { _, _ in },
+                onSnooze: { _ in },
+                onDelete: { _ in }
+            )
+
+            // Completed task
             TaskCardV4(
                 task: {
                     let t = TaskItem(title: "Team standup call")
                     t.estimatedMinutes = 15
                     t.starRating = 1
                     t.isCompleted = true
+                    t.taskType = .communicate
                     return t
                 }(),
                 onTap: {},
@@ -605,32 +637,7 @@ extension RecurringTypeExtended {
                 onDelete: { _ in }
             )
         }
-        .padding()
+        .padding(CosmicWidget.Spacing.screenPadding)
     }
-    .background(Color(.systemGroupedBackground))
-}
-
-#Preview("TaskCardV4 - Dark") {
-    ScrollView {
-        VStack(spacing: 16) {
-            TaskCardV4(
-                task: {
-                    let t = TaskItem(title: "Prepare presentation slides")
-                    t.aiAdvice = "Use company template, focus on key metrics"
-                    t.estimatedMinutes = 60
-                    t.starRating = 3
-                    t.scheduledTime = Date().addingTimeInterval(-3600) // Overdue
-                    return t
-                }(),
-                onTap: {},
-                onToggleComplete: {},
-                onStartFocus: { _, _ in },
-                onSnooze: { _ in },
-                onDelete: { _ in }
-            )
-        }
-        .padding()
-    }
-    .background(Color(.systemGroupedBackground))
-    .preferredColorScheme(.dark)
+    .background(CosmicWidget.Void.cosmos)
 }

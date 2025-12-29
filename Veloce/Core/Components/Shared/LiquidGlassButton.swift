@@ -138,66 +138,122 @@ struct LiquidGlassButton: View {
         }
     }
 
-    // MARK: - Background
+    // MARK: - Background (iOS 26 Native Liquid Glass)
 
     @ViewBuilder
     private var buttonBackground: some View {
+        let cornerRadius = LiquidGlassDesignSystem.Sizing.buttonCornerRadius
+        let shape = RoundedRectangle(cornerRadius: cornerRadius)
+        
         switch style {
         case .primary:
-            ZStack {
-                // Base gradient
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                    .fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
-
-                // Glass overlay
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                    .fill(.ultraThinMaterial.opacity(0.3))
-
-                // Glow overlay on press
-                if isPressed {
-                    RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                        .fill(Color.white.opacity(0.15))
+            // iOS 26: Use native Liquid Glass with gradient tint
+            if #available(iOS 26.0, *) {
+                ZStack {
+                    // Base gradient
+                    shape.fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
+                    
+                    // Native glass overlay with interactive response
+                    Color.clear
+                        .glassEffect(
+                            .regular
+                                .tint(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.3))
+                                .interactive(true),
+                            in: shape
+                        )
+                    
+                    // Glow overlay on press
+                    if isPressed {
+                        shape.fill(Color.white.opacity(0.15))
+                    }
+                }
+            } else {
+                ZStack {
+                    shape.fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
+                    shape.fill(.ultraThinMaterial.opacity(0.3))
+                    
+                    if isPressed {
+                        shape.fill(Color.white.opacity(0.15))
+                    }
                 }
             }
 
         case .secondary:
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                .fill(.ultraThinMaterial)
-                .background(
-                    RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                        .fill(LiquidGlassDesignSystem.GlassTints.primary)
-                )
+            // iOS 26: Pure native interactive glass
+            if #available(iOS 26.0, *) {
+                Color.clear
+                    .glassEffect(
+                        .regular
+                            .tint(LiquidGlassDesignSystem.GlassTints.interactive.opacity(0.2))
+                            .interactive(true),
+                        in: shape
+                    )
+            } else {
+                shape
+                    .fill(.ultraThinMaterial)
+                    .background(shape.fill(LiquidGlassDesignSystem.GlassTints.interactive.opacity(0.1)))
+            }
 
         case .ghost:
             if isPressed {
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                    .fill(.ultraThinMaterial.opacity(0.5))
+                if #available(iOS 26.0, *) {
+                    Color.clear
+                        .glassEffect(.regular.interactive(true), in: shape)
+                } else {
+                    shape.fill(.ultraThinMaterial.opacity(0.5))
+                }
             } else {
                 Color.clear
             }
 
         case .success:
-            ZStack {
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                    .fill(LiquidGlassDesignSystem.Gradients.success)
-
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                    .fill(.ultraThinMaterial.opacity(0.25))
+            // iOS 26: Glass over gradient
+            if #available(iOS 26.0, *) {
+                ZStack {
+                    shape.fill(LiquidGlassDesignSystem.Gradients.success)
+                    
+                    Color.clear
+                        .glassEffect(
+                            .regular.tint(LiquidGlassDesignSystem.Semantic.success.opacity(0.2)),
+                            in: shape
+                        )
+                }
+            } else {
+                ZStack {
+                    shape.fill(LiquidGlassDesignSystem.Gradients.success)
+                    shape.fill(.ultraThinMaterial.opacity(0.25))
+                }
             }
 
         case .destructive:
-            ZStack {
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                    .fill(
+            // iOS 26: Glass over red gradient
+            if #available(iOS 26.0, *) {
+                ZStack {
+                    shape.fill(
                         LinearGradient(
                             colors: [Color.red.opacity(0.8), Color.red.opacity(0.6)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
-
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                    .fill(.ultraThinMaterial.opacity(0.2))
+                    
+                    Color.clear
+                        .glassEffect(
+                            .regular.tint(Color.red.opacity(0.2)),
+                            in: shape
+                        )
+                }
+            } else {
+                ZStack {
+                    shape.fill(
+                        LinearGradient(
+                            colors: [Color.red.opacity(0.8), Color.red.opacity(0.6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    shape.fill(.ultraThinMaterial.opacity(0.2))
+                }
             }
         }
     }
@@ -227,7 +283,17 @@ struct LiquidGlassButton: View {
             // Prismatic animated border
             RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
                 .stroke(
-                    LiquidGlassDesignSystem.Gradients.prismaticBorder(rotation: borderRotation),
+                    AngularGradient(
+                        colors: [
+                            LiquidGlassDesignSystem.VibrantAccents.electricCyan,
+                            LiquidGlassDesignSystem.VibrantAccents.plasmaPurple,
+                            LiquidGlassDesignSystem.VibrantAccents.nebulaPink,
+                            LiquidGlassDesignSystem.VibrantAccents.electricCyan
+                        ],
+                        center: .center,
+                        startAngle: .degrees(borderRotation),
+                        endAngle: .degrees(borderRotation + 360)
+                    ),
                     lineWidth: isPressed ? 1.5 : 1.0
                 )
 
@@ -497,15 +563,44 @@ struct LiquidGlassButtonSmall: View {
     private var smallButtonBackground: some View {
         switch style {
         case .primary:
-            Capsule().fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
+            if #available(iOS 26.0, *) {
+                ZStack {
+                    Capsule().fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
+                    Color.clear.glassEffect(.regular.tint(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.2)), in: Capsule())
+                }
+            } else {
+                Capsule().fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
+            }
+            
         case .secondary:
-            Capsule().fill(.ultraThinMaterial)
+            if #available(iOS 26.0, *) {
+                Color.clear.glassEffect(.regular.interactive(true), in: Capsule())
+            } else {
+                Capsule().fill(.ultraThinMaterial)
+            }
+            
         case .ghost:
             Color.clear
+            
         case .success:
-            Capsule().fill(LiquidGlassDesignSystem.Gradients.success)
+            if #available(iOS 26.0, *) {
+                ZStack {
+                    Capsule().fill(LiquidGlassDesignSystem.Gradients.success)
+                    Color.clear.glassEffect(.regular.tint(LiquidGlassDesignSystem.Semantic.success.opacity(0.15)), in: Capsule())
+                }
+            } else {
+                Capsule().fill(LiquidGlassDesignSystem.Gradients.success)
+            }
+            
         case .destructive:
-            Capsule().fill(Color.red.opacity(0.7))
+            if #available(iOS 26.0, *) {
+                ZStack {
+                    Capsule().fill(Color.red.opacity(0.7))
+                    Color.clear.glassEffect(.regular.tint(Color.red.opacity(0.15)), in: Capsule())
+                }
+            } else {
+                Capsule().fill(Color.red.opacity(0.7))
+            }
         }
     }
 
@@ -557,12 +652,27 @@ struct LiquidGlassIconButton: View {
                 .font(.system(size: size * 0.4, weight: .medium))
                 .foregroundStyle(tint ?? .white)
                 .frame(width: size, height: size)
-                .liquidGlassInteractive(
-                    in: Circle(),
-                    tint: tint?.opacity(0.1)
-                )
         }
         .buttonStyle(PlainButtonStyle())
+        .background {
+            if #available(iOS 26.0, *) {
+                Color.clear
+                    .glassEffect(
+                        .regular
+                            .tint((tint ?? LiquidGlassDesignSystem.VibrantAccents.electricCyan).opacity(0.15))
+                            .interactive(true),
+                        in: Circle()
+                    )
+            } else {
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        if let tint = tint {
+                            Circle().fill(tint.opacity(0.1))
+                        }
+                    }
+            }
+        }
         .scaleEffect(isPressed ? 0.92 : 1.0)
         .animation(LiquidGlassDesignSystem.Springs.press, value: isPressed)
         .simultaneousGesture(

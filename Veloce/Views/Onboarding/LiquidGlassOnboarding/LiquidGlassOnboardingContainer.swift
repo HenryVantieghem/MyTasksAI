@@ -2,9 +2,10 @@
 //  LiquidGlassOnboardingContainer.swift
 //  Veloce
 //
-//  Ultra-Premium Liquid Glass Onboarding Container
-//  An award-winning 11-step journey featuring iOS 26 Liquid Glass effects,
-//  constellation progress navigation, prismatic transitions, and premium haptics.
+//  Aurora Design System - Onboarding Journey
+//  "Ascending Through the Aurora Nebula"
+//  An award-winning 11-step portal journey with flowing aurora waves,
+//  firefly particles, prismatic transitions, and cosmic sounds.
 //
 
 import SwiftUI
@@ -12,7 +13,7 @@ import EventKit
 import UserNotifications
 import FamilyControls
 
-// MARK: - Liquid Glass Onboarding Container
+// MARK: - Aurora Onboarding Container
 
 struct LiquidGlassOnboardingContainer: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -28,20 +29,71 @@ struct LiquidGlassOnboardingContainer: View {
     @State private var glassShimmerOffset: CGFloat = -300
     @State private var transitionDirection: Int = 1
 
+    // Aurora state
+    @State private var auroraIntensity: CGFloat = 0.25
+    @State private var showPortalEffect = false
+    @State private var portalScale: CGFloat = 0
+
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var horizontalPadding: CGFloat {
-        horizontalSizeClass == .regular ? 48 : Theme.Spacing.lg
+        horizontalSizeClass == .regular ? 48 : Aurora.Spacing.lg
+    }
+
+    // Aurora colors per step (ascending through the nebula)
+    private var stepAuroraColors: [Color] {
+        switch currentStep {
+        case .welcome:
+            return [Aurora.Colors.borealisViolet.opacity(0.5)]
+        case .calendarPermission:
+            return [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet]
+        case .notificationPermission:
+            return [Aurora.Colors.cosmicGold, Aurora.Colors.electricCyan]
+        case .screenTimePermission:
+            return [Aurora.Colors.borealisViolet, Aurora.Colors.stellarMagenta]
+        case .featureTasks:
+            return [Aurora.Colors.prismaticGreen, Aurora.Colors.electricCyan]
+        case .featureFocus:
+            return [Aurora.Colors.electricCyan, Aurora.Colors.deepPlasma]
+        case .featureMomentum:
+            return [Aurora.Colors.cosmicGold, Aurora.Colors.stellarMagenta]
+        case .featureAI:
+            return [Aurora.Colors.borealisViolet, Aurora.Colors.stellarMagenta, Aurora.Colors.electricCyan]
+        case .goalSetup:
+            return Aurora.Gradients.auroraSpectrum
+        case .trialInfo:
+            return [Aurora.Colors.cosmicGold, Aurora.Colors.prismaticGreen]
+        case .readyToLaunch:
+            return Aurora.Gradients.auroraSpectrum
+        }
+    }
+
+    // Aurora intensity increases as user progresses
+    private var stepIntensity: CGFloat {
+        let progress = CGFloat(CosmicOnboardingStep.allCases.firstIndex(of: currentStep) ?? 0)
+        let total = CGFloat(CosmicOnboardingStep.allCases.count - 1)
+        return 0.2 + (progress / total) * 0.5
     }
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Premium animated background
-                LiquidGlassOnboardingBackground(
-                    phase: nebulaPhase,
-                    currentStep: currentStep
+                // Aurora animated wave background
+                AuroraAnimatedWaveBackground(
+                    intensity: stepIntensity,
+                    showParticles: true,
+                    customColors: stepAuroraColors
                 )
+                .animation(AuroraMotion.Spring.focus, value: currentStep)
+
+                // Firefly constellation overlay
+                if !reduceMotion {
+                    AuroraFireflyField(
+                        count: 25,
+                        colors: stepAuroraColors
+                    )
+                    .opacity(0.6)
+                }
 
                 // Glass shimmer overlay
                 glassShimmerLayer(in: geometry)
@@ -121,7 +173,7 @@ struct LiquidGlassOnboardingContainer: View {
                         .tag(CosmicOnboardingStep.readyToLaunch)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
-                    .animation(LiquidGlassDesignSystem.Springs.focus, value: currentStep)
+                    .animation(AuroraMotion.Spring.focus, value: currentStep)
                 }
             }
         }
@@ -137,7 +189,7 @@ struct LiquidGlassOnboardingContainer: View {
         }
     }
 
-    // MARK: - Glass Shimmer Layer
+    // MARK: - Aurora Glass Shimmer Layer
 
     private func glassShimmerLayer(in geometry: GeometryProxy) -> some View {
         Rectangle()
@@ -145,18 +197,19 @@ struct LiquidGlassOnboardingContainer: View {
                 LinearGradient(
                     colors: [
                         .clear,
-                        LiquidGlassDesignSystem.VibrantAccents.electricCyan.opacity(0.06),
-                        LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.04),
+                        Aurora.Colors.electricCyan.opacity(0.08),
+                        Aurora.Colors.borealisViolet.opacity(0.06),
+                        Aurora.Colors.stellarMagenta.opacity(0.04),
                         .clear
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
                 )
             )
-            .frame(width: 200, height: geometry.size.height)
-            .blur(radius: 40)
+            .frame(width: 250, height: geometry.size.height)
+            .blur(radius: 50)
             .offset(x: glassShimmerOffset)
-            .opacity(0.5)
+            .opacity(0.6)
     }
 
     // MARK: - Liquid Glass Top Bar
@@ -173,7 +226,13 @@ struct LiquidGlassOnboardingContainer: View {
                         .foregroundStyle(.white.opacity(0.8))
                         .frame(width: 40, height: 40)
                 }
-                .liquidGlassInteractive(in: Circle())
+                .background {
+                    if #available(iOS 26.0, *) {
+                        Color.clear.glassEffect(.regular.interactive(true), in: Circle())
+                    } else {
+                        Circle().fill(.ultraThinMaterial)
+                    }
+                }
                 .transition(.scale.combined(with: .opacity))
             } else {
                 Spacer().frame(width: 40)
@@ -201,46 +260,56 @@ struct LiquidGlassOnboardingContainer: View {
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
                 }
-                .liquidGlassInteractive(in: Capsule())
+                .background {
+                    if #available(iOS 26.0, *) {
+                        Color.clear.glassEffect(.regular.interactive(true), in: Capsule())
+                    } else {
+                        Capsule().fill(.ultraThinMaterial)
+                    }
+                }
             } else {
                 Spacer().frame(width: 40)
             }
         }
         .padding(.horizontal, horizontalPadding)
-        .animation(LiquidGlassDesignSystem.Springs.ui, value: currentStep)
+        .animation(AuroraMotion.Spring.ui, value: currentStep)
     }
 
-    // MARK: - Navigation
+    // MARK: - Aurora Navigation
 
     private func advanceToNext() {
-        HapticsService.shared.pageTransition()
+        // Aurora feedback: cosmic whoosh + haptic
+        AuroraSoundEngine.shared.play(.tabSwitch)
+        AuroraHaptics.lightFlutter()
         transitionDirection = 1
 
         let allSteps = CosmicOnboardingStep.allCases
         if let currentIndex = allSteps.firstIndex(of: currentStep),
            currentIndex < allSteps.count - 1 {
-            withAnimation(LiquidGlassDesignSystem.Springs.focus) {
+            withAnimation(AuroraMotion.Spring.focus) {
                 currentStep = allSteps[currentIndex + 1]
             }
         }
     }
 
     private func goToPrevious() {
-        HapticsService.shared.lightImpact()
+        AuroraSoundEngine.shared.play(.dismiss)
+        AuroraHaptics.selection()
         transitionDirection = -1
 
         let allSteps = CosmicOnboardingStep.allCases
         if let currentIndex = allSteps.firstIndex(of: currentStep),
            currentIndex > 0 {
-            withAnimation(LiquidGlassDesignSystem.Springs.ui) {
+            withAnimation(AuroraMotion.Spring.ui) {
                 currentStep = allSteps[currentIndex - 1]
             }
         }
     }
 
     private func skipToLaunch() {
-        HapticsService.shared.glassMorph()
-        withAnimation(LiquidGlassDesignSystem.Springs.focus) {
+        // Portal jump effect
+        AuroraSoundEngine.shared.portalOpen()
+        withAnimation(AuroraMotion.Spring.portal) {
             currentStep = .readyToLaunch
         }
     }
@@ -295,9 +364,9 @@ enum OnboardingPermissionType {
 
     var color: Color {
         switch self {
-        case .calendar: return LiquidGlassDesignSystem.VibrantAccents.electricCyan
-        case .notifications: return LiquidGlassDesignSystem.VibrantAccents.solarGold
-        case .screenTime: return LiquidGlassDesignSystem.VibrantAccents.plasmaPurple
+        case .calendar: return Aurora.Colors.electricCyan
+        case .notifications: return Aurora.Colors.cosmicGold
+        case .screenTime: return Aurora.Colors.borealisViolet
         }
     }
 }
@@ -339,15 +408,15 @@ enum OnboardingFeatureType {
 
     var color: Color {
         switch self {
-        case .tasks: return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
-        case .focus: return LiquidGlassDesignSystem.VibrantAccents.electricCyan
-        case .momentum: return LiquidGlassDesignSystem.VibrantAccents.solarGold
-        case .ai: return LiquidGlassDesignSystem.VibrantAccents.plasmaPurple
+        case .tasks: return Aurora.Colors.prismaticGreen
+        case .focus: return Aurora.Colors.electricCyan
+        case .momentum: return Aurora.Colors.cosmicGold
+        case .ai: return Aurora.Colors.borealisViolet
         }
     }
 }
 
-// MARK: - Liquid Glass Onboarding Background
+// MARK: - Aurora Onboarding Background (Legacy - kept for reference)
 
 struct LiquidGlassOnboardingBackground: View {
     let phase: CGFloat
@@ -361,38 +430,30 @@ struct LiquidGlassOnboardingBackground: View {
     private var stepColor: Color {
         switch currentStep {
         case .welcome:
-            return LiquidGlassDesignSystem.VibrantAccents.plasmaPurple
+            return Aurora.Colors.borealisViolet
         case .calendarPermission, .notificationPermission, .screenTimePermission:
-            return LiquidGlassDesignSystem.VibrantAccents.electricCyan
+            return Aurora.Colors.electricCyan
         case .featureTasks, .featureFocus, .featureMomentum, .featureAI:
-            return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
+            return Aurora.Colors.prismaticGreen
         case .goalSetup:
-            return LiquidGlassDesignSystem.VibrantAccents.solarGold
+            return Aurora.Colors.cosmicGold
         case .trialInfo:
-            return LiquidGlassDesignSystem.VibrantAccents.nebulaPink
+            return Aurora.Colors.stellarMagenta
         case .readyToLaunch:
-            return LiquidGlassDesignSystem.VibrantAccents.cosmicBlue
+            return Aurora.Colors.deepPlasma
         }
     }
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Deep void gradient
-                LinearGradient(
-                    colors: [
-                        Theme.CelestialColors.voidDeep,
-                        Theme.CelestialColors.void,
-                        Theme.CelestialColors.abyss
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                // Aurora void gradient
+                Aurora.Gradients.voidGradient
 
                 // Dynamic step-colored nebula
                 RadialGradient(
                     colors: [
-                        stepColor.opacity(0.15),
+                        stepColor.opacity(0.18),
                         stepColor.opacity(0.08),
                         .clear
                     ],
@@ -401,13 +462,13 @@ struct LiquidGlassOnboardingBackground: View {
                     endRadius: 350
                 )
                 .blur(radius: 60)
-                .animation(LiquidGlassDesignSystem.Springs.focus, value: currentStep)
+                .animation(AuroraMotion.Spring.focus, value: currentStep)
 
-                // Secondary nebula
+                // Secondary aurora nebula
                 RadialGradient(
                     colors: [
-                        LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.08),
-                        LiquidGlassDesignSystem.VibrantAccents.electricCyan.opacity(0.04),
+                        Aurora.Colors.borealisViolet.opacity(0.1),
+                        Aurora.Colors.electricCyan.opacity(0.05),
                         .clear
                     ],
                     center: UnitPoint(x: 0.3 - phase * 0.1, y: 0.7),
@@ -442,7 +503,7 @@ struct LiquidGlassOnboardingBackground: View {
 
                 context.fill(
                     Circle().path(in: rect),
-                    with: .color(.white.opacity(opacity))
+                    with: .color(Aurora.Colors.stellarWhite.opacity(opacity))
                 )
             }
         }
@@ -469,27 +530,59 @@ struct LiquidGlassWelcomePage: View {
     let namespace: Namespace.ID
     let onContinue: () -> Void
 
+    @State private var orbPulse: CGFloat = 1.0
+    @State private var haloRotation: Double = 0
+    @State private var contentOpacity: Double = 0
+    @State private var contentOffset: CGFloat = 20
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: Aurora.Spacing.xl) {
             Spacer()
 
-            // Hero orb with glass halo
+            // Aurora Hero Orb with prismatic halo
             ZStack {
-                // Outer glow
+                // Multi-layer aurora halo
+                ForEach(0..<3) { i in
+                    Circle()
+                        .stroke(
+                            AngularGradient(
+                                colors: [
+                                    Aurora.Colors.borealisViolet.opacity(0.3 - Double(i) * 0.08),
+                                    Aurora.Colors.electricCyan.opacity(0.25 - Double(i) * 0.06),
+                                    Aurora.Colors.stellarMagenta.opacity(0.2 - Double(i) * 0.05),
+                                    Aurora.Colors.borealisViolet.opacity(0.3 - Double(i) * 0.08)
+                                ],
+                                center: .center,
+                                startAngle: .degrees(haloRotation + Double(i) * 40),
+                                endAngle: .degrees(haloRotation + 360 + Double(i) * 40)
+                            ),
+                            lineWidth: 1.5
+                        )
+                        .frame(width: 160 + CGFloat(i) * 35, height: 160 + CGFloat(i) * 35)
+                        .blur(radius: CGFloat(i) * 2)
+                }
+
+                // Outer bloom
                 Circle()
                     .fill(
                         RadialGradient(
                             colors: [
-                                LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.3),
+                                Aurora.Colors.borealisViolet.opacity(0.35),
+                                Aurora.Colors.electricCyan.opacity(0.15),
                                 .clear
                             ],
                             center: .center,
                             startRadius: 40,
-                            endRadius: 120
+                            endRadius: 140
                         )
                     )
-                    .frame(width: 200, height: 200)
+                    .frame(width: 280, height: 280)
+                    .blur(radius: 30)
+                    .scaleEffect(orbPulse)
 
+                // The EtherealOrb
                 EtherealOrb(
                     size: .large,
                     state: .active,
@@ -497,31 +590,83 @@ struct LiquidGlassWelcomePage: View {
                     intensity: 1.0,
                     showGlow: true
                 )
+                .scaleEffect(orbPulse)
                 .matchedGeometryEffect(id: "welcomeOrb", in: namespace)
             }
 
-            VStack(spacing: 16) {
+            VStack(spacing: Aurora.Spacing.md) {
                 Text(userName.isEmpty ? "Welcome" : "Welcome, \(userName)")
-                    .font(.system(size: 32, weight: .light))
-                    .foregroundStyle(.white)
+                    .font(Aurora.Typography.display)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text("Your journey to peak productivity begins now")
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .font(Aurora.Typography.body)
+                    .foregroundStyle(Aurora.Colors.textSecondary)
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, 32)
+            .padding(.horizontal, Aurora.Spacing.xl)
+            .opacity(contentOpacity)
+            .offset(y: contentOffset)
 
             Spacer()
 
-            // CTA Button
-            LiquidGlassButton.primary(
-                "Begin Journey",
-                icon: "arrow.right",
-                action: onContinue
-            )
-            .padding(.horizontal, 32)
-            .padding(.bottom, 48)
+            // Aurora CTA Button with prismatic glow
+            Button {
+                AuroraSoundEngine.shared.play(.taskComplete)
+                AuroraHaptics.mediumImpact()
+                onContinue()
+            } label: {
+                HStack(spacing: 12) {
+                    Text("Begin Journey")
+                        .font(.system(size: 17, weight: .semibold))
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 15, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+            }
+            .background {
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+            }
+            .aiBorder(Capsule(), lineWidth: 1.5, animated: !reduceMotion)
+            .padding(.horizontal, Aurora.Spacing.xl)
+            .padding(.bottom, Aurora.Spacing.xxl)
+            .opacity(contentOpacity)
+        }
+        .onAppear {
+            startWelcomeAnimations()
+        }
+    }
+
+    private func startWelcomeAnimations() {
+        guard !reduceMotion else {
+            contentOpacity = 1
+            contentOffset = 0
+            return
+        }
+
+        // Content fade in
+        withAnimation(.easeOut(duration: 0.8).delay(0.3)) {
+            contentOpacity = 1
+            contentOffset = 0
+        }
+
+        // Orb breathing pulse
+        withAnimation(.easeInOut(duration: AuroraMotion.Duration.breathingCycle).repeatForever(autoreverses: true)) {
+            orbPulse = 1.03
+        }
+
+        // Halo rotation
+        withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
+            haloRotation = 360
         }
     }
 }
@@ -540,13 +685,23 @@ struct LiquidGlassPermissionPage: View {
 
             // Permission icon with glass container
             ZStack {
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 120, height: 120)
-                    .overlay(
-                        Circle()
-                            .stroke(type.color.opacity(0.3), lineWidth: 1)
-                    )
+                if #available(iOS 26.0, *) {
+                    Color.clear
+                        .frame(width: 120, height: 120)
+                        .glassEffect(.regular, in: Circle())
+                        .overlay {
+                            Circle()
+                                .stroke(type.color.opacity(0.3), lineWidth: 1)
+                        }
+                } else {
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 120, height: 120)
+                        .overlay {
+                            Circle()
+                                .stroke(type.color.opacity(0.3), lineWidth: 1)
+                        }
+                }
 
                 Image(systemName: type.icon)
                     .font(.system(size: 48))
@@ -616,20 +771,41 @@ struct LiquidGlassFeaturePage: View {
                         .frame(width: 140 + CGFloat(i) * 30, height: 140 + CGFloat(i) * 30)
                 }
 
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 120, height: 120)
-                    .overlay(
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    colors: [feature.color.opacity(0.4), feature.color.opacity(0.1)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1.5
-                            )
-                    )
+                // Native iOS 26 Liquid Glass or fallback
+                if #available(iOS 26.0, *) {
+                    Color.clear
+                        .frame(width: 120, height: 120)
+                        .glassEffect(
+                            .regular.tint(feature.color.opacity(0.1)),
+                            in: Circle()
+                        )
+                        .overlay {
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [feature.color.opacity(0.4), feature.color.opacity(0.1)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
+                        }
+                } else {
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 120, height: 120)
+                        .overlay {
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [feature.color.opacity(0.4), feature.color.opacity(0.1)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
+                        }
+                }
 
                 Image(systemName: feature.icon)
                     .font(.system(size: 48))
@@ -727,19 +903,38 @@ struct GoalCategoryCard: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 100)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                isSelected ? category.color.opacity(0.5) : Color.white.opacity(0.1),
-                                lineWidth: isSelected ? 2 : 0.5
-                            )
-                    )
-            )
         }
         .buttonStyle(.plain)
+        .background {
+            let shape = RoundedRectangle(cornerRadius: 16)
+            
+            if #available(iOS 26.0, *) {
+                Color.clear
+                    .glassEffect(
+                        isSelected ? .regular.tint(category.color.opacity(0.2)).interactive(true) : .regular,
+                        in: shape
+                    )
+                    .overlay {
+                        shape.stroke(
+                            isSelected ? category.color.opacity(0.5) : Color.white.opacity(0.1),
+                            lineWidth: isSelected ? 2 : 0.5
+                        )
+                    }
+            } else {
+                ZStack {
+                    shape.fill(.ultraThinMaterial)
+                    if isSelected {
+                        shape.fill(category.color.opacity(0.1))
+                    }
+                }
+                .overlay {
+                    shape.stroke(
+                        isSelected ? category.color.opacity(0.5) : Color.white.opacity(0.1),
+                        lineWidth: isSelected ? 2 : 0.5
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -747,61 +942,196 @@ struct LiquidGlassTrialInfoPage: View {
     let namespace: Namespace.ID
     let onContinue: () -> Void
 
+    @State private var badgeGlow: CGFloat = 0.4
+    @State private var badgeRotation: Double = 0
+    @State private var showSparkles = false
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: Aurora.Spacing.xl) {
             Spacer()
 
-            // Trial badge
+            // Aurora Trial Badge with prismatic glow
             ZStack {
+                // Outer glow bloom
                 Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 120, height: 120)
-                    .overlay(
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        LiquidGlassDesignSystem.VibrantAccents.solarGold.opacity(0.5),
-                                        LiquidGlassDesignSystem.VibrantAccents.nebulaPink.opacity(0.3)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Aurora.Colors.cosmicGold.opacity(badgeGlow * 0.5),
+                                Aurora.Colors.stellarMagenta.opacity(badgeGlow * 0.2),
+                                .clear
+                            ],
+                            center: .center,
+                            startRadius: 40,
+                            endRadius: 120
+                        )
                     )
+                    .frame(width: 240, height: 240)
+                    .blur(radius: 30)
 
-                VStack(spacing: 4) {
+                // Rotating prismatic ring
+                Circle()
+                    .stroke(
+                        AngularGradient(
+                            colors: [
+                                Aurora.Colors.cosmicGold.opacity(0.5),
+                                Aurora.Colors.stellarMagenta.opacity(0.3),
+                                Aurora.Colors.prismaticGreen.opacity(0.4),
+                                Aurora.Colors.cosmicGold.opacity(0.5)
+                            ],
+                            center: .center,
+                            startAngle: .degrees(badgeRotation),
+                            endAngle: .degrees(badgeRotation + 360)
+                        ),
+                        lineWidth: 2
+                    )
+                    .frame(width: 140, height: 140)
+
+                // Glass badge
+                Group {
+                    if #available(iOS 26.0, *) {
+                        Color.clear
+                            .frame(width: 120, height: 120)
+                            .glassEffect(
+                                .regular.tint(Aurora.Colors.cosmicGold.opacity(0.1)),
+                                in: Circle()
+                            )
+                    } else {
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                            .frame(width: 120, height: 120)
+                            .overlay {
+                                Circle()
+                                    .fill(Aurora.Colors.cosmicGold.opacity(0.05))
+                            }
+                    }
+                }
+                .overlay {
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Aurora.Colors.cosmicGold.opacity(0.6),
+                                    Aurora.Colors.stellarMagenta.opacity(0.3)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                }
+
+                // Badge content
+                VStack(spacing: 2) {
                     Text("7")
-                        .font(.system(size: 40, weight: .bold))
-                        .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.solarGold)
+                        .font(.system(size: 44, weight: .bold, design: .rounded))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Aurora.Colors.cosmicGold, Aurora.Colors.stellarMagenta],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                     Text("DAYS")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .tracking(2)
                 }
             }
+            .matchedGeometryEffect(id: "trialBadge", in: namespace)
 
-            VStack(spacing: 12) {
+            VStack(spacing: Aurora.Spacing.sm) {
                 Text("Free Trial")
-                    .font(.system(size: 28, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .font(Aurora.Typography.title1)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
 
-                Text("Experience all premium features free for 7 days. Cancel anytime.")
-                    .font(.system(size: 16))
-                    .foregroundStyle(.white.opacity(0.6))
+                Text("Experience all premium features free for 7 days.\nCancel anytime, no questions asked.")
+                    .font(Aurora.Typography.body)
+                    .foregroundStyle(Aurora.Colors.textSecondary)
                     .multilineTextAlignment(.center)
+                    .lineSpacing(4)
             }
-            .padding(.horizontal, 32)
+            .padding(.horizontal, Aurora.Spacing.xl)
+
+            // Feature highlights with aurora icons
+            VStack(spacing: Aurora.Spacing.md) {
+                trialFeatureRow(icon: "sparkles", text: "AI-Powered Task Intelligence", color: Aurora.Colors.borealisViolet)
+                trialFeatureRow(icon: "brain.head.profile", text: "Deep Focus Mode", color: Aurora.Colors.electricCyan)
+                trialFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Advanced Analytics", color: Aurora.Colors.prismaticGreen)
+            }
+            .padding(.horizontal, Aurora.Spacing.xl)
 
             Spacer()
 
-            LiquidGlassButton.primary(
-                "Start Free Trial",
-                icon: "sparkles",
-                action: onContinue
-            )
-            .padding(.horizontal, 32)
-            .padding(.bottom, 48)
+            // CTA with success prismatic border
+            Button {
+                AuroraSoundEngine.shared.play(.success)
+                AuroraHaptics.success()
+                onContinue()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 16, weight: .semibold))
+                    Text("Start Free Trial")
+                        .font(.system(size: 17, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+            }
+            .background {
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [Aurora.Colors.cosmicGold, Aurora.Colors.prismaticGreen],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+            }
+            .prismaticBorder(Capsule(), style: .success, lineWidth: 2, animated: !reduceMotion)
+            .padding(.horizontal, Aurora.Spacing.xl)
+            .padding(.bottom, Aurora.Spacing.xxl)
+        }
+        .onAppear {
+            startTrialAnimations()
+        }
+    }
+
+    private func trialFeatureRow(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: Aurora.Spacing.sm) {
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundStyle(color)
+                .frame(width: 28)
+
+            Text(text)
+                .font(Aurora.Typography.callout)
+                .foregroundStyle(Aurora.Colors.textPrimary)
+
+            Spacer()
+
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(Aurora.Colors.prismaticGreen)
+        }
+        .padding(.horizontal, Aurora.Spacing.md)
+        .padding(.vertical, Aurora.Spacing.xs)
+    }
+
+    private func startTrialAnimations() {
+        guard !reduceMotion else { return }
+
+        // Badge glow pulse
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+            badgeGlow = 0.7
+        }
+
+        // Ring rotation
+        withAnimation(.linear(duration: 15).repeatForever(autoreverses: false)) {
+            badgeRotation = 360
         }
     }
 }
@@ -812,66 +1142,213 @@ struct LiquidGlassLaunchPage: View {
     let namespace: Namespace.ID
     let onLaunch: () -> Void
 
-    @State private var showCelebration = false
-    @State private var ringScale: CGFloat = 0.8
+    @State private var ringScale: CGFloat = 0.5
     @State private var ringOpacity: Double = 0
+    @State private var ringRotation: Double = 0
+    @State private var portalPulse: CGFloat = 1.0
+    @State private var coreGlow: CGFloat = 0.3
+    @State private var showSupernova = false
+    @State private var isLaunching = false
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
+        ZStack {
+            VStack(spacing: 32) {
+                Spacer()
 
-            // Launch portal rings
-            ZStack {
-                ForEach(0..<4) { i in
+                // Aurora Portal - Multi-layer rotating rings with prismatic glow
+                ZStack {
+                    // Outer glow bloom
                     Circle()
-                        .stroke(
-                            AngularGradient(
+                        .fill(
+                            RadialGradient(
                                 colors: [
-                                    LiquidGlassDesignSystem.VibrantAccents.cosmicBlue.opacity(0.4),
-                                    LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.3),
-                                    LiquidGlassDesignSystem.VibrantAccents.electricCyan.opacity(0.4)
+                                    Aurora.Colors.electricCyan.opacity(coreGlow * 0.4),
+                                    Aurora.Colors.borealisViolet.opacity(coreGlow * 0.2),
+                                    .clear
                                 ],
-                                center: .center
-                            ),
-                            lineWidth: 2
+                                center: .center,
+                                startRadius: 60,
+                                endRadius: 180
+                            )
                         )
-                        .frame(width: 120 + CGFloat(i) * 35, height: 120 + CGFloat(i) * 35)
-                        .scaleEffect(ringScale)
-                        .opacity(ringOpacity - Double(i) * 0.15)
-                }
+                        .frame(width: 360, height: 360)
+                        .blur(radius: 40)
 
-                Image(systemName: "rocket.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.cosmicBlue)
-            }
-            .onAppear {
-                withAnimation(.easeOut(duration: 0.8)) {
-                    ringScale = 1.0
-                    ringOpacity = 1.0
-                }
-            }
+                    // Rotating prismatic rings
+                    ForEach(0..<5) { i in
+                        Circle()
+                            .stroke(
+                                AngularGradient(
+                                    colors: Aurora.Gradients.auroraSpectrum.map { $0.opacity(0.6 - Double(i) * 0.1) },
+                                    center: .center,
+                                    startAngle: .degrees(ringRotation + Double(i) * 30),
+                                    endAngle: .degrees(ringRotation + 360 + Double(i) * 30)
+                                ),
+                                lineWidth: 2.5 - CGFloat(i) * 0.3
+                            )
+                            .frame(width: 100 + CGFloat(i) * 40, height: 100 + CGFloat(i) * 40)
+                            .scaleEffect(ringScale * portalPulse)
+                            .opacity(ringOpacity - Double(i) * 0.12)
+                            .blur(radius: CGFloat(i) * 0.5)
+                    }
 
-            VStack(spacing: 12) {
-                Text("Ready for Liftoff")
-                    .font(.system(size: 28, weight: .semibold))
+                    // Inner portal core with glass
+                    ZStack {
+                        // Core glow
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [
+                                        Aurora.Colors.stellarWhite.opacity(coreGlow),
+                                        Aurora.Colors.electricCyan.opacity(coreGlow * 0.5),
+                                        .clear
+                                    ],
+                                    center: .center,
+                                    startRadius: 10,
+                                    endRadius: 50
+                                )
+                            )
+                            .frame(width: 100, height: 100)
+
+                        // Glass core
+                        Group {
+                            if #available(iOS 26.0, *) {
+                                Color.clear
+                                    .frame(width: 80, height: 80)
+                                    .glassEffect(.regular, in: Circle())
+                            } else {
+                                Circle()
+                                    .fill(.ultraThinMaterial)
+                                    .frame(width: 80, height: 80)
+                            }
+                        }
+
+                        // Rocket icon with bloom
+                        Image(systemName: "rocket.fill")
+                            .font(.system(size: 36, weight: .medium))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Aurora.Colors.stellarWhite, Aurora.Colors.electricCyan],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .shadow(color: Aurora.Colors.electricCyan.opacity(0.6), radius: 12)
+                    }
+                }
+                .matchedGeometryEffect(id: "launchPortal", in: namespace)
+
+                VStack(spacing: 16) {
+                    Text("Ready for Liftoff")
+                        .font(Aurora.Typography.title1)
+                        .foregroundStyle(Aurora.Colors.textPrimary)
+
+                    Text("Your productivity journey awaits, \(userName.isEmpty ? "Explorer" : userName)")
+                        .font(Aurora.Typography.body)
+                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+
+                    if !goalSummary.isEmpty {
+                        Text("Goal: \(goalSummary)")
+                            .font(Aurora.Typography.caption1)
+                            .foregroundStyle(Aurora.Colors.cosmicGold)
+                            .padding(.top, 4)
+                    }
+                }
+                .padding(.horizontal, Aurora.Spacing.xl)
+
+                Spacer()
+
+                // Launch button with prismatic border
+                Button {
+                    triggerLaunch()
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("Launch")
+                            .font(.system(size: 18, weight: .semibold))
+                        Image(systemName: "arrow.up.forward")
+                            .font(.system(size: 16, weight: .semibold))
+                    }
                     .foregroundStyle(.white)
-
-                Text("Your productivity journey awaits, \(userName.isEmpty ? "Explorer" : userName)")
-                    .font(.system(size: 16))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                }
+                .background {
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                }
+                .prismaticBorder(Capsule(), style: .spectrum, lineWidth: 2, animated: !reduceMotion)
+                .disabled(isLaunching)
+                .padding(.horizontal, Aurora.Spacing.xl)
+                .padding(.bottom, Aurora.Spacing.xxl)
             }
-            .padding(.horizontal, 32)
 
-            Spacer()
+            // Supernova celebration overlay
+            if showSupernova {
+                AuroraSupernovaBurst(
+                    isActive: $showSupernova,
+                    colors: Aurora.Gradients.auroraSpectrum
+                )
+            }
+        }
+        .onAppear {
+            startPortalAnimations()
+        }
+    }
 
-            LiquidGlassButton.primary(
-                "Launch",
-                icon: "arrow.up.forward",
-                action: onLaunch
-            )
-            .padding(.horizontal, 32)
-            .padding(.bottom, 48)
+    private func startPortalAnimations() {
+        guard !reduceMotion else {
+            ringScale = 1.0
+            ringOpacity = 1.0
+            coreGlow = 0.6
+            return
+        }
+
+        // Scale in
+        withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {
+            ringScale = 1.0
+            ringOpacity = 1.0
+        }
+
+        // Start rotation
+        withAnimation(.linear(duration: AuroraMotion.Duration.prismaticRotation).repeatForever(autoreverses: false)) {
+            ringRotation = 360
+        }
+
+        // Pulse effect
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+            portalPulse = 1.05
+            coreGlow = 0.8
+        }
+    }
+
+    private func triggerLaunch() {
+        guard !isLaunching else { return }
+        isLaunching = true
+
+        // Epic launch feedback
+        AuroraSoundEngine.shared.celebration()
+
+        // Supernova burst
+        showSupernova = true
+
+        // Portal collapse + launch
+        withAnimation(AuroraMotion.Spring.portal) {
+            ringScale = 2.0
+            ringOpacity = 0
+        }
+
+        // Delay then complete
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            onLaunch()
         }
     }
 }

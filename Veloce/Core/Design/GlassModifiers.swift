@@ -36,30 +36,8 @@ extension View {
 }
 
 // MARK: - iOS 26 Native Liquid Glass Extensions
-// These provide convenient wrappers around iOS 26's native .glassEffect() API
-
-extension View {
-    /// Apply iOS 26 native Liquid Glass with interactive behavior
-    /// Use this for navigation elements (tab bars, toolbars, floating buttons)
-    @available(iOS 26.0, *)
-    func liquidGlassInteractive<S: Shape>(in shape: S = Capsule() as! S) -> some View {
-        self.glassEffect(.regular.interactive(true), in: shape)
-    }
-
-    /// Apply iOS 26 native Liquid Glass card effect
-    /// Use this for cards and containers on the navigation layer
-    @available(iOS 26.0, *)
-    func liquidGlassCard(cornerRadius: CGFloat = 16) -> some View {
-        self.glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius))
-    }
-
-    /// Apply iOS 26 native Liquid Glass with clear variant
-    /// Only use when: over media-rich content, with dimming layer, bold/bright content on top
-    @available(iOS 26.0, *)
-    func liquidGlassClear<S: Shape>(in shape: S) -> some View {
-        self.glassEffect(.clear, in: shape)
-    }
-}
+// NOTE: Main iOS 26 glass extensions are in LiquidGlassDesignSystem.swift
+// This file only contains legacy compatibility modifiers
 
 // MARK: - Legacy Glass Effect Modifier (Pre-iOS 26 Compatibility)
 /// Uses ultraThinMaterial for backwards compatibility
@@ -1169,7 +1147,7 @@ struct SupernovaBurstModifier: ViewModifier {
     let color: Color
     let particleCount: Int
 
-    @State private var particles: [SupernovaParticle] = []
+    @State private var particles: [GlassSupernovaParticle] = []
     @State private var burstScale: CGFloat = 0
     @State private var burstOpacity: Double = 1
 
@@ -1239,7 +1217,7 @@ struct SupernovaBurstModifier: ViewModifier {
         for i in 0..<particleCount {
             let angle = Double(i) * (2 * .pi / Double(particleCount))
             let distance = CGFloat.random(in: 50...120)
-            let particle = SupernovaParticle(
+            let particle = GlassSupernovaParticle(
                 id: UUID(),
                 color: colors.randomElement() ?? .white,
                 size: CGFloat.random(in: 3...8),
@@ -1278,7 +1256,7 @@ struct SupernovaBurstModifier: ViewModifier {
     }
 }
 
-struct SupernovaParticle: Identifiable {
+struct GlassSupernovaParticle: Identifiable {
     let id: UUID
     let color: Color
     let size: CGFloat
@@ -1291,13 +1269,13 @@ struct SupernovaParticle: Identifiable {
 // MARK: - Urgency Glow Modifier
 /// Time-based glow that shifts from calm cyan to critical red
 struct UrgencyGlowModifier: ViewModifier {
-    let urgencyLevel: UrgencyLevel  // 0 = calm, 1 = near, 2 = critical
+    let urgencyLevel: GlassUrgencyLevel  // 0 = calm, 1 = near, 2 = critical
     let isAnimated: Bool
 
     @State private var pulsePhase: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    enum UrgencyLevel {
+    enum GlassUrgencyLevel {
         case calm
         case near
         case critical

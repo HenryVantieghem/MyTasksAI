@@ -2,8 +2,9 @@
 //  ChatTasksView.swift
 //  Veloce
 //
-//  Living Cosmos Tasks View - iOS 26 Ultrathink Edition
-//  Features: List/Kanban toggle, TaskCardV5 Floating Glass Island, staggered animations
+//  Aurora Design System - Productivity Constellation
+//  Living aurora backgrounds that respond to task completion,
+//  tasks as energy nodes, completion transforms into stars.
 //
 
 import SwiftUI
@@ -49,9 +50,9 @@ enum KanbanSection: String, CaseIterable {
 
     var color: Color {
         switch self {
-        case .toDo: return Theme.AdaptiveColors.aiSecondary
-        case .inProgress: return Theme.AdaptiveColors.warning
-        case .done: return Theme.AdaptiveColors.success
+        case .toDo: return Aurora.Colors.electricCyan
+        case .inProgress: return Aurora.Colors.cosmicGold
+        case .done: return Aurora.Colors.prismaticGreen
         }
     }
 }
@@ -63,59 +64,101 @@ struct KanbanSectionHeader: View {
     let count: Int
 
     @State private var glowPulse: CGFloat = 0
+    @State private var haloRotation: Double = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
-            // Glowing orb indicator
+        HStack(spacing: Aurora.Spacing.sm) {
+            // Aurora energy orb indicator
             ZStack {
-                // Outer glow
+                // Outer aurora glow
                 SwiftUI.Circle()
-                    .fill(section.color.opacity(0.3))
-                    .frame(width: 16, height: 16)
-                    .blur(radius: 4 + (glowPulse * 2))
+                    .fill(section.color.opacity(0.4))
+                    .frame(width: 20, height: 20)
+                    .blur(radius: 6 + (glowPulse * 3))
 
-                // Core dot
+                // Rotating halo (for in-progress)
+                if section == .inProgress && !reduceMotion {
+                    SwiftUI.Circle()
+                        .stroke(
+                            AngularGradient(
+                                colors: [section.color, section.color.opacity(0.3), section.color],
+                                center: .center
+                            ),
+                            lineWidth: 1.5
+                        )
+                        .frame(width: 14, height: 14)
+                        .rotationEffect(.degrees(haloRotation))
+                }
+
+                // Core energy dot
                 SwiftUI.Circle()
-                    .fill(section.color)
+                    .fill(
+                        RadialGradient(
+                            colors: [Aurora.Colors.stellarWhite, section.color],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 5
+                        )
+                    )
                     .frame(width: 8, height: 8)
             }
 
-            // Section title
+            // Section title with Aurora typography
             Text(section.rawValue.uppercased())
-                .font(Theme.Typography.cosmosSectionHeader)
-                .foregroundStyle(Theme.CelestialColors.starDim)
+                .font(Aurora.Typography.caption)
+                .foregroundStyle(Aurora.Colors.textSecondary)
                 .tracking(1.5)
 
-            // Count badge
+            // Aurora count badge
             Text("\(count)")
-                .font(Theme.Typography.cosmosMetaSmall)
+                .font(Aurora.Typography.statSmall)
                 .foregroundStyle(section.color)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 3)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
                 .background {
                     Capsule()
-                        .fill(section.color.opacity(0.15))
+                        .fill(section.color.opacity(0.12))
                         .overlay {
                             Capsule()
-                                .strokeBorder(section.color.opacity(0.3), lineWidth: 0.5)
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [section.color.opacity(0.5), section.color.opacity(0.2)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 0.5
+                                )
                         }
                 }
 
             Spacer()
         }
-        .padding(.horizontal, Theme.Spacing.sm)
-        .padding(.vertical, Theme.Spacing.xs)
+        .padding(.horizontal, Aurora.Spacing.sm)
+        .padding(.vertical, Aurora.Spacing.xs)
         .onAppear {
-            guard !reduceMotion, section == .inProgress else { return }
-            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+            guard !reduceMotion else { return }
+            // Glow pulse for all sections
+            withAnimation(
+                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .repeatForever(autoreverses: true)
+            ) {
                 glowPulse = 1
+            }
+            // Rotating halo for in-progress
+            if section == .inProgress {
+                withAnimation(
+                    .linear(duration: 4)
+                    .repeatForever(autoreverses: false)
+                ) {
+                    haloRotation = 360
+                }
             }
         }
     }
 }
 
-// MARK: - Chat Tasks View (Living Cosmos Edition)
+// MARK: - Chat Tasks View (Aurora Productivity Constellation)
 
 struct ChatTasksView: View {
     @Bindable var viewModel: ChatTasksViewModel
@@ -236,8 +279,31 @@ struct ChatTasksView: View {
 
     var body: some View {
         ZStack {
-            // Cosmic void background (consistent with GrowView)
-            VoidBackground.calendar
+            // Aurora productivity-responsive background
+            AuroraAnimatedWaveBackground.forProductivityState(
+                productivityLevel: productivityLevel,
+                hasOverdueTasks: inProgressTasks.contains { task in
+                    if let scheduled = task.scheduledTime {
+                        return scheduled < Date()
+                    }
+                    return false
+                }
+            )
+            .ignoresSafeArea()
+
+            // Ambient firefly particles
+            if !reduceMotion {
+                AuroraFireflyField(
+                    particleCount: 25,
+                    colors: [
+                        Aurora.Colors.electricCyan.opacity(0.6),
+                        Aurora.Colors.borealisViolet.opacity(0.4),
+                        Aurora.Colors.prismaticGreen.opacity(0.3)
+                    ]
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+            }
 
             // Main content
             VStack(spacing: 0) {
@@ -248,7 +314,7 @@ struct ChatTasksView: View {
                 // Task feed or empty state
                 if filteredTasks.isEmpty && filteredRecentlyCompleted.isEmpty {
                     EmptyTasksView()
-                        .padding(.top, Theme.Spacing.universalHeaderHeight - 60)
+                        .padding(.top, 60)
                 } else {
                     if effectiveDisplayMode == .smartList {
                         listTaskFeed
@@ -258,7 +324,7 @@ struct ChatTasksView: View {
                 }
             }
 
-            // Celebration overlays
+            // Aurora celebration overlays
             celebrationOverlays
         }
         .onAppear {
@@ -302,7 +368,7 @@ struct ChatTasksView: View {
                     }
             }
         }
-        .padding(.horizontal, Theme.Spacing.screenPadding)
+        .padding(.horizontal, CosmicWidget.Spacing.screenPadding)
     }
 
     // MARK: - List Task Feed
@@ -326,7 +392,7 @@ struct ChatTasksView: View {
                         toDoSection
                             .staggeredReveal(
                                 isVisible: hasInitiallyLoaded,
-                                delay: Theme.Animation.staggerDelay * Double(inProgressTasks.count + 1),
+                                delay: CosmicMotion.Stagger.standard * Double(inProgressTasks.count + 1),
                                 direction: .fromBottom
                             )
                     }
@@ -336,7 +402,7 @@ struct ChatTasksView: View {
                         doneSection
                             .staggeredReveal(
                                 isVisible: hasInitiallyLoaded,
-                                delay: Theme.Animation.staggerDelay * Double(filteredTasks.count + 1),
+                                delay: CosmicMotion.Stagger.standard * Double(filteredTasks.count + 1),
                                 direction: .fromBottom
                             )
                     }
@@ -345,8 +411,8 @@ struct ChatTasksView: View {
                     Spacer(minLength: 120)
                         .id("bottom")
                 }
-                .padding(.horizontal, Theme.Spacing.screenPadding)
-                .padding(.top, Theme.Spacing.md)
+                .padding(.horizontal, CosmicWidget.Spacing.screenPadding)
+                .padding(.top, CosmicWidget.Spacing.md)
             }
             .scrollIndicators(.hidden)
             .onChange(of: filteredTasks.count) { oldCount, newCount in
@@ -509,8 +575,8 @@ struct ChatTasksView: View {
                     onDelete: nil
                 )
             }
-            .padding(.horizontal, Theme.Spacing.screenPadding)
-            .padding(.top, Theme.Spacing.md)
+            .padding(.horizontal, CosmicWidget.Spacing.screenPadding)
+            .padding(.top, CosmicWidget.Spacing.md)
             .padding(.bottom, 120)
         }
     }
@@ -547,7 +613,7 @@ struct ChatTasksView: View {
                 .zIndex(Double(inProgressTasks.count - index))
             }
         }
-        .padding(.bottom, Theme.Spacing.sm)
+        .padding(.bottom, CosmicWidget.Spacing.sm)
     }
 
     // MARK: - To Do Section
@@ -583,59 +649,77 @@ struct ChatTasksView: View {
                 .zIndex(Double(toDoTasks.count - index))
             }
         }
-        .padding(.bottom, Theme.Spacing.sm)
+        .padding(.bottom, CosmicWidget.Spacing.sm)
     }
 
-    // MARK: - Done Section
+    // MARK: - Aurora Done Section
 
     private var doneSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
             KanbanSectionHeader(section: .done, count: filteredRecentlyCompleted.count)
 
-            // Completed task rows (constellation style)
+            // Completed task rows (aurora constellation style)
             ForEach(filteredRecentlyCompleted) { task in
                 ConstellationTaskRow(task: task) {
+                    AuroraSoundEngine.shared.play(.buttonTap)
                     viewModel.uncompleteTask(task)
                 }
             }
         }
-        .padding(.bottom, Theme.Spacing.md)
+        .padding(.bottom, Aurora.Spacing.md)
         // Achievement aurora glow
         .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.CelestialColors.auroraGreen.opacity(0.03))
-                .blur(radius: 20)
-                .offset(y: 10)
+            ZStack {
+                // Primary achievement glow
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Aurora.Colors.prismaticGreen.opacity(0.04))
+                    .blur(radius: 20)
+                    .offset(y: 10)
+
+                // Secondary golden achievement shimmer
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Aurora.Colors.cosmicGold.opacity(0.02),
+                                Color.clear
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .blur(radius: 15)
+            }
         }
     }
 
     // MARK: - Constellation Completed Section (Legacy)
 
     private var constellationCompletedSection: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: CosmicWidget.Spacing.sm) {
             // Section header with aurora glow
-            HStack(spacing: Theme.Spacing.sm) {
+            HStack(spacing: CosmicWidget.Spacing.sm) {
                 // Constellation icon
                 Image(systemName: "sparkles")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                    .foregroundStyle(CosmicWidget.Widget.mint)
 
                 Text("Completed")
-                    .font(Theme.Typography.cosmosSectionHeader)
-                    .foregroundStyle(Theme.CelestialColors.starDim)
+                    .font(CosmicWidget.Typography.caption)
+                    .foregroundStyle(CosmicWidget.Text.secondary)
 
                 // Count badge
                 Text("\(filteredRecentlyCompleted.count)")
-                    .font(Theme.Typography.cosmosMetaSmall)
-                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                    .font(CosmicWidget.Typography.meta)
+                    .foregroundStyle(CosmicWidget.Widget.mint)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background {
                         Capsule()
-                            .fill(Theme.CelestialColors.auroraGreen.opacity(0.15))
+                            .fill(CosmicWidget.Widget.mint.opacity(0.15))
                     }
             }
-            .padding(.horizontal, Theme.Spacing.sm)
+            .padding(.horizontal, CosmicWidget.Spacing.sm)
 
             // Completed task rows (fade to constellation)
             ForEach(filteredRecentlyCompleted) { task in
@@ -644,38 +728,60 @@ struct ChatTasksView: View {
                 }
             }
         }
-        .padding(.bottom, Theme.Spacing.md)
+        .padding(.bottom, CosmicWidget.Spacing.md)
         // Achievement aurora glow
         .background {
             RoundedRectangle(cornerRadius: 16)
-                .fill(Theme.CelestialColors.auroraGreen.opacity(0.03))
+                .fill(CosmicWidget.Widget.mint.opacity(0.03))
                 .blur(radius: 20)
                 .offset(y: 10)
         }
     }
 
-    // MARK: - Celebration Overlays
+    // MARK: - Aurora Celebration Overlays
 
     @ViewBuilder
     private var celebrationOverlays: some View {
-        // Confetti burst
+        // Aurora supernova burst for major celebrations
         if showConfetti {
-            ConfettiBurst(particleCount: 80)
+            ZStack {
+                // Aurora confetti
+                AuroraConfettiShower(
+                    isActive: .constant(true),
+                    particleCount: 80,
+                    colors: Aurora.Gradients.auroraSpectrum
+                )
                 .ignoresSafeArea()
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                        showConfetti = false
-                    }
+
+                // Central supernova burst
+                AuroraSupernovaBurst(
+                    isActive: .constant(true),
+                    particleCount: 32,
+                    color: Aurora.Colors.cosmicGold
+                )
+                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 3)
+            }
+            .onAppear {
+                AuroraSoundEngine.shared.celebration()
+                AuroraHaptics.celebration()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    showConfetti = false
                 }
+            }
         }
 
         // Points animations
         PointsAnimationContainer(animations: $pointsAnimations)
 
-        // AI Creation Animation
+        // AI Creation Animation with Aurora effects
         if showAICreationAnimation {
-            AITaskCreationAnimation {
-                showAICreationAnimation = false
+            ZStack {
+                AITaskCreationAnimation {
+                    showAICreationAnimation = false
+                }
+                // Aurora mini burst
+                AuroraMiniBurst(color: Aurora.Colors.electricCyan, particleCount: 12)
+                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
             }
             .zIndex(2)
         }
@@ -689,15 +795,19 @@ struct ChatTasksView: View {
             return
         }
 
-        // Slight delay then trigger staggered reveal
+        // Aurora-style staggered reveal
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(Theme.Animation.portalOpen) {
+            withAnimation(AuroraMotion.Spring.fluidMorph) {
                 hasInitiallyLoaded = true
             }
         }
     }
 
     private func completeTask(_ task: TaskItem) {
+        // Aurora completion feedback
+        AuroraSoundEngine.shared.taskComplete()
+        AuroraHaptics.dopamineBurst()
+
         // Get position for points animation
         let screenCenter = CGPoint(x: 200, y: 400)
 
@@ -720,43 +830,50 @@ struct ChatTasksView: View {
     }
 }
 
-// MARK: - Dynamic Nebula Background
+// MARK: - Aurora Dynamic Nebula Background
 
 struct DynamicNebulaBackground: View {
     let productivityLevel: Double
     let hasOverdueTasks: Bool
 
     @State private var nebulaPhase: CGFloat = 0
+    @State private var auroraWave: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // Color shifts based on productivity
+    // Aurora color shifts based on productivity
     private var primaryColor: Color {
         if hasOverdueTasks {
-            return Theme.CelestialColors.urgencyNear.opacity(0.15)
+            return Aurora.Colors.warning.opacity(0.15)
         }
-        // Warm up as productivity increases
+        // Shift from violet to cyan to green as productivity increases
         let warmth = productivityLevel
-        return Color(
-            red: 0.58 + (warmth * 0.2),
-            green: 0.25 + (warmth * 0.3),
-            blue: 0.98 - (warmth * 0.3)
-        ).opacity(0.12)
+        if warmth < 0.3 {
+            return Aurora.Colors.borealisViolet.opacity(0.12)
+        } else if warmth < 0.7 {
+            return Aurora.Colors.electricCyan.opacity(0.15)
+        } else {
+            return Aurora.Colors.prismaticGreen.opacity(0.18)
+        }
     }
 
     private var secondaryColor: Color {
         if hasOverdueTasks {
-            return Theme.CelestialColors.urgencyCritical.opacity(0.08)
+            return Aurora.Colors.error.opacity(0.08)
         }
-        return Theme.CelestialColors.auroraGreen.opacity(0.08 * productivityLevel)
+        return Aurora.Colors.prismaticGreen.opacity(0.08 * productivityLevel)
+    }
+
+    private var tertiaryColor: Color {
+        return Aurora.Colors.stellarMagenta.opacity(0.06 * (1 - productivityLevel))
     }
 
     var body: some View {
         ZStack {
-            // Base void
-            Theme.CelestialColors.void
+            // Base aurora void
+            Aurora.Colors.voidDeep
                 .ignoresSafeArea()
 
-            // Primary nebula
+            // Primary aurora nebula
             RadialGradient(
                 colors: [
                     primaryColor,
@@ -769,7 +886,7 @@ struct DynamicNebulaBackground: View {
             )
             .ignoresSafeArea()
 
-            // Secondary nebula (shifts with productivity)
+            // Secondary aurora (shifts with productivity)
             RadialGradient(
                 colors: [
                     secondaryColor,
@@ -777,97 +894,167 @@ struct DynamicNebulaBackground: View {
                 ],
                 center: UnitPoint(
                     x: 0.8 + (nebulaPhase * 0.1),
-                    y: 0.3
+                    y: 0.3 + (auroraWave * 0.1)
                 ),
                 startRadius: 0,
                 endRadius: 300
             )
             .ignoresSafeArea()
 
-            // Ambient star dust
+            // Tertiary aurora glow (bottom)
+            RadialGradient(
+                colors: [
+                    tertiaryColor,
+                    Color.clear
+                ],
+                center: UnitPoint(
+                    x: 0.2 - (nebulaPhase * 0.05),
+                    y: 0.9
+                ),
+                startRadius: 0,
+                endRadius: 250
+            )
+            .ignoresSafeArea()
+
+            // Aurora star field
             if !reduceMotion {
-                StarFieldView(shift: nebulaPhase * 5, density: .sparse)
-                    .opacity(0.4)
+                AuroraStarField(starCount: 40, twinkleSpeed: 3.0)
+                    .opacity(0.5)
                     .ignoresSafeArea()
             }
         }
         .onAppear {
-            if !reduceMotion {
-                withAnimation(
-                    .easeInOut(duration: 8)
-                    .repeatForever(autoreverses: true)
-                ) {
-                    nebulaPhase = 1
-                }
+            guard !reduceMotion else { return }
+            withAnimation(
+                .easeInOut(duration: 8)
+                .repeatForever(autoreverses: true)
+            ) {
+                nebulaPhase = 1
+            }
+            withAnimation(
+                .easeInOut(duration: 12)
+                .repeatForever(autoreverses: true)
+            ) {
+                auroraWave = 1
             }
         }
     }
 }
 
-// MARK: - Constellation Task Row
+// MARK: - Aurora Constellation Task Row
 
 struct ConstellationTaskRow: View {
     let task: TaskItem
     let onUncomplete: () -> Void
 
     @State private var starTwinkle: CGFloat = 0
+    @State private var glowPulse: CGFloat = 0.5
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
-            // Star constellation point (where checkmark was)
+        HStack(spacing: Aurora.Spacing.sm) {
+            // Aurora star constellation point
             ZStack {
-                // Glow
+                // Outer aurora glow
                 SwiftUI.Circle()
-                    .fill(Theme.CelestialColors.auroraGreen.opacity(0.3))
-                    .frame(width: 16, height: 16)
-                    .blur(radius: 4 + (starTwinkle * 2))
+                    .fill(Aurora.Colors.prismaticGreen.opacity(0.4))
+                    .frame(width: 20, height: 20)
+                    .blur(radius: 6 + (starTwinkle * 4))
+                    .scaleEffect(1 + (glowPulse * 0.2))
 
-                // Star
+                // Inner glow ring
+                SwiftUI.Circle()
+                    .stroke(
+                        Aurora.Colors.prismaticGreen.opacity(0.6),
+                        lineWidth: 1
+                    )
+                    .frame(width: 14, height: 14)
+                    .scaleEffect(1 + (starTwinkle * 0.1))
+
+                // Core star with gradient
                 Image(systemName: "star.fill")
-                    .font(.system(size: 10))
-                    .foregroundStyle(Theme.CelestialColors.auroraGreen)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Aurora.Colors.cosmicGold, Aurora.Colors.prismaticGreen],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .scaleEffect(0.9 + (starTwinkle * 0.15))
             }
 
-            // Title (faded, ethereal)
+            // Title (ethereal, achieved)
             Text(task.title)
-                .font(Theme.Typography.cosmosWhisperSmall)
-                .foregroundStyle(Theme.CelestialColors.starGhost)
-                .strikethrough(true, color: Theme.CelestialColors.starGhost.opacity(0.5))
+                .font(Aurora.Typography.body)
+                .foregroundStyle(Aurora.Colors.textTertiary)
+                .strikethrough(true, color: Aurora.Colors.prismaticGreen.opacity(0.4))
                 .lineLimit(1)
 
             Spacer()
 
-            // Undo (re-materialize)
+            // Restore button with Aurora glow
             Button {
-                HapticsService.shared.selectionFeedback()
+                AuroraSoundEngine.shared.play(.buttonTap)
+                AuroraHaptics.light()
                 onUncomplete()
             } label: {
                 Text("Restore")
-                    .font(Theme.Typography.cosmosMetaSmall)
-                    .foregroundStyle(Theme.CelestialColors.nebulaEdge)
+                    .font(Aurora.Typography.meta)
+                    .foregroundStyle(Aurora.Colors.electricCyan)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background {
+                        Capsule()
+                            .fill(Aurora.Colors.electricCyan.opacity(0.1))
+                            .overlay {
+                                Capsule()
+                                    .strokeBorder(Aurora.Colors.electricCyan.opacity(0.3), lineWidth: 0.5)
+                            }
+                    }
             }
         }
-        .padding(.horizontal, Theme.Spacing.md)
-        .padding(.vertical, Theme.Spacing.sm)
+        .padding(.horizontal, Aurora.Spacing.md)
+        .padding(.vertical, Aurora.Spacing.sm)
         .background {
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
-                .fill(Theme.CelestialColors.abyss.opacity(0.5))
+            RoundedRectangle(cornerRadius: Aurora.Radius.card)
+                .fill(Aurora.Colors.voidNebula.opacity(0.6))
+                .overlay {
+                    // Subtle achievement aurora shimmer
+                    RoundedRectangle(cornerRadius: Aurora.Radius.card)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Aurora.Colors.prismaticGreen.opacity(0.05),
+                                    Color.clear
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                }
         }
         .onAppear {
-            if !reduceMotion {
-                withAnimation(
-                    .easeInOut(duration: 2)
-                    .repeatForever(autoreverses: true)
-                ) {
-                    starTwinkle = 1
-                }
+            guard !reduceMotion else { return }
+            // Star twinkle animation
+            withAnimation(
+                .easeInOut(duration: 1.5)
+                .repeatForever(autoreverses: true)
+            ) {
+                starTwinkle = 1
+            }
+            // Glow pulse animation
+            withAnimation(
+                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .repeatForever(autoreverses: true)
+            ) {
+                glowPulse = 1
             }
         }
     }
 }
 
-// MARK: - Kanban Column
+// MARK: - Aurora Kanban Column
 
 struct KanbanColumn: View {
     let section: KanbanSection
@@ -878,7 +1065,9 @@ struct KanbanColumn: View {
     var onSnooze: ((TaskItem) -> Void)?
     var onDelete: ((TaskItem) -> Void)?
 
+    @State private var headerGlow: CGFloat = 0
     @Environment(\.responsiveLayout) private var layout
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var columnWidth: CGFloat {
         switch layout.deviceType {
@@ -893,7 +1082,7 @@ struct KanbanColumn: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Column header with Liquid Glass
+            // Aurora column header
             columnHeader
 
             // Tasks in column
@@ -902,7 +1091,10 @@ struct KanbanColumn: View {
                     ForEach(tasks) { task in
                         TaskCardV4(
                             task: task,
-                            onTap: { onTaskTap(task) },
+                            onTap: {
+                                AuroraSoundEngine.shared.play(.buttonTap)
+                                onTaskTap(task)
+                            },
                             onToggleComplete: { onTaskComplete(task) },
                             onStartFocus: onStartFocus,
                             onSnooze: onSnooze,
@@ -921,56 +1113,113 @@ struct KanbanColumn: View {
     }
 
     private var columnHeader: some View {
-        HStack(spacing: 10) {
-            // Status indicator
-            Circle()
-                .fill(section.color)
-                .frame(width: 10, height: 10)
+        HStack(spacing: Aurora.Spacing.sm) {
+            // Aurora energy status indicator
+            ZStack {
+                // Outer glow
+                SwiftUI.Circle()
+                    .fill(section.color.opacity(0.4))
+                    .frame(width: 14, height: 14)
+                    .blur(radius: 4 + (headerGlow * 2))
+
+                // Core
+                SwiftUI.Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [Aurora.Colors.stellarWhite, section.color],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 6
+                        )
+                    )
+                    .frame(width: 10, height: 10)
+            }
 
             Text(section.rawValue)
-                .font(.headline)
-                .foregroundStyle(.primary)
+                .font(Aurora.Typography.headline)
+                .foregroundStyle(Aurora.Colors.textPrimary)
 
             Spacer()
 
-            // Count badge
+            // Aurora count badge
             Text("\(tasks.count)")
-                .font(.subheadline.weight(.semibold))
+                .font(Aurora.Typography.callout.weight(.semibold))
                 .foregroundStyle(section.color)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
                 .background(
                     Capsule()
                         .fill(section.color.opacity(0.12))
+                        .overlay {
+                            Capsule()
+                                .strokeBorder(section.color.opacity(0.3), lineWidth: 0.5)
+                        }
                 )
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(.horizontal, Aurora.Spacing.md)
+        .padding(.vertical, Aurora.Spacing.sm)
+        .background {
+            RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
+                .fill(Aurora.Colors.voidNebula)
+                .overlay {
+                    // Subtle section glow
+                    RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [section.color.opacity(0.08), Color.clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                }
+        }
         .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(section.color.opacity(0.2), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [section.color.opacity(0.3), section.color.opacity(0.1)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
+        }
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(
+                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .repeatForever(autoreverses: true)
+            ) {
+                headerGlow = 1
+            }
         }
     }
 
     private var emptyColumnPlaceholder: some View {
-        VStack(spacing: 8) {
-            Image(systemName: section.icon)
-                .font(.system(size: 28, weight: .light))
-                .foregroundStyle(.tertiary)
+        VStack(spacing: Aurora.Spacing.sm) {
+            // Aurora-styled empty icon
+            ZStack {
+                SwiftUI.Circle()
+                    .fill(section.color.opacity(0.1))
+                    .frame(width: 60, height: 60)
+                    .blur(radius: 10)
+
+                Image(systemName: section.icon)
+                    .font(.system(size: 28, weight: .light))
+                    .foregroundStyle(Aurora.Colors.textTertiary)
+            }
 
             Text("No tasks")
-                .font(.subheadline)
-                .foregroundStyle(.tertiary)
+                .font(Aurora.Typography.callout)
+                .foregroundStyle(Aurora.Colors.textTertiary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+        .background {
+            RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
-                .foregroundStyle(Color(.tertiarySystemFill))
-        )
+                .foregroundStyle(section.color.opacity(0.2))
+        }
     }
 }
 
@@ -984,7 +1233,7 @@ struct ChatSchedulePickerSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: Theme.Spacing.lg) {
+            VStack(spacing: CosmicWidget.Spacing.lg) {
                 DatePicker(
                     "Schedule",
                     selection: $selectedDate,
@@ -992,22 +1241,22 @@ struct ChatSchedulePickerSheet: View {
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.graphical)
-                .tint(Theme.Colors.accent)
+                .tint(CosmicWidget.Widget.electricCyan)
 
                 Button {
                     onSelect(selectedDate)
                     dismiss()
                 } label: {
                     Text("Set Schedule")
-                        .font(Theme.Typography.headline)
+                        .font(CosmicWidget.Typography.title3)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, Theme.Spacing.md)
-                        .background(Theme.Colors.accentGradient)
-                        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.lg))
+                        .padding(.vertical, CosmicWidget.Spacing.md)
+                        .background(CosmicWidget.Widget.electricCyanGradient)
+                        .clipShape(RoundedRectangle(cornerRadius: CosmicWidget.Radius.large))
                 }
             }
-            .padding(Theme.Spacing.screenPadding)
+            .padding(CosmicWidget.Spacing.screenPadding)
             .navigationTitle("Schedule Task")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -1029,25 +1278,25 @@ struct PriorityPickerSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: Theme.Spacing.md) {
+            VStack(spacing: CosmicWidget.Spacing.md) {
                 ForEach(1...3, id: \.self) { priority in
                     Button {
                         HapticsService.shared.selectionFeedback()
                         onSelect(priority)
                         dismiss()
                     } label: {
-                        HStack(spacing: Theme.Spacing.md) {
+                        HStack(spacing: CosmicWidget.Spacing.md) {
                             // Stars
                             HStack(spacing: 4) {
                                 ForEach(0..<priority, id: \.self) { _ in
                                     Image(systemName: "star.fill")
                                         .font(.system(size: 18))
-                                        .foregroundStyle(Theme.Colors.xp)
+                                        .foregroundStyle(CosmicWidget.Widget.gold)
                                 }
                                 ForEach(0..<(3 - priority), id: \.self) { _ in
                                     Image(systemName: "star")
                                         .font(.system(size: 18))
-                                        .foregroundStyle(Theme.Colors.textTertiary)
+                                        .foregroundStyle(CosmicWidget.Text.tertiary)
                                 }
                             }
 
@@ -1055,19 +1304,19 @@ struct PriorityPickerSheet: View {
 
                             // Label
                             Text(priorityLabel(priority))
-                                .font(Theme.Typography.body)
-                                .foregroundStyle(Theme.Colors.textPrimary)
+                                .font(CosmicWidget.Typography.body)
+                                .foregroundStyle(CosmicWidget.Text.primary)
                         }
-                        .padding(Theme.Spacing.md)
+                        .padding(CosmicWidget.Spacing.md)
                         .background(
-                            RoundedRectangle(cornerRadius: Theme.Radius.md)
-                                .fill(Theme.Colors.glassBackground.opacity(0.5))
+                            RoundedRectangle(cornerRadius: CosmicWidget.Radius.card)
+                                .fill(CosmicWidget.Void.nebula.opacity(0.5))
                         )
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(Theme.Spacing.screenPadding)
+            .padding(CosmicWidget.Spacing.screenPadding)
             .navigationTitle("Set Priority")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -1100,46 +1349,46 @@ struct ChatTaskDetailSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
+                VStack(alignment: .leading, spacing: CosmicWidget.Spacing.lg) {
                     // Title
                     Text(task.title)
-                        .font(Theme.Typography.title2)
-                        .foregroundStyle(Theme.Colors.textPrimary)
+                        .font(CosmicWidget.Typography.title2)
+                        .foregroundStyle(CosmicWidget.Text.primary)
 
                     // Metadata
-                    VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                    VStack(alignment: .leading, spacing: CosmicWidget.Spacing.sm) {
                         if task.starRating > 0 {
-                            HStack(spacing: Theme.Spacing.sm) {
+                            HStack(spacing: CosmicWidget.Spacing.sm) {
                                 Image(systemName: "star.fill")
-                                    .foregroundStyle(Theme.Colors.xp)
+                                    .foregroundStyle(CosmicWidget.Widget.gold)
                                 Text("Priority: \(task.starRating)/3")
-                                    .font(Theme.Typography.body)
-                                    .foregroundStyle(Theme.Colors.textSecondary)
+                                    .font(CosmicWidget.Typography.body)
+                                    .foregroundStyle(CosmicWidget.Text.secondary)
                             }
                         }
 
                         if let scheduled = task.scheduledTime {
-                            HStack(spacing: Theme.Spacing.sm) {
+                            HStack(spacing: CosmicWidget.Spacing.sm) {
                                 Image(systemName: "calendar")
-                                    .foregroundStyle(Theme.Colors.aiBlue)
+                                    .foregroundStyle(CosmicWidget.Widget.teal)
                                 Text("Scheduled: \(scheduled.formatted(date: .abbreviated, time: .shortened))")
-                                    .font(Theme.Typography.body)
-                                    .foregroundStyle(Theme.Colors.textSecondary)
+                                    .font(CosmicWidget.Typography.body)
+                                    .foregroundStyle(CosmicWidget.Text.secondary)
                             }
                         }
 
-                        HStack(spacing: Theme.Spacing.sm) {
+                        HStack(spacing: CosmicWidget.Spacing.sm) {
                             Image(systemName: "clock")
-                                .foregroundStyle(Theme.Colors.textTertiary)
+                                .foregroundStyle(CosmicWidget.Text.tertiary)
                             Text("Created: \(task.createdAt.formatted(date: .abbreviated, time: .shortened))")
-                                .font(Theme.Typography.body)
-                                .foregroundStyle(Theme.Colors.textSecondary)
+                                .font(CosmicWidget.Typography.body)
+                                .foregroundStyle(CosmicWidget.Text.secondary)
                         }
                     }
 
                     Spacer()
                 }
-                .padding(Theme.Spacing.screenPadding)
+                .padding(CosmicWidget.Spacing.screenPadding)
             }
             .navigationTitle("Task Details")
             .navigationBarTitleDisplayMode(.inline)
@@ -1150,7 +1399,7 @@ struct ChatTaskDetailSheet: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 24))
-                            .foregroundStyle(Theme.Colors.textTertiary)
+                            .foregroundStyle(CosmicWidget.Text.tertiary)
                     }
                 }
             }

@@ -88,5 +88,16 @@ struct VeloceShortcuts: AppShortcutsProvider {
             shortTitle: "Progress",
             systemImageName: "chart.bar"
         )
+        // Goal shortcuts
+        AppShortcut(
+            intent: GetTodaysGoalsIntent(),
+            phrases: [
+                "Show my goals in \(.applicationName)",
+                "What goals should I focus on with \(.applicationName)",
+                "Check my progress in \(.applicationName)"
+            ],
+            shortTitle: "Today's Goals",
+            systemImageName: "target"
+        )
     }
 }

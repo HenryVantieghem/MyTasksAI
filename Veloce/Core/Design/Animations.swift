@@ -235,8 +235,8 @@ struct SimpleFloatingModifier: ViewModifier {
     }
 }
 
-// MARK: - Rotation Animation Modifier
-struct ContinuousRotationModifier: ViewModifier {
+// MARK: - Rotation Animation Modifier (Animations version - respects reduce motion)
+struct AccessibleContinuousRotationModifier: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var rotation: Double = 0
 
@@ -296,14 +296,14 @@ extension View {
         modifier(ScaleInModifier(delay: delay))
     }
 
-    /// Floating animation (respects reduce motion)
-    func floating(amplitude: CGFloat = 5, duration: Double = 2) -> some View {
+    /// Floating animation (respects reduce motion) - accessible version
+    func accessibleFloating(amplitude: CGFloat = 5, duration: Double = 2) -> some View {
         modifier(SimpleFloatingModifier(amplitude: amplitude, duration: duration))
     }
 
-    /// Continuous rotation
-    func continuousRotation(duration: Double = 2, clockwise: Bool = true) -> some View {
-        modifier(ContinuousRotationModifier(duration: duration, clockwise: clockwise))
+    /// Continuous rotation (accessible version that respects reduce motion)
+    func accessibleContinuousRotation(duration: Double = 2, clockwise: Bool = true) -> some View {
+        modifier(AccessibleContinuousRotationModifier(duration: duration, clockwise: clockwise))
     }
 }
 
@@ -328,14 +328,14 @@ extension AnyTransition {
     /// Blur transition
     static var blur: AnyTransition {
         .modifier(
-            active: BlurTransitionModifier(isActive: true),
-            identity: BlurTransitionModifier(isActive: false)
+            active: AccessibleBlurTransitionModifier(isActive: true),
+            identity: AccessibleBlurTransitionModifier(isActive: false)
         )
     }
 }
 
-// MARK: - Blur Transition Modifier
-struct BlurTransitionModifier: ViewModifier {
+// MARK: - Blur Transition Modifier (Animations version with isActive parameter)
+struct AccessibleBlurTransitionModifier: ViewModifier {
     let isActive: Bool
 
     func body(content: Content) -> some View {

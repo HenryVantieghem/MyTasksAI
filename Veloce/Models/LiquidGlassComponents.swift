@@ -10,9 +10,8 @@ import SwiftUI
 
 // MARK: - Liquid Glass Container
 
-/// GlassEffectContainer wrapper for multiple glass elements
+/// GlassEffectContainer wrapper for multiple glass elements  
 /// Use when you have multiple glass UI elements near each other for better performance
-@available(iOS 26.0, *)
 struct LiquidGlassContainer<Content: View>: View {
     let spacing: CGFloat
     @ViewBuilder let content: () -> Content
@@ -23,15 +22,47 @@ struct LiquidGlassContainer<Content: View>: View {
     }
     
     var body: some View {
-        GlassEffectContainer(spacing: spacing) {
-            content()
+        if #available(iOS 26.0, *) {
+            GlassEffectContainer(spacing: spacing) {
+                content()
+            }
+        } else {
+            // Fallback: simple Group container
+            Group {
+                content()
+            }
         }
     }
 }
 
-// MARK: - Liquid Glass Constellation Progress
+// MARK: - Liquid Glass Pill
 
-struct GlassConstellationProgress: View {
+/// Compact pill/badge component with glass effect
+struct LiquidGlassPill: View {
+    let text: String
+    var icon: String? = nil
+    var color: Color = LiquidGlassDesignSystem.VibrantAccents.electricCyan
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if let icon = icon {
+                Image(systemName: icon)
+                    .font(.system(size: 10, weight: .semibold))
+            }
+            Text(text)
+                .font(.system(size: 11, weight: .medium))
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(color.opacity(0.15))
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Cosmic Constellation Progress
+
+struct CosmicConstellationProgress: View {
     let steps: [CosmicOnboardingStep]
     let currentStep: CosmicOnboardingStep
     let namespace: Namespace.ID
@@ -234,9 +265,8 @@ struct LiquidGlassBadge: View {
     }
 }
 
-// MARK: - Liquid Glass Toggle Row (iOS 26)
+// MARK: - Liquid Glass Toggle Row
 
-@available(iOS 26.0, *)
 struct LiquidGlassToggleRow: View {
     let title: String
     let subtitle: String?
@@ -400,9 +430,8 @@ struct LiquidGlassEmptyState: View {
     }
 }
 
-// MARK: - Liquid Glass Search Bar (iOS 26)
+// MARK: - Liquid Glass Search Bar
 
-@available(iOS 26.0, *)
 struct LiquidGlassSearchBar: View {
     @Binding var text: String
     let placeholder: String
@@ -440,18 +469,32 @@ struct LiquidGlassSearchBar: View {
         }
         .padding(LiquidGlassDesignSystem.Spacing.md)
         .frame(height: 44)
-        .glassEffect(
-            isFocused ? .regular.tint(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.1)) : .regular,
-            in: RoundedRectangle(cornerRadius: 12)
-        )
+        .background {
+            let shape = RoundedRectangle(cornerRadius: 12)
+            let tintColor = isFocused ? LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.1) : Color.clear
+            
+            if #available(iOS 26.0, *) {
+                Color.clear
+                    .glassEffect(
+                        .regular.tint(tintColor),
+                        in: shape
+                    )
+            } else {
+                ZStack {
+                    shape.fill(.ultraThinMaterial)
+                    if isFocused {
+                        shape.fill(tintColor)
+                    }
+                }
+            }
+        }
         .animation(LiquidGlassDesignSystem.Springs.quick, value: isFocused)
         .animation(LiquidGlassDesignSystem.Springs.quick, value: text.isEmpty)
     }
 }
 
-// MARK: - Liquid Glass Floating Action Button (iOS 26)
+// MARK: - Liquid Glass Floating Action Button
 
-@available(iOS 26.0, *)
 struct LiquidGlassFloatingActionButton: View {
     let icon: String
     let action: () -> Void

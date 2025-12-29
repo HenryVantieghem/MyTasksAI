@@ -2,8 +2,9 @@
 //  StatsContentView.swift
 //  Veloce
 //
-//  Stats segment for Grow tab
-//  Displays velocity score, stats grid, streaks, and level progress
+//  Aurora Design System - Energy Core Dashboard
+//  Stats segment for Grow tab with velocity orb, energy cells, and aurora effects
+//  Orbiting particles, shimmer fills, and prismatic progress rings
 //
 
 import SwiftUI
@@ -22,7 +23,10 @@ struct StatsContentView: View {
     let levelProgress: Double
 
     @Environment(\.responsiveLayout) private var layout
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var hasAnimated = false
+    @State private var orbRotation: Double = 0
+    @State private var glowPulse: CGFloat = 0.5
 
     // Adaptive columns based on device
     private var gridColumns: [GridItem] {
@@ -41,19 +45,19 @@ struct StatsContentView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: layout.spacing * 1.5) {
-                // Velocity Circle (Hero)
-                velocityCircle
+                // Velocity Energy Core (Hero)
+                velocityEnergyCore
                     .padding(.top, layout.spacing)
 
-                // Stats Grid - adaptive columns
-                statsGrid
+                // Energy Stats Grid - adaptive columns
+                energyStatsGrid
 
-                // Weekly Trend
+                // Weekly Trend with aurora styling
                 weeklyTrendCard
 
-                // Streaks Section
+                // Streaks Section with flame effect
                 if streak > 0 {
-                    streaksCard
+                    auroraStreaksCard
                 }
 
                 Spacer(minLength: layout.bottomSafeArea)
@@ -65,10 +69,11 @@ struct StatsContentView: View {
             withAnimation(.easeOut(duration: 0.6).delay(0.2)) {
                 hasAnimated = true
             }
+            startOrbAnimation()
         }
     }
 
-    // MARK: - Velocity Circle
+    // MARK: - Velocity Energy Core
 
     // Responsive circle size based on device
     private var circleSize: CGFloat {
@@ -82,71 +87,143 @@ struct StatsContentView: View {
         }
     }
 
-    private var velocityCircle: some View {
+    private var velocityEnergyCore: some View {
         ZStack {
-            // Outer ring
+            // Outer glow halo
             Circle()
-                .stroke(Color.gray.opacity(0.2), lineWidth: layout.deviceType.isTablet ? 10 : 8)
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Aurora.Colors.electricCyan.opacity(0.2 * glowPulse),
+                            Aurora.Colors.borealisViolet.opacity(0.1 * glowPulse),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: circleSize * 0.4,
+                        endRadius: circleSize * 0.8
+                    )
+                )
+                .frame(width: circleSize * 1.4, height: circleSize * 1.4)
+                .blur(radius: 20)
+
+            // Orbiting particles
+            if !reduceMotion {
+                ForEach(0..<6, id: \.self) { i in
+                    Circle()
+                        .fill(Aurora.Gradients.auroraSpectrum[i % Aurora.Gradients.auroraSpectrum.count])
+                        .frame(width: 6, height: 6)
+                        .blur(radius: 1)
+                        .offset(x: circleSize * 0.55)
+                        .rotationEffect(.degrees(orbRotation + Double(i) * 60))
+                }
+            }
+
+            // Outer ring with aurora gradient
+            Circle()
+                .stroke(Aurora.Colors.voidNebula, lineWidth: layout.deviceType.isTablet ? 10 : 8)
                 .frame(width: circleSize, height: circleSize)
 
-            // Progress ring
+            // Progress ring with prismatic aurora gradient
             Circle()
                 .trim(from: 0, to: hasAnimated ? velocityScore / 100 : 0)
                 .stroke(
-                    LinearGradient(
-                        colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                    AngularGradient(
+                        colors: [
+                            Aurora.Colors.electricCyan,
+                            Aurora.Colors.borealisViolet,
+                            Aurora.Colors.stellarMagenta,
+                            Aurora.Colors.electricCyan
+                        ],
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
                     ),
                     style: StrokeStyle(lineWidth: layout.deviceType.isTablet ? 10 : 8, lineCap: .round)
                 )
                 .frame(width: circleSize, height: circleSize)
                 .rotationEffect(.degrees(-90))
+                .shadow(color: Aurora.Colors.electricCyan.opacity(0.5), radius: 8)
 
-            // Score display - Dynamic Type for accessibility
-            VStack(spacing: 4) {
-                Text("\(Int(velocityScore))")
-                    .dynamicTypeFont(base: layout.deviceType.isTablet ? 56 : 48, weight: .thin, design: .rounded)
-                    .foregroundStyle(.white)
+            // Inner glow
+            Circle()
+                .fill(Aurora.Colors.electricCyan.opacity(0.1))
+                .frame(width: circleSize * 0.7, height: circleSize * 0.7)
+                .blur(radius: 15)
+
+            // Score display - Aurora style with glow
+            VStack(spacing: Aurora.Spacing.xs) {
+                ZStack {
+                    Text("\(Int(velocityScore))")
+                        .font(.system(size: circleSize * 0.35, weight: .bold, design: .rounded))
+                        .foregroundStyle(Aurora.Colors.electricCyan)
+                        .blur(radius: 6)
+                        .opacity(0.5)
+
+                    Text("\(Int(velocityScore))")
+                        .font(.system(size: circleSize * 0.35, weight: .bold, design: .rounded))
+                        .foregroundStyle(Aurora.Colors.textPrimary)
+                }
 
                 Text("VELOCITY")
-                    .dynamicTypeFont(base: 11, weight: .semibold)
-                    .foregroundStyle(.secondary)
+                    .font(Aurora.Typography.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Aurora.Colors.textTertiary)
                     .tracking(2)
             }
         }
     }
 
-    // MARK: - Stats Grid
+    private func startOrbAnimation() {
+        guard !reduceMotion else { return }
 
-    private var statsGrid: some View {
+        // Slow orbital rotation
+        withAnimation(
+            .linear(duration: 20)
+            .repeatForever(autoreverses: false)
+        ) {
+            orbRotation = 360
+        }
+
+        // Glow pulse
+        withAnimation(
+            .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+            .repeatForever(autoreverses: true)
+        ) {
+            glowPulse = 1.0
+        }
+    }
+
+    // MARK: - Energy Stats Grid
+
+    private var energyStatsGrid: some View {
         LazyVGrid(columns: gridColumns, spacing: layout.spacing) {
-            QuickStatCard(
+            // Aurora energy cell stat cards
+            AuroraStatCell(
                 value: "\(tasksCompletedToday)/\(dailyGoal)",
                 label: "Today",
                 progress: Double(tasksCompletedToday) / Double(max(dailyGoal, 1)),
-                color: .green
+                color: Aurora.Colors.prismaticGreen
             )
 
-            QuickStatCard(
+            AuroraStatCell(
                 value: "\(tasksCompleted)",
                 label: "All Time",
                 progress: min(Double(tasksCompleted) / 500, 1.0),
-                color: .blue
+                color: Aurora.Colors.electricCyan
             )
 
-            QuickStatCard(
+            AuroraStatCell(
                 value: String(format: "%.1fh", focusHours),
                 label: "Focus",
                 progress: min(focusHours / 40, 1.0),
-                color: .purple
+                color: Aurora.Colors.borealisViolet
             )
 
-            QuickStatCard(
+            AuroraStatCell(
                 value: "\(Int(completionRate))%",
                 label: "On Time",
                 progress: completionRate / 100,
-                color: .orange
+                color: Aurora.Colors.cosmicGold
             )
         }
     }
@@ -160,66 +237,184 @@ struct StatsContentView: View {
 
     private var weeklyTrendCard: some View {
         VStack(alignment: .leading, spacing: layout.spacing) {
-            Text("Weekly Trend")
-                .dynamicTypeFont(base: 15, weight: .medium)
-                .foregroundStyle(.secondary)
+            HStack {
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Aurora.Colors.borealisViolet)
+
+                Text("Weekly Trend")
+                    .font(Aurora.Typography.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Aurora.Colors.textSecondary)
+            }
 
             HStack(alignment: .bottom, spacing: layout.spacing * 0.75) {
-                ForEach(["M", "T", "W", "T", "F", "S", "S"], id: \.self) { day in
+                ForEach(Array(["M", "T", "W", "T", "F", "S", "S"].enumerated()), id: \.offset) { index, day in
                     VStack(spacing: 6) {
+                        // Aurora gradient bar with glow
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(Theme.Colors.aiPurple)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Aurora.Colors.borealisViolet,
+                                        Aurora.Colors.stellarMagenta.opacity(0.7)
+                                    ],
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                )
+                            )
                             .frame(width: trendBarWidth, height: CGFloat.random(in: 20...80))
+                            .shadow(color: Aurora.Colors.borealisViolet.opacity(0.3), radius: 4, y: 2)
 
                         Text(day)
-                            .dynamicTypeFont(base: 10, weight: .regular)
-                            .foregroundStyle(.secondary)
+                            .font(Aurora.Typography.caption)
+                            .foregroundStyle(Aurora.Colors.textTertiary)
                     }
                 }
             }
             .frame(height: layout.deviceType.isTablet ? 120 : 100, alignment: .bottom)
         }
         .padding(layout.cardPadding)
-        .background(Color(.systemGray6).opacity(0.5), in: RoundedRectangle(cornerRadius: 16))
+        .background(Aurora.Colors.voidNebula, in: RoundedRectangle(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            Aurora.Colors.borealisViolet.opacity(0.2),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        }
     }
 
-    // MARK: - Streaks Card
+    // MARK: - Aurora Streaks Card
 
-    private var streaksCard: some View {
+    private var auroraStreaksCard: some View {
         VStack(spacing: layout.spacing) {
             HStack {
-                Image(systemName: "flame.fill")
-                    .dynamicTypeFont(base: 16, weight: .medium)
-                    .foregroundStyle(.orange)
+                // Flame icon with glow
+                ZStack {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                        .blur(radius: 4)
+                        .opacity(0.6)
+
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Aurora.Colors.cosmicGold, Aurora.Colors.stellarMagenta],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            )
+                        )
+                }
+
                 Text("Current Streak")
-                    .dynamicTypeFont(base: 16, weight: .regular)
+                    .font(Aurora.Typography.body)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
                 Spacer()
-                Text("\(streak) days")
-                    .dynamicTypeFont(base: 16, weight: .semibold)
+
+                // Aurora streak number with glow
+                ZStack {
+                    Text("\(streak)")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                        .blur(radius: 4)
+                        .opacity(0.4)
+
+                    Text("\(streak)")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                }
+
+                Text("days")
+                    .font(Aurora.Typography.caption)
+                    .foregroundStyle(Aurora.Colors.textSecondary)
             }
 
-            Divider()
-                .background(.white.opacity(0.1))
+            // Aurora divider
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.clear,
+                            Aurora.Colors.stellarMagenta.opacity(0.3),
+                            Color.clear
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(height: 1)
 
             HStack {
-                Image(systemName: "trophy.fill")
-                    .dynamicTypeFont(base: 16, weight: .medium)
-                    .foregroundStyle(.yellow)
+                // Trophy icon with glow
+                ZStack {
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                        .blur(radius: 4)
+                        .opacity(0.6)
+
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                }
+
                 Text("Longest Streak")
-                    .dynamicTypeFont(base: 16, weight: .regular)
+                    .font(Aurora.Typography.body)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
                 Spacer()
-                Text("\(longestStreak) days")
-                    .dynamicTypeFont(base: 16, weight: .semibold)
+
+                // Aurora longest streak number with glow
+                ZStack {
+                    Text("\(longestStreak)")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                        .blur(radius: 4)
+                        .opacity(0.4)
+
+                    Text("\(longestStreak)")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                }
+
+                Text("days")
+                    .font(Aurora.Typography.caption)
+                    .foregroundStyle(Aurora.Colors.textSecondary)
             }
         }
         .padding(layout.cardPadding)
-        .background(Color(.systemGray6).opacity(0.5), in: RoundedRectangle(cornerRadius: 16))
+        .background(Aurora.Colors.voidNebula, in: RoundedRectangle(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            Aurora.Colors.stellarMagenta.opacity(0.3),
+                            Aurora.Colors.cosmicGold.opacity(0.2),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        }
+        .shadow(color: Aurora.Colors.stellarMagenta.opacity(0.2), radius: 12, y: 4)
     }
 }
 
-// MARK: - Quick Stat Card
+// MARK: - Aurora Stat Cell
 
-struct QuickStatCard: View {
+struct AuroraStatCell: View {
     let value: String
     let label: String
     let progress: Double
@@ -227,34 +422,73 @@ struct QuickStatCard: View {
 
     @Environment(\.responsiveLayout) private var layout
     @State private var animatedProgress: Double = 0
+    @State private var glowIntensity: CGFloat = 0.3
 
     var body: some View {
         VStack(alignment: .leading, spacing: layout.spacing * 0.75) {
-            Text(value)
-                .dynamicTypeFont(base: 20, weight: .semibold)
-                .foregroundStyle(.white)
+            // Aurora value with glow effect
+            ZStack(alignment: .leading) {
+                Text(value)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(color)
+                    .blur(radius: 6)
+                    .opacity(glowIntensity)
+
+                Text(value)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(color)
+            }
 
             Text(label)
-                .dynamicTypeFont(base: 12, weight: .regular)
-                .foregroundStyle(.secondary)
+                .font(Aurora.Typography.caption)
+                .fontWeight(.medium)
+                .foregroundStyle(Aurora.Colors.textSecondary)
+                .tracking(0.5)
 
+            // Aurora progress bar with shimmer
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(color.opacity(0.3))
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(color.opacity(0.2))
 
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(color)
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(
+                            LinearGradient(
+                                colors: [color, color.opacity(0.7)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
                         .frame(width: geo.size.width * animatedProgress)
+                        .shadow(color: color.opacity(0.5), radius: 4)
                 }
             }
             .frame(height: layout.deviceType.isTablet ? 6 : 4)
         }
         .padding(layout.cardPadding)
-        .background(Color(.systemGray6).opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
+        .background(Aurora.Colors.voidNebula, in: RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [color.opacity(0.3), Color.clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        }
+        .shadow(color: color.opacity(0.15), radius: 8, y: 4)
         .onAppear {
-            withAnimation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.3)) {
+            withAnimation(AuroraMotion.Spring.morph.delay(0.3)) {
                 animatedProgress = progress
+            }
+            // Subtle glow pulse
+            withAnimation(
+                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .repeatForever(autoreverses: true)
+            ) {
+                glowIntensity = 0.5
             }
         }
     }
@@ -262,7 +496,8 @@ struct QuickStatCard: View {
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea()
+        Aurora.Colors.voidCosmos.ignoresSafeArea()
+
         StatsContentView(
             velocityScore: 67,
             streak: 12,
@@ -277,4 +512,5 @@ struct QuickStatCard: View {
             levelProgress: 0.65
         )
     }
+    .preferredColorScheme(.dark)
 }

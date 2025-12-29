@@ -257,7 +257,7 @@ struct MainContainerView: View {
         selectedTask = task
         sheetDetent = .medium
         showTaskDetailSheet = true
-        HapticsService.shared.selectionFeedback()
+        AuroraHaptics.light()
     }
 
     private func setupViewModels() {
@@ -279,8 +279,9 @@ struct TasksPageView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background - Void design system
-                VoidBackground.tasks
+                // Background - Cosmic Widget design system
+                CosmicWidget.Void.cosmos
+                    .ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     // Stats bar
@@ -290,11 +291,11 @@ struct TasksPageView: View {
                         streak: GamificationService.shared.currentStreak,
                         points: GamificationService.shared.totalPoints
                     )
-                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.horizontal, CosmicWidget.Spacing.md)
 
                     // Filter pills
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Theme.Spacing.sm) {
+                        HStack(spacing: CosmicWidget.Spacing.sm) {
                             ForEach(TaskFilter.allCases, id: \.self) { filter in
                                 FilterPill(
                                     title: filter.rawValue,
@@ -306,9 +307,9 @@ struct TasksPageView: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, Theme.Spacing.md)
+                        .padding(.horizontal, CosmicWidget.Spacing.md)
                     }
-                    .padding(.vertical, Theme.Spacing.sm)
+                    .padding(.vertical, CosmicWidget.Spacing.sm)
 
                     // Task list
                     if viewModel.filteredTasks.isEmpty {
@@ -324,7 +325,7 @@ struct TasksPageView: View {
                     HStack {
                         Spacer()
                         addButton
-                            .padding(Theme.Spacing.lg)
+                            .padding(CosmicWidget.Spacing.lg)
                     }
                 }
             }
@@ -375,7 +376,7 @@ struct TasksPageView: View {
             // Clean thin icon
             Image(systemName: emptyStateIcon)
                 .font(.system(size: 64, weight: .thin))
-                .foregroundStyle(Theme.Colors.textTertiary)
+                .foregroundStyle(CosmicWidget.Text.tertiary)
                 .accessibilityHidden(true)
 
             VStack(spacing: 8) {
@@ -385,7 +386,7 @@ struct TasksPageView: View {
 
                 Text(emptyStateSubtitle)
                     .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .foregroundStyle(CosmicWidget.Text.secondary)
                     .multilineTextAlignment(.center)
             }
             .fadeIn(delay: 0.2)
@@ -473,10 +474,10 @@ struct PremiumFAB: View {
                     .stroke(
                         AngularGradient(
                             colors: [
-                                Theme.Colors.accent.opacity(isEmpty ? 0.6 : 0.3),
-                                Theme.Colors.accentSecondary.opacity(isEmpty ? 0.4 : 0.2),
-                                Theme.Colors.aiCyan.opacity(isEmpty ? 0.3 : 0.1),
-                                Theme.Colors.accent.opacity(isEmpty ? 0.6 : 0.3)
+                                CosmicWidget.Widget.violet.opacity(isEmpty ? 0.6 : 0.3),
+                                CosmicWidget.Widget.violetSecondary.opacity(isEmpty ? 0.4 : 0.2),
+                                CosmicWidget.Widget.electricCyan.opacity(isEmpty ? 0.3 : 0.1),
+                                CosmicWidget.Widget.violet.opacity(isEmpty ? 0.6 : 0.3)
                             ],
                             center: .center,
                             angle: .degrees(rotationAngle)
@@ -511,8 +512,8 @@ struct PremiumFAB: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Theme.Colors.accent.opacity(0.9),
-                                Theme.Colors.accentSecondary.opacity(0.7)
+                                CosmicWidget.Widget.violet.opacity(0.9),
+                                CosmicWidget.Widget.violetSecondary.opacity(0.7)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -527,7 +528,7 @@ struct PremiumFAB: View {
                     .rotationEffect(.degrees(isPressed ? 90 : 0))
             }
             .frame(width: 68, height: 68)
-            .shadow(color: Theme.Colors.accent.opacity(0.4), radius: 12, x: 0, y: 6)
+            .shadow(color: CosmicWidget.Widget.violet.opacity(0.4), radius: 12, x: 0, y: 6)
             .scaleEffect(isPressed ? 1.1 : 1.0)
             .offset(y: reduceMotion ? 0 : -floatPhase * 3)
         }
@@ -620,8 +621,8 @@ struct AnimatedEmptyStateIcon: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Theme.Colors.accent.opacity(0.15),
-                            Theme.Colors.accent.opacity(0.05),
+                            CosmicWidget.Widget.violet.opacity(0.15),
+                            CosmicWidget.Widget.violet.opacity(0.05),
                             Color.clear
                         ],
                         center: .center,
@@ -638,7 +639,7 @@ struct AnimatedEmptyStateIcon: View {
                     .font(.system(size: CGFloat([8, 10, 6, 12, 9][index])))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue, Theme.Colors.aiCyan],
+                            colors: [CosmicWidget.Widget.violet, CosmicWidget.Widget.teal, CosmicWidget.Widget.electricCyan],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -655,7 +656,7 @@ struct AnimatedEmptyStateIcon: View {
                 // Icon glow
                 Image(systemName: icon)
                     .font(.system(size: 64, weight: .light))
-                    .foregroundStyle(Theme.Colors.accent.opacity(0.3))
+                    .foregroundStyle(CosmicWidget.Widget.violet.opacity(0.3))
                     .blur(radius: 8)
 
                 // Main icon
@@ -664,8 +665,8 @@ struct AnimatedEmptyStateIcon: View {
                     .foregroundStyle(
                         LinearGradient(
                             colors: [
-                                Theme.Colors.accent,
-                                Theme.Colors.accentSecondary.opacity(0.7)
+                                CosmicWidget.Widget.violet,
+                                CosmicWidget.Widget.violetSecondary.opacity(0.7)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -712,19 +713,19 @@ struct ShimmerCTAButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: Theme.Spacing.sm) {
+            HStack(spacing: CosmicWidget.Spacing.sm) {
                 Image(systemName: "plus.circle.fill")
                 Text(title)
             }
-            .font(Theme.Typography.headline)
+            .font(CosmicWidget.Typography.headline)
             .foregroundStyle(.white)
-            .padding(.horizontal, Theme.Spacing.xl)
-            .padding(.vertical, Theme.Spacing.md)
+            .padding(.horizontal, CosmicWidget.Spacing.xl)
+            .padding(.vertical, CosmicWidget.Spacing.md)
             .background {
                 ZStack {
                     // Base gradient
                     Capsule()
-                        .fill(Theme.Colors.accentGradient)
+                        .fill(CosmicWidget.Widget.violetGradient)
 
                     // Shimmer overlay
                     Capsule()
@@ -744,7 +745,7 @@ struct ShimmerCTAButton: View {
                 }
             }
             .clipShape(Capsule())
-            .shadow(color: Theme.Colors.accent.opacity(0.4), radius: 12, x: 0, y: 4)
+            .shadow(color: CosmicWidget.Widget.violet.opacity(0.4), radius: 12, x: 0, y: 4)
             .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(.plain)
@@ -785,9 +786,9 @@ struct TaskRow: View {
 
     private var priorityColor: Color {
         switch task.priorityEnum {
-        case .high: return Theme.Colors.error
-        case .medium: return Theme.Colors.warning
-        case .low: return Theme.Colors.textTertiary.opacity(0.5)
+        case .high: return CosmicWidget.Semantic.error
+        case .medium: return CosmicWidget.Widget.gold
+        case .low: return CosmicWidget.Text.tertiary.opacity(0.5)
         }
     }
 
@@ -799,12 +800,12 @@ struct TaskRow: View {
         } label: {
             SwiftUI.Circle()
                 .strokeBorder(
-                    task.isCompleted ? Theme.Colors.success : Theme.Colors.textTertiary,
+                    task.isCompleted ? CosmicWidget.Widget.mint : CosmicWidget.Text.tertiary,
                     lineWidth: 1.5
                 )
                 .background(
                     SwiftUI.Circle()
-                        .fill(task.isCompleted ? Theme.Colors.success : Color.clear)
+                        .fill(task.isCompleted ? CosmicWidget.Widget.mint : Color.clear)
                 )
                 .overlay {
                     if task.isCompleted {
@@ -826,8 +827,8 @@ struct TaskRow: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(task.title)
                 .font(.system(size: 17, weight: .regular))
-                .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : .white)
-                .strikethrough(task.isCompleted, color: Theme.Colors.textTertiary)
+                .foregroundStyle(task.isCompleted ? CosmicWidget.Text.tertiary : .white)
+                .strikethrough(task.isCompleted, color: CosmicWidget.Text.tertiary)
                 .lineLimit(2)
 
             if task.starRating > 0 {
@@ -835,7 +836,7 @@ struct TaskRow: View {
                     ForEach(0..<task.starRating, id: \.self) { _ in
                         Image(systemName: "star.fill")
                             .font(.system(size: 12))
-                            .foregroundStyle(Theme.Colors.aiGold)
+                            .foregroundStyle(CosmicWidget.Widget.gold)
                     }
                 }
                 .accessibilityLabel("\(task.starRating) star priority")
@@ -854,10 +855,10 @@ struct TaskRow: View {
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
             }
             .padding(16)
-            .background(Theme.CelestialColors.abyss)
+            .background(CosmicWidget.Void.nebula)
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(TaskRowButtonStyle())
@@ -970,16 +971,16 @@ struct FilterPill: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: Theme.Spacing.xs) {
+            HStack(spacing: CosmicWidget.Spacing.xs) {
                 Image(systemName: icon)
                     .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
                     .symbolEffect(.bounce, value: isSelected)
                 Text(title)
-                    .font(isSelected ? Theme.Typography.caption1Medium : Theme.Typography.caption1)
+                    .font(isSelected ? CosmicWidget.Typography.captionMedium : CosmicWidget.Typography.caption)
             }
-            .padding(.horizontal, Theme.Spacing.md)
-            .padding(.vertical, Theme.Spacing.sm)
-            .foregroundStyle(isSelected ? .white : Theme.Colors.textPrimary)
+            .padding(.horizontal, CosmicWidget.Spacing.md)
+            .padding(.vertical, CosmicWidget.Spacing.sm)
+            .foregroundStyle(isSelected ? .white : CosmicWidget.Text.primary)
             .background {
                 ZStack {
                     if isSelected {
@@ -987,12 +988,12 @@ struct FilterPill: View {
                         Capsule()
                             .fill(
                                 LinearGradient(
-                                    colors: [Theme.Colors.accent, Theme.Colors.accentSecondary],
+                                    colors: [CosmicWidget.Widget.violet, CosmicWidget.Widget.violetSecondary],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .shadow(color: Theme.Colors.accent.opacity(0.4), radius: 8, x: 0, y: 2)
+                            .shadow(color: CosmicWidget.Widget.violet.opacity(0.4), radius: 8, x: 0, y: 2)
                     } else {
                         // Unselected: glass effect
                         Capsule()
@@ -1056,7 +1057,7 @@ struct MainStatsBar: View {
     }
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
+        HStack(spacing: CosmicWidget.Spacing.sm) {
             // Today's Progress with Ring
             TodayProgressStat(
                 completed: animatedCompleted,
@@ -1067,7 +1068,7 @@ struct MainStatsBar: View {
 
             // Divider
             Rectangle()
-                .fill(Theme.Colors.glassBorder)
+                .fill(Color.white.opacity(0.1))
                 .frame(width: 1, height: 40)
 
             // Streak with Flame
@@ -1075,18 +1076,18 @@ struct MainStatsBar: View {
 
             // Divider
             Rectangle()
-                .fill(Theme.Colors.glassBorder)
+                .fill(Color.white.opacity(0.1))
                 .frame(width: 1, height: 40)
 
             // Points
             PointsStat(points: animatedPoints)
         }
-        .padding(Theme.Spacing.md)
+        .padding(CosmicWidget.Spacing.md)
         .background {
-            RoundedRectangle(cornerRadius: Theme.Radius.card)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
                 .overlay(
-                    RoundedRectangle(cornerRadius: Theme.Radius.card)
+                    RoundedRectangle(cornerRadius: 16)
                         .stroke(
                             LinearGradient(
                                 colors: [
@@ -1173,12 +1174,12 @@ struct TodayProgressStat: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
+        HStack(spacing: CosmicWidget.Spacing.sm) {
             // Progress Ring
             ZStack {
                 // Track
                 SwiftUI.Circle()
-                    .stroke(Theme.Colors.textTertiary.opacity(0.2), lineWidth: 3)
+                    .stroke(CosmicWidget.Text.tertiary.opacity(0.2), lineWidth: 3)
                     .frame(width: 36, height: 36)
 
                 // Progress
@@ -1186,8 +1187,8 @@ struct TodayProgressStat: View {
                     .trim(from: 0, to: ringProgress)
                     .stroke(
                         isComplete ?
-                        LinearGradient(colors: [Theme.Colors.success, Theme.Colors.aiCyan], startPoint: .topLeading, endPoint: .bottomTrailing) :
-                            LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.accentSecondary], startPoint: .topLeading, endPoint: .bottomTrailing),
+                        LinearGradient(colors: [CosmicWidget.Widget.mint, CosmicWidget.Widget.electricCyan], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                            LinearGradient(colors: [CosmicWidget.Widget.violet, CosmicWidget.Widget.violetSecondary], startPoint: .topLeading, endPoint: .bottomTrailing),
                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                     )
                     .frame(width: 36, height: 36)
@@ -1197,23 +1198,23 @@ struct TodayProgressStat: View {
                 if isComplete {
                     Image(systemName: "checkmark")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Theme.Colors.success)
+                        .foregroundStyle(CosmicWidget.Widget.mint)
                         .scaleEffect(celebratePulse ? 1.2 : 1.0)
                 } else {
                     Image(systemName: "checkmark.circle")
                         .font(.system(size: 14))
-                        .foregroundStyle(Theme.Colors.accent)
+                        .foregroundStyle(CosmicWidget.Widget.violet)
                 }
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(completed)/\(total)")
-                    .font(Theme.Typography.headline)
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .font(CosmicWidget.Typography.headline)
+                    .foregroundStyle(CosmicWidget.Text.primary)
                     .contentTransition(.numericText())
                 Text("Today")
-                    .font(Theme.Typography.caption2)
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .font(CosmicWidget.Typography.caption2)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
             }
         }
         .frame(maxWidth: .infinity)
@@ -1253,13 +1254,13 @@ struct StreakStat: View {
     private var isOnFire: Bool { streak >= 3 }
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
+        HStack(spacing: CosmicWidget.Spacing.sm) {
             ZStack {
                 // Glow effect for active streaks
                 if isOnFire {
                     Image(systemName: "flame.fill")
                         .font(.system(size: 20))
-                        .foregroundStyle(Theme.Colors.fire.opacity(0.4))
+                        .foregroundStyle(CosmicWidget.Widget.sunsetOrange.opacity(0.4))
                         .blur(radius: 6)
                         .scaleEffect(1.0 + glowIntensity * 0.3)
                 }
@@ -1268,20 +1269,20 @@ struct StreakStat: View {
                     .font(.system(size: 20))
                     .foregroundStyle(
                         isOnFire ?
-                        LinearGradient(colors: [Theme.Colors.fire, Theme.Colors.streakOrange, Theme.Colors.warning], startPoint: .bottom, endPoint: .top) :
-                            LinearGradient(colors: [Theme.Colors.textTertiary], startPoint: .bottom, endPoint: .top)
+                        LinearGradient(colors: [CosmicWidget.Widget.sunsetOrange, CosmicWidget.Widget.sunsetOrange, CosmicWidget.Widget.gold], startPoint: .bottom, endPoint: .top) :
+                            LinearGradient(colors: [CosmicWidget.Text.tertiary], startPoint: .bottom, endPoint: .top)
                     )
                     .rotationEffect(.degrees(flameWiggle))
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(streak)")
-                    .font(Theme.Typography.headline)
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .font(CosmicWidget.Typography.headline)
+                    .foregroundStyle(CosmicWidget.Text.primary)
                     .contentTransition(.numericText())
                 Text(streak == 1 ? "Day" : "Days")
-                    .font(Theme.Typography.caption2)
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .font(CosmicWidget.Typography.caption2)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
             }
         }
         .frame(maxWidth: .infinity)
@@ -1308,19 +1309,19 @@ struct PointsStat: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.sm) {
+        HStack(spacing: CosmicWidget.Spacing.sm) {
             ZStack {
                 // Background glow
                 Image(systemName: "star.fill")
                     .font(.system(size: 18))
-                    .foregroundStyle(Theme.Colors.xp.opacity(0.3))
+                    .foregroundStyle(CosmicWidget.Widget.gold.opacity(0.3))
                     .blur(radius: 4)
 
                 Image(systemName: "star.fill")
                     .font(.system(size: 18))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Theme.Colors.gold, Theme.Colors.xp],
+                            colors: [CosmicWidget.Widget.gold, CosmicWidget.Widget.gold],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -1330,12 +1331,12 @@ struct PointsStat: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(points)")
-                    .font(Theme.Typography.headline)
-                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .font(CosmicWidget.Typography.headline)
+                    .foregroundStyle(CosmicWidget.Text.primary)
                     .contentTransition(.numericText())
                 Text("XP")
-                    .font(Theme.Typography.caption2)
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .font(CosmicWidget.Typography.caption2)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
             }
         }
         .frame(maxWidth: .infinity)
@@ -1358,19 +1359,19 @@ struct AddTaskSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: Theme.Spacing.lg) {
+            VStack(spacing: CosmicWidget.Spacing.lg) {
                 TextField("What do you need to do?", text: $title, axis: .vertical)
-                    .font(Theme.Typography.body)
+                    .font(CosmicWidget.Typography.body)
                     .focused($isFocused)
-                    .padding(Theme.Spacing.md)
-                    .background(Theme.Colors.glassBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.card))
-                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(CosmicWidget.Spacing.md)
+                    .background(CosmicWidget.Void.nebula)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .padding(.horizontal, CosmicWidget.Spacing.md)
 
                 Spacer()
             }
-            .padding(.top, Theme.Spacing.lg)
-            .background(Theme.Colors.background.ignoresSafeArea())
+            .padding(.top, CosmicWidget.Spacing.lg)
+            .background(CosmicWidget.Void.cosmos.ignoresSafeArea())
             .navigationTitle("New Task")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -1405,8 +1406,9 @@ struct CalendarPageView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background - Void design system
-                VoidBackground.calendar
+                // Background - Cosmic Widget design system
+                CosmicWidget.Void.cosmos
+                    .ignoresSafeArea()
 
                 VStack {
                     if !viewModel.isAuthorized {
@@ -1424,7 +1426,7 @@ struct CalendarPageView: View {
         VStack(spacing: 24) {
             Image(systemName: "calendar.badge.exclamationmark")
                 .font(.system(size: 64, weight: .thin))
-                .foregroundStyle(Theme.Colors.textTertiary)
+                .foregroundStyle(CosmicWidget.Text.tertiary)
 
             VStack(spacing: 8) {
                 Text("Calendar Access Required")
@@ -1433,7 +1435,7 @@ struct CalendarPageView: View {
 
                 Text("Enable calendar access to sync your tasks with your schedule.")
                     .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .foregroundStyle(CosmicWidget.Text.secondary)
                     .multilineTextAlignment(.center)
             }
 
@@ -1449,7 +1451,7 @@ struct CalendarPageView: View {
 
     private var calendarContent: some View {
         ScrollView {
-            VStack(spacing: Theme.Spacing.md) {
+            VStack(spacing: CosmicWidget.Spacing.md) {
                 // Calendar header
                 HStack {
                     Button {
@@ -1458,7 +1460,7 @@ struct CalendarPageView: View {
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(Theme.Colors.accent)
+                            .foregroundStyle(CosmicWidget.Widget.violet)
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                     }
@@ -1468,7 +1470,7 @@ struct CalendarPageView: View {
                     Spacer()
 
                     Text(viewModel.selectedDate, format: .dateTime.month().year())
-                        .font(Theme.Typography.headline)
+                        .font(CosmicWidget.Typography.headline)
                         .accessibilityAddTraits(.isHeader)
 
                     Spacer()
@@ -1479,17 +1481,17 @@ struct CalendarPageView: View {
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(Theme.Colors.accent)
+                            .foregroundStyle(CosmicWidget.Widget.violet)
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(ScaleButtonStyle())
                     .accessibilityLabel("Next month")
                 }
-                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.horizontal, CosmicWidget.Spacing.md)
 
                 // Week days
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: Theme.Spacing.sm) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: CosmicWidget.Spacing.sm) {
                     ForEach(viewModel.weekDays, id: \.self) { date in
                         CalendarDayCell(
                             date: date,
@@ -1500,23 +1502,23 @@ struct CalendarPageView: View {
                         }
                     }
                 }
-                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.horizontal, CosmicWidget.Spacing.md)
 
                 // Day's tasks
-                VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+                VStack(alignment: .leading, spacing: CosmicWidget.Spacing.sm) {
                     Text("Scheduled Tasks")
-                        .font(Theme.Typography.headline)
-                        .padding(.horizontal, Theme.Spacing.md)
+                        .font(CosmicWidget.Typography.headline)
+                        .padding(.horizontal, CosmicWidget.Spacing.md)
 
                     if viewModel.scheduledTasks.isEmpty {
                         Text("No tasks scheduled")
-                            .font(Theme.Typography.body)
-                            .foregroundStyle(Theme.Colors.textTertiary)
-                            .padding(Theme.Spacing.md)
+                            .font(CosmicWidget.Typography.body)
+                            .foregroundStyle(CosmicWidget.Text.tertiary)
+                            .padding(CosmicWidget.Spacing.md)
                     } else {
                         ForEach(viewModel.scheduledTasks) { task in
                             ScheduledTaskRow(task: task)
-                                .padding(.horizontal, Theme.Spacing.md)
+                                .padding(.horizontal, CosmicWidget.Spacing.md)
                         }
                     }
                 }
@@ -1545,14 +1547,14 @@ struct CalendarDayCell: View {
         } label: {
             VStack(spacing: 4) {
                 Text(date, format: .dateTime.weekday(.short))
-                    .font(Theme.Typography.caption2)
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .font(CosmicWidget.Typography.caption2)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
 
                 ZStack {
                     // Glow for today
                     if isToday && !isSelected {
                         SwiftUI.Circle()
-                            .fill(Theme.Colors.accent.opacity(0.2))
+                            .fill(CosmicWidget.Widget.violet.opacity(0.2))
                             .frame(width: 40, height: 40)
                             .blur(radius: 4)
                             .scaleEffect(todayPulse ? 1.1 : 1.0)
@@ -1562,7 +1564,7 @@ struct CalendarDayCell: View {
                     SwiftUI.Circle()
                         .fill(
                             isSelected ?
-                            LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.accentSecondary], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                            LinearGradient(colors: [CosmicWidget.Widget.violet, CosmicWidget.Widget.violetSecondary], startPoint: .topLeading, endPoint: .bottomTrailing) :
                                 LinearGradient(colors: [Color.clear], startPoint: .top, endPoint: .bottom)
                         )
                         .frame(width: 36, height: 36)
@@ -1579,7 +1581,7 @@ struct CalendarDayCell: View {
                         SwiftUI.Circle()
                             .stroke(
                                 LinearGradient(
-                                    colors: [Theme.Colors.accent, Theme.Colors.accentSecondary],
+                                    colors: [CosmicWidget.Widget.violet, CosmicWidget.Widget.violetSecondary],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -1590,16 +1592,16 @@ struct CalendarDayCell: View {
 
                     // Day number
                     Text(date, format: .dateTime.day())
-                        .font(isToday || isSelected ? Theme.Typography.bodyBold : Theme.Typography.body)
-                        .foregroundStyle(isSelected ? .white : (isToday ? Theme.Colors.accent : Theme.Colors.textPrimary))
+                        .font(isToday || isSelected ? CosmicWidget.Typography.bodyBold : CosmicWidget.Typography.body)
+                        .foregroundStyle(isSelected ? .white : (isToday ? CosmicWidget.Widget.violet : CosmicWidget.Text.primary))
                 }
-                .shadow(color: isSelected ? Theme.Colors.accent.opacity(0.3) : .clear, radius: 6, x: 0, y: 2)
+                .shadow(color: isSelected ? CosmicWidget.Widget.violet.opacity(0.3) : .clear, radius: 6, x: 0, y: 2)
 
                 // Event indicator
                 if hasEvents {
                     HStack(spacing: 2) {
                         SwiftUI.Circle()
-                            .fill(isSelected ? .white : Theme.Colors.accent)
+                            .fill(isSelected ? .white : CosmicWidget.Widget.violet)
                             .frame(width: 5, height: 5)
                     }
                     .transition(.scale.combined(with: .opacity))
@@ -1650,36 +1652,36 @@ struct ScheduledTaskRow: View {
     let task: TaskItem
 
     var body: some View {
-        HStack(spacing: Theme.Spacing.md) {
+        HStack(spacing: CosmicWidget.Spacing.md) {
             // Time pill
             if let time = task.scheduledTime {
                 Text(time, format: .dateTime.hour().minute())
-                    .font(Theme.Typography.caption1Medium)
-                    .foregroundStyle(Theme.Colors.accent)
+                    .font(CosmicWidget.Typography.captionMedium)
+                    .foregroundStyle(CosmicWidget.Widget.violet)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Theme.Colors.accent.opacity(0.1))
+                    .background(CosmicWidget.Widget.violet.opacity(0.1))
                     .clipShape(Capsule())
             }
 
             Text(task.title)
-                .font(Theme.Typography.body)
-                .foregroundStyle(Theme.Colors.textPrimary)
+                .font(CosmicWidget.Typography.body)
+                .foregroundStyle(CosmicWidget.Text.primary)
                 .lineLimit(1)
 
             Spacer()
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(Theme.Colors.textTertiary.opacity(0.5))
+                .foregroundStyle(CosmicWidget.Text.tertiary.opacity(0.5))
         }
-        .padding(Theme.Spacing.md)
+        .padding(CosmicWidget.Spacing.md)
         .background {
-            RoundedRectangle(cornerRadius: Theme.Radius.card)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
                 .overlay(
-                    RoundedRectangle(cornerRadius: Theme.Radius.card)
-                        .stroke(Theme.Colors.glassBorder, lineWidth: 0.5)
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
                 )
         }
         .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
@@ -1697,8 +1699,9 @@ struct GoalsPageView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background - Void design system
-                VoidBackground(glowPosition: .center, glowColor: Theme.Colors.aiGold, starCount: VoidDesign.Stars.countSparse)
+                // Background - Cosmic Widget design system
+                CosmicWidget.Void.cosmos
+                    .ignoresSafeArea()
 
                 if goals.isEmpty {
                     emptyState
@@ -1720,7 +1723,7 @@ struct GoalsPageView: View {
         VStack(spacing: 24) {
             Image(systemName: "target")
                 .font(.system(size: 64, weight: .thin))
-                .foregroundStyle(Theme.Colors.textTertiary)
+                .foregroundStyle(CosmicWidget.Text.tertiary)
                 .accessibilityHidden(true)
 
             VStack(spacing: 8) {
@@ -1730,7 +1733,7 @@ struct GoalsPageView: View {
 
                 Text("Set SMART goals to stay focused on what matters.")
                     .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .foregroundStyle(CosmicWidget.Text.secondary)
                     .multilineTextAlignment(.center)
             }
 
@@ -1775,21 +1778,21 @@ struct GoalRow: View {
 
     private var progressColor: LinearGradient {
         if goal.isCompleted {
-            return LinearGradient(colors: [Theme.Colors.success, Theme.Colors.aiCyan], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [CosmicWidget.Widget.mint, CosmicWidget.Widget.electricCyan], startPoint: .leading, endPoint: .trailing)
         } else if goal.progress >= 0.7 {
-            return LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.success], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [CosmicWidget.Widget.violet, CosmicWidget.Widget.mint], startPoint: .leading, endPoint: .trailing)
         } else {
-            return LinearGradient(colors: [Theme.Colors.accent, Theme.Colors.accentSecondary], startPoint: .leading, endPoint: .trailing)
+            return LinearGradient(colors: [CosmicWidget.Widget.violet, CosmicWidget.Widget.violetSecondary], startPoint: .leading, endPoint: .trailing)
         }
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: CosmicWidget.Spacing.sm) {
             HStack {
                 Text(goal.title)
-                    .font(Theme.Typography.headline)
-                    .foregroundStyle(goal.isCompleted ? Theme.Colors.textTertiary : Theme.Colors.textPrimary)
-                    .strikethrough(goal.isCompleted, color: Theme.Colors.textTertiary)
+                    .font(CosmicWidget.Typography.headline)
+                    .foregroundStyle(goal.isCompleted ? CosmicWidget.Text.tertiary : CosmicWidget.Text.primary)
+                    .strikethrough(goal.isCompleted, color: CosmicWidget.Text.tertiary)
 
                 Spacer()
 
@@ -1798,14 +1801,14 @@ struct GoalRow: View {
                         // Glow
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 22))
-                            .foregroundStyle(Theme.Colors.success.opacity(0.3))
+                            .foregroundStyle(CosmicWidget.Widget.mint.opacity(0.3))
                             .blur(radius: 4)
 
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 22))
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Theme.Colors.success, Theme.Colors.aiCyan],
+                                    colors: [CosmicWidget.Widget.mint, CosmicWidget.Widget.electricCyan],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
@@ -1816,7 +1819,7 @@ struct GoalRow: View {
                     // Progress ring
                     ZStack {
                         SwiftUI.Circle()
-                            .stroke(Theme.Colors.textTertiary.opacity(0.2), lineWidth: 2)
+                            .stroke(CosmicWidget.Text.tertiary.opacity(0.2), lineWidth: 2)
                             .frame(width: 24, height: 24)
 
                         SwiftUI.Circle()
@@ -1827,15 +1830,15 @@ struct GoalRow: View {
 
                         Text("\(Int(animatedProgress * 100))")
                             .font(.system(size: 8, weight: .bold, design: .default))
-                            .foregroundStyle(Theme.Colors.textTertiary)
+                            .foregroundStyle(CosmicWidget.Text.tertiary)
                     }
                 }
             }
 
             if let description = goal.goalDescription {
                 Text(description)
-                    .font(Theme.Typography.caption1)
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .font(CosmicWidget.Typography.caption)
+                    .foregroundStyle(CosmicWidget.Text.secondary)
                     .lineLimit(2)
             }
 
@@ -1844,22 +1847,22 @@ struct GoalRow: View {
                 ZStack(alignment: .leading) {
                     // Track
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Theme.Colors.textTertiary.opacity(0.15))
+                        .fill(CosmicWidget.Text.tertiary.opacity(0.15))
                         .frame(height: 6)
 
                     // Progress fill with gradient
                     RoundedRectangle(cornerRadius: 3)
                         .fill(progressColor)
                         .frame(width: geo.size.width * animatedProgress, height: 6)
-                        .shadow(color: Theme.Colors.accent.opacity(0.3), radius: 4, x: 0, y: 0)
+                        .shadow(color: CosmicWidget.Widget.violet.opacity(0.3), radius: 4, x: 0, y: 0)
                 }
             }
             .frame(height: 6)
 
             HStack {
                 Text("\(Int(animatedProgress * 100))% complete")
-                    .font(Theme.Typography.caption2)
-                    .foregroundStyle(Theme.Colors.textTertiary)
+                    .font(CosmicWidget.Typography.caption2)
+                    .foregroundStyle(CosmicWidget.Text.tertiary)
                     .contentTransition(.numericText())
 
                 Spacer()
@@ -1869,21 +1872,21 @@ struct GoalRow: View {
                         Image(systemName: "calendar")
                             .font(.system(size: 10))
                         Text(targetDate, format: .dateTime.month().day())
-                            .font(Theme.Typography.caption2)
+                            .font(CosmicWidget.Typography.caption2)
                     }
-                    .foregroundStyle(goal.isOverdue ? Theme.Colors.error : Theme.Colors.textTertiary)
+                    .foregroundStyle(goal.isOverdue ? CosmicWidget.Semantic.error : CosmicWidget.Text.tertiary)
                 }
             }
         }
-        .padding(Theme.Spacing.md)
+        .padding(CosmicWidget.Spacing.md)
         .background {
-            RoundedRectangle(cornerRadius: Theme.Radius.card)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
                 .overlay(
-                    RoundedRectangle(cornerRadius: Theme.Radius.card)
+                    RoundedRectangle(cornerRadius: 16)
                         .stroke(
                             goal.isCompleted ?
-                            LinearGradient(colors: [Theme.Colors.success.opacity(0.3), Theme.Colors.success.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                            LinearGradient(colors: [CosmicWidget.Widget.mint.opacity(0.3), CosmicWidget.Widget.mint.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing) :
                                 LinearGradient(colors: [.white.opacity(0.2), .white.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing),
                             lineWidth: 0.5
                         )
@@ -1940,17 +1943,17 @@ struct SettingsPageView: View {
                     HStack {
                         Image(systemName: "person.circle.fill")
                             .font(.system(size: 50))
-                            .foregroundStyle(Theme.Colors.accent)
+                            .foregroundStyle(CosmicWidget.Widget.violet)
 
                         VStack(alignment: .leading) {
                             Text(viewModel.fullName.isEmpty ? "Your Name" : viewModel.fullName)
-                                .font(Theme.Typography.headline)
+                                .font(CosmicWidget.Typography.headline)
                             Text(viewModel.email)
-                                .font(Theme.Typography.caption1)
-                                .foregroundStyle(Theme.Colors.textSecondary)
+                                .font(CosmicWidget.Typography.caption)
+                                .foregroundStyle(CosmicWidget.Text.secondary)
                         }
                     }
-                    .padding(.vertical, Theme.Spacing.sm)
+                    .padding(.vertical, CosmicWidget.Spacing.sm)
                 }
 
                 // Goals Section
@@ -1978,7 +1981,7 @@ struct SettingsPageView: View {
                         Text("Status")
                         Spacer()
                         Text(viewModel.isProUser ? "Pro" : "Free")
-                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .foregroundStyle(CosmicWidget.Text.secondary)
                     }
 
                     if !viewModel.isProUser {

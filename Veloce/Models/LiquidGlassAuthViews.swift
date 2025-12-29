@@ -44,9 +44,9 @@ struct LiquidGlassSignInView: View {
                         VStack(spacing: 20) {
                             // Email field
                             LiquidGlassTextField(
-                                placeholder: "Email",
                                 text: $email,
-                                isFocused: $focusedField,
+                                placeholder: "Email",
+                                icon: "envelope",
                                 onSubmit: {
                                     focusedField = .password
                                 }
@@ -55,12 +55,12 @@ struct LiquidGlassSignInView: View {
                             .keyboardType(.emailAddress)
                             .autocapitalization(.none)
                             .focused($focusedField, equals: .email)
-                            
+
                             // Password field
                             LiquidGlassSecureField(
                                 placeholder: "Password",
                                 text: $password,
-                                isFocused: $focusedField == .password,
+                                isFocused: focusedField == .email,
                                 onSubmit: {
                                     Task { await signIn() }
                                 }
@@ -237,8 +237,8 @@ struct LiquidGlassSignInView: View {
             showError = true
         }
         
-        HapticsService.shared.errorFeedback()
-        
+        HapticsService.shared.error()
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
             withAnimation(LiquidGlassDesignSystem.Springs.ui) {
                 showError = false
@@ -285,9 +285,9 @@ struct LiquidGlassSignUpView: View {
                         VStack(spacing: 20) {
                             // Name field
                             LiquidGlassTextField(
-                                placeholder: "Full Name",
                                 text: $name,
-                                isFocused: $focusedField,
+                                placeholder: "Full Name",
+                                icon: "person",
                                 onSubmit: {
                                     focusedField = .email
                                 }
@@ -297,9 +297,9 @@ struct LiquidGlassSignUpView: View {
                             
                             // Email field
                             LiquidGlassTextField(
-                                placeholder: "Email",
                                 text: $email,
-                                isFocused: $focusedField,
+                                placeholder: "Email",
+                                icon: "envelope",
                                 onSubmit: {
                                     focusedField = .password
                                 }
@@ -308,12 +308,12 @@ struct LiquidGlassSignUpView: View {
                             .keyboardType(.emailAddress)
                             .autocapitalization(.none)
                             .focused($focusedField, equals: .email)
-                            
+
                             // Password field
                             LiquidGlassSecureField(
                                 placeholder: "Password",
                                 text: $password,
-                                isFocused: focusedField == .password,
+                                isFocused: focusedField == .email,
                                 onSubmit: {
                                     focusedField = .confirmPassword
                                 }
@@ -338,7 +338,7 @@ struct LiquidGlassSignUpView: View {
                                 title: "Accept Terms & Privacy",
                                 subtitle: "By creating an account, you agree to our Terms of Service and Privacy Policy",
                                 icon: "checkmark.shield.fill",
-                                iconColor: LiquidGlassDesignSystem.VibrantAccents.auroraGreen,
+                                color: LiquidGlassDesignSystem.VibrantAccents.auroraGreen,
                                 isOn: $acceptedTerms
                             )
                             
@@ -530,8 +530,8 @@ struct LiquidGlassSignUpView: View {
             showError = true
         }
         
-        HapticsService.shared.errorFeedback()
-        
+        HapticsService.shared.error()
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
             withAnimation(LiquidGlassDesignSystem.Springs.ui) {
                 showError = false
@@ -616,7 +616,7 @@ struct LiquidGlassSecureField: View {
 
 struct CosmicStarField: View {
     let starCount: Int
-    @State private var stars: [CosmicStar] = []
+    @State private var stars: [AuthCosmicStar] = []
     
     var body: some View {
         Canvas { context, size in
@@ -635,7 +635,7 @@ struct CosmicStarField: View {
             }
         }
         .onAppear {
-            stars = CosmicStar.generateField(
+            stars = AuthCosmicStar.generateField(
                 count: starCount,
                 in: CGSize(width: 400, height: 900)
             )
@@ -643,18 +643,18 @@ struct CosmicStarField: View {
     }
 }
 
-// MARK: - Cosmic Star Model
+// MARK: - Auth Cosmic Star Model
 
-struct CosmicStar: Identifiable {
+struct AuthCosmicStar: Identifiable {
     let id = UUID()
     let position: CGPoint
     let size: CGFloat
     let baseOpacity: Double
     let twinkleDelay: Double
-    
-    static func generateField(count: Int, in size: CGSize) -> [CosmicStar] {
+
+    static func generateField(count: Int, in size: CGSize) -> [AuthCosmicStar] {
         (0..<count).map { _ in
-            CosmicStar(
+            AuthCosmicStar(
                 position: CGPoint(
                     x: CGFloat.random(in: 0...size.width),
                     y: CGFloat.random(in: 0...size.height)

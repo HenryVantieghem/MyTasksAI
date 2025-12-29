@@ -2,8 +2,9 @@
 //  GoalsContentView.swift
 //  Veloce
 //
-//  Goals segment for Grow tab - Premium Redesign
-//  Comprehensive goal tracking with beautiful visualizations
+//  Aurora Design System - Constellation Progress
+//  Goals segment for Grow tab with mini galaxy cards and progress rings
+//  Milestones orbit as stars, 100% completion triggers golden nova burst
 //
 
 import SwiftUI
@@ -93,44 +94,54 @@ struct GoalsContentView: View {
 
     private var headerSection: some View {
         VStack(spacing: layout.spacing * 1.25) {
-            // Title row
+            // Title row with Aurora styling
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Your Goals")
-                        .font(.system(size: 34, weight: .heavy, design: .rounded))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.white, .white.opacity(0.9)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
+                    // Aurora glow title
+                    ZStack(alignment: .leading) {
+                        Text("Your Goals")
+                            .font(.system(size: 34, weight: .heavy, design: .rounded))
+                            .foregroundStyle(Aurora.Colors.prismaticGreen)
+                            .blur(radius: 8)
+                            .opacity(0.4)
+
+                        Text("Your Goals")
+                            .font(.system(size: 34, weight: .heavy, design: .rounded))
+                            .foregroundStyle(Aurora.Colors.textPrimary)
+                    }
 
                     Text(headerSubtitle)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .font(Aurora.Typography.body)
+                        .foregroundStyle(Aurora.Colors.textSecondary)
                 }
 
                 Spacer()
 
                 Button {
                     showGoalCreation = true
+                    AuroraHaptics.light()
                 } label: {
                     ZStack {
+                        // Glow halo
+                        Circle()
+                            .fill(Aurora.Colors.prismaticGreen)
+                            .frame(width: addButtonSize, height: addButtonSize)
+                            .blur(radius: 12)
+                            .opacity(0.4)
+
                         Circle()
                             .fill(
                                 LinearGradient(
                                     colors: [
-                                        Theme.Colors.aiPurple,
-                                        Theme.Colors.aiPurple.opacity(0.8),
-                                        Theme.Colors.aiBlue.opacity(0.6)
+                                        Aurora.Colors.prismaticGreen,
+                                        Aurora.Colors.electricCyan.opacity(0.8)
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
                             .frame(width: addButtonSize, height: addButtonSize)
-                            .shadow(color: Theme.Colors.aiPurple.opacity(0.5), radius: 16, y: 6)
+                            .shadow(color: Aurora.Colors.prismaticGreen.opacity(0.5), radius: 16, y: 6)
 
                         Image(systemName: "plus")
                             .font(.system(size: 20, weight: .bold))
@@ -141,7 +152,6 @@ struct GoalsContentView: View {
                 .iPadHoverEffect(.lift)
             }
             .padding(.top, layout.spacing)
-            .glassEffect(.regular.tint(Theme.Colors.aiPurple).interactive(), in: .rect(cornerRadius: 20))
 
             // Stats cards
             if !goals.isEmpty {
@@ -165,29 +175,27 @@ struct GoalsContentView: View {
     }
 
     private var statsRow: some View {
-        GlassEffectContainer(spacing: 12) {
-            HStack(spacing: 12) {
-                GoalStatCard(
-                    icon: "flame.fill",
-                    value: "\(activeCount)",
-                    label: "Active",
-                    color: Theme.Colors.aiCyan
-                )
-                
-                GoalStatCard(
-                    icon: "checkmark.seal.fill",
-                    value: "\(completedCount)",
-                    label: "Completed",
-                    color: Theme.Colors.success
-                )
-                
-                GoalStatCard(
-                    icon: "chart.line.uptrend.xyaxis",
-                    value: "\(Int(averageProgress * 100))%",
-                    label: "Progress",
-                    color: Theme.Colors.aiPurple
-                )
-            }
+        HStack(spacing: 12) {
+            AuroraGoalStatCard(
+                icon: "flame.fill",
+                value: "\(activeCount)",
+                label: "Active",
+                iconColor: Aurora.Colors.electricCyan
+            )
+
+            AuroraGoalStatCard(
+                icon: "checkmark.seal.fill",
+                value: "\(completedCount)",
+                label: "Completed",
+                iconColor: Aurora.Colors.prismaticGreen
+            )
+
+            AuroraGoalStatCard(
+                icon: "chart.line.uptrend.xyaxis",
+                value: "\(Int(averageProgress * 100))%",
+                label: "Progress",
+                iconColor: Aurora.Colors.borealisViolet
+            )
         }
     }
 
@@ -319,26 +327,26 @@ struct GoalsContentView: View {
 
     private var emptyState: some View {
         VStack(spacing: 24) {
-            // Animated illustration
+            // Aurora constellation illustration
             ZStack {
-                // Outer glow rings
+                // Outer glow rings with aurora colors
                 ForEach(0..<3, id: \.self) { index in
                     Circle()
                         .stroke(
-                            Theme.Colors.aiPurple.opacity(0.1 - Double(index) * 0.03),
+                            Aurora.Colors.prismaticGreen.opacity(0.15 - Double(index) * 0.04),
                             lineWidth: 1
                         )
                         .frame(width: 120 + CGFloat(index) * 40, height: 120 + CGFloat(index) * 40)
                 }
 
-                // Central orb
+                // Central aurora orb
                 ZStack {
                     Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Theme.Colors.aiPurple.opacity(0.3),
-                                    Theme.Colors.aiPurple.opacity(0.1),
+                                    Aurora.Colors.prismaticGreen.opacity(0.3),
+                                    Aurora.Colors.electricCyan.opacity(0.15),
                                     .clear
                                 ],
                                 center: .center,
@@ -350,18 +358,18 @@ struct GoalsContentView: View {
 
                     Image(systemName: selectedFilter == .completed ? "checkmark.seal" : "leaf.fill")
                         .font(.system(size: 40))
-                        .foregroundStyle(Theme.Colors.aiPurple.opacity(0.6))
+                        .foregroundStyle(Aurora.Colors.prismaticGreen.opacity(0.7))
                 }
             }
 
             VStack(spacing: 8) {
                 Text(emptyStateTitle)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .font(Aurora.Typography.title3)
+                    .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text(emptyStateSubtitle)
-                    .font(.system(size: 14))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .font(Aurora.Typography.callout)
+                    .foregroundStyle(Aurora.Colors.textTertiary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
             }
@@ -369,25 +377,27 @@ struct GoalsContentView: View {
             if selectedFilter == .active {
                 Button {
                     showGoalCreation = true
+                    AuroraHaptics.medium()
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 16))
                         Text("Create Your First Goal")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(Aurora.Typography.subheadline)
+                            .fontWeight(.semibold)
                     }
                     .foregroundStyle(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 14)
                     .background(
                         LinearGradient(
-                            colors: [Theme.Colors.aiPurple, Theme.Colors.aiPurple.opacity(0.7)],
+                            colors: [Aurora.Colors.prismaticGreen, Aurora.Colors.electricCyan.opacity(0.8)],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .clipShape(Capsule())
-                    .shadow(color: Theme.Colors.aiPurple.opacity(0.4), radius: 12, y: 4)
+                    .shadow(color: Aurora.Colors.prismaticGreen.opacity(0.4), radius: 12, y: 4)
                 }
                 .buttonStyle(.plain)
             }
@@ -395,7 +405,7 @@ struct GoalsContentView: View {
         .padding(.vertical, 60)
         .offset(y: animateIn ? 0 : 30)
         .opacity(animateIn ? 1 : 0)
-        .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.2), value: animateIn)
+        .animation(AuroraMotion.Spring.ui.delay(0.2), value: animateIn)
     }
 
     private var emptyStateTitle: String {
@@ -423,7 +433,7 @@ enum GoalFilter: String, CaseIterable {
     case all = "All"
 }
 
-// MARK: - Goal Filter Pill
+// MARK: - Aurora Goal Filter Pill
 
 private struct GoalFilterPill: View {
     let filter: GoalFilter
@@ -432,10 +442,14 @@ private struct GoalFilterPill: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button {
+            action()
+            AuroraHaptics.light()
+        } label: {
             HStack(spacing: 8) {
                 Text(filter.rawValue)
-                    .font(.system(size: 15, weight: isSelected ? .bold : .semibold))
+                    .font(Aurora.Typography.subheadline)
+                    .fontWeight(isSelected ? .bold : .semibold)
 
                 if count > 0 {
                     Text("\(count)")
@@ -444,88 +458,39 @@ private struct GoalFilterPill: View {
                         .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(isSelected ? .white.opacity(0.3) : .white.opacity(0.15))
+                                .fill(isSelected ? Aurora.Colors.prismaticGreen.opacity(0.3) : Aurora.Colors.textTertiary.opacity(0.2))
                         )
                 }
             }
-            .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
+            .foregroundStyle(isSelected ? Aurora.Colors.textPrimary : Aurora.Colors.textTertiary)
             .padding(.horizontal, 18)
             .padding(.vertical, 12)
-            .background(
-                Group {
-                    if isSelected {
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Theme.Colors.aiPurple,
-                                        Theme.Colors.aiPurple.opacity(0.8),
-                                        Theme.Colors.aiBlue.opacity(0.6)
-                                    ],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+            .background {
+                if isSelected {
+                    Capsule()
+                        .fill(Aurora.Colors.prismaticGreen.opacity(0.2))
+                        .overlay {
+                            Capsule()
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [
+                                            Aurora.Colors.prismaticGreen.opacity(0.5),
+                                            Aurora.Colors.electricCyan.opacity(0.3)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1
                                 )
-                            )
-                            .shadow(color: Theme.Colors.aiPurple.opacity(0.5), radius: 12, y: 4)
-                    } else {
-                        Capsule()
-                            .fill(.white.opacity(0.1))
-                    }
+                        }
+                        .shadow(color: Aurora.Colors.prismaticGreen.opacity(0.3), radius: 8, y: 2)
+                } else {
+                    Capsule()
+                        .fill(Aurora.Colors.voidNebula.opacity(0.6))
                 }
-            )
+            }
         }
         .buttonStyle(.plain)
-        .glassEffect(isSelected ? .regular.tint(Theme.Colors.aiPurple).interactive() : .regular, in: .capsule)
-    }
-}
-
-// MARK: - Goal Stat Card
-
-private struct GoalStatCard: View {
-    let icon: String
-    let value: String
-    let label: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(color)
-
-                Text(value)
-                    .font(.system(size: 24, weight: .heavy, design: .rounded))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.white, .white.opacity(0.9)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-            }
-
-            Text(label)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.7))
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            color.opacity(0.15),
-                            color.opacity(0.08)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .shadow(color: color.opacity(0.4), radius: 12, y: 6)
-        )
-        .glassEffect(.regular.tint(color).interactive(), in: .rect(cornerRadius: 18))
     }
 }
 
@@ -544,14 +509,68 @@ struct PremiumGoalCard: View {
     }
 }
 
+// MARK: - Aurora Goal Stat Card
+
+struct AuroraGoalStatCard: View {
+    let icon: String
+    let value: String
+    let label: String
+    let iconColor: Color
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                // Glow halo
+                Circle()
+                    .fill(iconColor)
+                    .frame(width: 36, height: 36)
+                    .blur(radius: 8)
+                    .opacity(0.3)
+
+                Circle()
+                    .fill(iconColor.opacity(0.2))
+                    .frame(width: 36, height: 36)
+
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(iconColor)
+            }
+
+            Text(value)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundStyle(Aurora.Colors.textPrimary)
+
+            Text(label)
+                .font(Aurora.Typography.caption)
+                .foregroundStyle(Aurora.Colors.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(Aurora.Colors.voidNebula, in: RoundedRectangle(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [iconColor.opacity(0.3), Color.clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        }
+    }
+}
+
 // MARK: - Preview
 
 #Preview {
     ZStack {
-        VoidBackground.standard
+        Aurora.Colors.voidCosmos.ignoresSafeArea()
+
         GoalsContentView(
             goals: [],
             goalsVM: GoalsViewModel()
         )
     }
+    .preferredColorScheme(.dark)
 }

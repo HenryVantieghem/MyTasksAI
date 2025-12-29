@@ -299,6 +299,17 @@ final class AppViewModel {
         }
     }
 
+    /// Sign in with email and password
+    func signIn(email: String, password: String) async throws {
+        guard supabase.isConfigured else {
+            throw NSError(domain: "AppViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "Supabase not configured"])
+        }
+
+        let client = try supabase.getClient()
+        _ = try await client.auth.signIn(email: email, password: password)
+        await checkAuthenticationState()
+    }
+
     // MARK: - User Updates
 
     /// Update user profile

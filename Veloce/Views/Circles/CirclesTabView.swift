@@ -14,10 +14,13 @@ struct CirclesTabView: View {
     // MARK: State
     @State private var friendService = FriendService.shared
     @State private var circleService = CircleService.shared
+    @State private var pactService = PactService.shared
     @State private var showAddFriend = false
     @State private var showCreateCircle = false
     @State private var showJoinCircle = false
+    @State private var showCreatePact = false
     @State private var selectedCircle: SocialCircle?
+    @State private var selectedPact: Pact?
     @State private var isRefreshing = false
 
     var body: some View {
@@ -27,10 +30,18 @@ struct CirclesTabView: View {
 
             ScrollView {
                 VStack(spacing: Theme.Spacing.xl) {
+                    // Pact Invitations Banner (if any pending)
+                    if pactService.hasPendingInvitations {
+                        pactInvitationsBanner
+                    }
+
                     // Friend Requests Banner (if any pending)
                     if friendService.pendingCount > 0 {
                         friendRequestsBanner
                     }
+
+                    // My Pacts Section (NEW - Top priority)
+                    pactsSection
 
                     // My Circles Section
                     circlesSection
@@ -39,7 +50,7 @@ struct CirclesTabView: View {
                     friendsSection
 
                     // Empty state if needed
-                    if circleService.circles.isEmpty && friendService.friends.isEmpty {
+                    if circleService.circles.isEmpty && friendService.friends.isEmpty && pactService.activePacts.isEmpty {
                         emptyStateView
                     }
                 }
@@ -75,8 +86,131 @@ struct CirclesTabView: View {
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showCreatePact) {
+            CreatePactSheet()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(item: $selectedPact) { pact in
+            PactDetailView(pact: pact, currentUserId: getCurrentUserId())
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
         .task {
             await loadData()
+        }
+    }
+
+    // MARK: - Pact Invitations Banner
+
+    private var pactInvitationsBanner: some View {
+        VStack(spacing: 10) {
+            ForEach(pactService.pendingPacts) { pact in
+                PactInvitationBanner(
+                    pact: pact,
+                    currentUserId: getCurrentUserId(),
+                    onAccept: {
+                        Task {
+                            try? await pactService.acceptPact(pact.id)
+                        }
+                    },
+                    onDecline: {
+                        Task {
+                            try? await pactService.declinePact(pact.id)
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    // MARK: - Pacts Section
+
+    private var pactsSection: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
+            HStack {
+                Text("My Pacts")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(Theme.CelestialColors.starWhite)
+
+                if pactService.hasActivePacts {
+                    HStack(spacing: 4) {
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 12))
+                        Text("\(pactService.activeCount)")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundStyle(.orange)
+                }
+
+                Spacer()
+
+                if !friendService.friends.isEmpty {
+                    Button {
+                        showCreatePact = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Theme.Colors.aiPurple)
+                    }
+                }
+            }
+
+            if pactService.activePacts.isEmpty && pactService.sentPacts.isEmpty {
+                // Empty pacts state
+                VStack(spacing: Theme.Spacing.md) {
+                    Image(systemName: "link.circle")
+                        .font(.system(size: 36, weight: .light))
+                        .foregroundStyle(.white.opacity(0.3))
+
+                    VStack(spacing: 4) {
+                        Text("No pacts yet")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.6))
+
+                        Text("Start a mutual accountability streak with a friend")
+                            .font(.system(size: 13))
+                            .foregroundStyle(.white.opacity(0.4))
+                            .multilineTextAlignment(.center)
+                    }
+
+                    if !friendService.friends.isEmpty {
+                        Button {
+                            showCreatePact = true
+                        } label: {
+                            Text("Start a Pact")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 10)
+                                .background(Theme.Colors.aiPurple, in: Capsule())
+                        }
+                    } else {
+                        Text("Add friends first to start a pact")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.white.opacity(0.3))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 28)
+                .padding(.horizontal, 20)
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            } else {
+                // Active pacts
+                LazyVStack(spacing: Theme.Spacing.sm) {
+                    ForEach(pactService.activePacts) { pact in
+                        PactCardView(pact: pact, currentUserId: getCurrentUserId())
+                            .onTapGesture {
+                                selectedPact = pact
+                            }
+                    }
+
+                    // Sent pacts (pending acceptance)
+                    ForEach(pactService.sentPacts) { pact in
+                        SentPactCard(pact: pact, currentUserId: getCurrentUserId())
+                    }
+                }
+            }
         }
     }
 
@@ -296,6 +430,14 @@ struct CirclesTabView: View {
     private var fabButton: some View {
         Menu {
             Button {
+                showCreatePact = true
+            } label: {
+                Label("Start a Pact", systemImage: "link.badge.plus")
+            }
+
+            Divider()
+
+            Button {
                 showAddFriend = true
             } label: {
                 Label("Add Friend", systemImage: "person.badge.plus")
@@ -336,6 +478,7 @@ struct CirclesTabView: View {
         do {
             try await friendService.loadFriendships()
             try await circleService.loadCircles()
+            try await pactService.loadPacts()
         } catch {
             print("Error loading circles data: \(error)")
         }
@@ -348,8 +491,7 @@ struct CirclesTabView: View {
     }
 
     private func getCurrentUserId() -> UUID {
-        // TODO: Get from auth service
-        UUID()
+        SupabaseService.shared.currentUserId ?? UUID()
     }
 }
 
@@ -458,6 +600,69 @@ struct FriendRowView: View {
             }
         }
         .padding(.vertical, Theme.Spacing.sm)
+    }
+}
+
+// MARK: - Sent Pact Card (Pending Acceptance)
+
+struct SentPactCard: View {
+    let pact: Pact
+    let currentUserId: UUID
+
+    var body: some View {
+        HStack(spacing: Theme.Spacing.md) {
+            // Partner Avatar
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [.gray.opacity(0.5), .gray.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 44, height: 44)
+                .overlay(
+                    Text(partnerInitials)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.7))
+                )
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Pact with \(partnerName)")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.8))
+
+                Text("Waiting for acceptance...")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+
+            Spacer()
+
+            Image(systemName: "hourglass")
+                .font(.system(size: 14))
+                .foregroundStyle(.yellow.opacity(0.6))
+        }
+        .padding(14)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .opacity(0.7)
+    }
+
+    private var partner: FriendProfile? {
+        pact.partnerProfile(currentUserId: currentUserId)
+    }
+
+    private var partnerName: String {
+        partner?.displayName ?? "Partner"
+    }
+
+    private var partnerInitials: String {
+        let name = partnerName
+        let components = name.split(separator: " ")
+        if components.count >= 2 {
+            return String(components[0].prefix(1) + components[1].prefix(1)).uppercased()
+        }
+        return String(name.prefix(2)).uppercased()
     }
 }
 

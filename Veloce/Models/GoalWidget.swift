@@ -52,10 +52,10 @@ struct GoalProvider: TimelineProvider {
             targetDate: Date().addingTimeInterval(60 * 60 * 24 * 90),
             category: GoalCategory.career.rawValue,
             timeframe: GoalTimeframe.horizon.rawValue,
+            progress: 0.67,
             checkInStreak: 12,
             milestoneCount: 8,
-            completedMilestoneCount: 5,
-            progress: 0.67
+            completedMilestoneCount: 5
         )
     }
 }
@@ -459,8 +459,8 @@ struct GoalWidget: Widget {
 }
 
 // MARK: - Widget Bundle
-
-@main
+// NOTE: @main removed - GoalWidget should be in a separate Widget Extension target
+// When you create a Widget Extension, add @main back to this bundle
 struct GoalWidgetBundle: WidgetBundle {
     var body: some Widget {
         GoalWidget()
@@ -494,10 +494,10 @@ struct GoalWidgetBundle: WidgetBundle {
             targetDate: Date().addingTimeInterval(60 * 60 * 24 * 90),
             category: GoalCategory.health.rawValue,
             timeframe: GoalTimeframe.horizon.rawValue,
+            progress: 0.45,
             checkInStreak: 7,
             milestoneCount: 10,
-            completedMilestoneCount: 4,
-            progress: 0.45
+            completedMilestoneCount: 4
         )
     )
 }
@@ -513,10 +513,10 @@ struct GoalWidgetBundle: WidgetBundle {
             targetDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
             category: GoalCategory.education.rawValue,
             timeframe: GoalTimeframe.milestone.rawValue,
+            progress: 0.78,
             checkInStreak: 15,
             milestoneCount: 12,
-            completedMilestoneCount: 9,
-            progress: 0.78
+            completedMilestoneCount: 9
         )
     )
 }

@@ -145,8 +145,8 @@ struct GlowModifier: ViewModifier {
     }
 }
 
-// MARK: - Pulsing Glow Modifier
-struct PulsingGlowModifier: ViewModifier {
+// MARK: - Pulsing Glow Modifier (Iridescent version)
+struct IridescentPulsingGlowModifier: ViewModifier {
     let color: Color
     let radius: CGFloat
 
@@ -227,12 +227,12 @@ extension View {
         modifier(GlowModifier(color: color, radius: radius, opacity: opacity))
     }
 
-    /// Apply pulsing glow
-    func pulsingGlow(
+    /// Apply pulsing glow (iridescent version)
+    func iridescentPulsingGlow(
         color: Color = Theme.Colors.aiPurple,
         radius: CGFloat = 15
     ) -> some View {
-        modifier(PulsingGlowModifier(color: color, radius: radius))
+        modifier(IridescentPulsingGlowModifier(color: color, radius: radius))
     }
 
     /// Apply shimmer glow effect

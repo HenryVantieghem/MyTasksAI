@@ -638,6 +638,12 @@ extension AchievementType {
         case .deepFocusMaster: return 500
         case .distractionFree: return 1000
         case .focusStreak: return 250
+        // Pact achievements
+        case .pactFirst: return 100
+        case .pactWeek: return 200
+        case .pactMonth: return 500
+        case .pactCentury: return 2000
+        case .pactMaster: return 1000
         }
     }
 }

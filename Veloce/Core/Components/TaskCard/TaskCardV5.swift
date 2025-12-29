@@ -55,7 +55,7 @@ struct TaskCardV5: View {
         }
     }
 
-    private var urgencyLevel: UrgencyLevel {
+    private var urgencyLevel: CardUrgencyLevel {
         guard let scheduledTime = task.scheduledTime else {
             return .calm
         }
@@ -601,9 +601,9 @@ struct TaskCardV5: View {
     }
 }
 
-// MARK: - Urgency Level
+// MARK: - Card Urgency Level
 
-enum UrgencyLevel {
+enum CardUrgencyLevel {
     case calm       // > 24 hours away
     case near       // 2-24 hours away
     case critical   // < 2 hours away

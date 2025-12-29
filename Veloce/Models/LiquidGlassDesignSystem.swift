@@ -123,11 +123,12 @@ enum LiquidGlassDesignSystem {
         static let xl: CGFloat = 24
         static let xxl: CGFloat = 32
         static let xxxl: CGFloat = 48
-        
+
         // Semantic
         static let cardPadding: CGFloat = 16
         static let screenPadding: CGFloat = 20
         static let sectionSpacing: CGFloat = 24
+        static let comfortable: CGFloat = 20
     }
     
     // MARK: - Corner Radius
@@ -202,7 +203,7 @@ enum LiquidGlassDesignSystem {
         let radius: CGFloat
         let x: CGFloat
         let y: CGFloat
-        
+
         init(color: Color, radius: CGFloat, x: CGFloat = 0, y: CGFloat = 0) {
             self.color = color
             self.radius = radius
@@ -210,6 +211,159 @@ enum LiquidGlassDesignSystem {
             self.y = y
         }
     }
+
+    // MARK: - Glass Tints (For Interactive States)
+
+    enum GlassTints {
+        static let interactive = VibrantAccents.electricCyan
+        static let success = VibrantAccents.auroraGreen
+        static let error = Semantic.error
+        static let warning = VibrantAccents.solarGold
+        static let subtle = Color.white.opacity(0.1)
+        static let neutral = Color.white.opacity(0.15)
+    }
+
+    // MARK: - Glass Configuration
+
+    enum GlassConfig {
+        static let borderOpacityRest: Double = 0.2
+        static let borderOpacityPressed: Double = 0.4
+        static let borderOpacityFocused: Double = 0.6
+        static let backgroundBlur: CGFloat = 20
+        static let cornerRadius: CGFloat = 16
+    }
+
+    // MARK: - Sizing Tokens
+
+    enum Sizing {
+        static let buttonHeight: CGFloat = 50
+        static let inputHeight: CGFloat = 48
+        static let textFieldHeight: CGFloat = 48
+        static let iconSmall: CGFloat = 16
+        static let iconMedium: CGFloat = 20
+        static let iconLarge: CGFloat = 24
+        static let touchTarget: CGFloat = 44
+        static let cornerRadius: CGFloat = 16
+        static let buttonCornerRadius: CGFloat = 12
+    }
+
+    // MARK: - Gradients
+
+    enum Gradients {
+        static var primary: LinearGradient {
+            LinearGradient(
+                colors: [VibrantAccents.electricCyan, VibrantAccents.plasmaPurple],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        static var ctaPrimary: LinearGradient {
+            LinearGradient(
+                colors: [VibrantAccents.electricCyan, VibrantAccents.plasmaPurple],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        static var success: LinearGradient {
+            LinearGradient(
+                colors: [VibrantAccents.auroraGreen, VibrantAccents.electricCyan],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        }
+
+        static var sunset: LinearGradient {
+            LinearGradient(
+                colors: [VibrantAccents.solarGold, VibrantAccents.nebulaPink],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+
+        static var prismaticBorder: AngularGradient {
+            AngularGradient(
+                colors: [
+                    VibrantAccents.electricCyan,
+                    VibrantAccents.plasmaPurple,
+                    VibrantAccents.nebulaPink,
+                    VibrantAccents.electricCyan
+                ],
+                center: .center
+            )
+        }
+    }
+
+    // MARK: - Morph Animation Tokens
+
+    enum MorphAnimation {
+        static let duration: Double = 0.35
+        static let damping: Double = 0.75
+        static let response: Double = 0.4
+        static let shimmerSweep: Double = 3.0
+        static let prismaticRotation: Double = 8.0
+        static let glowPulse: Double = 2.0
+    }
+}
+
+// MARK: - Validation State
+
+enum GlassValidationState: Equatable {
+    case idle
+    case valid
+    case invalid(String)
+    case validating
+
+    var tint: Color {
+        switch self {
+        case .idle: return LiquidGlassDesignSystem.Text.tertiary
+        case .valid: return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
+        case .invalid: return LiquidGlassDesignSystem.Semantic.error
+        case .validating: return LiquidGlassDesignSystem.VibrantAccents.electricCyan
+        }
+    }
+}
+
+// MARK: - Button Styles
+
+enum LiquidGlassButtonStyle {
+    case primary
+    case secondary
+    case ghost
+    case destructive
+    case success
+
+    var foregroundColor: Color {
+        switch self {
+        case .primary, .destructive, .success:
+            return .white
+        case .secondary, .ghost:
+            return LiquidGlassDesignSystem.Text.primary
+        }
+    }
+
+    var backgroundColor: Color {
+        switch self {
+        case .primary:
+            return LiquidGlassDesignSystem.VibrantAccents.plasmaPurple
+        case .secondary:
+            return LiquidGlassDesignSystem.Void.nebula
+        case .ghost:
+            return .clear
+        case .destructive:
+            return LiquidGlassDesignSystem.Semantic.error
+        case .success:
+            return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
+        }
+    }
+}
+
+// MARK: - Extended Springs
+
+extension LiquidGlassDesignSystem.Springs {
+    /// Press animation (150ms) - button press feedback
+    static let press: SwiftUI.Animation = .spring(response: 0.15, dampingFraction: 0.8)
 }
 
 // MARK: - iOS 26 Native Liquid Glass View Extensions
@@ -220,23 +374,83 @@ extension View {
     
     /// Apply iOS 26 native Liquid Glass for interactive navigation elements
     /// Use for: Buttons, toolbars, tab bars, floating controls
-    @available(iOS 26.0, *)
-    func liquidGlassInteractive<S: Shape>(in shape: S = Capsule() as! S) -> some View {
-        self.glassEffect(.regular.interactive(true), in: shape)
+    func liquidGlassInteractive<S: InsettableShape>(in shape: S) -> some View {
+        if #available(iOS 26.0, *) {
+            return AnyView(self.glassEffect(.regular.interactive(true), in: shape))
+        } else {
+            // Fallback to material-based glass
+            return AnyView(
+                self
+                    .padding(12)
+                    .background(.ultraThinMaterial, in: shape)
+                    .overlay {
+                        shape.strokeBorder(
+                            LinearGradient(
+                                colors: [.white.opacity(0.3), .white.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.5
+                        )
+                    }
+            )
+        }
+    }
+    
+    /// Convenience method for Capsule shapes
+    func liquidGlassInteractive() -> some View {
+        liquidGlassInteractive(in: Capsule())
     }
     
     /// Apply iOS 26 native Liquid Glass card (non-interactive)
     /// Use for: Glass containers that don't respond to touch
-    @available(iOS 26.0, *)
     func liquidGlassCard(cornerRadius: CGFloat = 16) -> some View {
-        self.glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius))
+        if #available(iOS 26.0, *) {
+            return AnyView(self.glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius)))
+        } else {
+            return AnyView(
+                self
+                    .padding(16)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: cornerRadius))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [.white.opacity(0.2), .white.opacity(0.05)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 0.5
+                            )
+                    }
+            )
+        }
     }
     
     /// Apply iOS 26 native Liquid Glass with prominent tint
     /// Use for: Primary CTAs, important actions
-    @available(iOS 26.0, *)
-    func liquidGlassProminent<S: Shape>(in shape: S = Capsule() as! S, tint: Color = LiquidGlassDesignSystem.VibrantAccents.plasmaPurple) -> some View {
-        self.glassEffect(.regular.tint(tint).interactive(true), in: shape)
+    func liquidGlassProminent<S: InsettableShape>(in shape: S, tint: Color = LiquidGlassDesignSystem.VibrantAccents.plasmaPurple) -> some View {
+        if #available(iOS 26.0, *) {
+            return AnyView(self.glassEffect(.regular.tint(tint).interactive(true), in: shape))
+        } else {
+            return AnyView(
+                self
+                    .padding(12)
+                    .background {
+                        ZStack {
+                            shape.fill(.ultraThinMaterial)
+                            shape.fill(tint.opacity(0.15))
+                        }
+                    }
+                    .clipShape(shape)
+                    .overlay {
+                        shape.strokeBorder(
+                            tint.opacity(0.4),
+                            lineWidth: 1
+                        )
+                    }
+            )
+        }
     }
     
     // MARK: - Content Layer (Solid Backgrounds)
@@ -302,16 +516,26 @@ extension View {
         baseIntensity: Double = 0.3,
         pulseIntensity: Double = 0.6
     ) -> some View {
-        modifier(PulsingGlowModifier(color: color, baseIntensity: baseIntensity, pulseIntensity: pulseIntensity))
+        modifier(LiquidGlassPulsingGlowModifier(color: color, baseIntensity: baseIntensity, pulseIntensity: pulseIntensity))
     }
     
     /// Apply Liquid Glass text field styling (iOS 26 native)
-    @available(iOS 26.0, *)
     func liquidGlassTextField() -> some View {
-        self
-            .padding(LiquidGlassDesignSystem.Spacing.md)
-            .frame(height: 48)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Radius.input))
+        if #available(iOS 26.0, *) {
+            return AnyView(
+                self
+                    .padding(LiquidGlassDesignSystem.Spacing.md)
+                    .frame(height: 48)
+                    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Radius.input))
+            )
+        } else {
+            return AnyView(
+                self
+                    .padding(LiquidGlassDesignSystem.Spacing.md)
+                    .frame(height: 48)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Radius.input))
+            )
+        }
     }
     
     /// Apply screen padding
@@ -325,15 +549,15 @@ extension View {
     }
 }
 
-// MARK: - Pulsing Glow Modifier
+// MARK: - Liquid Glass Pulsing Glow Modifier
 
-private struct PulsingGlowModifier: ViewModifier {
+private struct LiquidGlassPulsingGlowModifier: ViewModifier {
     let color: Color
     let baseIntensity: Double
     let pulseIntensity: Double
-    
+
     @State private var phase: CGFloat = 0
-    
+
     func body(content: Content) -> some View {
         content
             .shadow(
@@ -350,10 +574,10 @@ private struct PulsingGlowModifier: ViewModifier {
     }
 }
 
-// MARK: - Liquid Glass Button Styles (iOS 26)
+// MARK: - Simple Liquid Glass Button Styles
 
-struct LiquidGlassButton {
-    
+struct SimpleLiquidGlassButton {
+
     /// Primary CTA button with native glass effect
     static func primary(
         _ title: String,
@@ -394,8 +618,7 @@ struct LiquidGlassButton {
         .buttonStyle(LiquidButtonPressStyle())
     }
     
-    /// Secondary button with glass effect
-    @available(iOS 26.0, *)
+    /// Secondary button with native iOS 26 Liquid Glass
     static func secondary(
         _ title: String,
         icon: String? = nil,
@@ -415,8 +638,18 @@ struct LiquidGlassButton {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 50)
+            .padding(.horizontal, 20)
         }
-        .liquidGlassInteractive(in: RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Radius.button))
+        .background {
+            let shape = RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Radius.button)
+            
+            if #available(iOS 26.0, *) {
+                Color.clear
+                    .glassEffect(.regular.interactive(true), in: shape)
+            } else {
+                shape.fill(.ultraThinMaterial)
+            }
+        }
         .buttonStyle(LiquidButtonPressStyle())
     }
     
@@ -488,10 +721,9 @@ struct LiquidButtonPressStyle: ButtonStyle {
     }
 }
 
-// MARK: - Liquid Glass TextField (iOS 26)
+// MARK: - Simple Liquid Glass TextField
 
-@available(iOS 26.0, *)
-struct LiquidGlassTextField: View {
+struct SimpleLiquidGlassTextField: View {
     let placeholder: String
     @Binding var text: String
     let icon: String?
@@ -524,18 +756,32 @@ struct LiquidGlassTextField: View {
         }
         .padding(LiquidGlassDesignSystem.Spacing.md)
         .frame(height: 48)
-        .glassEffect(
-            isFocused ? .regular.tint(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.2)) : .regular,
-            in: RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Radius.input)
-        )
+        .background {
+            let shape = RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Radius.input)
+            let tintColor = isFocused ? LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.2) : Color.clear
+            
+            if #available(iOS 26.0, *) {
+                Color.clear
+                    .glassEffect(
+                        .regular.tint(tintColor),
+                        in: shape
+                    )
+            } else {
+                ZStack {
+                    shape.fill(.ultraThinMaterial)
+                    if isFocused {
+                        shape.fill(tintColor)
+                    }
+                }
+            }
+        }
         .animation(LiquidGlassDesignSystem.Springs.quick, value: isFocused)
     }
 }
 
-// MARK: - Liquid Glass Tab Bar Item (iOS 26)
+// MARK: - Simple Liquid Glass Tab Bar Item
 
-@available(iOS 26.0, *)
-struct LiquidGlassTabItem: View {
+struct SimpleLiquidGlassTabItem: View {
     let icon: String
     let title: String
     let isSelected: Bool
@@ -569,15 +815,8 @@ struct LiquidGlassTabItem: View {
 
 // MARK: - iOS 26 Native Liquid Glass Button Styles
 
-// When iOS 26 is available, use these:
-@available(iOS 26.0, *)
-extension ButtonStyle where Self == GlassButtonStyle {
-    /// iOS 26 native glass button style
-    static var liquidGlass: GlassButtonStyle { .glass }
-    
-    /// iOS 26 native prominent glass button style
-    static var liquidGlassProminent: GlassProminentButtonStyle { .glassProminent }
-}
+// Note: GlassButtonStyle and GlassProminentButtonStyle are iOS 26 system types
+// Use .glass and .glassProminent directly when available in iOS 26
 
 // MARK: - Fallback for Pre-iOS 26
 
@@ -610,20 +849,7 @@ struct LiquidGlassFallbackButtonStyle: ButtonStyle {
 }
 
 // MARK: - Haptics Service Extension
-
-extension HapticsService {
-    /// Glass focus feedback
-    func glassFocus() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
-    }
-    
-    /// Glass morph feedback
-    func glassMorph() {
-        let generator = UIImpactFeedbackGenerator(style: .soft)
-        generator.impactOccurred()
-    }
-}
+// Note: glassFocus() and glassMorph() are defined in HapticsService.swift
 
 // MARK: - Preview
 
@@ -637,9 +863,9 @@ extension HapticsService {
             VStack(spacing: 32) {
                 // Buttons
                 VStack(spacing: 16) {
-                    LiquidGlassButton.primary("Launch App", icon: "rocket.fill") {}
-                    LiquidGlassButton.success("Complete", icon: "checkmark") {}
-                    LiquidGlassButton.destructive("Delete") {}
+                    SimpleLiquidGlassButton.primary("Launch App", icon: "rocket.fill") {}
+                    SimpleLiquidGlassButton.success("Complete", icon: "checkmark") {}
+                    SimpleLiquidGlassButton.destructive("Delete") {}
                 }
                 .padding(.horizontal, 24)
                 

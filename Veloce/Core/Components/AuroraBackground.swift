@@ -9,6 +9,16 @@
 
 import SwiftUI
 
+// MARK: - Aurora Star Particle
+
+struct AuroraStarParticle: Identifiable {
+    let id = UUID()
+    let position: CGPoint
+    let size: CGFloat
+    let brightness: Double
+    let twinkleSpeed: Double
+}
+
 // MARK: - Aurora Background
 
 struct AuroraBackground: View {

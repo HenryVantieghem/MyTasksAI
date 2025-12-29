@@ -157,6 +157,13 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
     case distractionFree = "distraction_free"   // Complete 50 focus sessions with blocking
     case focusStreak = "focus_streak"           // Use focus mode 7 days in a row
 
+    // Pact Achievements
+    case pactFirst = "pact_first"               // Start your first pact
+    case pactWeek = "pact_week"                 // 7-day mutual pact streak
+    case pactMonth = "pact_month"               // 30-day mutual pact streak
+    case pactCentury = "pact_century"           // 100-day mutual pact streak (legendary)
+    case pactMaster = "pact_master"             // Complete 5 pacts successfully
+
     var title: String {
         switch self {
         case .firstTask: return "Getting Started"
@@ -187,6 +194,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .deepFocusMaster: return "Deep Focus Master"
         case .distractionFree: return "Distraction Free"
         case .focusStreak: return "Focus Streak"
+        case .pactFirst: return "Pact Partner"
+        case .pactWeek: return "Pact Keeper"
+        case .pactMonth: return "Pact Champion"
+        case .pactCentury: return "Pact Legend"
+        case .pactMaster: return "Pact Master"
         }
     }
 
@@ -220,6 +232,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .deepFocusMaster: return "Complete 10 Deep Focus sessions (unbreakable)"
         case .distractionFree: return "Complete 50 focus sessions with app blocking"
         case .focusStreak: return "Use focus mode 7 days in a row"
+        case .pactFirst: return "Start your first mutual accountability pact"
+        case .pactWeek: return "Maintain a 7-day mutual pact streak"
+        case .pactMonth: return "Maintain a 30-day mutual pact streak"
+        case .pactCentury: return "Achieve a legendary 100-day mutual pact streak"
+        case .pactMaster: return "Complete 5 pacts successfully"
         }
     }
 
@@ -249,6 +266,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .deepFocusMaster: return "lock.shield.fill"
         case .distractionFree: return "shield.checkered"
         case .focusStreak: return "flame.circle.fill"
+        case .pactFirst: return "person.2.fill"
+        case .pactWeek: return "person.2.badge.gearshape.fill"
+        case .pactMonth: return "person.2.badge.plus"
+        case .pactCentury: return "crown.fill"
+        case .pactMaster: return "medal.fill"
         }
     }
 
@@ -296,6 +318,16 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
             return Theme.Colors.aiGold
         case .focusStreak:
             return Theme.Colors.aiOrange
+        case .pactFirst:
+            return Theme.Colors.aiPurple
+        case .pactWeek:
+            return Color(red: 0.8, green: 0.5, blue: 0.2)  // Bronze
+        case .pactMonth:
+            return Theme.Colors.aiGold
+        case .pactCentury:
+            return Theme.Colors.aiPink  // Legendary pink
+        case .pactMaster:
+            return Theme.Colors.completionMint
         }
     }
 
@@ -343,6 +375,16 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
             return 1000
         case .focusStreak:
             return 250
+        case .pactFirst:
+            return 100
+        case .pactWeek:
+            return 250
+        case .pactMonth:
+            return 750
+        case .pactCentury:
+            return 2000
+        case .pactMaster:
+            return 500
         }
     }
 
@@ -365,6 +407,11 @@ enum AchievementType: String, Codable, CaseIterable, Sendable {
         case .deepFocusMaster: return 10
         case .distractionFree: return 50
         case .focusStreak: return 7
+        case .pactFirst: return 1
+        case .pactWeek: return 7
+        case .pactMonth: return 30
+        case .pactCentury: return 100
+        case .pactMaster: return 5
         default: return 1
         }
     }

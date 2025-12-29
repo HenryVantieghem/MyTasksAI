@@ -9,6 +9,18 @@
 
 import SwiftUI
 
+// MARK: - Orb State
+
+enum OrbState: Equatable {
+    case dormant      // Resting state
+    case awake        // Active, aware
+    case listening    // Processing input
+    case thinking     // AI processing
+    case speaking     // Providing output
+    case celebration  // Success/completion
+    case error        // Error state
+}
+
 // MARK: - Celestial Orb
 
 struct CelestialOrb: View {

@@ -308,7 +308,17 @@ struct LiquidGlassTextField: View {
                 // Animated prismatic border when focused
                 RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius)
                     .stroke(
-                        LiquidGlassDesignSystem.Gradients.prismaticBorder(rotation: borderRotation),
+                        AngularGradient(
+                            colors: [
+                                LiquidGlassDesignSystem.VibrantAccents.electricCyan,
+                                LiquidGlassDesignSystem.VibrantAccents.plasmaPurple,
+                                LiquidGlassDesignSystem.VibrantAccents.nebulaPink,
+                                LiquidGlassDesignSystem.VibrantAccents.electricCyan
+                            ],
+                            center: .center,
+                            startAngle: .degrees(borderRotation),
+                            endAngle: .degrees(borderRotation + 360)
+                        ),
                         lineWidth: 1.5
                     )
             } else {
@@ -317,7 +327,7 @@ struct LiquidGlassTextField: View {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                validation.iconColor.opacity(borderOpacity),
+                                validation.tint.opacity(borderOpacity),
                                 Color.white.opacity(borderOpacity * 0.4),
                                 Color.white.opacity(borderOpacity * 0.2)
                             ],

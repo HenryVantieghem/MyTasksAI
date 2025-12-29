@@ -249,6 +249,11 @@ final class TasksViewModel {
             _ = gamification.awardPoints(points)
 
             haptics.taskComplete()
+
+            // Check pact progress for task-based pacts
+            Task {
+                await checkPactProgress()
+            }
         } else {
             task.completedAt = nil
             task.pointsEarned = 0
@@ -266,6 +271,14 @@ final class TasksViewModel {
         } catch {
             self.error = error.localizedDescription
         }
+    }
+
+    // MARK: - Pact Progress
+
+    /// Check and update pact progress based on tasks completed today
+    private func checkPactProgress() async {
+        let completedToday = todayCompleted
+        await PactService.shared.checkTaskPactProgress(tasksCompletedToday: completedToday)
     }
 
     // MARK: - Delete Task
