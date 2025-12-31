@@ -278,7 +278,7 @@ enum GlassValidationState: Equatable {
     var tint: Color {
         switch self {
         case .idle: return LiquidGlassDesignSystem.Text.tertiary
-        case .valid: return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
+        case .valid: return LiquidGlassDesignSystem.VibrantAccents.utopianGreen
         case .invalid: return LiquidGlassDesignSystem.Semantic.error
         case .validating: return LiquidGlassDesignSystem.VibrantAccents.electricCyan
         }
