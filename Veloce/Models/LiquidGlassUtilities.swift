@@ -122,20 +122,6 @@ extension ButtonStyle where Self == LiquidButtonPressStyle {
     static var liquidPress: LiquidButtonPressStyle { LiquidButtonPressStyle() }
 }
 
-// MARK: - Cosmic Tap Button Style (Legacy Compatibility)
-
-struct CosmicTapButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.spring(response: 0.2), value: configuration.isPressed)
-    }
-}
-
-extension ButtonStyle where Self == CosmicTapButtonStyle {
-    static var cosmicTap: CosmicTapButtonStyle { CosmicTapButtonStyle() }
-}
-
 // MARK: - Preview
 
 #Preview("Utilities") {
