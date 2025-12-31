@@ -198,5 +198,47 @@ struct UtopianDesignFallback {
         static let sm: CGFloat = 8
         static let md: CGFloat = 12
         static let lg: CGFloat = 20
+        static let card: CGFloat = 16
+    }
+
+    struct Colors {
+        // Gamification - GOLD theme
+        static let xpGold = Color(red: 1.0, green: 0.84, blue: 0.0)
+        static let starGold = Color(red: 1.0, green: 0.76, blue: 0.27)
+        static let streakFire = Color(red: 1.0, green: 0.42, blue: 0.21)
+
+        // Status
+        static let completed = Color(red: 0.06, green: 0.73, blue: 0.51)
+        static let inProgress = Color(red: 0.49, green: 0.23, blue: 0.93)
+        static let overdue = Color(red: 0.94, green: 0.27, blue: 0.27)
+        static let scheduled = Color(red: 0.36, green: 0.5, blue: 1.0)
+
+        // Focus Mode
+        static let focusActive = Color(red: 0.0, green: 0.85, blue: 1.0)
+        static let focusPaused = Color(red: 0.96, green: 0.62, blue: 0.04)
+
+        // AI
+        static let aiPurple = Color(red: 0.65, green: 0.25, blue: 1.0)
+
+        // Semantic
+        static let success = Color(red: 0.06, green: 0.73, blue: 0.51)
+        static let warning = Color(red: 0.96, green: 0.62, blue: 0.04)
+        static let error = Color(red: 0.94, green: 0.27, blue: 0.27)
+        static let info = Color(red: 0.23, green: 0.51, blue: 0.96)
+    }
+
+    struct Gamification {
+        static let xpGold = Color(red: 1.0, green: 0.84, blue: 0.0)
+        static let starGold = Color(red: 1.0, green: 0.76, blue: 0.27)
+    }
+
+    struct Layout {
+        static let cardPadding: CGFloat = 16
+        static let screenPadding: CGFloat = 20
+    }
+
+    struct Animation {
+        static let standard: SwiftUI.Animation = .spring(response: 0.3, dampingFraction: 0.8)
+        static let quick: SwiftUI.Animation = .spring(response: 0.2, dampingFraction: 0.9)
     }
 }
