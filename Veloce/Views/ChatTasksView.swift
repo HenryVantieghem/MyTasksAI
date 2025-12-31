@@ -703,7 +703,12 @@ struct ChatTasksView: View {
                 AuroraConfettiShower(
                     isActive: .constant(true),
                     particleCount: 80,
-                    colors: Aurora.Gradients.auroraSpectrum
+                    colors: [
+                        UtopianDesignFallback.Colors.focusActive,
+                        UtopianDesignFallback.Colors.aiPurple,
+                        UtopianDesignFallback.Colors.completed,
+                        UtopianDesignFallback.Gamification.starGold
+                    ]
                 )
                 .ignoresSafeArea()
 
