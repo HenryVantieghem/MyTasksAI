@@ -802,7 +802,7 @@ struct DynamicNebulaBackground: View {
     // Utopian color shifts based on productivity
     private var primaryColor: Color {
         if hasOverdueTasks {
-            return Aurora.Colors.warning.opacity(0.15)
+            return UtopianDesignFallback.Colors.warning.opacity(0.15)
         }
         // Shift from violet to cyan to green as productivity increases
         let warmth = productivityLevel
