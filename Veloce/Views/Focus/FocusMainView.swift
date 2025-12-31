@@ -2,9 +2,8 @@
 //  FocusMainView.swift
 //  Veloce
 //
-//  Aurora Design System - Temporal Energy Field
-//  Timer as pulsing energy core with 3-layer glow rings
-//  App blocking as force field visualization
+//  Focus View - Utopian Design System
+//  Night-mode gradient for focus, clean timer interface
 //
 
 import SwiftUI
@@ -70,10 +69,10 @@ enum QuickFocusMode: String, CaseIterable {
 
     var accentColor: Color {
         switch self {
-        case .pomodoro: return Aurora.Colors.cosmicGold
-        case .deepWork: return Aurora.Colors.borealisViolet
-        case .flow: return Aurora.Colors.electricCyan
-        case .custom: return Aurora.Colors.prismaticGreen
+        case .pomodoro: return UtopianDesignFallback.Gamification.starGold   // Gold for pomodoro
+        case .deepWork: return UtopianDesignFallback.Colors.aiPurple         // Purple for deep work
+        case .flow: return UtopianDesignFallback.Colors.focusActive          // Cyan for flow
+        case .custom: return UtopianDesignFallback.Colors.completed          // Green for custom
         }
     }
 }
@@ -120,13 +119,14 @@ struct FocusMainView: View {
 
     var body: some View {
         ZStack {
-            // Cosmic background with enhanced depth
-            enhancedCosmicBackground
+            // Utopian Night Gradient - Focus mode always uses deep night colors
+            UtopianGradients.night
+                .ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Section Selector - Compact Liquid Glass Pill
                 CompactFlowPill(selected: $selectedSection)
-                    .padding(.top, Aurora.Spacing.universalHeaderHeight + 8)
+                    .padding(.top, UtopianDesignFallback.Spacing.universalHeaderHeight + 8)
                     .padding(.horizontal, 24)  // Proper margin from edges
 
                 // Content based on section
@@ -161,7 +161,7 @@ struct FocusMainView: View {
         .sheet(isPresented: $showCustomTimerPicker) {
             EnhancedCustomTimerView(
                 selectedMinutes: $customMinutes,
-                accentColor: Aurora.Colors.prismaticGreen,
+                accentColor: UtopianDesignFallback.Colors.completed,
                 onStart: {
                     showCustomTimerPicker = false
                     timeRemaining = TimeInterval(customMinutes * 60)
@@ -201,7 +201,7 @@ struct FocusMainView: View {
                 Button {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         selectedSection = section
-                        AuroraHaptics.light()
+                        HapticsService.shared.lightImpact()
                     }
                 } label: {
                     HStack(spacing: 8) {
@@ -220,8 +220,8 @@ struct FocusMainView: View {
                                 .fill(
                                     LinearGradient(
                                         colors: [
-                                            section == .timer ? Aurora.Colors.cosmicGold : Aurora.Colors.electricCyan,
-                                            section == .timer ? Aurora.Colors.stellarMagenta : Aurora.Colors.deepPlasma
+                                            section == .timer ? UtopianDesignFallback.Gamification.starGold : UtopianDesignFallback.Colors.focusActive,
+                                            section == .timer ? UtopianDesignFallback.Colors.aiPurple : UtopianDesignFallback.Colors.aiPurple
                                         ],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
@@ -250,25 +250,25 @@ struct FocusMainView: View {
             VStack(spacing: 0) {
                 // Immersive Timer Display
                 immersiveTimerDisplay
-                    .padding(.top, Aurora.Spacing.xl)
+                    .padding(.top, UtopianDesignFallback.Spacing.xl)
 
                 // Mode Cards (Tiimo-style)
                 modeCardsSection
-                    .padding(.top, Aurora.Spacing.xl)
-                    .padding(.horizontal, Aurora.Spacing.screenPadding)
+                    .padding(.top, UtopianDesignFallback.Spacing.xl)
+                    .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
 
                 // Today's Focus Stats
                 todayFocusStats
-                    .padding(.top, Aurora.Spacing.xl)
-                    .padding(.horizontal, Aurora.Spacing.screenPadding)
+                    .padding(.top, UtopianDesignFallback.Spacing.xl)
+                    .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
 
                 // Streak Section
                 streakFlameSection
-                    .padding(.top, Aurora.Spacing.xl)
-                    .padding(.horizontal, Aurora.Spacing.screenPadding)
+                    .padding(.top, UtopianDesignFallback.Spacing.xl)
+                    .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
 
                 Spacer()
-                    .frame(height: Aurora.Spacing.floatingTabBarClearance)
+                    .frame(height: UtopianDesignFallback.Spacing.floatingTabBarClearance)
             }
         }
         .scrollIndicators(.hidden)
@@ -472,21 +472,21 @@ struct FocusMainView: View {
                     value: "2h 45m",
                     label: "Total Focus",
                     icon: "flame.fill",
-                    color: Aurora.Colors.stellarMagenta
+                    color: UtopianDesignFallback.Colors.aiPurple
                 )
 
                 FocusStatCard(
                     value: "5",
                     label: "Sessions",
                     icon: "checkmark.circle.fill",
-                    color: Aurora.Colors.prismaticGreen
+                    color: UtopianDesignFallback.Colors.completed
                 )
 
                 FocusStatCard(
                     value: "85%",
                     label: "Score",
                     icon: "star.fill",
-                    color: Aurora.Colors.cosmicGold
+                    color: UtopianDesignFallback.Gamification.starGold
                 )
             }
         }
@@ -497,7 +497,7 @@ struct FocusMainView: View {
     private var appBlockingSectionContent: some View {
         // Inline blocking with Overview/Schedules/Groups tabs
         InlineBlockingSection()
-            .padding(.top, Aurora.Spacing.lg)
+            .padding(.top, UtopianDesignFallback.Spacing.lg)
     }
 
     // MARK: - Screen Time Overview (Opal-style)
@@ -532,11 +532,11 @@ struct FocusMainView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.down.right")
                         .dynamicTypeFont(base: 12, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.prismaticGreen)
+                        .foregroundStyle(UtopianDesignFallback.Colors.completed)
 
                     Text("32min less than yesterday")
                         .dynamicTypeFont(base: 13)
-                        .foregroundStyle(Aurora.Colors.prismaticGreen)
+                        .foregroundStyle(UtopianDesignFallback.Colors.completed)
                 }
             }
             .padding(.vertical, 24)
@@ -546,7 +546,7 @@ struct FocusMainView: View {
                     .fill(.ultraThinMaterial.opacity(0.5))
                     .overlay(
                         RoundedRectangle(cornerRadius: 24)
-                            .stroke(Aurora.Colors.electricCyan.opacity(0.2), lineWidth: 1)
+                            .stroke(UtopianDesignFallback.Colors.focusActive.opacity(0.2), lineWidth: 1)
                     )
             )
 
@@ -563,7 +563,7 @@ struct FocusMainView: View {
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(
                                     LinearGradient(
-                                        colors: [Aurora.Colors.electricCyan, Aurora.Colors.deepPlasma],
+                                        colors: [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple],
                                         startPoint: .top,
                                         endPoint: .bottom
                                     )
@@ -606,7 +606,7 @@ struct FocusMainView: View {
                     title: "Focus Mode",
                     subtitle: "Block distractions",
                     icon: "moon.fill",
-                    color: Aurora.Colors.borealisViolet,
+                    color: UtopianDesignFallback.Colors.aiPurple,
                     isActive: blockingService.isBlocking
                 ) {
                     showAppBlocking = true
@@ -616,7 +616,7 @@ struct FocusMainView: View {
                     title: "Deep Focus",
                     subtitle: "Unbreakable session",
                     icon: "lock.shield.fill",
-                    color: Aurora.Colors.electricCyan,
+                    color: UtopianDesignFallback.Colors.focusActive,
                     isActive: false
                 ) {
                     showAppBlocking = true
@@ -628,7 +628,7 @@ struct FocusMainView: View {
                     title: "Social Break",
                     subtitle: "Block social apps",
                     icon: "person.2.slash.fill",
-                    color: Aurora.Colors.cosmicGold,
+                    color: UtopianDesignFallback.Gamification.starGold,
                     isActive: false
                 ) {
                     showAppBlocking = true
@@ -638,7 +638,7 @@ struct FocusMainView: View {
                     title: "Custom Block",
                     subtitle: "Choose apps",
                     icon: "square.grid.2x2.fill",
-                    color: Aurora.Colors.prismaticGreen,
+                    color: UtopianDesignFallback.Colors.completed,
                     isActive: false
                 ) {
                     showAppBlocking = true
@@ -663,7 +663,7 @@ struct FocusMainView: View {
                 } label: {
                     Text("See All")
                         .dynamicTypeFont(base: 13, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.electricCyan)
+                        .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                 }
                 .buttonStyle(.plain)
             }
@@ -689,7 +689,7 @@ struct FocusMainView: View {
                     name: "Productivity",
                     time: "52m",
                     percentage: 0.20,
-                    color: Aurora.Colors.deepPlasma,
+                    color: UtopianDesignFallback.Colors.aiPurple,
                     icon: "doc.text.fill"
                 )
 
@@ -720,7 +720,7 @@ struct FocusMainView: View {
                 } label: {
                     Image(systemName: "plus")
                         .dynamicTypeFont(base: 14, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.electricCyan)
+                        .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                 }
                 .buttonStyle(.plain)
             }
@@ -758,24 +758,17 @@ struct FocusMainView: View {
         timerState = .idle
         timeRemaining = selectedMode.duration
         totalTime = selectedMode.duration
-        AuroraHaptics.medium()
+        HapticsService.shared.impact(.medium)
     }
 
     // MARK: - Enhanced Cosmic Background
 
+    // Legacy background - kept for reference but main body now uses UtopianGradients.night
     private var enhancedCosmicBackground: some View {
         ZStack {
-            // Base void gradient
-            LinearGradient(
-                colors: [
-                    Aurora.Colors.voidCosmos,
-                    Aurora.Colors.voidCosmos,
-                    Aurora.Colors.voidNebula
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            // Base night gradient (Utopian night zone)
+            UtopianGradients.night
+                .ignoresSafeArea()
 
             // Rotating nebula layers
             nebulaLayers
@@ -783,8 +776,8 @@ struct FocusMainView: View {
             // Central focus glow
             RadialGradient(
                 colors: [
-                    Aurora.Colors.cosmicGold.opacity(0.15),
-                    Aurora.Colors.stellarMagenta.opacity(0.08),
+                    UtopianDesignFallback.Gamification.starGold.opacity(0.15),
+                    UtopianDesignFallback.Colors.aiPurple.opacity(0.08),
                     Color.clear
                 ],
                 center: .center,
@@ -807,8 +800,8 @@ struct FocusMainView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Aurora.Colors.borealisViolet.opacity(0.12),
-                            Aurora.Colors.borealisViolet.opacity(0.04),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.12),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.04),
                             Color.clear
                         ],
                         center: .center,
@@ -825,8 +818,8 @@ struct FocusMainView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Aurora.Colors.cosmicGold.opacity(0.08),
-                            Aurora.Colors.stellarMagenta.opacity(0.04),
+                            UtopianDesignFallback.Gamification.starGold.opacity(0.08),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.04),
                             Color.clear
                         ],
                         center: .center,
@@ -843,7 +836,7 @@ struct FocusMainView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Aurora.Colors.electricCyan.opacity(0.06),
+                            UtopianDesignFallback.Colors.focusActive.opacity(0.06),
                             Color.clear
                         ],
                         center: .center,
@@ -899,7 +892,7 @@ struct FocusMainView: View {
     // MARK: - Header View
 
     private var headerView: some View {
-        VStack(spacing: Aurora.Spacing.sm) {
+        VStack(spacing: UtopianDesignFallback.Spacing.sm) {
             Text(headerGreeting)
                 .dynamicTypeFont(base: 28, weight: .thin)
                 .foregroundStyle(.white)
@@ -908,7 +901,7 @@ struct FocusMainView: View {
                 .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
         }
-        .padding(.vertical, Aurora.Spacing.lg)
+        .padding(.vertical, UtopianDesignFallback.Spacing.lg)
     }
 
     private var headerGreeting: String {
@@ -929,7 +922,7 @@ struct FocusMainView: View {
             let strokeWidth: CGFloat = ringSize * 0.056 // ~10 when size is 180
             let fontSize = min(ringSize * 0.22, 40)
 
-            VStack(spacing: Aurora.Spacing.lg) {
+            VStack(spacing: UtopianDesignFallback.Spacing.lg) {
                 // Timer Circle
                 ZStack {
                     // Background ring
@@ -1034,7 +1027,7 @@ struct FocusMainView: View {
     // MARK: - Timer Actions
 
     private func toggleTimer() {
-        AuroraHaptics.medium()
+        HapticsService.shared.impact(.medium)
 
         switch timerState {
         case .idle:
@@ -1094,7 +1087,7 @@ struct FocusMainView: View {
     private func selectMode(_ mode: QuickFocusMode) {
         guard timerState == .idle else { return }
 
-        AuroraHaptics.light()
+        HapticsService.shared.lightImpact()
         selectedMode = mode
         timeRemaining = mode.duration
         totalTime = mode.duration
@@ -1103,16 +1096,16 @@ struct FocusMainView: View {
     // MARK: - Portal Cards
 
     private var portalCardsView: some View {
-        VStack(spacing: Aurora.Spacing.xl) {
+        VStack(spacing: UtopianDesignFallback.Spacing.xl) {
             // Focus Timer Portal
             FocusPortalCard(
                 title: "Focus Timer",
                 subtitle: "Set duration & start session",
                 icon: "timer",
-                accentColor: Aurora.Colors.cosmicGold,
+                accentColor: UtopianDesignFallback.Gamification.starGold,
                 glowIntensity: 0.7 + portalPulse * 0.2
             ) {
-                AuroraHaptics.medium()
+                HapticsService.shared.impact(.medium)
                 showFocusTimer = true
             }
 
@@ -1121,10 +1114,10 @@ struct FocusMainView: View {
                 title: "App Blocking",
                 subtitle: "Control your digital space",
                 icon: "shield.lefthalf.filled",
-                accentColor: Aurora.Colors.electricCyan,
+                accentColor: UtopianDesignFallback.Colors.focusActive,
                 glowIntensity: 0.5 + portalPulse * 0.15
             ) {
-                AuroraHaptics.medium()
+                HapticsService.shared.impact(.medium)
                 showAppBlocking = true
             }
         }
@@ -1133,22 +1126,22 @@ struct FocusMainView: View {
     // MARK: - Quick Stats Bar
 
     private var quickStatsBar: some View {
-        HStack(spacing: Aurora.Spacing.lg) {
-            quickStatItem(value: "2h 45m", label: "Today's Focus", icon: "flame.fill", color: Aurora.Colors.stellarMagenta)
+        HStack(spacing: UtopianDesignFallback.Spacing.lg) {
+            quickStatItem(value: "2h 45m", label: "Today's Focus", icon: "flame.fill", color: UtopianDesignFallback.Colors.aiPurple)
 
             Divider()
                 .frame(height: 30)
                 .background(.white.opacity(0.2))
 
-            quickStatItem(value: "5", label: "Sessions", icon: "checkmark.circle.fill", color: Aurora.Colors.prismaticGreen)
+            quickStatItem(value: "5", label: "Sessions", icon: "checkmark.circle.fill", color: UtopianDesignFallback.Colors.completed)
 
             Divider()
                 .frame(height: 30)
                 .background(.white.opacity(0.2))
 
-            quickStatItem(value: "85%", label: "Focus Score", icon: "star.fill", color: Aurora.Colors.cosmicGold)
+            quickStatItem(value: "85%", label: "Focus Score", icon: "star.fill", color: UtopianDesignFallback.Gamification.starGold)
         }
-        .padding(Aurora.Spacing.md)
+        .padding(UtopianDesignFallback.Spacing.md)
         // 🌟 LIQUID GLASS: Interactive glass stats bar
         .glassEffect(
             .regular.interactive(true),
@@ -1243,7 +1236,7 @@ struct FocusPortalCard: View {
                 portalGlow
 
                 // Glass container
-                HStack(spacing: Aurora.Spacing.lg) {
+                HStack(spacing: UtopianDesignFallback.Spacing.lg) {
                     // Left: Animated orb icon
                     orbIconView
 
@@ -1265,7 +1258,7 @@ struct FocusPortalCard: View {
                         .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.4))
                 }
-                .padding(Aurora.Spacing.xl)
+                .padding(UtopianDesignFallback.Spacing.xl)
                 // 🌟 LIQUID GLASS: Interactive glass with tint for portal effect
                 .glassEffect(
                     .regular
@@ -1696,7 +1689,7 @@ struct ScheduleBlockRow: View {
             Spacer()
 
             Toggle("", isOn: .constant(isActive))
-                .toggleStyle(SwitchToggleStyle(tint: Aurora.Colors.electricCyan))
+                .toggleStyle(SwitchToggleStyle(tint: UtopianDesignFallback.Colors.focusActive))
                 .labelsHidden()
         }
         .padding(12)
@@ -1740,7 +1733,7 @@ struct CustomTimerPickerSheet: View {
                             get: { Double(minutes) },
                             set: { minutes = Int($0) }
                         ), in: 1...180, step: 1)
-                        .tint(Aurora.Colors.prismaticGreen)
+                        .tint(UtopianDesignFallback.Colors.completed)
 
                         HStack {
                             Text("1 min")
@@ -1766,7 +1759,7 @@ struct CustomTimerPickerSheet: View {
                             ForEach(presets, id: \.self) { preset in
                                 Button {
                                     minutes = preset
-                                    AuroraHaptics.light()
+                                    HapticsService.shared.lightImpact()
                                 } label: {
                                     Text("\(preset)m")
                                         .dynamicTypeFont(base: 14, weight: .medium)
@@ -1775,7 +1768,7 @@ struct CustomTimerPickerSheet: View {
                                         .padding(.vertical, 10)
                                         .background(
                                             RoundedRectangle(cornerRadius: 10)
-                                                .fill(minutes == preset ? Aurora.Colors.prismaticGreen : .white.opacity(0.1))
+                                                .fill(minutes == preset ? UtopianDesignFallback.Colors.completed : .white.opacity(0.1))
                                         )
                                 }
                                 .buttonStyle(.plain)
@@ -1788,7 +1781,7 @@ struct CustomTimerPickerSheet: View {
 
                     // Start button
                     Button {
-                        AuroraHaptics.medium()
+                        HapticsService.shared.impact(.medium)
                         onStart()
                     } label: {
                         Text("Start Focus")
@@ -1798,7 +1791,7 @@ struct CustomTimerPickerSheet: View {
                             .padding(.vertical, 16)
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
-                                    .fill(Aurora.Colors.prismaticGreen)
+                                    .fill(UtopianDesignFallback.Colors.completed)
                             )
                     }
                     .buttonStyle(.plain)

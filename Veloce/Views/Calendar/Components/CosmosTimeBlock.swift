@@ -121,11 +121,9 @@ struct CosmosTimeBlock: View {
             radius: isPressed ? 8 : 4,
             y: isPressed ? 1 : 2
         )
-        .supernovaBurst(
-            trigger: $showSupernova,
-            color: Theme.CelestialColors.auroraGreen,
-            particleCount: 20
-        )
+        // Completion feedback via scale animation (native approach)
+        .scaleEffect(showSupernova ? 1.02 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: showSupernova)
         .animation(LivingCosmos.Animations.quick, value: isPressed)
         .simultaneousGesture(pressGesture)
         .onAppear {

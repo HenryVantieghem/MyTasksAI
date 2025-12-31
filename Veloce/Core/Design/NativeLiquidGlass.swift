@@ -55,28 +55,37 @@ extension View {
 }
 
 // MARK: - Content Layer Modifiers (NO Glass - Solid Backgrounds)
+// Designed for Utopian gradient backgrounds
 
 extension View {
 
     /// Solid card for content layer (NOT glass)
     /// Use for: list items, task cards, content containers
-    func contentCard(cornerRadius: CGFloat = 16) -> some View {
+    /// Optimized for Utopian gradient backgrounds
+    func contentCard(cornerRadius: CGFloat = 12) -> some View {
         self
-            .background(Color(.secondarySystemBackground))
+            .background(Color.white.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 
     /// Elevated content card with subtle shadow
-    func elevatedContentCard(cornerRadius: CGFloat = 16) -> some View {
+    func elevatedContentCard(cornerRadius: CGFloat = 12) -> some View {
         self
-            .background(Color(.tertiarySystemBackground))
+            .background(Color.white.opacity(0.15))
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+            .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
     }
 
-    /// Void background for dark theme apps
-    func voidBackground() -> some View {
-        self.background(Color(red: 0.02, green: 0.02, blue: 0.04))
+    /// Subtle card for minimal visual weight
+    func subtleCard(cornerRadius: CGFloat = 12) -> some View {
+        self
+            .background(Color.white.opacity(0.05))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    }
+
+    /// Utopian gradient background (time-aware)
+    func utopianBackground() -> some View {
+        self.background(UtopianGradients.background(for: Date()).ignoresSafeArea())
     }
 }
 
@@ -102,8 +111,31 @@ struct NativeGlassContainer<Content: View>: View {
 @available(iOS 26.0, *)
 extension View {
     /// Apply scroll edge effect for legibility when content scrolls under glass
+    /// Use .hard for pinned accessory views, .soft for gradual fade
     func glassScrollEdge(style: ScrollEdgeEffectStyle = .hard, for edges: Edge.Set = .top) -> some View {
         self.scrollEdgeEffectStyle(style, for: edges)
+    }
+}
+
+// MARK: - Morphing Support
+
+@available(iOS 26.0, *)
+extension View {
+    /// Apply glass effect ID for fluid morphing transitions between glass shapes
+    /// System automatically creates smooth morphing animations when IDs match
+    func glassMorphID<ID: Hashable>(_ id: ID) -> some View {
+        self.glassEffectID(id)
+    }
+}
+
+// MARK: - Container Relative Shape
+
+@available(iOS 26.0, *)
+extension View {
+    /// Align control shape with container curvature for visual continuity
+    /// Creates concentric nesting: controls → sheets → windows → display
+    func glassContainerShape() -> some View {
+        self.containerShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
@@ -204,39 +236,42 @@ extension ButtonStyle where Self == NativeSecondaryButtonStyle {
 
 // MARK: - Preview
 
-#Preview("Native Glass Examples") {
+#Preview("Native Glass + Utopian Gradients") {
     ZStack {
-        Color(red: 0.02, green: 0.02, blue: 0.04)
+        // Utopian gradient background
+        UtopianGradients.background(for: Date())
             .ignoresSafeArea()
 
         VStack(spacing: 24) {
             // Navigation layer - Glass
             Text("Navigation Layer (Glass)")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.7))
 
             HStack(spacing: 12) {
                 Button("Primary") { }
-                    .buttonStyle(.nativePrimary(tint: .blue))
+                    .buttonStyle(.nativePrimary(tint: Color(hex: "#7C3AED")))
 
                 Button("Secondary") { }
                     .buttonStyle(.nativeSecondary)
             }
 
             Divider()
+                .background(Color.white.opacity(0.2))
                 .padding(.vertical)
 
             // Content layer - Solid
             Text("Content Layer (Solid)")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.7))
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Task Card")
                     .font(.headline)
-                Text("This uses solid background, not glass")
+                    .foregroundStyle(.white)
+                Text("Solid background over Utopian gradient")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
@@ -245,9 +280,10 @@ extension ButtonStyle where Self == NativeSecondaryButtonStyle {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Elevated Card")
                     .font(.headline)
-                Text("Solid with subtle shadow")
+                    .foregroundStyle(.white)
+                Text("Higher opacity + shadow")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
@@ -255,5 +291,4 @@ extension ButtonStyle where Self == NativeSecondaryButtonStyle {
         }
         .padding()
     }
-    .preferredColorScheme(.dark)
 }

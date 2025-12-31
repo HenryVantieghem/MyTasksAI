@@ -637,8 +637,9 @@ struct LiquidGlassWelcomePage: View {
                             endPoint: .trailing
                         )
                     )
+                    .shadow(color: Aurora.Colors.electricCyan.opacity(0.4), radius: 12, y: 4)
             }
-            .aiBorder(Capsule(), lineWidth: 1.5, animated: !reduceMotion)
+            .clipShape(Capsule())
             .padding(.horizontal, Aurora.Spacing.xl)
             .padding(.bottom, Aurora.Spacing.xxl)
             .opacity(contentOpacity)
@@ -1093,7 +1094,8 @@ struct LiquidGlassTrialInfoPage: View {
                         )
                     )
             }
-            .prismaticBorder(Capsule(), style: .success, lineWidth: 2, animated: !reduceMotion)
+            .clipShape(Capsule())
+            .shadow(color: Aurora.Colors.cosmicGold.opacity(0.3), radius: 12, y: 4)
             .padding(.horizontal, Aurora.Spacing.xl)
             .padding(.bottom, Aurora.Spacing.xxl)
         }
@@ -1287,7 +1289,8 @@ struct LiquidGlassLaunchPage: View {
                             )
                         )
                 }
-                .prismaticBorder(Capsule(), style: .spectrum, lineWidth: 2, animated: !reduceMotion)
+                .clipShape(Capsule())
+                .shadow(color: Aurora.Colors.electricCyan.opacity(0.4), radius: 16, y: 6)
                 .disabled(isLaunching)
                 .padding(.horizontal, Aurora.Spacing.xl)
                 .padding(.bottom, Aurora.Spacing.xxl)

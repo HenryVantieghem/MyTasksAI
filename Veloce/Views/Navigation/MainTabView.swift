@@ -4,7 +4,11 @@
 //
 //  Main Tab View - Primary navigation container
 //  5 tabs: Tasks, Plan, Grow, Flow, Journal
-//  Replaces MainContainerView's tab logic with standard TabView
+//
+//  Utopian Design:
+//  - Time-aware gradient background
+//  - Native iOS 26 TabView with glass
+//  - Tab bar minimization on scroll
 //
 
 import SwiftUI
@@ -79,7 +83,14 @@ struct MainTabView: View {
                 }
                 .tag(AppTab.journal)
         }
-        .tint(.purple)
+        .tint(Color(hex: "#7C3AED")) // Primary purple from Utopian system
+        .background {
+            // Utopian time-aware gradient background
+            UtopianGradients.background(for: Date())
+                .ignoresSafeArea()
+        }
+        // iOS 26: Tab bar minimizes on scroll for content focus
+        .modifier(TabBarMinimizationModifier())
         // Full-featured Liquid Glass Task Detail Sheet - using .sheet(item:) for reliable presentation
         .sheet(item: $selectedTaskForDetail) { task in
             LiquidGlassTaskDetailSheet(
@@ -235,4 +246,18 @@ struct MainTabView: View {
 #Preview {
     MainTabView()
         .preferredColorScheme(.dark)
+}
+
+// MARK: - iOS 26 Tab Bar Minimization
+
+/// Modifier that applies tab bar minimization on iOS 26+
+struct TabBarMinimizationModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .tabBarMinimizationBehavior(.onScrollDown)
+        } else {
+            content
+        }
+    }
 }

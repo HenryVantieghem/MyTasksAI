@@ -2,14 +2,28 @@
 //  LiquidGlassButton.swift
 //  Veloce
 //
-//  Ultra-Premium Liquid Glass Button Component
-//  Features native iOS 26 glass effects with graceful fallbacks,
-//  animated gradients, shimmer effects, and premium haptics.
+//  Pure Native iOS 26 Button Components
+//  Uses Apple's native button styles and Liquid Glass APIs
+//
+//  Architecture:
+//  - Primary: .borderedProminent with tint
+//  - Secondary: Native glass with .glassEffect()
+//  - Ghost: Plain with subtle glass on press
 //
 
 import SwiftUI
 
-// MARK: - Liquid Glass Button
+// MARK: - Button Style Enum
+
+enum LiquidGlassButtonStyle {
+    case primary
+    case secondary
+    case ghost
+    case success
+    case destructive
+}
+
+// MARK: - Primary Button (Native .borderedProminent)
 
 struct LiquidGlassButton: View {
     let title: String
@@ -20,13 +34,6 @@ struct LiquidGlassButton: View {
     let isEnabled: Bool
     let fullWidth: Bool
     let action: () -> Void
-
-    @State private var isPressed = false
-    @State private var shimmerOffset: CGFloat = -1.0
-    @State private var glowPulse: Double = 0
-    @State private var borderRotation: Double = 0
-
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     enum IconPosition {
         case leading
@@ -56,380 +63,139 @@ struct LiquidGlassButton: View {
     var body: some View {
         Button {
             guard isEnabled && !isLoading else { return }
-            triggerHaptic()
+            HapticsService.shared.impact(.medium)
             action()
         } label: {
-            buttonContent
+            buttonLabel
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(nativeButtonStyle)
         .disabled(!isEnabled || isLoading)
-        .scaleEffect(isPressed ? 0.97 : 1.0)
-        .animation(LiquidGlassDesignSystem.Springs.press, value: isPressed)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in
-                    if !isPressed && isEnabled && !isLoading {
-                        isPressed = true
-                        HapticsService.shared.lightImpact()
-                    }
-                }
-                .onEnded { _ in
-                    isPressed = false
-                }
-        )
-        .onAppear {
-            startAnimations()
-        }
     }
 
-    // MARK: - Button Content
+    // MARK: - Button Label
 
     @ViewBuilder
-    private var buttonContent: some View {
+    private var buttonLabel: some View {
         HStack(spacing: 10) {
             if iconPosition == .leading, let icon = icon {
-                iconView(systemName: icon)
+                Image(systemName: icon)
+                    .font(.body.weight(.semibold))
             }
 
             if isLoading {
-                loadingIndicator
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: textColor))
+                    .scaleEffect(0.85)
+                Text("Loading...")
+                    .font(.body.weight(.medium))
             } else {
                 Text(title)
-                    .dynamicTypeFont(base: 17, weight: .semibold)
-                    .tracking(0.5)
+                    .font(.headline)
             }
 
             if iconPosition == .trailing, let icon = icon, !isLoading {
-                iconView(systemName: icon)
+                Image(systemName: icon)
+                    .font(.body.weight(.semibold))
             }
         }
-        .foregroundStyle(textColor)
         .frame(maxWidth: fullWidth ? .infinity : nil)
-        .frame(height: LiquidGlassDesignSystem.Sizing.buttonHeight)
-        .padding(.horizontal, 24)
-        .background(buttonBackground)
-        .clipShape(RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius))
-        .overlay(buttonBorder)
-        .overlay(shimmerOverlay)
-        .shadow(color: shadowColor, radius: shadowRadius, x: 0, y: shadowY)
-        .opacity(isEnabled ? 1 : 0.5)
+        .frame(height: 50)
     }
 
-    // MARK: - Icon View
+    // MARK: - Native Button Style
 
-    @ViewBuilder
-    private func iconView(systemName: String) -> some View {
-        Image(systemName: systemName)
-            .dynamicTypeFont(base: 15, weight: .semibold)
-            .foregroundStyle(textColor)
-    }
-
-    // MARK: - Loading Indicator
-
-    @ViewBuilder
-    private var loadingIndicator: some View {
-        HStack(spacing: 8) {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: textColor))
-                .scaleEffect(0.85)
-
-            Text("Loading...")
-                .dynamicTypeFont(base: 16, weight: .medium)
-        }
-    }
-
-    // MARK: - Background (iOS 26 Native Liquid Glass)
-
-    @ViewBuilder
-    private var buttonBackground: some View {
-        let cornerRadius = LiquidGlassDesignSystem.Sizing.buttonCornerRadius
-        let shape = RoundedRectangle(cornerRadius: cornerRadius)
-        
+    private var nativeButtonStyle: some ButtonStyle {
         switch style {
         case .primary:
-            // iOS 26: Use native Liquid Glass with gradient tint
-            if #available(iOS 26.0, *) {
-                ZStack {
-                    // Base gradient
-                    shape.fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
-                    
-                    // Native glass overlay with interactive response
-                    Color.clear
-                        .glassEffect(
-                            .regular
-                                .tint(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.3))
-                                .interactive(true),
-                            in: shape
-                        )
-                    
-                    // Glow overlay on press
-                    if isPressed {
-                        shape.fill(Color.white.opacity(0.15))
-                    }
-                }
-            } else {
-                ZStack {
-                    shape.fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
-                    shape.fill(.ultraThinMaterial.opacity(0.3))
-                    
-                    if isPressed {
-                        shape.fill(Color.white.opacity(0.15))
-                    }
-                }
-            }
-
+            return AnyButtonStyle(NativePrimaryStyle(tint: LiquidGlassDesignSystem.VibrantAccents.electricCyan))
         case .secondary:
-            // iOS 26: Pure native interactive glass
-            if #available(iOS 26.0, *) {
-                Color.clear
-                    .glassEffect(
-                        .regular
-                            .tint(LiquidGlassDesignSystem.GlassTints.interactive.opacity(0.2))
-                            .interactive(true),
-                        in: shape
-                    )
-            } else {
-                shape
-                    .fill(.ultraThinMaterial)
-                    .background(shape.fill(LiquidGlassDesignSystem.GlassTints.interactive.opacity(0.1)))
-            }
-
+            return AnyButtonStyle(NativeSecondaryStyle())
         case .ghost:
-            if isPressed {
-                if #available(iOS 26.0, *) {
-                    Color.clear
-                        .glassEffect(.regular.interactive(true), in: shape)
-                } else {
-                    shape.fill(.ultraThinMaterial.opacity(0.5))
-                }
-            } else {
-                Color.clear
-            }
-
+            return AnyButtonStyle(NativeGhostStyle())
         case .success:
-            // iOS 26: Glass over gradient
-            if #available(iOS 26.0, *) {
-                ZStack {
-                    shape.fill(LiquidGlassDesignSystem.Gradients.success)
-                    
-                    Color.clear
-                        .glassEffect(
-                            .regular.tint(LiquidGlassDesignSystem.Semantic.success.opacity(0.2)),
-                            in: shape
-                        )
-                }
-            } else {
-                ZStack {
-                    shape.fill(LiquidGlassDesignSystem.Gradients.success)
-                    shape.fill(.ultraThinMaterial.opacity(0.25))
-                }
-            }
-
+            return AnyButtonStyle(NativePrimaryStyle(tint: LiquidGlassDesignSystem.VibrantAccents.auroraGreen))
         case .destructive:
-            // iOS 26: Glass over red gradient
-            if #available(iOS 26.0, *) {
-                ZStack {
-                    shape.fill(
-                        LinearGradient(
-                            colors: [Color.red.opacity(0.8), Color.red.opacity(0.6)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    
-                    Color.clear
-                        .glassEffect(
-                            .regular.tint(Color.red.opacity(0.2)),
-                            in: shape
-                        )
-                }
-            } else {
-                ZStack {
-                    shape.fill(
-                        LinearGradient(
-                            colors: [Color.red.opacity(0.8), Color.red.opacity(0.6)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    shape.fill(.ultraThinMaterial.opacity(0.2))
-                }
-            }
+            return AnyButtonStyle(NativePrimaryStyle(tint: .red))
         }
     }
-
-    // MARK: - Border
-
-    @ViewBuilder
-    private var buttonBorder: some View {
-        switch style {
-        case .primary, .success:
-            // Subtle inner highlight
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                .stroke(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.3),
-                            Color.white.opacity(0.1),
-                            Color.clear
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.75
-                )
-
-        case .secondary:
-            // Prismatic animated border
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                .stroke(
-                    AngularGradient(
-                        colors: [
-                            LiquidGlassDesignSystem.VibrantAccents.electricCyan,
-                            LiquidGlassDesignSystem.VibrantAccents.plasmaPurple,
-                            LiquidGlassDesignSystem.VibrantAccents.nebulaPink,
-                            LiquidGlassDesignSystem.VibrantAccents.electricCyan
-                        ],
-                        center: .center,
-                        startAngle: .degrees(borderRotation),
-                        endAngle: .degrees(borderRotation + 360)
-                    ),
-                    lineWidth: isPressed ? 1.5 : 1.0
-                )
-
-        case .ghost:
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                .stroke(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(isPressed ? 0.4 : 0.2),
-                            Color.white.opacity(isPressed ? 0.2 : 0.1)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 0.75
-                )
-
-        case .destructive:
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                .stroke(
-                    Color.red.opacity(0.5),
-                    lineWidth: 0.75
-                )
-        }
-    }
-
-    // MARK: - Shimmer Overlay
-
-    @ViewBuilder
-    private var shimmerOverlay: some View {
-        if style == .primary && !reduceMotion && isEnabled {
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.buttonCornerRadius)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.clear,
-                            Color.white.opacity(0.15),
-                            Color.clear
-                        ],
-                        startPoint: UnitPoint(x: shimmerOffset - 0.3, y: 0.5),
-                        endPoint: UnitPoint(x: shimmerOffset + 0.3, y: 0.5)
-                    )
-                )
-                .allowsHitTesting(false)
-        }
-    }
-
-    // MARK: - Colors
 
     private var textColor: Color {
         switch style {
         case .primary, .success, .destructive:
             return .white
         case .secondary:
-            return LiquidGlassDesignSystem.VibrantAccents.stellarWhite
+            return .primary
         case .ghost:
             return LiquidGlassDesignSystem.VibrantAccents.electricCyan
         }
     }
+}
 
-    private var shadowColor: Color {
-        guard isEnabled else { return .clear }
+// MARK: - Native Button Styles
 
-        switch style {
-        case .primary:
-            return LiquidGlassDesignSystem.VibrantAccents.electricCyan.opacity(isPressed ? 0.5 : 0.3)
-        case .secondary:
-            return LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(isPressed ? 0.4 : 0.2)
-        case .ghost:
-            return .clear
-        case .success:
-            return LiquidGlassDesignSystem.VibrantAccents.auroraGreen.opacity(isPressed ? 0.5 : 0.3)
-        case .destructive:
-            return Color.red.opacity(isPressed ? 0.4 : 0.2)
-        }
+/// Primary button style using solid tinted background
+struct NativePrimaryStyle: ButtonStyle {
+    let tint: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(.white)
+            .padding(.horizontal, 24)
+            .background(
+                Capsule()
+                    .fill(tint)
+                    .shadow(color: tint.opacity(0.3), radius: configuration.isPressed ? 8 : 16, y: configuration.isPressed ? 2 : 8)
+            )
+            .clipShape(Capsule())
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .animation(.spring(response: 0.2), value: configuration.isPressed)
     }
+}
 
-    private var shadowRadius: CGFloat {
-        isPressed ? 24 : 16
+/// Secondary button style using native Liquid Glass
+struct NativeSecondaryStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 24)
+            .adaptiveGlassCapsule(interactive: true)
+            .opacity(configuration.isPressed ? 0.85 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .animation(.spring(response: 0.2), value: configuration.isPressed)
     }
+}
 
-    private var shadowY: CGFloat {
-        isPressed ? 4 : 8
-    }
-
-    // MARK: - Animations
-
-    private func startAnimations() {
-        guard !reduceMotion else { return }
-
-        // Shimmer animation for primary buttons
-        if style == .primary {
-            withAnimation(
-                .linear(duration: LiquidGlassDesignSystem.MorphAnimation.shimmerSweep)
-                .repeatForever(autoreverses: false)
-            ) {
-                shimmerOffset = 2.0
+/// Ghost button style - minimal with subtle glass on press
+struct NativeGhostStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
+            .padding(.horizontal, 16)
+            .background {
+                if configuration.isPressed {
+                    Capsule()
+                        .fill(.ultraThinMaterial.opacity(0.5))
+                }
             }
-        }
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(.spring(response: 0.2), value: configuration.isPressed)
+    }
+}
 
-        // Border rotation for secondary buttons
-        if style == .secondary {
-            withAnimation(
-                .linear(duration: LiquidGlassDesignSystem.MorphAnimation.prismaticRotation)
-                .repeatForever(autoreverses: false)
-            ) {
-                borderRotation = 360
-            }
-        }
+// MARK: - Type Erasure for ButtonStyle
 
-        // Glow pulse for success buttons
-        if style == .success {
-            withAnimation(
-                .easeInOut(duration: LiquidGlassDesignSystem.MorphAnimation.glowPulse)
-                .repeatForever(autoreverses: true)
-            ) {
-                glowPulse = 1
-            }
+struct AnyButtonStyle: ButtonStyle {
+    private let _makeBody: (Configuration) -> AnyView
+
+    init<S: ButtonStyle>(_ style: S) {
+        _makeBody = { configuration in
+            AnyView(style.makeBody(configuration: configuration))
         }
     }
 
-    // MARK: - Haptics
-
-    private func triggerHaptic() {
-        switch style {
-        case .primary:
-            HapticsService.shared.premiumButtonPress()
-        case .secondary:
-            HapticsService.shared.impact(.medium)
-        case .ghost:
-            HapticsService.shared.lightImpact()
-        case .success:
-            HapticsService.shared.successConfirm()
-        case .destructive:
-            HapticsService.shared.impact(.rigid)
-        }
+    func makeBody(configuration: Configuration) -> some View {
+        _makeBody(configuration)
     }
 }
 
@@ -454,7 +220,7 @@ extension LiquidGlassButton {
         )
     }
 
-    /// Secondary button with prismatic border
+    /// Secondary button with glass effect
     static func secondary(
         _ title: String,
         icon: String? = nil,
@@ -489,7 +255,7 @@ extension LiquidGlassButton {
         )
     }
 
-    /// Success button (for completion actions)
+    /// Success button
     static func success(
         _ title: String,
         icon: String? = "checkmark",
@@ -514,8 +280,6 @@ struct LiquidGlassButtonSmall: View {
     let icon: String?
     let action: () -> Void
 
-    @State private var isPressed = false
-
     init(
         _ title: String,
         style: LiquidGlassButtonStyle = .secondary,
@@ -536,88 +300,52 @@ struct LiquidGlassButtonSmall: View {
             HStack(spacing: 6) {
                 if let icon = icon {
                     Image(systemName: icon)
-                        .dynamicTypeFont(base: 13, weight: .semibold)
+                        .font(.caption.weight(.semibold))
                 }
-
                 Text(title)
-                    .dynamicTypeFont(base: 14, weight: .semibold)
+                    .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(style == .ghost ? LiquidGlassDesignSystem.VibrantAccents.electricCyan : .white)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
-            .background(smallButtonBackground)
-            .clipShape(Capsule())
-            .overlay(smallButtonBorder)
         }
-        .buttonStyle(PlainButtonStyle())
-        .scaleEffect(isPressed ? 0.95 : 1.0)
-        .animation(LiquidGlassDesignSystem.Springs.press, value: isPressed)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in isPressed = true }
-                .onEnded { _ in isPressed = false }
-        )
+        .buttonStyle(smallButtonStyle)
     }
 
-    @ViewBuilder
-    private var smallButtonBackground: some View {
+    private var smallButtonStyle: some ButtonStyle {
         switch style {
         case .primary:
-            if #available(iOS 26.0, *) {
-                ZStack {
-                    Capsule().fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
-                    Color.clear.glassEffect(.regular.tint(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.2)), in: Capsule())
-                }
-            } else {
-                Capsule().fill(LiquidGlassDesignSystem.Gradients.ctaPrimary)
-            }
-            
+            return AnyButtonStyle(SmallPrimaryStyle(tint: LiquidGlassDesignSystem.VibrantAccents.electricCyan))
         case .secondary:
-            if #available(iOS 26.0, *) {
-                Color.clear.glassEffect(.regular.interactive(true), in: Capsule())
-            } else {
-                Capsule().fill(.ultraThinMaterial)
-            }
-            
+            return AnyButtonStyle(SmallSecondaryStyle())
         case .ghost:
-            Color.clear
-            
+            return AnyButtonStyle(NativeGhostStyle())
         case .success:
-            if #available(iOS 26.0, *) {
-                ZStack {
-                    Capsule().fill(LiquidGlassDesignSystem.Gradients.success)
-                    Color.clear.glassEffect(.regular.tint(LiquidGlassDesignSystem.Semantic.success.opacity(0.15)), in: Capsule())
-                }
-            } else {
-                Capsule().fill(LiquidGlassDesignSystem.Gradients.success)
-            }
-            
+            return AnyButtonStyle(SmallPrimaryStyle(tint: LiquidGlassDesignSystem.VibrantAccents.auroraGreen))
         case .destructive:
-            if #available(iOS 26.0, *) {
-                ZStack {
-                    Capsule().fill(Color.red.opacity(0.7))
-                    Color.clear.glassEffect(.regular.tint(Color.red.opacity(0.15)), in: Capsule())
-                }
-            } else {
-                Capsule().fill(Color.red.opacity(0.7))
-            }
+            return AnyButtonStyle(SmallPrimaryStyle(tint: .red))
         }
     }
+}
 
-    @ViewBuilder
-    private var smallButtonBorder: some View {
-        Capsule()
-            .stroke(
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(style == .ghost ? 0.3 : 0.2),
-                        Color.white.opacity(0.1)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                lineWidth: 0.5
-            )
+struct SmallPrimaryStyle: ButtonStyle {
+    let tint: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(Capsule().fill(tint))
+            .clipShape(Capsule())
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .animation(.spring(response: 0.2), value: configuration.isPressed)
+    }
+}
+
+struct SmallSecondaryStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .adaptiveGlassCapsule(interactive: true)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .animation(.spring(response: 0.2), value: configuration.isPressed)
     }
 }
 
@@ -628,8 +356,6 @@ struct LiquidGlassIconButton: View {
     let size: CGFloat
     let tint: Color?
     let action: () -> Void
-
-    @State private var isPressed = false
 
     init(
         icon: String,
@@ -650,48 +376,33 @@ struct LiquidGlassIconButton: View {
         } label: {
             Image(systemName: icon)
                 .font(.system(size: size * 0.4, weight: .medium))
-                .foregroundStyle(tint ?? .white)
+                .foregroundStyle(tint ?? .primary)
                 .frame(width: size, height: size)
         }
-        .buttonStyle(PlainButtonStyle())
-        .background {
-            if #available(iOS 26.0, *) {
-                Color.clear
-                    .glassEffect(
-                        .regular
-                            .tint((tint ?? LiquidGlassDesignSystem.VibrantAccents.electricCyan).opacity(0.15))
-                            .interactive(true),
-                        in: Circle()
-                    )
-            } else {
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .overlay {
-                        if let tint = tint {
-                            Circle().fill(tint.opacity(0.1))
-                        }
-                    }
-            }
-        }
-        .scaleEffect(isPressed ? 0.92 : 1.0)
-        .animation(LiquidGlassDesignSystem.Springs.press, value: isPressed)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in isPressed = true }
-                .onEnded { _ in isPressed = false }
-        )
+        .buttonStyle(IconButtonStyle(tint: tint))
+    }
+}
+
+struct IconButtonStyle: ButtonStyle {
+    let tint: Color?
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .adaptiveGlass(cornerRadius: 999, interactive: true)
+            .scaleEffect(configuration.isPressed ? 0.92 : 1.0)
+            .animation(.spring(response: 0.2), value: configuration.isPressed)
     }
 }
 
 // MARK: - Preview
 
-#Preview("Button Styles") {
+#Preview("Native Button Styles") {
     ZStack {
-        Theme.CelestialColors.voidDeep
+        LiquidGlassDesignSystem.Void.cosmos
             .ignoresSafeArea()
 
         VStack(spacing: 24) {
-            Text("Liquid Glass Buttons")
+            Text("Native Liquid Glass Buttons")
                 .font(.title2.bold())
                 .foregroundStyle(.white)
 
@@ -703,12 +414,12 @@ struct LiquidGlassIconButton: View {
                 print("Secondary tapped")
             }
 
-            LiquidGlassButton.success("Complete Setup", icon: "checkmark.circle") {
+            LiquidGlassButton.success("Complete", icon: "checkmark.circle") {
                 print("Success tapped")
             }
 
             LiquidGlassButton(
-                "Delete Account",
+                "Delete",
                 style: .destructive,
                 icon: "trash",
                 iconPosition: .leading
@@ -730,39 +441,17 @@ struct LiquidGlassIconButton: View {
 
             HStack(spacing: 16) {
                 LiquidGlassIconButton(icon: "xmark") {
-                    print("Close tapped")
+                    print("Close")
                 }
 
                 LiquidGlassIconButton(icon: "heart.fill", tint: .pink) {
-                    print("Heart tapped")
+                    print("Heart")
                 }
 
                 LiquidGlassIconButton(icon: "plus", tint: LiquidGlassDesignSystem.VibrantAccents.electricCyan) {
-                    print("Add tapped")
+                    print("Add")
                 }
             }
-        }
-        .padding()
-    }
-}
-
-#Preview("Loading State") {
-    ZStack {
-        Theme.CelestialColors.voidDeep
-            .ignoresSafeArea()
-
-        VStack(spacing: 24) {
-            LiquidGlassButton(
-                "Creating Account...",
-                style: .primary,
-                isLoading: true
-            ) {}
-
-            LiquidGlassButton(
-                "Disabled Button",
-                style: .primary,
-                isEnabled: false
-            ) {}
         }
         .padding()
     }

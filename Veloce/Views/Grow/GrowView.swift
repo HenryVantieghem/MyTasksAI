@@ -2,9 +2,9 @@
 //  GrowView.swift
 //  Veloce
 //
-//  Aurora Design System - Energy Core Dashboard
+//  Utopian Design System - Growth Dashboard
 //  Grow Tab - Contains 3 segments: Stats, Goals, Circles
-//  Energy visualization with aurora particles and prismatic glass
+//  Time-aware gradients with gold gamification theme
 //
 
 import SwiftUI
@@ -25,11 +25,11 @@ enum GrowSegment: String, CaseIterable {
         }
     }
 
-    var auroraColor: Color {
+    var accentColor: Color {
         switch self {
-        case .stats: return Aurora.Colors.electricCyan
-        case .goals: return Aurora.Colors.prismaticGreen
-        case .circles: return Aurora.Colors.stellarMagenta
+        case .stats: return UtopianDesignFallback.Colors.focusActive      // Cyan for stats
+        case .goals: return UtopianDesignFallback.Colors.completed        // Green for goals
+        case .circles: return UtopianDesignFallback.Colors.aiPurple       // Purple for circles
         }
     }
 }
@@ -49,28 +49,16 @@ struct GrowView: View {
 
     var body: some View {
         ZStack {
-            // Aurora cosmic void background
-            Aurora.Colors.voidCosmos
+            // Utopian time-aware gradient background
+            UtopianGradients.background(for: Date())
                 .ignoresSafeArea()
-
-            // Subtle aurora waves responding to segment
-            if !reduceMotion {
-                AuroraAnimatedWaveBackground(
-                    colors: [
-                        selectedSegment.auroraColor.opacity(0.3),
-                        Aurora.Colors.borealisViolet.opacity(0.2)
-                    ]
-                )
-                .ignoresSafeArea()
-                .opacity(0.4)
-            }
 
             VStack(spacing: 0) {
-                // Aurora Segmented Picker
-                auroraSegmentPicker
+                // Utopian Segmented Picker
+                utopianSegmentPicker
                     .padding(.top, 80) // Below universal header
-                    .padding(.horizontal, Aurora.Spacing.screenPadding)
-                    .padding(.bottom, Aurora.Spacing.lg)
+                    .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
+                    .padding(.bottom, UtopianDesignFallback.Spacing.lg)
 
                 // Content
                 TabView(selection: $selectedSegment) {
@@ -106,25 +94,25 @@ struct GrowView: View {
         }
     }
 
-    // MARK: - Aurora Segment Picker
+    // MARK: - Utopian Segment Picker
 
-    private var auroraSegmentPicker: some View {
+    private var utopianSegmentPicker: some View {
         HStack(spacing: 0) {
             ForEach(GrowSegment.allCases, id: \.self) { segment in
-                auroraSegmentTab(segment)
+                utopianSegmentTab(segment)
             }
         }
-        .padding(Aurora.Spacing.xs)
+        .padding(UtopianDesignFallback.Spacing.xs)
         .background {
             RoundedRectangle(cornerRadius: 24)
-                .fill(Aurora.Colors.voidNebula.opacity(0.8))
+                .fill(.ultraThinMaterial.opacity(0.6))
                 .overlay {
                     RoundedRectangle(cornerRadius: 24)
                         .strokeBorder(
                             LinearGradient(
                                 colors: [
-                                    Aurora.Colors.electricCyan.opacity(0.2),
-                                    Aurora.Colors.borealisViolet.opacity(0.1),
+                                    UtopianDesignFallback.Colors.focusActive.opacity(0.2),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.1),
                                     Color.clear
                                 ],
                                 startPoint: .topLeading,
@@ -134,26 +122,24 @@ struct GrowView: View {
                         )
                 }
         }
-        .auroraGlass(in: RoundedRectangle(cornerRadius: 24))
     }
 
-    private func auroraSegmentTab(_ segment: GrowSegment) -> some View {
+    private func utopianSegmentTab(_ segment: GrowSegment) -> some View {
         let isSelected = selectedSegment == segment
 
         return Button {
-            withAnimation(AuroraMotion.Spring.ui) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 selectedSegment = segment
             }
-            AuroraHaptics.light()
-            AuroraSoundEngine.shared.play(.tabSwitch)
+            HapticsService.shared.lightImpact()
         } label: {
-            HStack(spacing: Aurora.Spacing.sm) {
+            HStack(spacing: UtopianDesignFallback.Spacing.sm) {
                 ZStack {
                     // Glow behind icon when selected
                     if isSelected {
                         Image(systemName: segment.icon)
                             .dynamicTypeFont(base: 12, weight: .semibold)
-                            .foregroundStyle(segment.auroraColor)
+                            .foregroundStyle(segment.accentColor)
                             .blur(radius: 4)
                     }
 
@@ -162,23 +148,23 @@ struct GrowView: View {
                 }
 
                 Text(segment.rawValue)
-                    .font(Aurora.Typography.subheadline)
+                    .font(UtopianDesignFallback.Typography.body)
                     .fontWeight(.semibold)
             }
-            .foregroundStyle(isSelected ? Aurora.Colors.textPrimary : Aurora.Colors.textTertiary)
-            .padding(.horizontal, Aurora.Spacing.lg)
-            .padding(.vertical, Aurora.Spacing.md)
+            .foregroundStyle(isSelected ? .white : .white.opacity(0.5))
+            .padding(.horizontal, UtopianDesignFallback.Spacing.lg)
+            .padding(.vertical, UtopianDesignFallback.Spacing.md)
             .background {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(segment.auroraColor.opacity(0.2))
+                        .fill(segment.accentColor.opacity(0.2))
                         .overlay {
                             RoundedRectangle(cornerRadius: 20)
                                 .strokeBorder(
                                     LinearGradient(
                                         colors: [
-                                            segment.auroraColor.opacity(0.5),
-                                            segment.auroraColor.opacity(0.2)
+                                            segment.accentColor.opacity(0.5),
+                                            segment.accentColor.opacity(0.2)
                                         ],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
@@ -186,7 +172,7 @@ struct GrowView: View {
                                     lineWidth: 1
                                 )
                         }
-                        .shadow(color: segment.auroraColor.opacity(0.3), radius: 8, y: 2)
+                        .shadow(color: segment.accentColor.opacity(0.3), radius: 8, y: 2)
                 }
             }
         }

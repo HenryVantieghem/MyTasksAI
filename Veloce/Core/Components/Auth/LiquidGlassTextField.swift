@@ -2,9 +2,13 @@
 //  LiquidGlassTextField.swift
 //  Veloce
 //
-//  Ultra-Premium Liquid Glass Text Field Component
-//  Features native iOS 26 glass effects, floating labels,
-//  prismatic borders, and real-time validation with premium haptics.
+//  Pure Native iOS 26 Text Field Components
+//  Uses standard TextField with native Liquid Glass styling
+//
+//  Architecture:
+//  - Standard TextField/SecureField
+//  - Native glass background via adaptiveGlass()
+//  - System validation states
 //
 
 import SwiftUI
@@ -27,12 +31,6 @@ struct LiquidGlassTextField: View {
     var onSubmit: (() -> Void)?
 
     @FocusState private var isFocused: Bool
-    @State private var borderRotation: Double = 0
-    @State private var iconGlowPulse: Double = 0
-    @State private var labelOffset: CGFloat = 0
-    @State private var labelScale: CGFloat = 1.0
-
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(
         text: Binding<String>,
@@ -62,64 +60,21 @@ struct LiquidGlassTextField: View {
         self.onSubmit = onSubmit
     }
 
-    // MARK: - Computed Properties
-
-    private var shouldShowFloatingLabel: Bool {
-        isFocused || !text.isEmpty
-    }
-
-    private var currentTint: Color {
-        if isFocused {
-            return LiquidGlassDesignSystem.GlassTints.interactive
-        }
-        return validation.tint
-    }
-
-    private var borderOpacity: Double {
-        if isFocused {
-            return LiquidGlassDesignSystem.GlassConfig.borderOpacityFocused
-        }
-        switch validation {
-        case .valid, .invalid:
-            return LiquidGlassDesignSystem.GlassConfig.borderOpacityPressed
-        default:
-            return LiquidGlassDesignSystem.GlassConfig.borderOpacityRest
-        }
-    }
-
-    private var glowColor: Color {
-        if isFocused {
-            return LiquidGlassDesignSystem.VibrantAccents.electricCyan
-        }
-        switch validation {
-        case .valid:
-            return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
-        case .invalid:
-            return Color.red
-        default:
-            return .clear
-        }
-    }
-
-    // MARK: - Body
-
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             // Main text field container
             HStack(spacing: 12) {
-                // Icon container
+                // Icon
                 if let icon = icon {
-                    iconContainer(systemName: icon)
+                    Image(systemName: icon)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(isFocused ? accentColor : .secondary)
+                        .frame(width: 24)
                 }
 
-                // Text field with floating label
-                ZStack(alignment: .leading) {
-                    // Floating label
-                    floatingLabel
-
-                    // Actual text field
-                    textFieldView
-                }
+                // Text field
+                textFieldView
+                    .frame(maxWidth: .infinity)
 
                 // Validation indicator
                 validationIndicator
@@ -129,19 +84,12 @@ struct LiquidGlassTextField: View {
                     secureToggle
                 }
             }
-            .frame(height: LiquidGlassDesignSystem.Sizing.textFieldHeight)
+            .frame(height: 48)
             .padding(.horizontal, 16)
             .background(fieldBackground)
-            .clipShape(RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius))
             .overlay(fieldBorder)
-            .shadow(
-                color: glowColor.opacity(isFocused || validation != .idle ? 0.3 : 0),
-                radius: 16,
-                x: 0,
-                y: 0
-            )
-            .animation(LiquidGlassDesignSystem.Springs.focus, value: isFocused)
-            .animation(LiquidGlassDesignSystem.Springs.focus, value: validation)
+            .animation(.spring(response: 0.3), value: isFocused)
+            .animation(.spring(response: 0.3), value: validation)
 
             // Error message
             if case .invalid(let message) = validation {
@@ -150,63 +98,10 @@ struct LiquidGlassTextField: View {
         }
         .onChange(of: isFocused) { _, newValue in
             onFocusChange?(newValue)
-            updateLabelPosition()
-
             if newValue {
-                HapticsService.shared.glassFocus()
+                HapticsService.shared.lightImpact()
             }
         }
-        .onChange(of: text) { _, _ in
-            updateLabelPosition()
-        }
-        .onAppear {
-            updateLabelPosition()
-            startAnimations()
-        }
-    }
-
-    // MARK: - Icon Container
-
-    @ViewBuilder
-    private func iconContainer(systemName: String) -> some View {
-        ZStack {
-            // Glow circle (when focused)
-            if isFocused && !reduceMotion {
-                Circle()
-                    .fill(LiquidGlassDesignSystem.VibrantAccents.electricCyan.opacity(0.2))
-                    .frame(width: 36, height: 36)
-                    .blur(radius: 8)
-                    .scaleEffect(1 + iconGlowPulse * 0.15)
-            }
-
-            // Icon
-            Image(systemName: systemName)
-                .dynamicTypeFont(base: 18, weight: .medium)
-                .foregroundStyle(
-                    isFocused
-                    ? LiquidGlassDesignSystem.VibrantAccents.electricCyan
-                    : Color.white.opacity(0.5)
-                )
-        }
-        .frame(width: 24)
-        .animation(LiquidGlassDesignSystem.Springs.focus, value: isFocused)
-    }
-
-    // MARK: - Floating Label
-
-    @ViewBuilder
-    private var floatingLabel: some View {
-        Text(placeholder)
-            .font(.system(size: shouldShowFloatingLabel ? 11 : 16, weight: .medium))
-            .foregroundStyle(
-                isFocused
-                ? LiquidGlassDesignSystem.VibrantAccents.electricCyan
-                : Color.white.opacity(shouldShowFloatingLabel ? 0.6 : 0.4)
-            )
-            .offset(y: shouldShowFloatingLabel ? -14 : 0)
-            .scaleEffect(shouldShowFloatingLabel ? 0.85 : 1.0, anchor: .leading)
-            .allowsHitTesting(false)
-            .animation(LiquidGlassDesignSystem.Springs.focus, value: shouldShowFloatingLabel)
     }
 
     // MARK: - Text Field View
@@ -215,14 +110,14 @@ struct LiquidGlassTextField: View {
     private var textFieldView: some View {
         Group {
             if isSecure && !showSecureText {
-                SecureField("", text: $text)
+                SecureField(placeholder, text: $text)
             } else {
-                TextField("", text: $text)
+                TextField(placeholder, text: $text)
             }
         }
-        .dynamicTypeFont(base: 16, weight: .regular)
-        .foregroundStyle(.white)
-        .tint(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
+        .font(.body)
+        .foregroundStyle(.primary)
+        .tint(accentColor)
         .keyboardType(keyboardType)
         .textContentType(textContentType)
         .textInputAutocapitalization(autocapitalization)
@@ -231,71 +126,70 @@ struct LiquidGlassTextField: View {
         .onSubmit {
             onSubmit?()
         }
-        .offset(y: shouldShowFloatingLabel ? 6 : 0)
-        .animation(LiquidGlassDesignSystem.Springs.focus, value: shouldShowFloatingLabel)
     }
 
     // MARK: - Validation Indicator
 
     @ViewBuilder
     private var validationIndicator: some View {
-        Group {
-            switch validation {
-            case .idle:
-                EmptyView()
+        switch validation {
+        case .idle:
+            EmptyView()
 
-            case .validating:
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: LiquidGlassDesignSystem.VibrantAccents.electricCyan))
-                    .scaleEffect(0.7)
+        case .validating:
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: accentColor))
+                .scaleEffect(0.7)
 
-            case .valid:
-                Image(systemName: "checkmark.circle.fill")
-                    .dynamicTypeFont(base: 20)
-                    .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.auroraGreen)
-                    .transition(.scale.combined(with: .opacity))
+        case .valid:
+            Image(systemName: "checkmark.circle.fill")
+                .font(.title3)
+                .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.auroraGreen)
+                .transition(.scale.combined(with: .opacity))
 
-            case .invalid:
-                Image(systemName: "exclamationmark.circle.fill")
-                    .dynamicTypeFont(base: 20)
-                    .foregroundStyle(Color.red)
-                    .transition(.scale.combined(with: .opacity))
-            }
+        case .invalid:
+            Image(systemName: "exclamationmark.circle.fill")
+                .font(.title3)
+                .foregroundStyle(.red)
+                .transition(.scale.combined(with: .opacity))
         }
-        .animation(LiquidGlassDesignSystem.Springs.ui, value: validation)
     }
 
     // MARK: - Secure Toggle
 
-    @ViewBuilder
     private var secureToggle: some View {
         Button {
             HapticsService.shared.lightImpact()
             showSecureText.toggle()
         } label: {
             Image(systemName: showSecureText ? "eye.slash.fill" : "eye.fill")
-                .dynamicTypeFont(base: 16)
-                .foregroundStyle(Color.white.opacity(0.5))
+                .font(.body)
+                .foregroundStyle(.secondary)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
     }
 
     // MARK: - Field Background
 
     @ViewBuilder
     private var fieldBackground: some View {
-        ZStack {
-            // Base glass
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius)
+        let cornerRadius: CGFloat = 12
+        let shape = RoundedRectangle(cornerRadius: cornerRadius)
+
+        if #available(iOS 26.0, *) {
+            Color.clear
+                .glassEffect(
+                    .regular.tint(isFocused ? accentColor.opacity(0.1) : Color.clear),
+                    in: shape
+                )
+        } else {
+            shape
                 .fill(.ultraThinMaterial)
-
-            // Tint overlay
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius)
-                .fill(currentTint)
-
-            // Void overlay for depth
-            RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius)
-                .fill(Theme.CelestialColors.void.opacity(0.3))
+                .overlay {
+                    if isFocused {
+                        shape.fill(accentColor.opacity(0.05))
+                    }
+                }
         }
     }
 
@@ -303,41 +197,11 @@ struct LiquidGlassTextField: View {
 
     @ViewBuilder
     private var fieldBorder: some View {
-        Group {
-            if isFocused && !reduceMotion {
-                // Animated prismatic border when focused
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius)
-                    .stroke(
-                        AngularGradient(
-                            colors: [
-                                LiquidGlassDesignSystem.VibrantAccents.electricCyan,
-                                LiquidGlassDesignSystem.VibrantAccents.plasmaPurple,
-                                LiquidGlassDesignSystem.VibrantAccents.nebulaPink,
-                                LiquidGlassDesignSystem.VibrantAccents.electricCyan
-                            ],
-                            center: .center,
-                            startAngle: .degrees(borderRotation),
-                            endAngle: .degrees(borderRotation + 360)
-                        ),
-                        lineWidth: 1.5
-                    )
-            } else {
-                // Standard glass border
-                RoundedRectangle(cornerRadius: LiquidGlassDesignSystem.Sizing.cornerRadius)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                validation.tint.opacity(borderOpacity),
-                                Color.white.opacity(borderOpacity * 0.4),
-                                Color.white.opacity(borderOpacity * 0.2)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 0.75
-                    )
-            }
-        }
+        RoundedRectangle(cornerRadius: 12)
+            .stroke(
+                isFocused ? accentColor : borderColor,
+                lineWidth: isFocused ? 1.5 : 0.5
+            )
     }
 
     // MARK: - Error Message
@@ -346,47 +210,30 @@ struct LiquidGlassTextField: View {
     private func errorMessage(_ message: String) -> some View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .dynamicTypeFont(base: 11)
+                .font(.caption2)
 
             Text(message)
-                .dynamicTypeFont(base: 12, weight: .medium)
+                .font(.caption)
         }
-        .foregroundStyle(Color.red.opacity(0.9))
+        .foregroundStyle(.red.opacity(0.9))
         .padding(.leading, icon != nil ? 52 : 16)
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
-    // MARK: - Helpers
+    // MARK: - Colors
 
-    private func updateLabelPosition() {
-        withAnimation(LiquidGlassDesignSystem.Springs.focus) {
-            if isFocused || !text.isEmpty {
-                labelOffset = -14
-                labelScale = 0.85
-            } else {
-                labelOffset = 0
-                labelScale = 1.0
-            }
-        }
+    private var accentColor: Color {
+        LiquidGlassDesignSystem.VibrantAccents.electricCyan
     }
 
-    private func startAnimations() {
-        guard !reduceMotion else { return }
-
-        // Border rotation animation
-        withAnimation(
-            .linear(duration: LiquidGlassDesignSystem.MorphAnimation.prismaticRotation)
-            .repeatForever(autoreverses: false)
-        ) {
-            borderRotation = 360
-        }
-
-        // Icon glow pulse
-        withAnimation(
-            .easeInOut(duration: 1.5)
-            .repeatForever(autoreverses: true)
-        ) {
-            iconGlowPulse = 1
+    private var borderColor: Color {
+        switch validation {
+        case .valid:
+            return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
+        case .invalid:
+            return .red
+        default:
+            return .white.opacity(0.2)
         }
     }
 }
@@ -414,15 +261,11 @@ struct LiquidGlassPasswordStrength: View {
 
         var color: Color {
             switch self {
-            case .weak: return Color.red
-            case .fair: return Color.orange
+            case .weak: return .red
+            case .fair: return .orange
             case .good: return LiquidGlassDesignSystem.VibrantAccents.solarGold
             case .strong: return LiquidGlassDesignSystem.VibrantAccents.auroraGreen
             }
-        }
-
-        var progress: Double {
-            Double(rawValue) / Double(PasswordStrength.allCases.count)
         }
     }
 
@@ -444,17 +287,16 @@ struct LiquidGlassPasswordStrength: View {
 
             // Label
             Text(strength.label)
-                .dynamicTypeFont(base: 11, weight: .medium)
+                .font(.caption2.weight(.medium))
                 .foregroundStyle(strength.color)
         }
-        .padding(.leading, 4)
         .animation(.easeInOut(duration: 0.2), value: strength)
     }
 }
 
 // MARK: - Preview
 
-#Preview("Text Field States") {
+#Preview("Native Text Fields") {
     struct PreviewWrapper: View {
         @State private var email = ""
         @State private var password = "test123"
@@ -463,11 +305,11 @@ struct LiquidGlassPasswordStrength: View {
 
         var body: some View {
             ZStack {
-                Theme.CelestialColors.voidDeep
+                LiquidGlassDesignSystem.Void.cosmos
                     .ignoresSafeArea()
 
                 VStack(spacing: 24) {
-                    Text("Liquid Glass Text Fields")
+                    Text("Native Liquid Glass Text Fields")
                         .font(.title2.bold())
                         .foregroundStyle(.white)
 
@@ -511,14 +353,6 @@ struct LiquidGlassPasswordStrength: View {
                             password: password
                         )
                     }
-
-                    // Validating state
-                    LiquidGlassTextField(
-                        text: .constant("checking..."),
-                        placeholder: "Username",
-                        icon: "at",
-                        validation: .validating
-                    )
                 }
                 .padding()
             }

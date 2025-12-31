@@ -5,6 +5,10 @@
 //  Universal header component appearing on every tab
 //  Left: Velocity Score pill | Center: Tab title | Right: Profile button
 //
+//  Utopian Design:
+//  - Uses Utopian typography and spacing tokens
+//  - Subtle gradient background that blends with Utopian gradients
+//
 
 import SwiftUI
 
@@ -78,11 +82,16 @@ struct AppHeaderView: View {
                 )
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .padding(.horizontal, UtopianDesignFallback.Spacing.lg)
+        .padding(.vertical, UtopianDesignFallback.Spacing.md)
         .background(
+            // Subtle gradient that blends with Utopian backgrounds
             LinearGradient(
-                colors: [Color.black.opacity(0.8), Color.black.opacity(0.4), Color.clear],
+                colors: [
+                    Color.black.opacity(0.6),
+                    Color.black.opacity(0.3),
+                    Color.clear
+                ],
                 startPoint: .top,
                 endPoint: .bottom
             )

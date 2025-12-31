@@ -2,11 +2,27 @@
 //  PrismaticBorder.swift
 //  Veloce
 //
-//  Prismatic Border Effects - Chromatic Aberration & Light Refraction
-//  Light-splitting rainbow borders that rotate and pulse
+//  DEPRECATED: Prismatic Border Effects
+//  These custom effects have been replaced with native iOS 26 Liquid Glass.
+//
+//  Migration Guide:
+//  - Replace .prismaticBorder() with simple .shadow() + .clipShape()
+//  - Use native .glassEffect() for glass appearance
+//  - Remove custom animated borders for pure Apple aesthetic
+//
+//  Example:
+//  // Before:
+//  Button("Action") { }.prismaticBorder(Capsule(), style: .ai)
+//
+//  // After:
+//  Button("Action") { }
+//      .clipShape(Capsule())
+//      .shadow(color: .cyan.opacity(0.3), radius: 12, y: 4)
 //
 
 import SwiftUI
+
+// MARK: - DEPRECATED - Use native shadows instead
 
 // MARK: - Prismatic Border Style
 
@@ -182,6 +198,8 @@ public struct PrismaticBorderModifier<S: Shape>: ViewModifier {
 extension View {
 
     /// Apply prismatic rotating border
+    /// - Warning: DEPRECATED - Use `.shadow()` instead for native Liquid Glass aesthetic
+    @available(*, deprecated, message: "Use .shadow(color:radius:y:) instead for native iOS 26 aesthetic")
     public func prismaticBorder<S: Shape>(
         _ shape: S,
         style: PrismaticBorderStyle = .spectrum,
@@ -201,6 +219,8 @@ extension View {
     }
 
     /// Apply AI-style prismatic border (cyan-violet)
+    /// - Warning: DEPRECATED - Use `.shadow()` instead
+    @available(*, deprecated, message: "Use .shadow(color: .cyan.opacity(0.3), radius: 12, y: 4) instead")
     public func aiBorder<S: Shape>(
         _ shape: S,
         lineWidth: CGFloat = 1.5,
@@ -210,6 +230,8 @@ extension View {
     }
 
     /// Apply category-colored prismatic border
+    /// - Warning: DEPRECATED - Use `.shadow()` instead
+    @available(*, deprecated, message: "Use .shadow(color:radius:y:) with category color instead")
     public func categoryBorder<S: Shape>(
         _ shape: S,
         category: String?,

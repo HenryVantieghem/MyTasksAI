@@ -2,9 +2,9 @@
 //  ChatTasksView.swift
 //  Veloce
 //
-//  Aurora Design System - Productivity Constellation
-//  Living aurora backgrounds that respond to task completion,
-//  tasks as energy nodes, completion transforms into stars.
+//  Tasks View - Utopian Design System
+//  Time-aware gradient backgrounds, unified task cards,
+//  rewarding gamification with gold theme.
 //
 
 import SwiftUI
@@ -279,31 +279,9 @@ struct ChatTasksView: View {
 
     var body: some View {
         ZStack {
-            // Aurora productivity-responsive background
-            AuroraAnimatedWaveBackground.forProductivityState(
-                productivityLevel: productivityLevel,
-                hasOverdueTasks: inProgressTasks.contains { task in
-                    if let scheduled = task.scheduledTime {
-                        return scheduled < Date()
-                    }
-                    return false
-                }
-            )
-            .ignoresSafeArea()
-
-            // Ambient firefly particles
-            if !reduceMotion {
-                AuroraFireflyField(
-                    particleCount: 25,
-                    colors: [
-                        Aurora.Colors.electricCyan.opacity(0.6),
-                        Aurora.Colors.borealisViolet.opacity(0.4),
-                        Aurora.Colors.prismaticGreen.opacity(0.3)
-                    ]
-                )
+            // Utopian time-aware gradient background
+            UtopianGradients.background(for: Date())
                 .ignoresSafeArea()
-                .allowsHitTesting(false)
-            }
 
             // Main content
             VStack(spacing: 0) {
@@ -587,7 +565,7 @@ struct ChatTasksView: View {
             KanbanSectionHeader(section: .inProgress, count: inProgressTasks.count)
 
             ForEach(Array(inProgressTasks.enumerated()), id: \.element.id) { index, task in
-                TaskCardV4(
+                TaskCardUnified(
                     task: task,
                     onTap: {
                         HapticsService.shared.selectionFeedback()
@@ -595,25 +573,13 @@ struct ChatTasksView: View {
                     },
                     onToggleComplete: {
                         completeTask(task)
-                    },
-                    onStartFocus: onStartFocus,
-                    onSnooze: { task in
-                        viewModel.snoozeTask(task)
-                    },
-                    onDelete: { task in
-                        viewModel.deleteTask(task)
-                    },
-                    showAIThinking: newlyCreatedTaskIds.contains(task.id),
-                    onAIThinkingComplete: {
-                        // Remove from newly created set after animation completes
-                        newlyCreatedTaskIds.remove(task.id)
                     }
                 )
                 .id(task.id)
                 .zIndex(Double(inProgressTasks.count - index))
             }
         }
-        .padding(.bottom, CosmicWidget.Spacing.sm)
+        .padding(.bottom, UtopianDesignFallback.Spacing.sm)
     }
 
     // MARK: - To Do Section
@@ -623,7 +589,7 @@ struct ChatTasksView: View {
             KanbanSectionHeader(section: .toDo, count: toDoTasks.count)
 
             ForEach(Array(toDoTasks.enumerated()), id: \.element.id) { index, task in
-                TaskCardV4(
+                TaskCardUnified(
                     task: task,
                     onTap: {
                         HapticsService.shared.selectionFeedback()
@@ -631,25 +597,13 @@ struct ChatTasksView: View {
                     },
                     onToggleComplete: {
                         completeTask(task)
-                    },
-                    onStartFocus: onStartFocus,
-                    onSnooze: { task in
-                        viewModel.snoozeTask(task)
-                    },
-                    onDelete: { task in
-                        viewModel.deleteTask(task)
-                    },
-                    showAIThinking: newlyCreatedTaskIds.contains(task.id),
-                    onAIThinkingComplete: {
-                        // Remove from newly created set after animation completes
-                        newlyCreatedTaskIds.remove(task.id)
                     }
                 )
                 .id(task.id)
                 .zIndex(Double(toDoTasks.count - index))
             }
         }
-        .padding(.bottom, CosmicWidget.Spacing.sm)
+        .padding(.bottom, UtopianDesignFallback.Spacing.sm)
     }
 
     // MARK: - Aurora Done Section
@@ -1089,16 +1043,13 @@ struct KanbanColumn: View {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack(spacing: 10) {
                     ForEach(tasks) { task in
-                        TaskCardV4(
+                        TaskCardUnified(
                             task: task,
                             onTap: {
-                                AuroraSoundEngine.shared.play(.buttonTap)
+                                HapticsService.shared.selectionFeedback()
                                 onTaskTap(task)
                             },
-                            onToggleComplete: { onTaskComplete(task) },
-                            onStartFocus: onStartFocus,
-                            onSnooze: onSnooze,
-                            onDelete: onDelete
+                            onToggleComplete: { onTaskComplete(task) }
                         )
                     }
 

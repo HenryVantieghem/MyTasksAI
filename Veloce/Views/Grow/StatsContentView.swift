@@ -2,9 +2,8 @@
 //  StatsContentView.swift
 //  Veloce
 //
-//  Aurora Design System - Energy Core Dashboard
-//  Stats segment for Grow tab with velocity orb, energy cells, and aurora effects
-//  Orbiting particles, shimmer fills, and prismatic progress rings
+//  Utopian Design System - Growth Stats Dashboard
+//  Stats segment with velocity ring, gold gamification, and time-aware gradients
 //
 
 import SwiftUI

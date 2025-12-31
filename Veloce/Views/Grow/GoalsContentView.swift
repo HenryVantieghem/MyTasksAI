@@ -2,9 +2,8 @@
 //  GoalsContentView.swift
 //  Veloce
 //
-//  Aurora Design System - Constellation Progress
-//  Goals segment for Grow tab with mini galaxy cards and progress rings
-//  Milestones orbit as stars, 100% completion triggers golden nova burst
+//  Utopian Design System - Goals Dashboard
+//  Goals segment with progress tracking and gold gamification
 //
 
 import SwiftUI

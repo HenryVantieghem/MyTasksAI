@@ -2,9 +2,8 @@
 //  CirclesContentView.swift
 //  Veloce
 //
-//  Aurora Design System - Social Constellation
-//  Circles & Friends with aurora trails and member orbits
-//  Activity shows as aurora trails, new members enter as comets
+//  Utopian Design System - Social Dashboard
+//  Circles & Friends with consistent Utopian styling
 //
 
 import SwiftUI

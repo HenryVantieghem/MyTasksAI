@@ -2,19 +2,25 @@
 //  TaskCardV2.swift
 //  Veloce
 //
-//  Living Cosmos Task Card - Apple Design Award Level
-//  Bioluminescent deep sea meets cosmic nebula
-//  Features: Morphic glass, parallax depth, plasma core, urgency glow, supernova completion
+//  DEPRECATED: Living Cosmos Task Card
 //
-//  DEPRECATED: This component is being replaced by TaskCardV3, which offers:
-//  - Simplified visual hierarchy (~88pt height vs ~140pt)
-//  - Things 3-style ElegantCheckBubble for completion
-//  - Swipe gestures for quick actions (complete, snooze, delete)
-//  - Better scannability with reduced visual noise
-//  - ~400 lines vs ~1100 lines
+//  This component uses custom effects (.morphicGlass, .urgencyGlow, .supernovaBurst)
+//  that have been replaced with native iOS 26 Liquid Glass APIs.
 //
-//  Migration: Replace TaskCardV2 with TaskCardV3 in all new code.
-//  This file is retained for reference during transition.
+//  Migration to TaskCardV3/V4/V5:
+//  - Replace .morphicGlass() with .glassEffect(.regular, in: RoundedRectangle())
+//  - Replace .urgencyGlow() with simple border color changes
+//  - Replace .supernovaBurst() with .scaleEffect() animations
+//  - Use native button styles and haptics
+//
+//  Benefits of migration:
+//  - 60% less code (~400 lines vs ~1100 lines)
+//  - Native iOS 26 Liquid Glass support
+//  - Better performance (system-optimized rendering)
+//  - Automatic accessibility support
+//  - Swipe gestures for quick actions
+//
+//  This file is retained for backwards compatibility during transition.
 //
 
 import SwiftUI
