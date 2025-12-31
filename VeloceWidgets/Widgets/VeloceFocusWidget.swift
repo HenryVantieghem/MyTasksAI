@@ -21,8 +21,8 @@ struct VeloceFocusWidget: Widget {
                 .containerBackground(for: .widget) {
                     WidgetCosmicBackground(
                         showStars: true,
-                        showAurora: true,
-                        auroraIntensity: entry.state == .active ? 0.5 : 0.35
+                        showGlow: true,
+                        glowIntensity: entry.state == .active ? 0.5 : 0.35
                     )
                 }
         }
@@ -165,10 +165,10 @@ struct FocusEntry: TimelineEntry {
 
         var accentColor: Color {
             switch self {
-            case .idle: return WidgetAurora.Colors.textTertiary
+            case .idle: return WidgetUtopian.Colors.textTertiary
             case .active: return Color(red: 1.0, green: 0.55, blue: 0.20)
-            case .paused: return WidgetAurora.Colors.gold
-            case .breakTime: return WidgetAurora.Colors.emerald
+            case .paused: return WidgetUtopian.Colors.gold
+            case .breakTime: return WidgetUtopian.Colors.emerald
             }
         }
     }
@@ -221,11 +221,11 @@ struct FocusWidgetView: View {
                         if entry.state == .idle {
                             Image(systemName: "play.fill")
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                                .foregroundStyle(WidgetUtopian.Colors.textSecondary)
                         } else {
                             Text(entry.formattedTime)
                                 .font(.system(size: 16, weight: .medium, design: .monospaced))
-                                .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                                .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                                 .contentTransition(.numericText())
                         }
                     }
@@ -235,12 +235,12 @@ struct FocusWidgetView: View {
                 VStack(spacing: 4) {
                     if entry.state == .idle {
                         Text("Start Focus")
-                            .font(WidgetAurora.Typography.subheadline)
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                            .font(WidgetUtopian.Typography.subheadline)
+                            .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                         Text("Tap to begin")
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.micro)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                     } else {
                         // Status pill
                         HStack(spacing: 4) {
@@ -250,7 +250,7 @@ struct FocusWidgetView: View {
                                 .shadow(color: entry.state.accentColor.opacity(0.6), radius: 3)
 
                             Text(entry.state.statusText)
-                                .font(WidgetAurora.Typography.micro)
+                                .font(WidgetUtopian.Typography.micro)
                                 .foregroundStyle(entry.state.accentColor)
                         }
                         .padding(.horizontal, 8)
@@ -266,8 +266,8 @@ struct FocusWidgetView: View {
 
                         // Mode label
                         Text(entry.mode)
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                            .font(WidgetUtopian.Typography.micro)
+                            .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                             .lineLimit(1)
                     }
                 }

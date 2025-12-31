@@ -2,23 +2,23 @@
 //  WidgetDesignSystem.swift
 //  VeloceWidgets
 //
-//  Aurora Design System for Widgets
+//  Utopian Design System for Widgets
 //  Ethereal cosmic aesthetic matching the auth screens
-//  Crystalline glass, flowing aurora, twinkling starfield
+//  Crystalline glass, flowing gradients, twinkling starfield
 //
 
 import SwiftUI
 import WidgetKit
 
-// MARK: - Widget Aurora Namespace
+// MARK: - Widget Utopian Namespace
 
-enum WidgetAurora {
+enum WidgetUtopian {
 
     // MARK: - Colors
 
     enum Colors {
 
-        // Aurora Palette - Rich, Vibrant
+        // Utopian Palette - Rich, Vibrant
         static let violet = Color(red: 0.48, green: 0.12, blue: 0.74)
         static let purple = Color(red: 0.58, green: 0.22, blue: 0.88)
         static let electric = Color(red: 0.24, green: 0.56, blue: 0.98)
@@ -62,8 +62,8 @@ enum WidgetAurora {
 
     enum Gradients {
 
-        /// Primary aurora gradient
-        static var aurora: LinearGradient {
+        /// Primary utopian gradient
+        static var utopian: LinearGradient {
             LinearGradient(
                 colors: [Colors.violet, Colors.electric, Colors.cyan],
                 startPoint: .topLeading,
@@ -71,8 +71,8 @@ enum WidgetAurora {
             )
         }
 
-        /// Full aurora spectrum
-        static var auroraFull: LinearGradient {
+        /// Full utopian spectrum
+        static var utopianFull: LinearGradient {
             LinearGradient(
                 colors: [Colors.violet, Colors.purple, Colors.electric, Colors.cyan, Colors.emerald],
                 startPoint: .topLeading,
@@ -89,7 +89,7 @@ enum WidgetAurora {
             )
         }
 
-        /// Widget cosmic background with aurora tint
+        /// Widget cosmic background with utopian tint
         static var widgetBackground: LinearGradient {
             LinearGradient(
                 colors: [
@@ -102,8 +102,8 @@ enum WidgetAurora {
             )
         }
 
-        /// Angular aurora for progress rings
-        static var auroraRing: AngularGradient {
+        /// Angular utopian for progress rings
+        static var utopianRing: AngularGradient {
             AngularGradient(
                 colors: [
                     Colors.violet,
@@ -181,18 +181,18 @@ enum WidgetAurora {
 
 struct WidgetCosmicBackground: View {
     var showStars: Bool = true
-    var showAurora: Bool = true
-    var auroraIntensity: Double = 0.35
+    var showGlow: Bool = true
+    var glowIntensity: Double = 0.35
     var starCount: Int = 15
 
     var body: some View {
         ZStack {
             // Base cosmic gradient
-            WidgetAurora.Gradients.widgetBackground
+            WidgetUtopian.Gradients.widgetBackground
 
-            // Aurora glow layer
-            if showAurora {
-                auroraLayer
+            // Utopian glow layer
+            if showGlow {
+                glowLayer
             }
 
             // Star particles
@@ -202,14 +202,14 @@ struct WidgetCosmicBackground: View {
         }
     }
 
-    private var auroraLayer: some View {
+    private var glowLayer: some View {
         ZStack {
             // Top-left violet glow
             Ellipse()
                 .fill(
                     RadialGradient(
                         colors: [
-                            WidgetAurora.Colors.violet.opacity(auroraIntensity * 0.6),
+                            WidgetUtopian.Colors.violet.opacity(glowIntensity * 0.6),
                             Color.clear
                         ],
                         center: .center,
@@ -225,7 +225,7 @@ struct WidgetCosmicBackground: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            WidgetAurora.Colors.electric.opacity(auroraIntensity * 0.4),
+                            WidgetUtopian.Colors.electric.opacity(glowIntensity * 0.4),
                             Color.clear
                         ],
                         center: .center,
@@ -241,7 +241,7 @@ struct WidgetCosmicBackground: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            WidgetAurora.Colors.cyan.opacity(auroraIntensity * 0.3),
+                            WidgetUtopian.Colors.cyan.opacity(glowIntensity * 0.3),
                             Color.clear
                         ],
                         center: .center,
@@ -276,10 +276,10 @@ struct WidgetCosmicBackground: View {
 
 struct WidgetGlassCard<Content: View>: View {
     let content: Content
-    var cornerRadius: CGFloat = WidgetAurora.Layout.cornerRadius
+    var cornerRadius: CGFloat = WidgetUtopian.Layout.cornerRadius
     var showBorder: Bool = true
 
-    init(cornerRadius: CGFloat = WidgetAurora.Layout.cornerRadius, showBorder: Bool = true, @ViewBuilder content: () -> Content) {
+    init(cornerRadius: CGFloat = WidgetUtopian.Layout.cornerRadius, showBorder: Bool = true, @ViewBuilder content: () -> Content) {
         self.cornerRadius = cornerRadius
         self.showBorder = showBorder
         self.content = content()
@@ -289,11 +289,11 @@ struct WidgetGlassCard<Content: View>: View {
         content
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(WidgetAurora.Colors.glassBase)
+                    .fill(WidgetUtopian.Colors.glassBase)
                     .overlay(
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(
-                                showBorder ? WidgetAurora.Gradients.glassBorder : .clear,
+                                showBorder ? WidgetUtopian.Gradients.glassBorder : .clear,
                                 lineWidth: 1
                             )
                     )
@@ -301,9 +301,9 @@ struct WidgetGlassCard<Content: View>: View {
     }
 }
 
-// MARK: - Aurora Progress Ring
+// MARK: - Utopian Progress Ring
 
-struct AuroraProgressRing: View {
+struct UtopianProgressRing: View {
     let progress: Double
     let size: CGFloat
     let lineWidth: CGFloat
@@ -321,21 +321,21 @@ struct AuroraProgressRing: View {
             // Glow
             if showGlow {
                 Circle()
-                    .stroke(WidgetAurora.Colors.violet.opacity(0.3), lineWidth: lineWidth + 8)
+                    .stroke(WidgetUtopian.Colors.violet.opacity(0.3), lineWidth: lineWidth + 8)
                     .frame(width: size, height: size)
                     .blur(radius: 8)
             }
 
             // Background ring
             Circle()
-                .stroke(WidgetAurora.Colors.glassBorder, lineWidth: lineWidth)
+                .stroke(WidgetUtopian.Colors.glassBorder, lineWidth: lineWidth)
                 .frame(width: size, height: size)
 
             // Progress ring
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
-                    WidgetAurora.Gradients.auroraRing,
+                    WidgetUtopian.Gradients.utopianRing,
                     style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                 )
                 .frame(width: size, height: size)
@@ -344,19 +344,19 @@ struct AuroraProgressRing: View {
             // End cap glow
             if progress > 0.05 {
                 Circle()
-                    .fill(WidgetAurora.Colors.cyan)
+                    .fill(WidgetUtopian.Colors.cyan)
                     .frame(width: lineWidth, height: lineWidth)
                     .offset(y: -size / 2)
                     .rotationEffect(.degrees(360 * progress - 90))
-                    .shadow(color: WidgetAurora.Colors.cyan.opacity(0.8), radius: 4)
+                    .shadow(color: WidgetUtopian.Colors.cyan.opacity(0.8), radius: 4)
             }
         }
     }
 }
 
-// MARK: - Aurora Flame
+// MARK: - Utopian Flame
 
-struct AuroraFlame: View {
+struct UtopianFlame: View {
     let intensity: FlameIntensity
     let size: CGFloat
 
@@ -377,26 +377,26 @@ struct AuroraFlame: View {
         var colors: [Color] {
             switch self {
             case .none:
-                return [WidgetAurora.Colors.textQuaternary, WidgetAurora.Colors.textQuaternary.opacity(0.3)]
+                return [WidgetUtopian.Colors.textQuaternary, WidgetUtopian.Colors.textQuaternary.opacity(0.3)]
             case .spark:
-                return [WidgetAurora.Colors.flameInner, WidgetAurora.Colors.flameMid]
+                return [WidgetUtopian.Colors.flameInner, WidgetUtopian.Colors.flameMid]
             case .kindle:
-                return [WidgetAurora.Colors.flameInner, WidgetAurora.Colors.flameMid, WidgetAurora.Colors.flameOuter]
+                return [WidgetUtopian.Colors.flameInner, WidgetUtopian.Colors.flameMid, WidgetUtopian.Colors.flameOuter]
             case .flame:
-                return [WidgetAurora.Colors.flameCore, WidgetAurora.Colors.flameInner, WidgetAurora.Colors.flameMid, WidgetAurora.Colors.flameOuter]
+                return [WidgetUtopian.Colors.flameCore, WidgetUtopian.Colors.flameInner, WidgetUtopian.Colors.flameMid, WidgetUtopian.Colors.flameOuter]
             case .blaze:
-                return [WidgetAurora.Colors.flameCore, WidgetAurora.Colors.flameInner, WidgetAurora.Colors.flameMid, WidgetAurora.Colors.flameOuter, WidgetAurora.Colors.violet.opacity(0.5)]
+                return [WidgetUtopian.Colors.flameCore, WidgetUtopian.Colors.flameInner, WidgetUtopian.Colors.flameMid, WidgetUtopian.Colors.flameOuter, WidgetUtopian.Colors.violet.opacity(0.5)]
             case .inferno:
-                return [Color.white, WidgetAurora.Colors.flameCore, WidgetAurora.Colors.flameInner, WidgetAurora.Colors.flameMid, WidgetAurora.Colors.violet]
+                return [Color.white, WidgetUtopian.Colors.flameCore, WidgetUtopian.Colors.flameInner, WidgetUtopian.Colors.flameMid, WidgetUtopian.Colors.violet]
             }
         }
 
         var glowColor: Color {
             switch self {
             case .none: return .clear
-            case .spark, .kindle: return WidgetAurora.Colors.flameMid
-            case .flame: return WidgetAurora.Colors.flameInner
-            case .blaze, .inferno: return WidgetAurora.Colors.flameCore
+            case .spark, .kindle: return WidgetUtopian.Colors.flameMid
+            case .flame: return WidgetUtopian.Colors.flameInner
+            case .blaze, .inferno: return WidgetUtopian.Colors.flameCore
             }
         }
     }
@@ -445,7 +445,7 @@ struct WidgetStatPill: View {
             Image(systemName: icon)
                 .font(.system(size: 10, weight: .semibold))
             Text(value)
-                .font(WidgetAurora.Typography.micro)
+                .font(WidgetUtopian.Typography.micro)
         }
         .foregroundStyle(color)
         .padding(.horizontal, 8)
@@ -461,9 +461,9 @@ struct WidgetStatPill: View {
     }
 }
 
-// MARK: - Widget Aurora Button
+// MARK: - Widget Utopian Button
 
-struct WidgetAuroraButton: View {
+struct WidgetUtopianButton: View {
     let title: String
     let icon: String?
     let url: URL
@@ -482,20 +482,20 @@ struct WidgetAuroraButton: View {
                         .font(.system(size: 11, weight: .semibold))
                 }
                 Text(title)
-                    .font(WidgetAurora.Typography.caption)
+                    .font(WidgetUtopian.Typography.caption)
             }
-            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+            .foregroundStyle(WidgetUtopian.Colors.textPrimary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
             .background(
-                RoundedRectangle(cornerRadius: WidgetAurora.Layout.smallCornerRadius)
-                    .fill(WidgetAurora.Gradients.aurora.opacity(0.8))
+                RoundedRectangle(cornerRadius: WidgetUtopian.Layout.smallCornerRadius)
+                    .fill(WidgetUtopian.Gradients.utopian.opacity(0.8))
                     .overlay(
-                        RoundedRectangle(cornerRadius: WidgetAurora.Layout.smallCornerRadius)
-                            .stroke(WidgetAurora.Colors.glassHighlight, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: WidgetUtopian.Layout.smallCornerRadius)
+                            .stroke(WidgetUtopian.Colors.glassHighlight, lineWidth: 0.5)
                     )
             )
-            .shadow(color: WidgetAurora.Colors.violet.opacity(0.3), radius: 8, y: 2)
+            .shadow(color: WidgetUtopian.Colors.violet.opacity(0.3), radius: 8, y: 2)
         }
     }
 }
@@ -513,19 +513,19 @@ struct FocusTimerRing: View {
 
         var primaryColor: Color {
             switch self {
-            case .idle: return WidgetAurora.Colors.textQuaternary
+            case .idle: return WidgetUtopian.Colors.textQuaternary
             case .active: return Color(red: 1.0, green: 0.55, blue: 0.20) // Amber/Orange
-            case .paused: return WidgetAurora.Colors.gold
-            case .breakTime: return WidgetAurora.Colors.emerald
+            case .paused: return WidgetUtopian.Colors.gold
+            case .breakTime: return WidgetUtopian.Colors.emerald
             }
         }
 
         var secondaryColor: Color {
             switch self {
-            case .idle: return WidgetAurora.Colors.glassBorder
+            case .idle: return WidgetUtopian.Colors.glassBorder
             case .active: return Color(red: 1.0, green: 0.35, blue: 0.15) // Deep orange
-            case .paused: return WidgetAurora.Colors.flameInner
-            case .breakTime: return WidgetAurora.Colors.cyan
+            case .paused: return WidgetUtopian.Colors.flameInner
+            case .breakTime: return WidgetUtopian.Colors.cyan
             }
         }
 
@@ -533,8 +533,8 @@ struct FocusTimerRing: View {
             switch self {
             case .idle: return .clear
             case .active: return Color(red: 1.0, green: 0.55, blue: 0.20).opacity(0.4)
-            case .paused: return WidgetAurora.Colors.gold.opacity(0.3)
-            case .breakTime: return WidgetAurora.Colors.emerald.opacity(0.3)
+            case .paused: return WidgetUtopian.Colors.gold.opacity(0.3)
+            case .breakTime: return WidgetUtopian.Colors.emerald.opacity(0.3)
             }
         }
 
@@ -574,7 +574,7 @@ struct FocusTimerRing: View {
 
             // Background ring
             Circle()
-                .stroke(WidgetAurora.Colors.glassBorder, lineWidth: lineWidth)
+                .stroke(WidgetUtopian.Colors.glassBorder, lineWidth: lineWidth)
                 .frame(width: size, height: size)
 
             // Progress ring with gradient
@@ -640,11 +640,11 @@ struct LevelBadge: View {
 
     private var tierColors: (primary: Color, secondary: Color) {
         switch level {
-        case 1...9: return (WidgetAurora.Colors.emerald, WidgetAurora.Colors.cyan)
-        case 10...24: return (WidgetAurora.Colors.electric, WidgetAurora.Colors.violet)
-        case 25...49: return (WidgetAurora.Colors.gold, WidgetAurora.Colors.flameInner)
-        case 50...99: return (WidgetAurora.Colors.rose, WidgetAurora.Colors.violet)
-        default: return (WidgetAurora.Colors.violet, Color.white) // Diamond tier
+        case 1...9: return (WidgetUtopian.Colors.emerald, WidgetUtopian.Colors.cyan)
+        case 10...24: return (WidgetUtopian.Colors.electric, WidgetUtopian.Colors.violet)
+        case 25...49: return (WidgetUtopian.Colors.gold, WidgetUtopian.Colors.flameInner)
+        case 50...99: return (WidgetUtopian.Colors.rose, WidgetUtopian.Colors.violet)
+        default: return (WidgetUtopian.Colors.violet, Color.white) // Diamond tier
         }
     }
 
@@ -727,8 +727,8 @@ struct XPProgressBar: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                WidgetAurora.Colors.glassBorder.opacity(0.5),
-                                WidgetAurora.Colors.glassBorder
+                                WidgetUtopian.Colors.glassBorder.opacity(0.5),
+                                WidgetUtopian.Colors.glassBorder
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
@@ -741,16 +741,16 @@ struct XPProgressBar: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                WidgetAurora.Colors.gold,
-                                WidgetAurora.Colors.flameInner,
-                                WidgetAurora.Colors.gold
+                                WidgetUtopian.Colors.gold,
+                                WidgetUtopian.Colors.flameInner,
+                                WidgetUtopian.Colors.gold
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .frame(width: max(height, geo.size.width * progress), height: height)
-                    .shadow(color: WidgetAurora.Colors.gold.opacity(0.5), radius: 4)
+                    .shadow(color: WidgetUtopian.Colors.gold.opacity(0.5), radius: 4)
 
                 // Shimmer highlight
                 if progress > 0.1 {
@@ -787,8 +787,8 @@ struct QuickAddButton: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            WidgetAurora.Colors.cyan.opacity(0.3),
-                            WidgetAurora.Colors.violet.opacity(0.2),
+                            WidgetUtopian.Colors.cyan.opacity(0.3),
+                            WidgetUtopian.Colors.violet.opacity(0.2),
                             .clear
                         ],
                         center: .center,
@@ -804,9 +804,9 @@ struct QuickAddButton: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            WidgetAurora.Colors.violet,
-                            WidgetAurora.Colors.electric,
-                            WidgetAurora.Colors.cyan
+                            WidgetUtopian.Colors.violet,
+                            WidgetUtopian.Colors.electric,
+                            WidgetUtopian.Colors.cyan
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -824,7 +824,7 @@ struct QuickAddButton: View {
                             lineWidth: 2
                         )
                 )
-                .shadow(color: WidgetAurora.Colors.violet.opacity(0.4), radius: 8, y: 2)
+                .shadow(color: WidgetUtopian.Colors.violet.opacity(0.4), radius: 8, y: 2)
 
             // Plus icon
             Image(systemName: "plus")
@@ -867,17 +867,17 @@ struct CalendarDateDisplay: View {
             // Day name
             Text(dayName)
                 .font(.system(size: size == .compact ? 10 : 12, weight: .semibold))
-                .foregroundStyle(WidgetAurora.Colors.cyan)
+                .foregroundStyle(WidgetUtopian.Colors.cyan)
 
             // Day number with dramatic styling
             Text(dayNumber)
                 .font(.system(size: size == .compact ? 32 : 42, weight: .thin, design: .rounded))
-                .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
             // Month
             Text(monthName)
                 .font(.system(size: size == .compact ? 9 : 11, weight: .medium))
-                .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                .foregroundStyle(WidgetUtopian.Colors.textTertiary)
         }
     }
 }
@@ -900,17 +900,17 @@ struct WidgetEventCard: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(WidgetAurora.Typography.body)
-                    .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                    .font(WidgetUtopian.Typography.body)
+                    .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                     .lineLimit(1)
 
                 HStack(spacing: 4) {
                     Image(systemName: isTask ? "checkmark.circle" : "calendar")
                         .font(.system(size: 9))
                     Text(time)
-                        .font(WidgetAurora.Typography.micro)
+                        .font(WidgetUtopian.Typography.micro)
                 }
-                .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                .foregroundStyle(WidgetUtopian.Colors.textTertiary)
             }
 
             Spacer()
@@ -919,7 +919,7 @@ struct WidgetEventCard: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(WidgetAurora.Colors.glassBase)
+                .fill(WidgetUtopian.Colors.glassBase)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(color.opacity(0.2), lineWidth: 0.5)
@@ -935,7 +935,7 @@ struct CosmicOrb: View {
     let primaryColor: Color
     let secondaryColor: Color
 
-    init(size: CGFloat = 40, primaryColor: Color = WidgetAurora.Colors.violet, secondaryColor: Color = WidgetAurora.Colors.electric) {
+    init(size: CGFloat = 40, primaryColor: Color = WidgetUtopian.Colors.violet, secondaryColor: Color = WidgetUtopian.Colors.electric) {
         self.size = size
         self.primaryColor = primaryColor
         self.secondaryColor = secondaryColor
@@ -1000,15 +1000,15 @@ struct CosmicOrb: View {
 #Preview("Design System") {
     ScrollView {
         VStack(spacing: 24) {
-            // Aurora Progress Ring
+            // Utopian Progress Ring
             VStack(spacing: 8) {
                 Text("Progress Rings")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 HStack(spacing: 20) {
-                    AuroraProgressRing(progress: 0.3, size: 60, lineWidth: 6)
-                    AuroraProgressRing(progress: 0.7, size: 80, lineWidth: 8)
+                    UtopianProgressRing(progress: 0.3, size: 60, lineWidth: 6)
+                    UtopianProgressRing(progress: 0.7, size: 80, lineWidth: 8)
                     FocusTimerRing(progress: 0.5, state: .active, size: 60, lineWidth: 6)
                 }
             }
@@ -1016,23 +1016,23 @@ struct CosmicOrb: View {
             // Flames
             VStack(spacing: 8) {
                 Text("Flame Intensities")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 HStack(spacing: 16) {
-                    AuroraFlame(intensity: .spark, size: 28)
-                    AuroraFlame(intensity: .kindle, size: 32)
-                    AuroraFlame(intensity: .flame, size: 36)
-                    AuroraFlame(intensity: .blaze, size: 40)
-                    AuroraFlame(intensity: .inferno, size: 44)
+                    UtopianFlame(intensity: .spark, size: 28)
+                    UtopianFlame(intensity: .kindle, size: 32)
+                    UtopianFlame(intensity: .flame, size: 36)
+                    UtopianFlame(intensity: .blaze, size: 40)
+                    UtopianFlame(intensity: .inferno, size: 44)
                 }
             }
 
             // Level Badges
             VStack(spacing: 8) {
                 Text("Level Badges")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 HStack(spacing: 16) {
                     LevelBadge(level: 5, size: .small)
@@ -1045,8 +1045,8 @@ struct CosmicOrb: View {
             // XP Progress Bar
             VStack(spacing: 8) {
                 Text("XP Progress")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 XPProgressBar(currentXP: 750, requiredXP: 1000, height: 10)
                     .frame(width: 200)
@@ -1055,21 +1055,21 @@ struct CosmicOrb: View {
             // Stat Pills
             VStack(spacing: 8) {
                 Text("Stat Pills")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 HStack(spacing: 8) {
-                    WidgetStatPill(icon: "checkmark.circle.fill", value: "5", color: WidgetAurora.Colors.success)
-                    WidgetStatPill(icon: "flame.fill", value: "7", color: WidgetAurora.Colors.flameInner)
-                    WidgetStatPill(icon: "star.fill", value: "Lv 12", color: WidgetAurora.Colors.gold)
+                    WidgetStatPill(icon: "checkmark.circle.fill", value: "5", color: WidgetUtopian.Colors.success)
+                    WidgetStatPill(icon: "flame.fill", value: "7", color: WidgetUtopian.Colors.flameInner)
+                    WidgetStatPill(icon: "star.fill", value: "Lv 12", color: WidgetUtopian.Colors.gold)
                 }
             }
 
             // Quick Add Button
             VStack(spacing: 8) {
                 Text("Quick Add")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 QuickAddButton(size: 50)
             }
@@ -1077,8 +1077,8 @@ struct CosmicOrb: View {
             // Calendar Display
             VStack(spacing: 8) {
                 Text("Date Display")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 CalendarDateDisplay(date: Date(), size: .full)
             }
@@ -1086,13 +1086,13 @@ struct CosmicOrb: View {
             // Event Card
             VStack(spacing: 8) {
                 Text("Event Cards")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 WidgetEventCard(
                     title: "Team standup",
                     time: "9:00 AM",
-                    color: WidgetAurora.Colors.electric,
+                    color: WidgetUtopian.Colors.electric,
                     isTask: false
                 )
                 .frame(width: 200)
@@ -1100,7 +1100,7 @@ struct CosmicOrb: View {
                 WidgetEventCard(
                     title: "Complete project",
                     time: "2:00 PM",
-                    color: WidgetAurora.Colors.violet,
+                    color: WidgetUtopian.Colors.violet,
                     isTask: true
                 )
                 .frame(width: 200)
@@ -1109,8 +1109,8 @@ struct CosmicOrb: View {
             // Cosmic Orb
             VStack(spacing: 8) {
                 Text("Cosmic Orb")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                 CosmicOrb(size: 40)
             }

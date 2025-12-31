@@ -57,7 +57,7 @@ struct CrystallineTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             // Main field container
-            HStack(spacing: Aurora.Layout.spacing) {
+            HStack(spacing: UtopianDesignFallback.Layout.spacing) {
                 // Leading icon
                 fieldIcon
 
@@ -73,11 +73,11 @@ struct CrystallineTextField: View {
                 // Trailing elements
                 trailingElements
             }
-            .padding(.horizontal, Aurora.Layout.spacing)
+            .padding(.horizontal, UtopianDesignFallback.Layout.spacing)
             .padding(.vertical, 14)
             .background(fieldBackground)
             .overlay(fieldBorder)
-            .clipShape(RoundedRectangle(cornerRadius: Aurora.Radius.textField))
+            .clipShape(RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.textField))
             .shadow(color: shadowColor, radius: isFocused ? 12 : 6, y: isFocused ? 4 : 2)
 
             // Error message
@@ -114,7 +114,7 @@ struct CrystallineTextField: View {
                 .foregroundStyle(iconColor)
                 .frame(width: 24, height: 24)
         }
-        .animation(Aurora.Animation.quick, value: isFocused)
+        .animation(UtopianDesignFallback.Animation.quick, value: isFocused)
     }
 
     // MARK: - Floating Label
@@ -140,7 +140,7 @@ struct CrystallineTextField: View {
             }
         }
         .dynamicTypeFont(base: 16, weight: .regular)
-        .foregroundStyle(Aurora.Colors.textPrimary)
+        .foregroundStyle(.white)
         .focused($isFocused)
         .keyboardType(keyboardType)
         .textContentType(textContentType)
@@ -156,7 +156,7 @@ struct CrystallineTextField: View {
 
     @ViewBuilder
     private var trailingElements: some View {
-        HStack(spacing: Aurora.Layout.spacingSmall) {
+        HStack(spacing: UtopianDesignFallback.Layout.spacingSmall) {
             // Secure toggle
             if isSecure {
                 Button {
@@ -165,7 +165,7 @@ struct CrystallineTextField: View {
                 } label: {
                     Image(systemName: showSecureText ? "eye.slash.fill" : "eye.fill")
                         .dynamicTypeFont(base: 16, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.textTertiary)
+                        .foregroundStyle(.white.opacity(0.5))
                         .frame(width: 28, height: 28)
                 }
                 .buttonStyle(.plain)
@@ -187,18 +187,18 @@ struct CrystallineTextField: View {
         case .validating:
             ProgressView()
                 .scaleEffect(0.8)
-                .tint(Aurora.Colors.electric)
+                .tint(UtopianDesignFallback.Colors.focusActive)
 
         case .valid:
             Image(systemName: "checkmark.circle.fill")
                 .dynamicTypeFont(base: 20)
-                .foregroundStyle(Aurora.Colors.success)
+                .foregroundStyle(UtopianDesignFallback.Colors.completed)
                 .transition(.scale.combined(with: .opacity))
 
         case .invalid:
             Image(systemName: "exclamationmark.circle.fill")
                 .dynamicTypeFont(base: 20)
-                .foregroundStyle(Aurora.Colors.error)
+                .foregroundStyle(UtopianDesignFallback.Colors.error)
                 .transition(.scale.combined(with: .opacity))
         }
     }
@@ -208,16 +208,16 @@ struct CrystallineTextField: View {
     private var fieldBackground: some View {
         ZStack {
             // Base glass fill
-            RoundedRectangle(cornerRadius: Aurora.Radius.textField)
-                .fill(isFocused ? Aurora.Colors.glassFocused : Aurora.Colors.glassBase)
+            RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.textField)
+                .fill(isFocused ? UtopianDesignFallback.Colors.glassFocused : UtopianDesignFallback.Colors.glassBase)
 
             // Subtle gradient
-            RoundedRectangle(cornerRadius: Aurora.Radius.textField)
+            RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.textField)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Aurora.Colors.cosmicSurface.opacity(isFocused ? 0.6 : 0.5),
-                            Aurora.Colors.cosmicDeep.opacity(isFocused ? 0.4 : 0.3)
+                            UtopianDesignFallback.Colors.cosmicSurface.opacity(isFocused ? 0.6 : 0.5),
+                            UtopianDesignFallback.Colors.cosmicDeep.opacity(isFocused ? 0.4 : 0.3)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -226,7 +226,7 @@ struct CrystallineTextField: View {
 
             // Focus glow
             if isFocused {
-                RoundedRectangle(cornerRadius: Aurora.Radius.textField)
+                RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.textField)
                     .fill(accentColor.opacity(0.03))
             }
         }
@@ -235,7 +235,7 @@ struct CrystallineTextField: View {
     // MARK: - Field Border
 
     private var fieldBorder: some View {
-        RoundedRectangle(cornerRadius: Aurora.Radius.textField)
+        RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.textField)
             .stroke(borderGradient, lineWidth: isFocused ? 1.5 : 1)
     }
 
@@ -245,7 +245,7 @@ struct CrystallineTextField: View {
                 colors: [
                     accentColor.opacity(0.8),
                     accentColor.opacity(0.4),
-                    Aurora.Colors.glassBorder
+                    UtopianDesignFallback.Colors.glassBorder
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -253,9 +253,9 @@ struct CrystallineTextField: View {
         } else {
             return LinearGradient(
                 colors: [
-                    Aurora.Colors.glassHighlight.opacity(0.5),
-                    Aurora.Colors.glassBorder,
-                    Aurora.Colors.glassBorder.opacity(0.5)
+                    UtopianDesignFallback.Colors.glassHighlight.opacity(0.5),
+                    UtopianDesignFallback.Colors.glassBorder,
+                    UtopianDesignFallback.Colors.glassBorder.opacity(0.5)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -273,7 +273,7 @@ struct CrystallineTextField: View {
             Text(message)
                 .dynamicTypeFont(base: 12, weight: .medium)
         }
-        .foregroundStyle(Aurora.Colors.error)
+        .foregroundStyle(UtopianDesignFallback.Colors.error)
         .padding(.leading, 44) // Align with text field content
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
@@ -286,9 +286,9 @@ struct CrystallineTextField: View {
 
     private var accentColor: Color {
         switch validation {
-        case .valid: return Aurora.Colors.success
-        case .invalid: return Aurora.Colors.error
-        default: return Aurora.Colors.electric
+        case .valid: return UtopianDesignFallback.Colors.completed
+        case .invalid: return UtopianDesignFallback.Colors.error
+        default: return UtopianDesignFallback.Colors.focusActive
         }
     }
 
@@ -297,9 +297,9 @@ struct CrystallineTextField: View {
             return accentColor
         }
         switch validation {
-        case .valid: return Aurora.Colors.success
-        case .invalid: return Aurora.Colors.error
-        default: return Aurora.Colors.textTertiary
+        case .valid: return UtopianDesignFallback.Colors.completed
+        case .invalid: return UtopianDesignFallback.Colors.error
+        default: return .white.opacity(0.5)
         }
     }
 
@@ -307,7 +307,7 @@ struct CrystallineTextField: View {
         if isFocused {
             return accentColor
         }
-        return Aurora.Colors.textQuaternary
+        return UtopianDesignFallback.Colors.textQuaternary
     }
 
     private var shadowColor: Color {
@@ -331,7 +331,7 @@ struct CrystallineTextField: View {
         }
 
         if animated {
-            withAnimation(Aurora.Animation.spring) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 action()
             }
         } else {
@@ -394,7 +394,7 @@ struct CrystallineTextField: View {
                 )
             }
             .padding()
-            .background(AuroraBackground.auth)
+            .background(UtopianGradients.background(for: Date()))
         }
     }
 

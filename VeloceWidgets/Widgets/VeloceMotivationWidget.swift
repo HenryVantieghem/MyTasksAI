@@ -2,7 +2,7 @@
 //  VeloceMotivationWidget.swift
 //  VeloceWidgets
 //
-//  Motivation Widget - Aurora Design System
+//  Motivation Widget - Utopian Design System
 //  Ethereal cosmic quotes with crystalline glass styling
 //  Beautiful inspiration with twinkling starfield
 //
@@ -19,7 +19,7 @@ struct VeloceMotivationWidget: Widget {
         StaticConfiguration(kind: kind, provider: MotivationTimelineProvider()) { entry in
             MotivationWidgetView(entry: entry)
                 .containerBackground(for: .widget) {
-                    WidgetCosmicBackground(showStars: true, showAurora: true, auroraIntensity: 0.35, starCount: 20)
+                    WidgetCosmicBackground(showStars: true, showGlow: true, glowIntensity: 0.35, starCount: 20)
                 }
         }
         .configurationDisplayName("Daily Motivation")
@@ -170,7 +170,7 @@ struct MotivationWidgetView: View {
 
     private var mediumWidget: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Icon with aurora glow
+            // Icon with utopian glow
             HStack {
                 ZStack {
                     // Glow
@@ -178,8 +178,8 @@ struct MotivationWidgetView: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    WidgetAurora.Colors.violet.opacity(0.4),
-                                    WidgetAurora.Colors.electric.opacity(0.2),
+                                    WidgetUtopian.Colors.violet.opacity(0.4),
+                                    WidgetUtopian.Colors.electric.opacity(0.2),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -192,10 +192,10 @@ struct MotivationWidgetView: View {
 
                     // Icon container
                     Circle()
-                        .fill(WidgetAurora.Colors.glassBase)
+                        .fill(WidgetUtopian.Colors.glassBase)
                         .overlay(
                             Circle()
-                                .stroke(WidgetAurora.Colors.glassBorder, lineWidth: 0.5)
+                                .stroke(WidgetUtopian.Colors.glassBorder, lineWidth: 0.5)
                         )
                         .frame(width: 36, height: 36)
 
@@ -203,7 +203,7 @@ struct MotivationWidgetView: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [WidgetAurora.Colors.violet, WidgetAurora.Colors.electric],
+                                colors: [WidgetUtopian.Colors.violet, WidgetUtopian.Colors.electric],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -217,7 +217,7 @@ struct MotivationWidgetView: View {
                     WidgetStatPill(
                         icon: "checkmark.circle.fill",
                         value: "\(entry.tasksCompleted) done",
-                        color: WidgetAurora.Colors.success
+                        color: WidgetUtopian.Colors.success
                     )
                 }
             }
@@ -228,13 +228,13 @@ struct MotivationWidgetView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("\"\(entry.quote.text)\"")
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                    .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                     .lineLimit(3)
                     .lineSpacing(2)
 
                 Text("— \(entry.quote.author)")
-                    .font(WidgetAurora.Typography.caption)
-                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                    .font(WidgetUtopian.Typography.caption)
+                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
             }
         }
         .padding(16)
@@ -244,29 +244,29 @@ struct MotivationWidgetView: View {
 
     private var largeWidget: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header with aurora orb
+            // Header with utopian orb
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(entry.greeting)
-                        .font(WidgetAurora.Typography.caption)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                        .font(WidgetUtopian.Typography.caption)
+                        .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                     Text("Stay Focused")
                         .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                        .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                 }
 
                 Spacer()
 
-                // Mini aurora orb
+                // Mini utopian orb
                 ZStack {
                     // Outer glow
                     Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    WidgetAurora.Colors.violet.opacity(0.4),
-                                    WidgetAurora.Colors.electric.opacity(0.2),
+                                    WidgetUtopian.Colors.violet.opacity(0.4),
+                                    WidgetUtopian.Colors.electric.opacity(0.2),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -282,9 +282,9 @@ struct MotivationWidgetView: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    WidgetAurora.Colors.violet,
-                                    WidgetAurora.Colors.purple,
-                                    WidgetAurora.Colors.electric
+                                    WidgetUtopian.Colors.violet,
+                                    WidgetUtopian.Colors.purple,
+                                    WidgetUtopian.Colors.electric
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -302,7 +302,7 @@ struct MotivationWidgetView: View {
                                     lineWidth: 1
                                 )
                         )
-                        .shadow(color: WidgetAurora.Colors.violet.opacity(0.5), radius: 8)
+                        .shadow(color: WidgetUtopian.Colors.violet.opacity(0.5), radius: 8)
 
                     // Sparkle icon
                     Image(systemName: "sparkles")
@@ -311,14 +311,14 @@ struct MotivationWidgetView: View {
                 }
             }
 
-            // Divider with aurora gradient
+            // Divider with utopian gradient
             Rectangle()
                 .fill(
                     LinearGradient(
                         colors: [
-                            WidgetAurora.Colors.violet.opacity(0.4),
-                            WidgetAurora.Colors.electric.opacity(0.2),
-                            WidgetAurora.Colors.glassBorder.opacity(0)
+                            WidgetUtopian.Colors.violet.opacity(0.4),
+                            WidgetUtopian.Colors.electric.opacity(0.2),
+                            WidgetUtopian.Colors.glassBorder.opacity(0)
                         ],
                         startPoint: .leading,
                         endPoint: .trailing
@@ -333,67 +333,67 @@ struct MotivationWidgetView: View {
                 // Opening quote mark
                 Image(systemName: "quote.opening")
                     .font(.system(size: 24, weight: .light))
-                    .foregroundStyle(WidgetAurora.Colors.violet)
+                    .foregroundStyle(WidgetUtopian.Colors.violet)
 
                 // Quote text
                 Text(entry.quote.text)
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                    .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                     .lineSpacing(4)
 
                 // Author and icon
                 HStack {
                     Text("— \(entry.quote.author)")
-                        .font(WidgetAurora.Typography.subheadline)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                        .font(WidgetUtopian.Typography.subheadline)
+                        .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                     Spacer()
 
                     ZStack {
                         Circle()
-                            .fill(WidgetAurora.Colors.glassBase)
+                            .fill(WidgetUtopian.Colors.glassBase)
                             .overlay(
                                 Circle()
-                                    .stroke(WidgetAurora.Colors.glassBorder, lineWidth: 0.5)
+                                    .stroke(WidgetUtopian.Colors.glassBorder, lineWidth: 0.5)
                             )
                             .frame(width: 28, height: 28)
 
                         Image(systemName: entry.quote.icon)
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(WidgetAurora.Colors.violet)
+                            .foregroundStyle(WidgetUtopian.Colors.violet)
                     }
                 }
             }
             .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: WidgetAurora.Layout.cornerRadius)
-                    .fill(WidgetAurora.Colors.glassBase)
+                RoundedRectangle(cornerRadius: WidgetUtopian.Layout.cornerRadius)
+                    .fill(WidgetUtopian.Colors.glassBase)
                     .overlay(
-                        RoundedRectangle(cornerRadius: WidgetAurora.Layout.cornerRadius)
-                            .stroke(WidgetAurora.Gradients.glassBorder, lineWidth: 0.5)
+                        RoundedRectangle(cornerRadius: WidgetUtopian.Layout.cornerRadius)
+                            .stroke(WidgetUtopian.Gradients.glassBorder, lineWidth: 0.5)
                     )
             )
 
             Spacer()
 
-            // Quick stats with aurora styling
+            // Quick stats with utopian styling
             HStack(spacing: 16) {
                 WidgetStatPill(
                     icon: "checkmark.circle.fill",
                     value: "\(entry.tasksCompleted)",
-                    color: WidgetAurora.Colors.success
+                    color: WidgetUtopian.Colors.success
                 )
 
                 WidgetStatPill(
                     icon: "flame.fill",
                     value: "7",
-                    color: WidgetAurora.Colors.flameInner
+                    color: WidgetUtopian.Colors.flameInner
                 )
 
                 WidgetStatPill(
                     icon: "star.fill",
                     value: "Lv 12",
-                    color: WidgetAurora.Colors.gold
+                    color: WidgetUtopian.Colors.gold
                 )
 
                 Spacer()

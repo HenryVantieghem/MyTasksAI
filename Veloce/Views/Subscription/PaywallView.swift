@@ -2,8 +2,8 @@
 //  PaywallView.swift
 //  Veloce
 //
-//  Paywall View - Aurora Design System
-//  Premium subscription screen with celestial aurora aesthetic
+//  Paywall View - Utopian Design System
+//  Premium subscription screen with celestial Utopian aesthetic
 //  matching the auth/onboarding flow
 //
 
@@ -30,7 +30,7 @@ struct PaywallView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Aurora background - consistent with auth
+                // Utopian background - consistent with auth
                 AuroraBackground.paywall
 
                 // Animated Logo at top
@@ -48,7 +48,7 @@ struct PaywallView: View {
 
                 // Content
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: Aurora.Layout.spacingXL) {
+                    VStack(spacing: UtopianDesignFallback.Spacing.xl) {
                         // Spacer for logo
                         Spacer(minLength: logoSpacerHeight(for: geometry))
 
@@ -59,27 +59,27 @@ struct PaywallView: View {
 
                         // Features list with crystalline card
                         featuresSection
-                            .padding(.horizontal, Aurora.Layout.screenPadding)
+                            .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
 
                         // Price card
                         priceCard
                             .opacity(showPriceCard ? 1 : 0)
                             .scaleEffect(showPriceCard ? 1 : 0.95)
-                            .padding(.horizontal, Aurora.Layout.screenPadding)
+                            .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
 
                         // CTA button
                         ctaButton
                             .opacity(showContent ? 1 : 0)
                             .offset(y: showContent ? 0 : 20)
-                            .padding(.horizontal, Aurora.Layout.screenPadding)
+                            .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
 
                         // Footer
                         footerSection
                             .opacity(showContent ? 1 : 0)
 
-                        Spacer(minLength: Aurora.Layout.spacingXL)
+                        Spacer(minLength: UtopianDesignFallback.Spacing.xl)
                     }
-                    .padding(.top, Aurora.Layout.spacingLarge)
+                    .padding(.top, UtopianDesignFallback.Spacing.lg)
                 }
             }
         }
@@ -112,20 +112,20 @@ struct PaywallView: View {
     // MARK: - Title Section
 
     private var titleSection: some View {
-        VStack(spacing: Aurora.Layout.spacingSmall) {
+        VStack(spacing: UtopianDesignFallback.Spacing.sm) {
             // Editorial thin typography - consistent with AuthView
             Text("MyTasksAI")
                 .font(.system(size: 42, weight: .thin, design: .default))
-                .foregroundStyle(Aurora.Colors.textPrimary)
+                .foregroundStyle(.white)
 
             Text("Your Trial Has Ended")
                 .dynamicTypeFont(base: 20, weight: .semibold)
-                .foregroundStyle(Aurora.Colors.textPrimary)
-                .padding(.top, Aurora.Layout.spacingSmall)
+                .foregroundStyle(.white)
+                .padding(.top, UtopianDesignFallback.Spacing.sm)
 
             Text("Subscribe to continue using all AI features")
                 .dynamicTypeFont(base: 15)
-                .foregroundStyle(Aurora.Colors.textSecondary)
+                .foregroundStyle(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
         }
     }
@@ -133,7 +133,7 @@ struct PaywallView: View {
     // MARK: - Features Section
 
     private var featuresSection: some View {
-        VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: UtopianDesignFallback.Spacing.md) {
             ForEach(Array(SubscriptionTier.pro.features.enumerated()), id: \.offset) { index, feature in
                 featureRow(feature, index: index)
             }
@@ -142,26 +142,26 @@ struct PaywallView: View {
     }
 
     private func featureRow(_ feature: String, index: Int) -> some View {
-        HStack(spacing: Aurora.Layout.spacing) {
+        HStack(spacing: UtopianDesignFallback.Spacing.md) {
             // Checkmark with glow
             ZStack {
                 SwiftUI.Circle()
-                    .fill(Aurora.Colors.success.opacity(0.15))
+                    .fill(UtopianDesignFallback.Colors.completed.opacity(0.15))
                     .frame(width: 32, height: 32)
 
                 SwiftUI.Circle()
-                    .fill(Aurora.Colors.success.opacity(0.1))
+                    .fill(UtopianDesignFallback.Colors.completed.opacity(0.1))
                     .frame(width: 32, height: 32)
                     .blur(radius: 6)
 
                 Image(systemName: "checkmark")
                     .dynamicTypeFont(base: 14, weight: .bold)
-                    .foregroundStyle(Aurora.Colors.success)
+                    .foregroundStyle(UtopianDesignFallback.Colors.completed)
             }
 
             Text(feature)
                 .dynamicTypeFont(base: 16, weight: .medium)
-                .foregroundStyle(Aurora.Colors.textPrimary)
+                .foregroundStyle(.white)
 
             Spacer()
         }
@@ -172,7 +172,7 @@ struct PaywallView: View {
     // MARK: - Price Card
 
     private var priceCard: some View {
-        VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: UtopianDesignFallback.Spacing.md) {
             // Crown badge
             HStack(spacing: 6) {
                 Image(systemName: "crown.fill")
@@ -180,42 +180,42 @@ struct PaywallView: View {
                 Text("Unlock Pro")
                     .dynamicTypeFont(base: 15, weight: .semibold)
             }
-            .foregroundStyle(Aurora.Colors.violet)
+            .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
             .padding(.horizontal, 18)
             .padding(.vertical, 10)
             .background(
                 Capsule()
-                    .fill(Aurora.Colors.violet.opacity(0.15))
+                    .fill(UtopianDesignFallback.Colors.aiPurple.opacity(0.15))
             )
 
             // Price display
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text("$9.99")
                     .dynamicTypeFont(base: 44, weight: .bold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
 
                 Text("/month")
                     .dynamicTypeFont(base: 16, weight: .medium)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
 
             // Cancel info
             Text("Cancel anytime • Automatic renewal")
                 .dynamicTypeFont(base: 13)
-                .foregroundStyle(Aurora.Colors.textTertiary)
+                .foregroundStyle(.white.opacity(0.5))
         }
-        .padding(Aurora.Layout.spacingXL)
+        .padding(UtopianDesignFallback.Spacing.xl)
         .background(
-            RoundedRectangle(cornerRadius: Aurora.Radius.xxl)
-                .fill(Aurora.Colors.cosmicSurface)
+            RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.xxl)
+                .fill(Color.white.opacity(0.1))
                 .overlay(
-                    RoundedRectangle(cornerRadius: Aurora.Radius.xxl)
+                    RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.xxl)
                         .stroke(
                             LinearGradient(
                                 colors: [
-                                    Aurora.Colors.violet.opacity(0.5),
-                                    Aurora.Colors.electric.opacity(0.3),
-                                    Aurora.Colors.glassBorder
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.5),
+                                    UtopianDesignFallback.Colors.focusActive.opacity(0.3),
+                                    Color.white.opacity(0.2)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -224,7 +224,7 @@ struct PaywallView: View {
                         )
                 )
         )
-        .shadow(color: Aurora.Colors.violet.opacity(0.2), radius: 20, y: 8)
+        .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.2), radius: 20, y: 8)
     }
 
     // MARK: - CTA Button
@@ -245,21 +245,21 @@ struct PaywallView: View {
     // MARK: - Footer Section
 
     private var footerSection: some View {
-        VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: UtopianDesignFallback.Spacing.md) {
             // Restore purchases
-            AuroraLinkButton("Restore Purchases", color: Aurora.Colors.textSecondary) {
+            AuroraLinkButton("Restore Purchases", color: .white.opacity(0.7)) {
                 Task {
                     await restorePurchases()
                 }
             }
 
             // Legal links
-            HStack(spacing: Aurora.Layout.spacingLarge) {
-                AuroraLinkButton("Privacy Policy", color: Aurora.Colors.textTertiary) {
+            HStack(spacing: UtopianDesignFallback.Spacing.lg) {
+                AuroraLinkButton("Privacy Policy", color: .white.opacity(0.5)) {
                     openURL("https://yourapp.com/privacy")
                 }
 
-                AuroraLinkButton("Terms of Use", color: Aurora.Colors.textTertiary) {
+                AuroraLinkButton("Terms of Use", color: .white.opacity(0.5)) {
                     openURL("https://yourapp.com/terms")
                 }
             }
@@ -267,9 +267,9 @@ struct PaywallView: View {
             // Fine print
             Text("Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless it is canceled at least 24 hours before the end of the current period.")
                 .dynamicTypeFont(base: 11)
-                .foregroundStyle(Aurora.Colors.textQuaternary)
+                .foregroundStyle(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, Aurora.Layout.spacingXL)
+                .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
         }
     }
 
@@ -277,33 +277,33 @@ struct PaywallView: View {
 
     private func startAnimations() {
         // Staggered reveal
-        withAnimation(Aurora.Animation.spring.delay(0.1)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.1)) {
             showLogo = true
         }
 
-        withAnimation(Aurora.Animation.spring.delay(0.3)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.3)) {
             showTitle = true
         }
 
         // Stagger feature appearance
         for index in featureAppearance.indices {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(index) * 0.08) {
-                withAnimation(Aurora.Animation.spring) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     featureAppearance[index] = true
                 }
             }
         }
 
-        withAnimation(Aurora.Animation.spring.delay(0.9)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.9)) {
             showPriceCard = true
         }
 
-        withAnimation(Aurora.Animation.spring.delay(1.1)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(1.1)) {
             showContent = true
         }
 
         // Logo glow pulse
-        withAnimation(Aurora.Animation.glowPulse) {
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
             logoGlow = 0.9
         }
     }
@@ -362,7 +362,7 @@ struct PaywallView: View {
     }
 }
 
-// MARK: - Aurora Background Extension
+// MARK: - Utopian Background Extension
 
 extension AuroraBackground {
     /// Paywall screen background - premium feel
@@ -371,7 +371,7 @@ extension AuroraBackground {
             showStars: true,
             starCount: 45,
             auroraIntensity: 0.42,
-            glowColor: Aurora.Colors.violet,
+            glowColor: UtopianDesignFallback.Colors.aiPurple,
             glowPosition: UnitPoint(x: 0.5, y: 0.25)
         )
     }

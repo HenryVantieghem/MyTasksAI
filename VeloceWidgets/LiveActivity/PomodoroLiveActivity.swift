@@ -2,8 +2,8 @@
 //  PomodoroLiveActivity.swift
 //  VeloceWidgets
 //
-//  Pomodoro Live Activity - Aurora Design System
-//  Ethereal cosmic timer with aurora gradients
+//  Pomodoro Live Activity - Utopian Design System
+//  Ethereal cosmic timer with utopian gradients
 //  Dynamic Island & Lock Screen with glass styling
 //
 
@@ -59,7 +59,7 @@ struct LockScreenView: View {
 
     var body: some View {
         HStack(spacing: 16) {
-            // Timer ring with aurora gradient
+            // Timer ring with utopian gradient
             ZStack {
                 // Ambient glow
                 Circle()
@@ -83,7 +83,7 @@ struct LockScreenView: View {
                     .stroke(Color.white.opacity(0.12), lineWidth: 5)
                     .frame(width: 52, height: 52)
 
-                // Progress ring with aurora gradient
+                // Progress ring with utopian gradient
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
@@ -159,7 +159,7 @@ struct LockScreenView: View {
         }
         .padding(16)
         .background(
-            // Aurora cosmic background
+            // Utopian cosmic background
             ZStack {
                 // Base gradient
                 LinearGradient(
@@ -171,13 +171,13 @@ struct LockScreenView: View {
                     endPoint: .bottomTrailing
                 )
 
-                // Aurora glow based on state
-                stateAuroraGlow
+                // Utopian glow based on state
+                stateUtopianGlow
             }
         )
     }
 
-    private var stateAuroraGlow: some View {
+    private var stateUtopianGlow: some View {
         ZStack {
             // Primary glow
             Ellipse()
@@ -286,7 +286,7 @@ struct CompactLeadingView: View {
 
     var body: some View {
         ZStack {
-            // Mini aurora progress ring
+            // Mini utopian progress ring
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
@@ -445,7 +445,7 @@ struct ExpandedCenterView: View {
                 .frame(width: 100, height: 100)
                 .blur(radius: 8)
 
-            // Progress ring with aurora gradient
+            // Progress ring with utopian gradient
             Circle()
                 .stroke(Color.white.opacity(0.12), lineWidth: 6)
                 .frame(width: 70, height: 70)
@@ -506,7 +506,7 @@ struct ExpandedBottomView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            // Pause/Resume button with aurora styling
+            // Pause/Resume button with utopian styling
             Link(destination: URL(string: "veloce://pomodoro/toggle")!) {
                 HStack(spacing: 5) {
                     Image(systemName: context.state.state == .running ? "pause.fill" : "play.fill")

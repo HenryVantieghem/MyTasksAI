@@ -2,7 +2,7 @@
 //  HowItWorksView.swift
 //  Veloce
 //
-//  How It Works View - Aurora Design System
+//  How It Works View - Utopian Design System
 //  Explains the 3-day free trial subscription flow
 //  with visual timeline showing trial → paywall → subscribe
 //
@@ -28,26 +28,26 @@ struct HowItWorksView: View {
             "gift.fill",
             "3 Days Free",
             "Full access to all features. No credit card required to start.",
-            Aurora.Colors.success
+            UtopianDesignFallback.Colors.completed
         ),
         (
             "clock.badge.exclamationmark.fill",
             "Trial Ends",
             "After 3 days, your free trial expires and the paywall appears.",
-            Aurora.Colors.gold
+            UtopianDesignFallback.Gamification.starGold
         ),
         (
             "crown.fill",
             "Subscribe to Continue",
             "Choose a plan to unlock all AI features and continue your productivity journey.",
-            Aurora.Colors.violet
+            UtopianDesignFallback.Colors.aiPurple
         )
     ]
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Aurora background
+                // Utopian background
                 AuroraBackground.howItWorks
 
                 // Animated Logo at top
@@ -64,7 +64,7 @@ struct HowItWorksView: View {
                 )
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: Aurora.Layout.spacingXL) {
+                    VStack(spacing: UtopianDesignFallback.Spacing.xl) {
                         // Spacer for logo
                         Spacer(minLength: logoSpacerHeight(for: geometry))
 
@@ -75,18 +75,18 @@ struct HowItWorksView: View {
 
                         // Timeline section
                         timelineSection
-                            .padding(.horizontal, Aurora.Layout.screenPadding)
+                            .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
                             .opacity(showTimeline ? 1 : 0)
 
                         // Footer
                         footerSection
                             .opacity(showFooter ? 1 : 0)
                             .offset(y: showFooter ? 0 : 20)
-                            .padding(.horizontal, Aurora.Layout.screenPadding)
+                            .padding(.horizontal, UtopianDesignFallback.Spacing.screenPadding)
 
-                        Spacer(minLength: Aurora.Layout.spacingXL)
+                        Spacer(minLength: UtopianDesignFallback.Spacing.xl)
                     }
-                    .padding(.top, Aurora.Layout.spacingLarge)
+                    .padding(.top, UtopianDesignFallback.Spacing.lg)
                 }
 
                 // Close button
@@ -127,14 +127,14 @@ struct HowItWorksView: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .dynamicTypeFont(base: 28)
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .foregroundStyle(.white.opacity(0.7))
                         .background(
                             Circle()
-                                .fill(Aurora.Colors.cosmicSurface.opacity(0.5))
+                                .fill(Color.white.opacity(0.1).opacity(0.5))
                                 .frame(width: 30, height: 30)
                         )
                 }
-                .padding(.trailing, Aurora.Layout.screenPadding)
+                .padding(.trailing, UtopianDesignFallback.Spacing.screenPadding)
                 .padding(.top, 16)
             }
             Spacer()
@@ -144,7 +144,7 @@ struct HowItWorksView: View {
     // MARK: - Title Section
 
     private var titleSection: some View {
-        VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: UtopianDesignFallback.Spacing.md) {
             // Badge
             HStack(spacing: 6) {
                 Image(systemName: "questionmark.circle.fill")
@@ -152,23 +152,23 @@ struct HowItWorksView: View {
                 Text("How It Works")
                     .dynamicTypeFont(base: 15, weight: .semibold)
             }
-            .foregroundStyle(Aurora.Colors.cyan)
+            .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
             .padding(.horizontal, 18)
             .padding(.vertical, 10)
             .background(
                 Capsule()
-                    .fill(Aurora.Colors.cyan.opacity(0.15))
+                    .fill(UtopianDesignFallback.Colors.focusActive.opacity(0.15))
             )
 
             // Main title
             Text("Your Free Trial")
                 .dynamicTypeFont(base: 34, weight: .bold)
-                .foregroundStyle(Aurora.Colors.textPrimary)
+                .foregroundStyle(.white)
 
             // Subtitle
             Text("Experience all premium features\nfor 3 days, completely free")
                 .dynamicTypeFont(base: 16)
-                .foregroundStyle(Aurora.Colors.textSecondary)
+                .foregroundStyle(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
         }
@@ -191,13 +191,13 @@ struct HowItWorksView: View {
                 )
             }
         }
-        .crystallineCard(padding: Aurora.Layout.spacingLarge)
+        .crystallineCard(padding: UtopianDesignFallback.Spacing.lg)
     }
 
     // MARK: - Footer Section
 
     private var footerSection: some View {
-        VStack(spacing: Aurora.Layout.spacingLarge) {
+        VStack(spacing: UtopianDesignFallback.Spacing.lg) {
             // Got it button
             AuroraButton(
                 "Got It",
@@ -209,14 +209,14 @@ struct HowItWorksView: View {
             }
 
             // No commitment message
-            HStack(spacing: Aurora.Layout.spacingSmall) {
+            HStack(spacing: UtopianDesignFallback.Spacing.sm) {
                 Image(systemName: "lock.shield.fill")
                     .dynamicTypeFont(base: 14)
-                    .foregroundStyle(Aurora.Colors.success)
+                    .foregroundStyle(UtopianDesignFallback.Colors.completed)
 
                 Text("No credit card required to start")
                     .dynamicTypeFont(base: 14)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
         }
     }
@@ -225,7 +225,7 @@ struct HowItWorksView: View {
 
     private func startAnimations() {
         // Logo fade in
-        withAnimation(Aurora.Animation.spring.delay(0.1)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.1)) {
             showLogo = true
         }
 
@@ -235,19 +235,19 @@ struct HowItWorksView: View {
         }
 
         // Title
-        withAnimation(Aurora.Animation.spring.delay(0.3)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.3)) {
             showTitle = true
         }
 
         // Timeline container
-        withAnimation(Aurora.Animation.spring.delay(0.5)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.5)) {
             showTimeline = true
         }
 
         // Stagger step cards
         for index in stepAppearance.indices {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7 + Double(index) * 0.2) {
-                withAnimation(Aurora.Animation.spring) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     stepAppearance[index] = true
                 }
             }
@@ -257,7 +257,7 @@ struct HowItWorksView: View {
         startStepAnimation()
 
         // Footer
-        withAnimation(Aurora.Animation.spring.delay(1.4)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(1.4)) {
             showFooter = true
         }
     }
@@ -285,7 +285,7 @@ struct TimelineStepCard: View {
     let isActive: Bool
 
     var body: some View {
-        HStack(alignment: .top, spacing: Aurora.Layout.spacing) {
+        HStack(alignment: .top, spacing: UtopianDesignFallback.Spacing.md) {
             // Timeline indicator
             VStack(spacing: 0) {
                 // Step circle
@@ -336,7 +336,7 @@ struct TimelineStepCard: View {
             }
 
             // Content
-            VStack(alignment: .leading, spacing: Aurora.Layout.spacingSmall) {
+            VStack(alignment: .leading, spacing: UtopianDesignFallback.Spacing.sm) {
                 // Step number badge
                 Text("Step \(stepNumber)")
                     .dynamicTypeFont(base: 12, weight: .semibold)
@@ -351,17 +351,17 @@ struct TimelineStepCard: View {
                 // Title
                 Text(title)
                     .dynamicTypeFont(base: 18, weight: .bold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
 
                 // Subtitle
                 Text(subtitle)
                     .dynamicTypeFont(base: 14)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
                     .lineSpacing(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.top, 4)
-            .padding(.bottom, isLast ? 0 : Aurora.Layout.spacingLarge)
+            .padding(.bottom, isLast ? 0 : UtopianDesignFallback.Spacing.lg)
 
             Spacer()
         }
@@ -371,14 +371,14 @@ struct TimelineStepCard: View {
 
     private var nextStepColor: Color {
         switch stepNumber {
-        case 1: return Aurora.Colors.gold
-        case 2: return Aurora.Colors.violet
-        default: return Aurora.Colors.glassBorder
+        case 1: return UtopianDesignFallback.Gamification.starGold
+        case 2: return UtopianDesignFallback.Colors.aiPurple
+        default: return Color.white.opacity(0.3)
         }
     }
 }
 
-// MARK: - Aurora Background Extension
+// MARK: - Utopian Background Extension
 
 extension AuroraBackground {
     /// How It Works screen background
@@ -387,7 +387,7 @@ extension AuroraBackground {
             showStars: true,
             starCount: 40,
             auroraIntensity: 0.35,
-            glowColor: Aurora.Colors.cyan,
+            glowColor: UtopianDesignFallback.Colors.focusActive,
             glowPosition: UnitPoint(x: 0.5, y: 0.3)
         )
     }

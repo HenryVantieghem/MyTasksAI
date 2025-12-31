@@ -21,8 +21,8 @@ struct VeloceTasksWidget: Widget {
                 .containerBackground(for: .widget) {
                     WidgetCosmicBackground(
                         showStars: true,
-                        showAurora: true,
-                        auroraIntensity: entry.progress >= 1.0 ? 0.5 : 0.35
+                        showGlow: true,
+                        glowIntensity: entry.progress >= 1.0 ? 0.5 : 0.35
                     )
                 }
         }
@@ -131,18 +131,18 @@ struct WidgetTaskItem: Codable, Identifiable {
 
     var priorityColor: Color {
         switch priority.lowercased() {
-        case "high": return WidgetAurora.Colors.rose
-        case "medium": return WidgetAurora.Colors.gold
-        case "low": return WidgetAurora.Colors.emerald
-        default: return WidgetAurora.Colors.textTertiary
+        case "high": return WidgetUtopian.Colors.rose
+        case "medium": return WidgetUtopian.Colors.gold
+        case "low": return WidgetUtopian.Colors.emerald
+        default: return WidgetUtopian.Colors.textTertiary
         }
     }
 
     var priorityGlow: Color {
         switch priority.lowercased() {
-        case "high": return WidgetAurora.Colors.rose.opacity(0.4)
-        case "medium": return WidgetAurora.Colors.gold.opacity(0.3)
-        case "low": return WidgetAurora.Colors.emerald.opacity(0.3)
+        case "high": return WidgetUtopian.Colors.rose.opacity(0.4)
+        case "medium": return WidgetUtopian.Colors.gold.opacity(0.3)
+        case "low": return WidgetUtopian.Colors.emerald.opacity(0.3)
         default: return Color.clear
         }
     }
@@ -180,17 +180,17 @@ struct TasksWidgetView: View {
                 HStack(spacing: 6) {
                     ZStack {
                         Circle()
-                            .fill(WidgetAurora.Colors.gold.opacity(0.2))
+                            .fill(WidgetUtopian.Colors.gold.opacity(0.2))
                             .frame(width: 24, height: 24)
 
                         Image(systemName: "star.fill")
                             .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(WidgetAurora.Colors.gold)
+                            .foregroundStyle(WidgetUtopian.Colors.gold)
                     }
 
                     Text("Tasks")
-                        .font(WidgetAurora.Typography.caption)
-                        .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                        .font(WidgetUtopian.Typography.caption)
+                        .foregroundStyle(WidgetUtopian.Colors.textSecondary)
 
                     Spacer()
 
@@ -200,9 +200,9 @@ struct TasksWidgetView: View {
                             Image(systemName: "sparkle")
                                 .font(.system(size: 8))
                             Text("+\(entry.xpEarned)")
-                                .font(WidgetAurora.Typography.micro)
+                                .font(WidgetUtopian.Typography.micro)
                         }
-                        .foregroundStyle(WidgetAurora.Colors.electric)
+                        .foregroundStyle(WidgetUtopian.Colors.electric)
                     }
                 }
 
@@ -212,25 +212,25 @@ struct TasksWidgetView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text("\(entry.completedCount)")
-                            .font(WidgetAurora.Typography.largeNumber)
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                            .font(WidgetUtopian.Typography.largeNumber)
+                            .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                         Text("today")
-                            .font(WidgetAurora.Typography.caption)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.caption)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                     }
 
-                    // Aurora progress bar
+                    // Utopian progress bar
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             Capsule()
-                                .fill(WidgetAurora.Colors.glassBorder)
+                                .fill(WidgetUtopian.Colors.glassBorder)
                                 .frame(height: 6)
 
                             Capsule()
-                                .fill(entry.isAllComplete ? WidgetAurora.Colors.success : WidgetAurora.Gradients.aurora)
+                                .fill(entry.isAllComplete ? WidgetUtopian.Colors.success : WidgetUtopian.Gradients.utopian)
                                 .frame(width: max(6, geo.size.width * entry.progress), height: 6)
-                                .shadow(color: (entry.isAllComplete ? WidgetAurora.Colors.success : WidgetAurora.Colors.violet).opacity(0.5), radius: 4)
+                                .shadow(color: (entry.isAllComplete ? WidgetUtopian.Colors.success : WidgetUtopian.Colors.violet).opacity(0.5), radius: 4)
                         }
                     }
                     .frame(height: 6)
@@ -249,8 +249,8 @@ struct TasksWidgetView: View {
                         }
 
                         Text(nextTask.title)
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.micro)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                             .lineLimit(1)
                     }
                 } else if entry.isAllComplete {
@@ -258,9 +258,9 @@ struct TasksWidgetView: View {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.system(size: 10))
                         Text("All done!")
-                            .font(WidgetAurora.Typography.micro)
+                            .font(WidgetUtopian.Typography.micro)
                     }
-                    .foregroundStyle(WidgetAurora.Colors.success)
+                    .foregroundStyle(WidgetUtopian.Colors.success)
                 }
             }
             .padding(14)
@@ -272,19 +272,19 @@ struct TasksWidgetView: View {
     private var mediumWidget: some View {
         Link(destination: URL(string: "veloce://tasks")!) {
             HStack(spacing: 16) {
-                // Left: Aurora progress ring with XP badge
+                // Left: Utopian progress ring with XP badge
                 VStack(spacing: 8) {
                     ZStack {
-                        AuroraProgressRing(progress: entry.progress, size: 72, lineWidth: 7)
+                        UtopianProgressRing(progress: entry.progress, size: 72, lineWidth: 7)
 
                         VStack(spacing: 0) {
                             Text("\(entry.completedCount)")
-                                .font(WidgetAurora.Typography.mediumNumber)
-                                .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                                .font(WidgetUtopian.Typography.mediumNumber)
+                                .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                             Text("of \(entry.totalCount)")
-                                .font(WidgetAurora.Typography.micro)
-                                .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                .font(WidgetUtopian.Typography.micro)
+                                .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                         }
                     }
 
@@ -293,23 +293,23 @@ struct TasksWidgetView: View {
                         WidgetStatPill(
                             icon: "sparkle",
                             value: "+\(entry.xpEarned) XP",
-                            color: WidgetAurora.Colors.electric
+                            color: WidgetUtopian.Colors.electric
                         )
                     } else {
                         Text("Today")
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.micro)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                     }
                 }
 
-                // Divider with aurora gradient
+                // Divider with utopian gradient
                 Rectangle()
                     .fill(
                         LinearGradient(
                             colors: [
-                                WidgetAurora.Colors.glassBorder.opacity(0),
-                                WidgetAurora.Colors.violet.opacity(0.3),
-                                WidgetAurora.Colors.glassBorder.opacity(0)
+                                WidgetUtopian.Colors.glassBorder.opacity(0),
+                                WidgetUtopian.Colors.violet.opacity(0.3),
+                                WidgetUtopian.Colors.glassBorder.opacity(0)
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -334,8 +334,8 @@ struct TasksWidgetView: View {
                                 .frame(width: 28, alignment: .leading)
 
                                 Text(task.title)
-                                    .font(WidgetAurora.Typography.body)
-                                    .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                                    .font(WidgetUtopian.Typography.body)
+                                    .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                                     .lineLimit(1)
 
                                 Spacer()
@@ -343,15 +343,15 @@ struct TasksWidgetView: View {
                                 // Time if scheduled
                                 if let time = task.scheduledTime {
                                     Text(time)
-                                        .font(WidgetAurora.Typography.micro)
-                                        .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                        .font(WidgetUtopian.Typography.micro)
+                                        .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                                 }
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 8)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(WidgetAurora.Colors.glassBase)
+                                    .fill(WidgetUtopian.Colors.glassBase)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
                                             .stroke(task.priorityColor.opacity(0.15), lineWidth: 0.5)
@@ -365,18 +365,18 @@ struct TasksWidgetView: View {
                             Image(systemName: "plus.circle.fill")
                                 .font(.system(size: 10))
                             Text("\(entry.tasks.count - 3) more")
-                                .font(WidgetAurora.Typography.micro)
+                                .font(WidgetUtopian.Typography.micro)
                         }
-                        .foregroundStyle(WidgetAurora.Colors.cyan)
+                        .foregroundStyle(WidgetUtopian.Colors.cyan)
                         .padding(.leading, 4)
                     } else if entry.isAllComplete {
                         HStack(spacing: 4) {
                             Image(systemName: "sparkles")
                                 .font(.system(size: 10))
                             Text("All tasks complete!")
-                                .font(WidgetAurora.Typography.micro)
+                                .font(WidgetUtopian.Typography.micro)
                         }
-                        .foregroundStyle(WidgetAurora.Colors.success)
+                        .foregroundStyle(WidgetUtopian.Colors.success)
                         .padding(.leading, 4)
                     }
 
@@ -392,23 +392,23 @@ struct TasksWidgetView: View {
 
     private var largeWidget: some View {
         VStack(alignment: .leading, spacing: 14) {
-            // Header with aurora orb and XP
+            // Header with utopian orb and XP
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Today's Tasks")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                        .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                     HStack(spacing: 8) {
                         Text("\(entry.completedCount) of \(entry.totalCount) completed")
-                            .font(WidgetAurora.Typography.caption)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.caption)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                         if entry.xpEarned > 0 {
                             WidgetStatPill(
                                 icon: "sparkle",
                                 value: "+\(entry.xpEarned)",
-                                color: WidgetAurora.Colors.electric
+                                color: WidgetUtopian.Colors.electric
                             )
                         }
                     }
@@ -416,30 +416,30 @@ struct TasksWidgetView: View {
 
                 Spacer()
 
-                // Mini aurora progress ring
+                // Mini utopian progress ring
                 ZStack {
-                    AuroraProgressRing(progress: entry.progress, size: 44, lineWidth: 4, showGlow: false)
+                    UtopianProgressRing(progress: entry.progress, size: 44, lineWidth: 4, showGlow: false)
 
                     if entry.isAllComplete {
                         Image(systemName: "checkmark")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(WidgetAurora.Colors.success)
+                            .foregroundStyle(WidgetUtopian.Colors.success)
                     } else {
                         Text("\(Int(entry.progress * 100))%")
                             .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                            .foregroundStyle(WidgetUtopian.Colors.textSecondary)
                     }
                 }
             }
 
-            // Divider with aurora gradient
+            // Divider with utopian gradient
             Rectangle()
                 .fill(
                     LinearGradient(
                         colors: [
-                            WidgetAurora.Colors.violet.opacity(0.3),
-                            WidgetAurora.Colors.electric.opacity(0.2),
-                            WidgetAurora.Colors.glassBorder.opacity(0)
+                            WidgetUtopian.Colors.violet.opacity(0.3),
+                            WidgetUtopian.Colors.electric.opacity(0.2),
+                            WidgetUtopian.Colors.glassBorder.opacity(0)
                         ],
                         startPoint: .leading,
                         endPoint: .trailing
@@ -478,9 +478,9 @@ struct TasksWidgetView: View {
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(task.title)
-                                    .font(WidgetAurora.Typography.subheadline)
-                                    .strikethrough(task.isCompleted, color: WidgetAurora.Colors.textQuaternary)
-                                    .foregroundStyle(task.isCompleted ? WidgetAurora.Colors.textQuaternary : WidgetAurora.Colors.textPrimary)
+                                    .font(WidgetUtopian.Typography.subheadline)
+                                    .strikethrough(task.isCompleted, color: WidgetUtopian.Colors.textQuaternary)
+                                    .foregroundStyle(task.isCompleted ? WidgetUtopian.Colors.textQuaternary : WidgetUtopian.Colors.textPrimary)
                                     .lineLimit(1)
 
                                 // Star rating row
@@ -494,10 +494,10 @@ struct TasksWidgetView: View {
                                     if let time = task.scheduledTime {
                                         Text("•")
                                             .font(.system(size: 8))
-                                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                            .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                                         Text(time)
-                                            .font(WidgetAurora.Typography.micro)
-                                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                            .font(WidgetUtopian.Typography.micro)
+                                            .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                                     }
                                 }
                             }
@@ -507,15 +507,15 @@ struct TasksWidgetView: View {
                             // Points earned if completed
                             if task.isCompleted {
                                 Text("+10")
-                                    .font(WidgetAurora.Typography.micro)
-                                    .foregroundStyle(WidgetAurora.Colors.success)
+                                    .font(WidgetUtopian.Typography.micro)
+                                    .foregroundStyle(WidgetUtopian.Colors.success)
                             }
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(WidgetAurora.Colors.glassBase)
+                                .fill(WidgetUtopian.Colors.glassBase)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(task.priorityColor.opacity(0.1), lineWidth: 0.5)
@@ -528,7 +528,7 @@ struct TasksWidgetView: View {
             Spacer()
 
             // Quick add button
-            WidgetAuroraButton("Add Task", icon: "plus", url: URL(string: "veloce://add-task")!)
+            WidgetUtopianButton("Add Task", icon: "plus", url: URL(string: "veloce://add-task")!)
         }
         .padding(16)
     }

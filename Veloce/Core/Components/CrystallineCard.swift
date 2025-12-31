@@ -4,7 +4,7 @@
 //
 //  Crystalline Card
 //  Premium glass-morphic card with proper depth rendering on cosmic backgrounds.
-//  Features inner shadows, clean borders, and aurora glow on selection.
+//  Features inner shadows, clean borders, and utopian glow on selection.
 //
 
 import SwiftUI
@@ -21,9 +21,9 @@ struct CrystallineCardModifier: ViewModifier {
 
     init(
         isSelected: Bool = false,
-        accentColor: Color = Aurora.Colors.violet,
-        cornerRadius: CGFloat = Aurora.Radius.card,
-        padding: CGFloat = Aurora.Layout.cardPadding
+        accentColor: Color = UtopianDesignFallback.Colors.aiPurple,
+        cornerRadius: CGFloat = UtopianDesignFallback.Radius.card,
+        padding: CGFloat = UtopianDesignFallback.Layout.cardPadding
     ) {
         self.isSelected = isSelected
         self.accentColor = accentColor
@@ -40,9 +40,9 @@ struct CrystallineCardModifier: ViewModifier {
             .shadow(color: glowShadowColor, radius: isSelected ? 16 : 8, y: 4)
             .shadow(color: .black.opacity(0.3), radius: 8, y: 2)
             .scaleEffect(isSelected ? 1.02 : 1.0)
-            .animation(Aurora.Animation.spring, value: isSelected)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isSelected)
             .onChange(of: isSelected) { _, selected in
-                withAnimation(Aurora.Animation.standard) {
+                withAnimation(UtopianDesignFallback.Animation.standard) {
                     glowOpacity = selected ? 0.5 : 0
                 }
             }
@@ -57,15 +57,15 @@ struct CrystallineCardModifier: ViewModifier {
         ZStack {
             // Base fill - proper glass on cosmic black
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Aurora.Colors.cosmicSurface)
+                .fill(UtopianDesignFallback.Colors.cosmicSurface)
 
             // Subtle gradient overlay for depth
             RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Aurora.Colors.glassBase,
-                            Aurora.Colors.cosmicSurface.opacity(0.5)
+                            UtopianDesignFallback.Colors.glassBase,
+                            UtopianDesignFallback.Colors.cosmicSurface.opacity(0.5)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -82,7 +82,7 @@ struct CrystallineCardModifier: ViewModifier {
             VStack {
                 LinearGradient(
                     colors: [
-                        Aurora.Colors.glassInnerShadow,
+                        UtopianDesignFallback.Colors.glassInnerShadow,
                         Color.clear
                     ],
                     startPoint: .top,
@@ -126,7 +126,7 @@ struct CrystallineCardModifier: ViewModifier {
                 colors: [
                     accentColor.opacity(0.6),
                     accentColor.opacity(0.3),
-                    Aurora.Colors.glassBorder
+                    UtopianDesignFallback.Colors.glassBorder
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -134,9 +134,9 @@ struct CrystallineCardModifier: ViewModifier {
         } else {
             return LinearGradient(
                 colors: [
-                    Aurora.Colors.glassHighlight.opacity(0.8),
-                    Aurora.Colors.glassBorder,
-                    Aurora.Colors.glassBorder.opacity(0.5)
+                    UtopianDesignFallback.Colors.glassHighlight.opacity(0.8),
+                    UtopianDesignFallback.Colors.glassBorder,
+                    UtopianDesignFallback.Colors.glassBorder.opacity(0.5)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -155,9 +155,9 @@ extension View {
     /// Apply crystalline card styling
     func crystallineCard(
         isSelected: Bool = false,
-        accentColor: Color = Aurora.Colors.violet,
-        cornerRadius: CGFloat = Aurora.Radius.card,
-        padding: CGFloat = Aurora.Layout.cardPadding
+        accentColor: Color = UtopianDesignFallback.Colors.aiPurple,
+        cornerRadius: CGFloat = UtopianDesignFallback.Radius.card,
+        padding: CGFloat = UtopianDesignFallback.Layout.cardPadding
     ) -> some View {
         modifier(CrystallineCardModifier(
             isSelected: isSelected,
@@ -186,7 +186,7 @@ struct CrystallineSelectionCard: View {
         title: String,
         subtitle: String? = nil,
         isSelected: Bool,
-        accentColor: Color = Aurora.Colors.violet,
+        accentColor: Color = UtopianDesignFallback.Colors.aiPurple,
         action: @escaping () -> Void
     ) {
         self.icon = icon
@@ -202,7 +202,7 @@ struct CrystallineSelectionCard: View {
             HapticsService.shared.selectionFeedback()
             action()
         } label: {
-            HStack(spacing: Aurora.Layout.spacing) {
+            HStack(spacing: UtopianDesignFallback.Layout.spacing) {
                 // Icon circle
                 iconCircle
 
@@ -210,12 +210,12 @@ struct CrystallineSelectionCard: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .dynamicTypeFont(base: 16, weight: .semibold)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
 
                     if let subtitle {
                         Text(subtitle)
                             .dynamicTypeFont(base: 13)
-                            .foregroundStyle(Aurora.Colors.textTertiary)
+                            .foregroundStyle(.white.opacity(0.5))
                     }
                 }
 
@@ -233,7 +233,7 @@ struct CrystallineSelectionCard: View {
         }
         .buttonStyle(.plain)
         .scaleEffect(isPressed ? 0.97 : 1.0)
-        .animation(Aurora.Animation.quick, value: isPressed)
+        .animation(UtopianDesignFallback.Animation.quick, value: isPressed)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in isPressed = true }
@@ -247,7 +247,7 @@ struct CrystallineSelectionCard: View {
                 .fill(
                     isSelected
                         ? accentColor.opacity(0.2)
-                        : Aurora.Colors.cosmicElevated
+                        : UtopianDesignFallback.Colors.cosmicElevated
                 )
                 .frame(width: 48, height: 48)
 
@@ -259,7 +259,7 @@ struct CrystallineSelectionCard: View {
 
             Image(systemName: icon)
                 .dynamicTypeFont(base: 20, weight: .medium)
-                .foregroundStyle(isSelected ? accentColor : Aurora.Colors.textSecondary)
+                .foregroundStyle(isSelected ? accentColor : .white.opacity(0.7))
         }
     }
 }
@@ -277,7 +277,7 @@ struct CrystallineFeatureCard: View {
         icon: String,
         title: String,
         description: String,
-        accentColor: Color = Aurora.Colors.cyan
+        accentColor: Color = UtopianDesignFallback.Colors.focusActive
     ) {
         self.icon = icon
         self.title = title
@@ -286,7 +286,7 @@ struct CrystallineFeatureCard: View {
     }
 
     var body: some View {
-        HStack(spacing: Aurora.Layout.spacing) {
+        HStack(spacing: UtopianDesignFallback.Layout.spacing) {
             // Glowing icon
             ZStack {
                 SwiftUI.Circle()
@@ -306,17 +306,17 @@ struct CrystallineFeatureCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .dynamicTypeFont(base: 15, weight: .semibold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
 
                 Text(description)
                     .dynamicTypeFont(base: 13)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .foregroundStyle(.white.opacity(0.5))
                     .lineLimit(2)
             }
 
             Spacer()
         }
-        .crystallineCard(padding: Aurora.Layout.spacing)
+        .crystallineCard(padding: UtopianDesignFallback.Layout.spacing)
     }
 }
 
@@ -341,7 +341,7 @@ struct CrystallineFeatureCard: View {
             title: "Health",
             subtitle: "Fitness & wellness goals",
             isSelected: false,
-            accentColor: Aurora.Colors.rose,
+            accentColor: UtopianDesignFallback.Colors.error,
             action: {}
         )
 
@@ -360,11 +360,11 @@ struct CrystallineFeatureCard: View {
             icon: "bell.badge.fill",
             title: "Smart Reminders",
             description: "Never miss an important task",
-            accentColor: Aurora.Colors.emerald
+            accentColor: UtopianDesignFallback.Colors.completed
         )
     }
     .padding()
-    .background(AuroraBackground.auth)
+    .background(UtopianGradients.background(for: Date()))
 }
 
 #Preview("Card States") {
@@ -376,9 +376,9 @@ struct CrystallineFeatureCard: View {
             .crystallineCard(isSelected: true)
 
         Text("Custom Color")
-            .crystallineCard(isSelected: true, accentColor: Aurora.Colors.emerald)
+            .crystallineCard(isSelected: true, accentColor: UtopianDesignFallback.Colors.completed)
     }
     .foregroundStyle(.white)
     .padding()
-    .background(Aurora.Colors.cosmicBlack)
+    .background(Color.black)
 }

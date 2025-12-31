@@ -43,7 +43,7 @@ struct CelestialOrb: View {
 
     init(
         state: Binding<OrbState>,
-        size: CGFloat = Aurora.Size.orbHero,
+        size: CGFloat = UtopianDesignFallback.Size.orbHero,
         showRings: Bool = true,
         showParticles: Bool = false
     ) {
@@ -102,22 +102,22 @@ struct CelestialOrb: View {
     private var stateColor: Color {
         switch state {
         case .dormant, .aware, .active, .processing, .celebration:
-            return Aurora.Colors.violet
+            return UtopianDesignFallback.Colors.aiPurple
         case .success:
-            return Aurora.Colors.success
+            return UtopianDesignFallback.Colors.completed
         case .error:
-            return Aurora.Colors.error
+            return UtopianDesignFallback.Colors.error
         }
     }
 
     private var stateSecondaryColor: Color {
         switch state {
         case .dormant, .aware, .active, .processing, .celebration:
-            return Aurora.Colors.cyan
+            return UtopianDesignFallback.Colors.focusActive
         case .success:
-            return Aurora.Colors.emerald
+            return UtopianDesignFallback.Colors.completed
         case .error:
-            return Aurora.Colors.rose
+            return UtopianDesignFallback.Colors.error
         }
     }
 
@@ -151,7 +151,7 @@ struct CelestialOrb: View {
                         AngularGradient(
                             colors: [
                                 stateColor.opacity(0.35 - Double(index) * 0.08),
-                                Aurora.Colors.electric.opacity(0.25 - Double(index) * 0.06),
+                                UtopianDesignFallback.Colors.focusActive.opacity(0.25 - Double(index) * 0.06),
                                 stateSecondaryColor.opacity(0.30 - Double(index) * 0.07),
                                 stateColor.opacity(0.35 - Double(index) * 0.08)
                             ],
@@ -187,7 +187,7 @@ struct CelestialOrb: View {
                 RadialGradient(
                     colors: [
                         stateColor.opacity(0.5),
-                        Aurora.Colors.electric.opacity(0.3),
+                        UtopianDesignFallback.Colors.focusActive.opacity(0.3),
                         Color.clear
                     ],
                     center: .center,
@@ -206,7 +206,7 @@ struct CelestialOrb: View {
         SwiftUI.Circle()
             .fill(
                 LinearGradient(
-                    colors: [stateColor, Aurora.Colors.electric, stateSecondaryColor],
+                    colors: [stateColor, UtopianDesignFallback.Colors.focusActive, stateSecondaryColor],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -288,7 +288,7 @@ struct CelestialOrb: View {
     }
 
     private func particleColor(for index: Int) -> Color {
-        let colors = [Aurora.Colors.violet, Aurora.Colors.electric, Aurora.Colors.cyan, Aurora.Colors.emerald]
+        let colors = [UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.completed]
         return colors[index % colors.count]
     }
 
@@ -315,7 +315,7 @@ struct CelestialOrb: View {
     }
 
     private func celebrationColor(for index: Int) -> Color {
-        let colors = [Aurora.Colors.violet, Aurora.Colors.electric, Aurora.Colors.cyan, Aurora.Colors.emerald, Aurora.Colors.rose, Aurora.Colors.gold]
+        let colors = [UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.completed, UtopianDesignFallback.Colors.error, UtopianDesignFallback.Gamification.starGold]
         return colors[index % colors.count]
     }
 
@@ -362,7 +362,7 @@ struct CelestialOrb: View {
     }
 
     private func animateDormant() {
-        withAnimation(Aurora.Animation.orbBreathing) {
+        withAnimation(UtopianDesignFallback.Animation.orbBreathing) {
             orbScale = 1.05
             glowOpacity = 0.45
             glowScale = 1.0
@@ -371,7 +371,7 @@ struct CelestialOrb: View {
     }
 
     private func animateAware() {
-        withAnimation(Aurora.Animation.spring) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             orbScale = 1.08
             glowOpacity = 0.6
             glowScale = 1.05
@@ -380,7 +380,7 @@ struct CelestialOrb: View {
     }
 
     private func animateActive() {
-        withAnimation(Aurora.Animation.orbBreathing) {
+        withAnimation(UtopianDesignFallback.Animation.orbBreathing) {
             orbScale = 1.12
             glowOpacity = 0.75
             glowScale = 1.1
@@ -394,11 +394,11 @@ struct CelestialOrb: View {
             orbRotation = 360
         }
         // Pulsing glow
-        withAnimation(Aurora.Animation.glowPulse) {
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
             glowOpacity = 0.85
             glowScale = 1.15
         }
-        withAnimation(Aurora.Animation.spring) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             orbScale = 1.1
             ringScale = 1.05
         }
@@ -406,7 +406,7 @@ struct CelestialOrb: View {
 
     private func animateSuccess() {
         // Quick scale up then settle
-        withAnimation(Aurora.Animation.springSnappy) {
+        withAnimation(UtopianDesignFallback.Animation.springSnappy) {
             orbScale = 1.2
             glowOpacity = 0.9
             glowScale = 1.2
@@ -415,14 +415,14 @@ struct CelestialOrb: View {
         // Celebration burst
         celebrationOpacity = 0
         celebrationScale = 0.5
-        withAnimation(Aurora.Animation.spring) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             celebrationOpacity = 0.8
             celebrationScale = 1.0
         }
 
         // Fade out burst
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            withAnimation(Aurora.Animation.slow) {
+            withAnimation(UtopianDesignFallback.Animation.slow) {
                 celebrationOpacity = 0
                 orbScale = 1.05
                 glowScale = 1.0
@@ -437,13 +437,13 @@ struct CelestialOrb: View {
         }
 
         // Red flash
-        withAnimation(Aurora.Animation.quick) {
+        withAnimation(UtopianDesignFallback.Animation.quick) {
             glowOpacity = 0.9
         }
 
         // Reset
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            withAnimation(Aurora.Animation.spring) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 shakeOffset = 0
                 glowOpacity = 0.5
             }
@@ -452,7 +452,7 @@ struct CelestialOrb: View {
 
     private func animateCelebration() {
         // Dramatic expansion
-        withAnimation(Aurora.Animation.springGentle) {
+        withAnimation(UtopianDesignFallback.Animation.springGentle) {
             orbScale = 1.3
             glowOpacity = 1.0
             glowScale = 1.4
@@ -462,13 +462,13 @@ struct CelestialOrb: View {
         // Burst particles outward
         celebrationOpacity = 0
         celebrationScale = 0.3
-        withAnimation(Aurora.Animation.spring) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             celebrationOpacity = 1.0
             celebrationScale = 1.5
         }
 
         // Continued celebration pulse
-        withAnimation(Aurora.Animation.auroraPulse) {
+        withAnimation(UtopianDesignFallback.Animation.utopianPulse) {
             orbScale = 1.25
             glowScale = 1.35
         }
@@ -487,7 +487,7 @@ struct StaticCelestialOrb: View {
 
     init(
         state: OrbState = .dormant,
-        size: CGFloat = Aurora.Size.orbHero,
+        size: CGFloat = UtopianDesignFallback.Size.orbHero,
         showRings: Bool = true,
         showParticles: Bool = false
     ) {
@@ -545,7 +545,7 @@ struct StaticCelestialOrb: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(AuroraBackground.auth)
+            .background(UtopianGradients.background(for: Date()))
         }
 
         private var stateLabel: String {
@@ -573,7 +573,7 @@ struct StaticCelestialOrb: View {
                     .padding(.vertical, 8)
                     .background(
                         Capsule()
-                            .fill(orbState == state ? Aurora.Colors.violet : Aurora.Colors.glassBase)
+                            .fill(orbState == state ? UtopianDesignFallback.Colors.aiPurple : Color.white.opacity(0.1))
                     )
             }
         }
@@ -594,5 +594,5 @@ struct StaticCelestialOrb: View {
         StaticCelestialOrb(state: .celebration, size: 140, showRings: true, showParticles: true)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Aurora.Colors.cosmicBlack)
+    .background(Color.black)
 }

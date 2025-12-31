@@ -2,9 +2,9 @@
 //  LiquidGlassOnboardingContainer.swift
 //  Veloce
 //
-//  Aurora Design System - Onboarding Journey
-//  "Ascending Through the Aurora Nebula"
-//  An award-winning 11-step portal journey with flowing aurora waves,
+//  Utopian Design System - Onboarding Journey
+//  "Ascending Through the Utopian Nebula"
+//  An award-winning 11-step portal journey with flowing Utopian waves,
 //  firefly particles, prismatic transitions, and cosmic sounds.
 //
 
@@ -13,7 +13,7 @@ import EventKit
 import UserNotifications
 import FamilyControls
 
-// MARK: - Aurora Onboarding Container
+// MARK: - Utopian Onboarding Container
 
 struct LiquidGlassOnboardingContainer: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -30,7 +30,7 @@ struct LiquidGlassOnboardingContainer: View {
     @State private var glassShimmerOffset: CGFloat = -300
     @State private var transitionDirection: Int = 1
 
-    // Aurora state
+    // Utopian state
     @State private var auroraIntensity: CGFloat = 0.25
     @State private var showPortalEffect = false
     @State private var portalScale: CGFloat = 0
@@ -42,35 +42,35 @@ struct LiquidGlassOnboardingContainer: View {
         layout.screenPadding
     }
 
-    // Aurora colors per step (ascending through the nebula)
+    // Utopian colors per step (ascending through the nebula)
     private var stepAuroraColors: [Color] {
         switch currentStep {
         case .welcome:
-            return [Aurora.Colors.borealisViolet.opacity(0.5)]
+            return [UtopianDesignFallback.Colors.aiPurple.opacity(0.5)]
         case .calendarPermission:
-            return [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet]
+            return [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple]
         case .notificationPermission:
-            return [Aurora.Colors.cosmicGold, Aurora.Colors.electricCyan]
+            return [UtopianDesignFallback.Gamification.starGold, UtopianDesignFallback.Colors.focusActive]
         case .screenTimePermission:
-            return [Aurora.Colors.borealisViolet, Aurora.Colors.stellarMagenta]
+            return [UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.aiPurple]
         case .featureTasks:
-            return [Aurora.Colors.prismaticGreen, Aurora.Colors.electricCyan]
+            return [UtopianDesignFallback.Colors.completed, UtopianDesignFallback.Colors.focusActive]
         case .featureFocus:
-            return [Aurora.Colors.electricCyan, Aurora.Colors.deepPlasma]
+            return [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple.opacity(0.8)]
         case .featureMomentum:
-            return [Aurora.Colors.cosmicGold, Aurora.Colors.stellarMagenta]
+            return [UtopianDesignFallback.Gamification.starGold, UtopianDesignFallback.Colors.aiPurple]
         case .featureAI:
-            return [Aurora.Colors.borealisViolet, Aurora.Colors.stellarMagenta, Aurora.Colors.electricCyan]
+            return [UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.focusActive]
         case .goalSetup:
-            return Aurora.Gradients.auroraSpectrum
+            return [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.completed]
         case .trialInfo:
-            return [Aurora.Colors.cosmicGold, Aurora.Colors.prismaticGreen]
+            return [UtopianDesignFallback.Gamification.starGold, UtopianDesignFallback.Colors.completed]
         case .readyToLaunch:
-            return Aurora.Gradients.auroraSpectrum
+            return [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.completed]
         }
     }
 
-    // Aurora intensity increases as user progresses
+    // Utopian intensity increases as user progresses
     private var stepIntensity: CGFloat {
         let progress = CGFloat(CosmicOnboardingStep.allCases.firstIndex(of: currentStep) ?? 0)
         let total = CGFloat(CosmicOnboardingStep.allCases.count - 1)
@@ -80,13 +80,13 @@ struct LiquidGlassOnboardingContainer: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Aurora animated wave background
+                // Utopian animated wave background
                 AuroraAnimatedWaveBackground(
                     intensity: stepIntensity,
                     showParticles: true,
                     customColors: stepAuroraColors
                 )
-                .animation(AuroraMotion.Spring.focus, value: currentStep)
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: currentStep)
 
                 // Firefly constellation overlay
                 if !reduceMotion {
@@ -175,7 +175,7 @@ struct LiquidGlassOnboardingContainer: View {
                         .tag(CosmicOnboardingStep.readyToLaunch)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
-                    .animation(AuroraMotion.Spring.focus, value: currentStep)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: currentStep)
                 }
             }
         }
@@ -191,7 +191,7 @@ struct LiquidGlassOnboardingContainer: View {
         }
     }
 
-    // MARK: - Aurora Glass Shimmer Layer
+    // MARK: - Utopian Glass Shimmer Layer
 
     private func glassShimmerLayer(in geometry: GeometryProxy) -> some View {
         Rectangle()
@@ -199,9 +199,9 @@ struct LiquidGlassOnboardingContainer: View {
                 LinearGradient(
                     colors: [
                         .clear,
-                        Aurora.Colors.electricCyan.opacity(0.08),
-                        Aurora.Colors.borealisViolet.opacity(0.06),
-                        Aurora.Colors.stellarMagenta.opacity(0.04),
+                        UtopianDesignFallback.Colors.focusActive.opacity(0.08),
+                        UtopianDesignFallback.Colors.aiPurple.opacity(0.06),
+                        UtopianDesignFallback.Colors.aiPurple.opacity(0.04),
                         .clear
                     ],
                     startPoint: .leading,
@@ -274,21 +274,21 @@ struct LiquidGlassOnboardingContainer: View {
             }
         }
         .padding(.horizontal, horizontalPadding)
-        .animation(AuroraMotion.Spring.ui, value: currentStep)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: currentStep)
     }
 
-    // MARK: - Aurora Navigation
+    // MARK: - Utopian Navigation
 
     private func advanceToNext() {
-        // Aurora feedback: cosmic whoosh + haptic
+        // Utopian feedback: cosmic whoosh + haptic
         AuroraSoundEngine.shared.play(.tabSwitch)
-        AuroraHaptics.lightFlutter()
+        HapticsService.shared.impact(.light)
         transitionDirection = 1
 
         let allSteps = CosmicOnboardingStep.allCases
         if let currentIndex = allSteps.firstIndex(of: currentStep),
            currentIndex < allSteps.count - 1 {
-            withAnimation(AuroraMotion.Spring.focus) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 currentStep = allSteps[currentIndex + 1]
             }
         }
@@ -296,13 +296,13 @@ struct LiquidGlassOnboardingContainer: View {
 
     private func goToPrevious() {
         AuroraSoundEngine.shared.play(.dismiss)
-        AuroraHaptics.selection()
+        HapticsService.shared.selectionFeedback()
         transitionDirection = -1
 
         let allSteps = CosmicOnboardingStep.allCases
         if let currentIndex = allSteps.firstIndex(of: currentStep),
            currentIndex > 0 {
-            withAnimation(AuroraMotion.Spring.ui) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 currentStep = allSteps[currentIndex - 1]
             }
         }
@@ -311,7 +311,7 @@ struct LiquidGlassOnboardingContainer: View {
     private func skipToLaunch() {
         // Portal jump effect
         AuroraSoundEngine.shared.portalOpen()
-        withAnimation(AuroraMotion.Spring.portal) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             currentStep = .readyToLaunch
         }
     }
@@ -366,9 +366,9 @@ enum OnboardingPermissionType {
 
     var color: Color {
         switch self {
-        case .calendar: return Aurora.Colors.electricCyan
-        case .notifications: return Aurora.Colors.cosmicGold
-        case .screenTime: return Aurora.Colors.borealisViolet
+        case .calendar: return UtopianDesignFallback.Colors.focusActive
+        case .notifications: return UtopianDesignFallback.Gamification.starGold
+        case .screenTime: return UtopianDesignFallback.Colors.aiPurple
         }
     }
 }
@@ -410,15 +410,15 @@ enum OnboardingFeatureType {
 
     var color: Color {
         switch self {
-        case .tasks: return Aurora.Colors.prismaticGreen
-        case .focus: return Aurora.Colors.electricCyan
-        case .momentum: return Aurora.Colors.cosmicGold
-        case .ai: return Aurora.Colors.borealisViolet
+        case .tasks: return UtopianDesignFallback.Colors.completed
+        case .focus: return UtopianDesignFallback.Colors.focusActive
+        case .momentum: return UtopianDesignFallback.Gamification.starGold
+        case .ai: return UtopianDesignFallback.Colors.aiPurple
         }
     }
 }
 
-// MARK: - Aurora Onboarding Background (Legacy - kept for reference)
+// MARK: - Utopian Onboarding Background (Legacy - kept for reference)
 
 struct LiquidGlassOnboardingBackground: View {
     let phase: CGFloat
@@ -432,25 +432,25 @@ struct LiquidGlassOnboardingBackground: View {
     private var stepColor: Color {
         switch currentStep {
         case .welcome:
-            return Aurora.Colors.borealisViolet
+            return UtopianDesignFallback.Colors.aiPurple
         case .calendarPermission, .notificationPermission, .screenTimePermission:
-            return Aurora.Colors.electricCyan
+            return UtopianDesignFallback.Colors.focusActive
         case .featureTasks, .featureFocus, .featureMomentum, .featureAI:
-            return Aurora.Colors.prismaticGreen
+            return UtopianDesignFallback.Colors.completed
         case .goalSetup:
-            return Aurora.Colors.cosmicGold
+            return UtopianDesignFallback.Gamification.starGold
         case .trialInfo:
-            return Aurora.Colors.stellarMagenta
+            return UtopianDesignFallback.Colors.aiPurple
         case .readyToLaunch:
-            return Aurora.Colors.deepPlasma
+            return UtopianDesignFallback.Colors.aiPurple.opacity(0.8)
         }
     }
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Aurora void gradient
-                Aurora.Gradients.voidGradient
+                // Utopian void gradient
+                UtopianGradients.background(for: Date())
 
                 // Dynamic step-colored nebula
                 RadialGradient(
@@ -464,13 +464,13 @@ struct LiquidGlassOnboardingBackground: View {
                     endRadius: 350
                 )
                 .blur(radius: 60)
-                .animation(AuroraMotion.Spring.focus, value: currentStep)
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: currentStep)
 
-                // Secondary aurora nebula
+                // Secondary Utopian nebula
                 RadialGradient(
                     colors: [
-                        Aurora.Colors.borealisViolet.opacity(0.1),
-                        Aurora.Colors.electricCyan.opacity(0.05),
+                        UtopianDesignFallback.Colors.aiPurple.opacity(0.1),
+                        UtopianDesignFallback.Colors.focusActive.opacity(0.05),
                         .clear
                     ],
                     center: UnitPoint(x: 0.3 - phase * 0.1, y: 0.7),
@@ -505,7 +505,7 @@ struct LiquidGlassOnboardingBackground: View {
 
                 context.fill(
                     Circle().path(in: rect),
-                    with: .color(Aurora.Colors.stellarWhite.opacity(opacity))
+                    with: .color(Color.white.opacity(opacity))
                 )
             }
         }
@@ -540,7 +540,7 @@ struct LiquidGlassWelcomePage: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(spacing: Aurora.Spacing.xl) {
+        VStack(spacing: UtopianDesignFallback.Spacing.xl) {
             Spacer()
 
             // Aurora Hero Orb with prismatic halo
@@ -551,10 +551,10 @@ struct LiquidGlassWelcomePage: View {
                         .stroke(
                             AngularGradient(
                                 colors: [
-                                    Aurora.Colors.borealisViolet.opacity(0.3 - Double(i) * 0.08),
-                                    Aurora.Colors.electricCyan.opacity(0.25 - Double(i) * 0.06),
-                                    Aurora.Colors.stellarMagenta.opacity(0.2 - Double(i) * 0.05),
-                                    Aurora.Colors.borealisViolet.opacity(0.3 - Double(i) * 0.08)
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.3 - Double(i) * 0.08),
+                                    UtopianDesignFallback.Colors.focusActive.opacity(0.25 - Double(i) * 0.06),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.2 - Double(i) * 0.05),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.3 - Double(i) * 0.08)
                                 ],
                                 center: .center,
                                 startAngle: .degrees(haloRotation + Double(i) * 40),
@@ -571,8 +571,8 @@ struct LiquidGlassWelcomePage: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                Aurora.Colors.borealisViolet.opacity(0.35),
-                                Aurora.Colors.electricCyan.opacity(0.15),
+                                UtopianDesignFallback.Colors.aiPurple.opacity(0.35),
+                                UtopianDesignFallback.Colors.focusActive.opacity(0.15),
                                 .clear
                             ],
                             center: .center,
@@ -596,17 +596,17 @@ struct LiquidGlassWelcomePage: View {
                 .matchedGeometryEffect(id: "welcomeOrb", in: namespace)
             }
 
-            VStack(spacing: Aurora.Spacing.md) {
+            VStack(spacing: UtopianDesignFallback.Spacing.md) {
                 Text(userName.isEmpty ? "Welcome" : "Welcome, \(userName)")
-                    .font(Aurora.Typography.display)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .font(UtopianDesignFallback.Typography.display)
+                    .foregroundStyle(.white)
 
                 Text("Your journey to peak productivity begins now")
-                    .font(Aurora.Typography.body)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .font(UtopianDesignFallback.Typography.body)
+                    .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, Aurora.Spacing.xl)
+            .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
             .opacity(contentOpacity)
             .offset(y: contentOffset)
 
@@ -615,7 +615,7 @@ struct LiquidGlassWelcomePage: View {
             // Aurora CTA Button with prismatic glow
             Button {
                 AuroraSoundEngine.shared.play(.taskComplete)
-                AuroraHaptics.mediumImpact()
+                HapticsService.shared.impact(.medium)
                 onContinue()
             } label: {
                 HStack(spacing: 12) {
@@ -632,16 +632,16 @@ struct LiquidGlassWelcomePage: View {
                 Capsule()
                     .fill(
                         LinearGradient(
-                            colors: [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet],
+                            colors: [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
-                    .shadow(color: Aurora.Colors.electricCyan.opacity(0.4), radius: 12, y: 4)
+                    .shadow(color: UtopianDesignFallback.Colors.focusActive.opacity(0.4), radius: 12, y: 4)
             }
             .clipShape(Capsule())
-            .padding(.horizontal, Aurora.Spacing.xl)
-            .padding(.bottom, Aurora.Spacing.xxl)
+            .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
+            .padding(.bottom, UtopianDesignFallback.Spacing.xxl)
             .opacity(contentOpacity)
         }
         .onAppear {
@@ -663,7 +663,7 @@ struct LiquidGlassWelcomePage: View {
         }
 
         // Orb breathing pulse
-        withAnimation(.easeInOut(duration: AuroraMotion.Duration.breathingCycle).repeatForever(autoreverses: true)) {
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
             orbPulse = 1.03
         }
 
@@ -952,7 +952,7 @@ struct LiquidGlassTrialInfoPage: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        VStack(spacing: Aurora.Spacing.xl) {
+        VStack(spacing: UtopianDesignFallback.Spacing.xl) {
             Spacer()
 
             // Aurora Trial Badge with prismatic glow
@@ -962,8 +962,8 @@ struct LiquidGlassTrialInfoPage: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                Aurora.Colors.cosmicGold.opacity(badgeGlow * 0.5),
-                                Aurora.Colors.stellarMagenta.opacity(badgeGlow * 0.2),
+                                UtopianDesignFallback.Gamification.starGold.opacity(badgeGlow * 0.5),
+                                UtopianDesignFallback.Colors.aiPurple.opacity(badgeGlow * 0.2),
                                 .clear
                             ],
                             center: .center,
@@ -979,10 +979,10 @@ struct LiquidGlassTrialInfoPage: View {
                     .stroke(
                         AngularGradient(
                             colors: [
-                                Aurora.Colors.cosmicGold.opacity(0.5),
-                                Aurora.Colors.stellarMagenta.opacity(0.3),
-                                Aurora.Colors.prismaticGreen.opacity(0.4),
-                                Aurora.Colors.cosmicGold.opacity(0.5)
+                                UtopianDesignFallback.Gamification.starGold.opacity(0.5),
+                                UtopianDesignFallback.Colors.aiPurple.opacity(0.3),
+                                UtopianDesignFallback.Colors.completed.opacity(0.4),
+                                UtopianDesignFallback.Gamification.starGold.opacity(0.5)
                             ],
                             center: .center,
                             startAngle: .degrees(badgeRotation),
@@ -998,7 +998,7 @@ struct LiquidGlassTrialInfoPage: View {
                         Color.clear
                             .frame(width: 120, height: 120)
                             .glassEffect(
-                                .regular.tint(Aurora.Colors.cosmicGold.opacity(0.1)),
+                                .regular.tint(UtopianDesignFallback.Gamification.starGold.opacity(0.1)),
                                 in: Circle()
                             )
                     } else {
@@ -1007,7 +1007,7 @@ struct LiquidGlassTrialInfoPage: View {
                             .frame(width: 120, height: 120)
                             .overlay {
                                 Circle()
-                                    .fill(Aurora.Colors.cosmicGold.opacity(0.05))
+                                    .fill(UtopianDesignFallback.Gamification.starGold.opacity(0.05))
                             }
                     }
                 }
@@ -1016,8 +1016,8 @@ struct LiquidGlassTrialInfoPage: View {
                         .stroke(
                             LinearGradient(
                                 colors: [
-                                    Aurora.Colors.cosmicGold.opacity(0.6),
-                                    Aurora.Colors.stellarMagenta.opacity(0.3)
+                                    UtopianDesignFallback.Gamification.starGold.opacity(0.6),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.3)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -1032,46 +1032,46 @@ struct LiquidGlassTrialInfoPage: View {
                         .font(.system(size: 44, weight: .bold, design: .rounded))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Aurora.Colors.cosmicGold, Aurora.Colors.stellarMagenta],
+                                colors: [UtopianDesignFallback.Gamification.starGold, UtopianDesignFallback.Colors.aiPurple],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
                         )
                     Text("DAYS")
                         .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .foregroundStyle(.white.opacity(0.7))
                         .tracking(2)
                 }
             }
             .matchedGeometryEffect(id: "trialBadge", in: namespace)
 
-            VStack(spacing: Aurora.Spacing.sm) {
+            VStack(spacing: UtopianDesignFallback.Spacing.sm) {
                 Text("Free Trial")
-                    .font(Aurora.Typography.title1)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .font(UtopianDesignFallback.Typography.title1)
+                    .foregroundStyle(.white)
 
                 Text("Experience all premium features free for 7 days.\nCancel anytime, no questions asked.")
-                    .font(Aurora.Typography.body)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .font(UtopianDesignFallback.Typography.body)
+                    .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
             }
-            .padding(.horizontal, Aurora.Spacing.xl)
+            .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
 
             // Feature highlights with aurora icons
-            VStack(spacing: Aurora.Spacing.md) {
-                trialFeatureRow(icon: "sparkles", text: "AI-Powered Task Intelligence", color: Aurora.Colors.borealisViolet)
-                trialFeatureRow(icon: "brain.head.profile", text: "Deep Focus Mode", color: Aurora.Colors.electricCyan)
-                trialFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Advanced Analytics", color: Aurora.Colors.prismaticGreen)
+            VStack(spacing: UtopianDesignFallback.Spacing.md) {
+                trialFeatureRow(icon: "sparkles", text: "AI-Powered Task Intelligence", color: UtopianDesignFallback.Colors.aiPurple)
+                trialFeatureRow(icon: "brain.head.profile", text: "Deep Focus Mode", color: UtopianDesignFallback.Colors.focusActive)
+                trialFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Advanced Analytics", color: UtopianDesignFallback.Colors.completed)
             }
-            .padding(.horizontal, Aurora.Spacing.xl)
+            .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
 
             Spacer()
 
             // CTA with success prismatic border
             Button {
                 AuroraSoundEngine.shared.play(.success)
-                AuroraHaptics.success()
+                HapticsService.shared.notification(.success)
                 onContinue()
             } label: {
                 HStack(spacing: 10) {
@@ -1088,16 +1088,16 @@ struct LiquidGlassTrialInfoPage: View {
                 Capsule()
                     .fill(
                         LinearGradient(
-                            colors: [Aurora.Colors.cosmicGold, Aurora.Colors.prismaticGreen],
+                            colors: [UtopianDesignFallback.Gamification.starGold, UtopianDesignFallback.Colors.completed],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
             }
             .clipShape(Capsule())
-            .shadow(color: Aurora.Colors.cosmicGold.opacity(0.3), radius: 12, y: 4)
-            .padding(.horizontal, Aurora.Spacing.xl)
-            .padding(.bottom, Aurora.Spacing.xxl)
+            .shadow(color: UtopianDesignFallback.Gamification.starGold.opacity(0.3), radius: 12, y: 4)
+            .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
+            .padding(.bottom, UtopianDesignFallback.Spacing.xxl)
         }
         .onAppear {
             startTrialAnimations()
@@ -1105,24 +1105,24 @@ struct LiquidGlassTrialInfoPage: View {
     }
 
     private func trialFeatureRow(icon: String, text: String, color: Color) -> some View {
-        HStack(spacing: Aurora.Spacing.sm) {
+        HStack(spacing: UtopianDesignFallback.Spacing.sm) {
             Image(systemName: icon)
                 .dynamicTypeFont(base: 18)
                 .foregroundStyle(color)
                 .frame(width: 28)
 
             Text(text)
-                .font(Aurora.Typography.callout)
-                .foregroundStyle(Aurora.Colors.textPrimary)
+                .font(UtopianDesignFallback.Typography.callout)
+                .foregroundStyle(.white)
 
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
                 .dynamicTypeFont(base: 16)
-                .foregroundStyle(Aurora.Colors.prismaticGreen)
+                .foregroundStyle(UtopianDesignFallback.Colors.completed)
         }
-        .padding(.horizontal, Aurora.Spacing.md)
-        .padding(.vertical, Aurora.Spacing.xs)
+        .padding(.horizontal, UtopianDesignFallback.Spacing.md)
+        .padding(.vertical, UtopianDesignFallback.Spacing.xs)
     }
 
     private func startTrialAnimations() {
@@ -1168,8 +1168,8 @@ struct LiquidGlassLaunchPage: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Aurora.Colors.electricCyan.opacity(coreGlow * 0.4),
-                                    Aurora.Colors.borealisViolet.opacity(coreGlow * 0.2),
+                                    UtopianDesignFallback.Colors.focusActive.opacity(coreGlow * 0.4),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(coreGlow * 0.2),
                                     .clear
                                 ],
                                 center: .center,
@@ -1185,7 +1185,7 @@ struct LiquidGlassLaunchPage: View {
                         Circle()
                             .stroke(
                                 AngularGradient(
-                                    colors: Aurora.Gradients.auroraSpectrum.map { $0.opacity(0.6 - Double(i) * 0.1) },
+                                    colors: [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.completed].map { $0.opacity(0.6 - Double(i) * 0.1) },
                                     center: .center,
                                     startAngle: .degrees(ringRotation + Double(i) * 30),
                                     endAngle: .degrees(ringRotation + 360 + Double(i) * 30)
@@ -1205,8 +1205,8 @@ struct LiquidGlassLaunchPage: View {
                             .fill(
                                 RadialGradient(
                                     colors: [
-                                        Aurora.Colors.stellarWhite.opacity(coreGlow),
-                                        Aurora.Colors.electricCyan.opacity(coreGlow * 0.5),
+                                        .white.opacity(coreGlow),
+                                        UtopianDesignFallback.Colors.focusActive.opacity(coreGlow * 0.5),
                                         .clear
                                     ],
                                     center: .center,
@@ -1234,34 +1234,34 @@ struct LiquidGlassLaunchPage: View {
                             .dynamicTypeFont(base: 36, weight: .medium)
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Aurora.Colors.stellarWhite, Aurora.Colors.electricCyan],
+                                    colors: [.white, UtopianDesignFallback.Colors.focusActive],
                                     startPoint: .top,
                                     endPoint: .bottom
                                 )
                             )
-                            .shadow(color: Aurora.Colors.electricCyan.opacity(0.6), radius: 12)
+                            .shadow(color: UtopianDesignFallback.Colors.focusActive.opacity(0.6), radius: 12)
                     }
                 }
                 .matchedGeometryEffect(id: "launchPortal", in: namespace)
 
                 VStack(spacing: 16) {
                     Text("Ready for Liftoff")
-                        .font(Aurora.Typography.title1)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .font(UtopianDesignFallback.Typography.title1)
+                        .foregroundStyle(.white)
 
                     Text("Your productivity journey awaits, \(userName.isEmpty ? "Explorer" : userName)")
-                        .font(Aurora.Typography.body)
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .font(UtopianDesignFallback.Typography.body)
+                        .foregroundStyle(.white.opacity(0.7))
                         .multilineTextAlignment(.center)
 
                     if !goalSummary.isEmpty {
                         Text("Goal: \(goalSummary)")
-                            .font(Aurora.Typography.caption1)
-                            .foregroundStyle(Aurora.Colors.cosmicGold)
+                            .font(UtopianDesignFallback.Typography.caption1)
+                            .foregroundStyle(UtopianDesignFallback.Gamification.starGold)
                             .padding(.top, 4)
                     }
                 }
-                .padding(.horizontal, Aurora.Spacing.xl)
+                .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
 
                 Spacer()
 
@@ -1283,24 +1283,24 @@ struct LiquidGlassLaunchPage: View {
                     Capsule()
                         .fill(
                             LinearGradient(
-                                colors: [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet],
+                                colors: [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
                         )
                 }
                 .clipShape(Capsule())
-                .shadow(color: Aurora.Colors.electricCyan.opacity(0.4), radius: 16, y: 6)
+                .shadow(color: UtopianDesignFallback.Colors.focusActive.opacity(0.4), radius: 16, y: 6)
                 .disabled(isLaunching)
-                .padding(.horizontal, Aurora.Spacing.xl)
-                .padding(.bottom, Aurora.Spacing.xxl)
+                .padding(.horizontal, UtopianDesignFallback.Spacing.xl)
+                .padding(.bottom, UtopianDesignFallback.Spacing.xxl)
             }
 
             // Supernova celebration overlay
             if showSupernova {
                 AuroraSupernovaBurst(
                     isActive: $showSupernova,
-                    colors: Aurora.Gradients.auroraSpectrum
+                    colors: [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.completed]
                 )
             }
         }
@@ -1324,7 +1324,7 @@ struct LiquidGlassLaunchPage: View {
         }
 
         // Start rotation
-        withAnimation(.linear(duration: AuroraMotion.Duration.prismaticRotation).repeatForever(autoreverses: false)) {
+        withAnimation(.linear(duration: 20.0).repeatForever(autoreverses: false)) {
             ringRotation = 360
         }
 
@@ -1346,7 +1346,7 @@ struct LiquidGlassLaunchPage: View {
         showSupernova = true
 
         // Portal collapse + launch
-        withAnimation(AuroraMotion.Spring.portal) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             ringScale = 2.0
             ringOpacity = 0
         }

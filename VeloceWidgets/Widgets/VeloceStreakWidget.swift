@@ -3,7 +3,7 @@
 //  VeloceWidgets
 //
 //  Streak Widget - Living Cosmos Design
-//  Ethereal flame with cosmic aurora glow
+//  Ethereal flame with cosmic utopian glow
 //  Shows productivity streak with gamification
 //  "Don't break the chain!" motivation
 //
@@ -22,8 +22,8 @@ struct VeloceStreakWidget: Widget {
                 .containerBackground(for: .widget) {
                     WidgetCosmicBackground(
                         showStars: true,
-                        showAurora: true,
-                        auroraIntensity: entry.streak > 7 ? 0.5 : 0.35
+                        showGlow: true,
+                        glowIntensity: entry.streak > 7 ? 0.5 : 0.35
                     )
                 }
         }
@@ -91,7 +91,7 @@ struct StreakEntry: TimelineEntry {
         self.dailyGoalMet = dailyGoalMet
     }
 
-    var flameIntensity: AuroraFlame.FlameIntensity {
+    var flameIntensity: UtopianFlame.FlameIntensity {
         switch streak {
         case 0: return .none
         case 1...2: return .spark
@@ -120,11 +120,11 @@ struct StreakEntry: TimelineEntry {
 
     var accentColor: Color {
         switch streak {
-        case 0: return WidgetAurora.Colors.textQuaternary
-        case 1...6: return WidgetAurora.Colors.flameInner
-        case 7...13: return WidgetAurora.Colors.flameMid
-        case 14...29: return WidgetAurora.Colors.rose
-        default: return WidgetAurora.Colors.violet
+        case 0: return WidgetUtopian.Colors.textQuaternary
+        case 1...6: return WidgetUtopian.Colors.flameInner
+        case 7...13: return WidgetUtopian.Colors.flameMid
+        case 14...29: return WidgetUtopian.Colors.rose
+        default: return WidgetUtopian.Colors.violet
         }
     }
 
@@ -169,24 +169,24 @@ struct StreakWidgetView: View {
     private var smallWidget: some View {
         Link(destination: URL(string: "veloce://momentum")!) {
             VStack(spacing: 8) {
-                // Aurora flame with glow
-                AuroraFlame(intensity: entry.flameIntensity, size: 48)
+                // Utopian flame with glow
+                UtopianFlame(intensity: entry.flameIntensity, size: 48)
 
-                // Streak count with aurora styling
+                // Streak count with utopian styling
                 VStack(spacing: 4) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text("\(entry.streak)")
-                            .font(WidgetAurora.Typography.largeNumber)
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                            .font(WidgetUtopian.Typography.largeNumber)
+                            .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                         Text(entry.streak == 1 ? "day" : "days")
-                            .font(WidgetAurora.Typography.caption)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.caption)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                     }
 
                     // Motivation text with glow
                     Text(entry.motivationText)
-                        .font(WidgetAurora.Typography.micro)
+                        .font(WidgetUtopian.Typography.micro)
                         .foregroundStyle(entry.accentColor)
                         .shadow(color: entry.accentColor.opacity(0.4), radius: 3)
                 }
@@ -197,21 +197,21 @@ struct StreakWidgetView: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 10))
                         Text(warning)
-                            .font(WidgetAurora.Typography.micro)
+                            .font(WidgetUtopian.Typography.micro)
                     }
-                    .foregroundStyle(WidgetAurora.Colors.warning)
+                    .foregroundStyle(WidgetUtopian.Colors.warning)
                 } else if entry.streak > 0 {
                     HStack(spacing: 12) {
                         WidgetStatPill(
                             icon: "star.fill",
                             value: "Lv \(entry.level)",
-                            color: WidgetAurora.Colors.gold
+                            color: WidgetUtopian.Colors.gold
                         )
 
                         WidgetStatPill(
                             icon: "sparkle",
                             value: formatXP(entry.xp),
-                            color: WidgetAurora.Colors.electric
+                            color: WidgetUtopian.Colors.electric
                         )
                     }
                 }
@@ -227,11 +227,11 @@ struct StreakWidgetView: View {
             HStack(spacing: 20) {
                 // Left: Large flame with tier info
                 VStack(spacing: 8) {
-                    AuroraFlame(intensity: entry.flameIntensity, size: 60)
+                    UtopianFlame(intensity: entry.flameIntensity, size: 60)
 
                     VStack(spacing: 2) {
                         Text(entry.streakTierName)
-                            .font(WidgetAurora.Typography.caption)
+                            .font(WidgetUtopian.Typography.caption)
                             .foregroundStyle(entry.accentColor)
 
                         if entry.isPersonalBest && entry.streak > 0 {
@@ -239,9 +239,9 @@ struct StreakWidgetView: View {
                                 Image(systemName: "crown.fill")
                                     .font(.system(size: 9))
                                 Text("Personal Best!")
-                                    .font(WidgetAurora.Typography.micro)
+                                    .font(WidgetUtopian.Typography.micro)
                             }
-                            .foregroundStyle(WidgetAurora.Colors.gold)
+                            .foregroundStyle(WidgetUtopian.Colors.gold)
                         }
                     }
                 }
@@ -252,9 +252,9 @@ struct StreakWidgetView: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                WidgetAurora.Colors.glassBorder.opacity(0),
+                                WidgetUtopian.Colors.glassBorder.opacity(0),
                                 entry.accentColor.opacity(0.4),
-                                WidgetAurora.Colors.glassBorder.opacity(0)
+                                WidgetUtopian.Colors.glassBorder.opacity(0)
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -268,17 +268,17 @@ struct StreakWidgetView: View {
                     // Main streak count
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text("\(entry.streak)")
-                            .font(WidgetAurora.Typography.heroNumber)
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                            .font(WidgetUtopian.Typography.heroNumber)
+                            .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                         VStack(alignment: .leading, spacing: 0) {
                             Text(entry.streak == 1 ? "day" : "days")
-                                .font(WidgetAurora.Typography.subheadline)
-                                .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                                .font(WidgetUtopian.Typography.subheadline)
+                                .foregroundStyle(WidgetUtopian.Colors.textSecondary)
 
                             Text("streak")
-                                .font(WidgetAurora.Typography.micro)
-                                .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                .font(WidgetUtopian.Typography.micro)
+                                .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                         }
                     }
 
@@ -289,22 +289,22 @@ struct StreakWidgetView: View {
                                 .font(.system(size: 12))
 
                             Text("Don't break the chain!")
-                                .font(WidgetAurora.Typography.body)
+                                .font(WidgetUtopian.Typography.body)
                         }
-                        .foregroundStyle(WidgetAurora.Colors.warning)
+                        .foregroundStyle(WidgetUtopian.Colors.warning)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(WidgetAurora.Colors.warning.opacity(0.15))
+                                .fill(WidgetUtopian.Colors.warning.opacity(0.15))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(WidgetAurora.Colors.warning.opacity(0.3), lineWidth: 0.5)
+                                        .stroke(WidgetUtopian.Colors.warning.opacity(0.3), lineWidth: 0.5)
                                 )
                         )
                     } else {
                         Text(entry.motivationText)
-                            .font(WidgetAurora.Typography.body)
+                            .font(WidgetUtopian.Typography.body)
                             .foregroundStyle(entry.accentColor)
                             .shadow(color: entry.accentColor.opacity(0.3), radius: 2)
                     }
@@ -314,20 +314,20 @@ struct StreakWidgetView: View {
                         WidgetStatPill(
                             icon: "star.fill",
                             value: "Lv \(entry.level)",
-                            color: WidgetAurora.Colors.gold
+                            color: WidgetUtopian.Colors.gold
                         )
 
                         WidgetStatPill(
                             icon: "sparkle",
                             value: formatXP(entry.xp),
-                            color: WidgetAurora.Colors.electric
+                            color: WidgetUtopian.Colors.electric
                         )
 
                         if entry.longestStreak > 0 {
                             WidgetStatPill(
                                 icon: "trophy.fill",
                                 value: "\(entry.longestStreak)",
-                                color: WidgetAurora.Colors.cyan
+                                color: WidgetUtopian.Colors.cyan
                             )
                         }
                     }

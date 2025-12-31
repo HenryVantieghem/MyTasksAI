@@ -2,7 +2,7 @@
 //  TaskInputBarV2.swift
 //  Veloce
 //
-//  Aurora Design System - Cosmic Command Center
+//  Utopian Design System - Cosmic Command Center
 //  Floating glass portal to AI companion with prismatic
 //  borders, particle effects, and cosmic sound feedback.
 //
@@ -38,9 +38,9 @@ enum InputTaskPriority: Int, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
-        case .low: return Aurora.Colors.prismaticGreen
-        case .medium: return Aurora.Colors.cosmicGold
-        case .high: return Aurora.Colors.error
+        case .low: return UtopianDesignFallback.Colors.completed
+        case .medium: return UtopianDesignFallback.Gamification.starGold
+        case .high: return UtopianDesignFallback.Colors.error
         }
     }
 
@@ -82,13 +82,13 @@ enum InputTemplateCategory: String, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
-        case .work: return Aurora.Colors.categoryWork
-        case .personal: return Aurora.Colors.categoryPersonal
-        case .health: return Aurora.Colors.categoryHealth
-        case .errands: return Aurora.Colors.cosmicGold
-        case .learning: return Aurora.Colors.categoryLearning
-        case .creative: return Aurora.Colors.categoryCreative
-        case .custom: return Aurora.Colors.cosmicGold
+        case .work: return UtopianDesignFallback.Colors.categoryWork
+        case .personal: return UtopianDesignFallback.Colors.categoryPersonal
+        case .health: return UtopianDesignFallback.Colors.categoryHealth
+        case .errands: return UtopianDesignFallback.Gamification.starGold
+        case .learning: return UtopianDesignFallback.Colors.categoryLearning
+        case .creative: return UtopianDesignFallback.Colors.categoryCreative
+        case .custom: return UtopianDesignFallback.Gamification.starGold
         }
     }
 }
@@ -293,10 +293,10 @@ struct TaskInputBarV2: View {
             // Main floating island container
             floatingIslandContainer
         }
-        .animation(AuroraMotion.Spring.ui, value: effectiveMode)
-        .animation(AuroraMotion.Spring.elasticBounce, value: showCategoryBadge)
-        .animation(AuroraMotion.Spring.ui, value: showChipsRow)
-        .animation(AuroraMotion.Spring.liquidSnap, value: canSend)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: effectiveMode)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showCategoryBadge)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showChipsRow)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: canSend)
 
         // Sheets
         .sheet(isPresented: $showTemplatePicker) {
@@ -402,31 +402,31 @@ struct TaskInputBarV2: View {
         }
     }
 
-    // MARK: - Aurora Floating Island Background
+    // MARK: - Utopian Floating Island Background
     // iOS 26 Liquid Glass: Navigation layer gets glass, content doesn't
 
     private var floatingIslandBackground: some View {
-        // Recording state gets a subtle red tint, otherwise pure aurora glass
+        // Recording state gets a subtle red tint, otherwise pure utopian glass
         Capsule()
-            .fill(isRecording ? Aurora.Colors.error.opacity(0.08) : Color.clear)
+            .fill(isRecording ? UtopianDesignFallback.Colors.error.opacity(0.08) : Color.clear)
     }
 
-    // MARK: - Aurora Prismatic Border
-    // Aurora-styled borders with prismatic effects
+    // MARK: - Utopian Prismatic Border
+    // Utopian-styled borders with prismatic effects
 
     @ViewBuilder
     private var floatingIslandBorder: some View {
         if isRecording && !reduceMotion {
-            // Aurora recording border - prismatic red pulse
+            // Utopian recording border - prismatic red pulse
             Capsule()
                 .stroke(
                     AngularGradient(
                         colors: [
-                            Aurora.Colors.error.opacity(0.7),
-                            Aurora.Colors.stellarMagenta.opacity(0.5),
-                            Aurora.Colors.error.opacity(0.4),
-                            Aurora.Colors.borealisViolet.opacity(0.5),
-                            Aurora.Colors.error.opacity(0.7)
+                            UtopianDesignFallback.Colors.error.opacity(0.7),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.5),
+                            UtopianDesignFallback.Colors.error.opacity(0.4),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.5),
+                            UtopianDesignFallback.Colors.error.opacity(0.7)
                         ],
                         center: .center,
                         angle: .degrees(borderRotation)
@@ -435,13 +435,13 @@ struct TaskInputBarV2: View {
                 )
                 .blur(radius: 0.5)
         } else if isFocused.wrappedValue {
-            // Focused: Aurora AI gradient border (Cyan → Violet)
+            // Focused: Utopian AI gradient border (Cyan → Violet)
             Capsule()
                 .stroke(
                     LinearGradient(
                         colors: [
-                            Aurora.Colors.electricCyan.opacity(0.6),
-                            Aurora.Colors.borealisViolet.opacity(0.4)
+                            UtopianDesignFallback.Colors.focusActive.opacity(0.6),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.4)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -457,7 +457,7 @@ struct TaskInputBarV2: View {
     private var voiceInputButton: some View {
         Button {
             AuroraSoundEngine.shared.play(.buttonTap)
-            AuroraHaptics.medium()
+            HapticsService.shared.impact(.medium)
             toggleVoiceRecording()
         } label: {
             ZStack {
@@ -511,15 +511,15 @@ struct TaskInputBarV2: View {
     private var voiceButtonBackground: some View {
         if isRecording {
             Circle()
-                .fill(Aurora.Colors.error)
+                .fill(UtopianDesignFallback.Colors.error)
                 .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
         } else if isTranscribing {
             Circle()
-                .fill(Aurora.Colors.borealisViolet.opacity(0.3))
+                .fill(UtopianDesignFallback.Colors.aiPurple.opacity(0.3))
                 .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
         } else {
             Circle()
-                .fill(Aurora.Colors.voidNebula)
+                .fill(Color.white.opacity(0.1))
                 .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
         }
     }
@@ -529,12 +529,12 @@ struct TaskInputBarV2: View {
         if isTranscribing {
             Image(systemName: "waveform")
                 .font(.system(size: FloatingIslandMetrics.micIconSize, weight: .medium))
-                .foregroundStyle(Aurora.Colors.borealisViolet)
+                .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
                 .symbolEffect(.variableColor.iterative.reversing, options: .repeating)
         } else {
             Image(systemName: isRecording ? "stop.fill" : "mic.fill")
                 .font(.system(size: FloatingIslandMetrics.micIconSize, weight: .medium))
-                .foregroundStyle(isRecording ? .white : Aurora.Colors.textSecondary)
+                .foregroundStyle(isRecording ? .white : .white.opacity(0.7))
                 .scaleEffect(isRecording ? 0.85 : 1.0)
         }
     }
@@ -583,38 +583,38 @@ struct TaskInputBarV2: View {
 
     private var placeholderText: Text {
         Text("What's on your mind?")
-            .font(Aurora.Typography.body)
+            .font(UtopianDesignFallback.Typography.body)
             .italic()
-            .foregroundStyle(Aurora.Colors.textTertiary)
+            .foregroundStyle(.white.opacity(0.5))
     }
 
-    // MARK: - Aurora AI Sparkles Button
+    // MARK: - Utopian AI Sparkles Button
 
     private var aiSparklesButton: some View {
         Button {
             AuroraSoundEngine.shared.play(.buttonTap)
-            AuroraHaptics.light()
+            HapticsService.shared.impact(.light)
             if canSend {
                 showAISheet = true
             } else {
-                withAnimation(AuroraMotion.Spring.elasticBounce) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     aiModeEnabled.toggle()
                 }
                 if aiModeEnabled {
                     AuroraSoundEngine.shared.play(.aiActivate)
-                    AuroraHaptics.dopamineBurst()
+                    HapticsService.shared.notification(.success)
                 }
             }
         } label: {
             ZStack {
-                // Aurora glow when enabled
+                // Utopian glow when enabled
                 if aiModeEnabled || isAIEnhancing {
                     Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Aurora.Colors.electricCyan.opacity(0.5),
-                                    Aurora.Colors.borealisViolet.opacity(0.3),
+                                    UtopianDesignFallback.Colors.focusActive.opacity(0.5),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.3),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -627,17 +627,17 @@ struct TaskInputBarV2: View {
                         .scaleEffect(isAIEnhancing ? 1.2 : 1.0)
                 }
 
-                // Aurora button background
+                // Utopian button background
                 Circle()
                     .fill(
                         aiModeEnabled
                             ? LinearGradient(
-                                colors: [Aurora.Colors.electricCyan.opacity(0.35), Aurora.Colors.borealisViolet.opacity(0.25)],
+                                colors: [UtopianDesignFallback.Colors.focusActive.opacity(0.35), UtopianDesignFallback.Colors.aiPurple.opacity(0.25)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                             : LinearGradient(
-                                colors: [Aurora.Colors.electricCyan.opacity(0.15)],
+                                colors: [UtopianDesignFallback.Colors.focusActive.opacity(0.15)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -645,11 +645,11 @@ struct TaskInputBarV2: View {
                     .frame(width: FloatingIslandMetrics.buttonSize - 4, height: FloatingIslandMetrics.buttonSize - 4)
                     .overlay {
                         if aiModeEnabled && !reduceMotion {
-                            // Aurora prismatic rotating border
+                            // Utopian prismatic rotating border
                             Circle()
                                 .stroke(
                                     AngularGradient(
-                                        colors: Aurora.Gradients.auroraSpectrum,
+                                        colors: UtopianDesignFallback.Gradients.utopianSpectrum,
                                         center: .center,
                                         angle: .degrees(sparkleRotation)
                                     ),
@@ -662,11 +662,11 @@ struct TaskInputBarV2: View {
                 if isAIEnhancing {
                     ProgressView()
                         .scaleEffect(0.8)
-                        .tint(Aurora.Colors.electricCyan)
+                        .tint(UtopianDesignFallback.Colors.focusActive)
                 } else {
                     Image(systemName: "sparkles")
                         .font(.system(size: FloatingIslandMetrics.aiIconSize, weight: .semibold))
-                        .foregroundStyle(Aurora.Gradients.aiGradient)
+                        .foregroundStyle(UtopianDesignFallback.Gradients.aiGradient)
                         .symbolEffect(.bounce, value: aiModeEnabled)
                 }
             }
@@ -683,7 +683,7 @@ struct TaskInputBarV2: View {
         .onAppear {
             if !reduceMotion {
                 withAnimation(
-                    .linear(duration: AuroraMotion.Duration.prismaticRotation)
+                    .linear(duration: 8.0)
                     .repeatForever(autoreverses: false)
                 ) {
                     sparkleRotation = 360
@@ -692,28 +692,28 @@ struct TaskInputBarV2: View {
         }
     }
 
-    // MARK: - Aurora Plus Button (Action Tray Trigger)
+    // MARK: - Utopian Plus Button (Action Tray Trigger)
 
     private var plusButton: some View {
         Button {
             AuroraSoundEngine.shared.play(.buttonTap)
-            AuroraHaptics.light()
+            HapticsService.shared.impact(.light)
             if text.isEmpty {
                 showTemplatePicker = true
             } else {
-                withAnimation(AuroraMotion.Spring.elasticBounce) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     showActionTray.toggle()
                 }
             }
         } label: {
             ZStack {
                 Circle()
-                    .fill(Aurora.Colors.voidNebula)
+                    .fill(Color.white.opacity(0.1))
                     .frame(width: FloatingIslandMetrics.buttonSize, height: FloatingIslandMetrics.buttonSize)
 
                 Image(systemName: showActionTray ? "xmark" : "plus")
                     .font(.system(size: FloatingIslandMetrics.iconSize, weight: .medium))
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
                     .rotationEffect(.degrees(showActionTray ? 90 : 0))
             }
         }
@@ -727,7 +727,7 @@ struct TaskInputBarV2: View {
         .matchedTransitionSource(id: "templatePicker", in: sheetNamespace)
     }
 
-    // MARK: - Aurora Send Button
+    // MARK: - Utopian Send Button
 
     private var sendButton: some View {
         Button {
@@ -735,24 +735,24 @@ struct TaskInputBarV2: View {
             submitTask()
         } label: {
             ZStack {
-                // Aurora ambient glow
+                // Utopian ambient glow
                 if !reduceMotion {
                     Circle()
-                        .fill(Aurora.Colors.electricCyan.opacity(0.5))
+                        .fill(UtopianDesignFallback.Colors.focusActive.opacity(0.5))
                         .frame(width: 48, height: 48)
                         .blur(radius: 8)
                         .scaleEffect(sendPulse)
                 }
 
-                // Main button with Aurora AI gradient
+                // Main button with Utopian AI gradient
                 Circle()
-                    .fill(Aurora.Gradients.aiGradient)
+                    .fill(UtopianDesignFallback.Gradients.aiGradient)
                     .frame(width: FloatingIslandMetrics.sendButtonSize, height: FloatingIslandMetrics.sendButtonSize)
                     .overlay {
                         Circle()
                             .fill(
                                 RadialGradient(
-                                    colors: [Aurora.Colors.stellarWhite.opacity(0.4), Color.clear],
+                                    colors: [Color.white.opacity(0.4), Color.clear],
                                     center: UnitPoint(x: 0.3, y: 0.3),
                                     startRadius: 0,
                                     endRadius: 16
@@ -791,11 +791,11 @@ struct TaskInputBarV2: View {
                             time: selectedTime,
                             onTap: { showDatePicker = true },
                             onRemove: {
-                                withAnimation(AuroraMotion.Spring.ui) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                     selectedDate = nil
                                     selectedTime = nil
                                 }
-                                AuroraHaptics.light()
+                                HapticsService.shared.impact(.light)
                             }
                         )
                         .transition(.scale.combined(with: .opacity))
@@ -814,10 +814,10 @@ struct TaskInputBarV2: View {
                     // Category chips
                     ForEach(Array(categories), id: \.self) { category in
                         CategoryChipView(category: category) {
-                            _ = withAnimation(AuroraMotion.Spring.ui) {
+                            _ = withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 categories.remove(category)
                             }
-                            AuroraHaptics.light()
+                            HapticsService.shared.impact(.light)
                         }
                         .transition(.scale.combined(with: .opacity))
                         .glassEffectID("category_\(category.id)", in: glassNamespace)
@@ -836,10 +836,10 @@ struct TaskInputBarV2: View {
                     // Duration chip (if estimated)
                     if let minutes = estimatedMinutes {
                         DurationChipView(minutes: minutes) {
-                            withAnimation(AuroraMotion.Spring.ui) {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 estimatedMinutes = nil
                             }
-                            AuroraHaptics.light()
+                            HapticsService.shared.impact(.light)
                         }
                         .transition(.scale.combined(with: .opacity))
                         .glassEffectID("durationChip", in: glassNamespace)
@@ -876,16 +876,16 @@ struct TaskInputBarV2: View {
         .padding(.top, 12)
     }
 
-    // MARK: - Aurora AI Processing Overlay
+    // MARK: - Utopian AI Processing Overlay
 
     private var aiProcessingOverlay: some View {
         Capsule()
             .fill(
                 LinearGradient(
                     colors: [
-                        Aurora.Colors.borealisViolet.opacity(0.1),
-                        Aurora.Colors.electricCyan.opacity(0.06),
-                        Aurora.Colors.borealisViolet.opacity(0.1)
+                        UtopianDesignFallback.Colors.aiPurple.opacity(0.1),
+                        UtopianDesignFallback.Colors.focusActive.opacity(0.06),
+                        UtopianDesignFallback.Colors.aiPurple.opacity(0.1)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
@@ -897,8 +897,8 @@ struct TaskInputBarV2: View {
                         Circle()
                             .fill(
                                 index == aiDotPhase
-                                    ? Aurora.Colors.electricCyan
-                                    : Aurora.Colors.borealisViolet
+                                    ? UtopianDesignFallback.Colors.focusActive
+                                    : UtopianDesignFallback.Colors.aiPurple
                             )
                             .frame(width: 8, height: 8)
                             .opacity(aiDotPhase == index ? 1.0 : 0.3)
@@ -909,7 +909,7 @@ struct TaskInputBarV2: View {
             .allowsHitTesting(false)
     }
 
-    // MARK: - Aurora Category Badge
+    // MARK: - Utopian Category Badge
 
     private var categoryBadgeView: some View {
         HStack(spacing: 6) {
@@ -919,17 +919,17 @@ struct TaskInputBarV2: View {
             Text(categoryText)
                 .dynamicTypeFont(base: 11, weight: .medium)
         }
-        .foregroundStyle(Aurora.Colors.electricCyan)
+        .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background {
             Capsule()
-                .fill(Aurora.Colors.electricCyan.opacity(0.12))
+                .fill(UtopianDesignFallback.Colors.focusActive.opacity(0.12))
                 .overlay {
                     Capsule()
                         .stroke(
                             LinearGradient(
-                                colors: [Aurora.Colors.electricCyan.opacity(0.4), Aurora.Colors.borealisViolet.opacity(0.2)],
+                                colors: [UtopianDesignFallback.Colors.focusActive.opacity(0.4), UtopianDesignFallback.Colors.aiPurple.opacity(0.2)],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             ),
@@ -1125,13 +1125,13 @@ extension TaskInputBarV2 {
         audioLevelTimer = nil
     }
 
-    // MARK: - Aurora Task Submission
+    // MARK: - Utopian Task Submission
 
     private func submitTask() {
         guard canSend else { return }
 
         let taskText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        AuroraHaptics.medium()
+        HapticsService.shared.impact(.medium)
 
         startAIProcessing()
 
@@ -1163,7 +1163,7 @@ extension TaskInputBarV2 {
         nlpDetections = []
     }
 
-    // MARK: - Aurora AI Processing
+    // MARK: - Utopian AI Processing
 
     private func startAIProcessing() {
         isAIProcessing = true
@@ -1180,25 +1180,25 @@ extension TaskInputBarV2 {
             }
         }
 
-        AuroraHaptics.light()
+        HapticsService.shared.impact(.light)
     }
 
     private func stopAIProcessing() {
         isAIProcessing = false
         AuroraSoundEngine.shared.play(.aiComplete)
-        AuroraHaptics.dopamineBurst()
+        HapticsService.shared.notification(.success)
     }
 
     private func showCategoryResult() {
         let detectedCategories = ["Work", "Personal", "Health", "Learning", "Creative"]
         categoryText = detectedCategories.randomElement() ?? "Task"
 
-        withAnimation(AuroraMotion.Spring.elasticBounce) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             showCategoryBadge = true
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            withAnimation(AuroraMotion.Spring.ui) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 showCategoryBadge = false
             }
         }
@@ -1727,20 +1727,20 @@ enum TaskNLPService {
     }
 }
 
-// MARK: - Aurora Floating Island Shadow Modifier
+// MARK: - Utopian Floating Island Shadow Modifier
 
 extension View {
     func floatingIslandShadow(mode: TaskInputBarMode, canSend: Bool) -> some View {
         self
-            // Layer 1: Deep aurora void shadow
+            // Layer 1: Deep utopian void shadow
             .shadow(
                 color: Color.black.opacity(0.55),
                 radius: 40,
                 y: 20
             )
-            // Layer 2: Aurora AI glow when can send
+            // Layer 2: Utopian AI glow when can send
             .shadow(
-                color: canSend ? Aurora.Colors.electricCyan.opacity(0.35) : Color.clear,
+                color: canSend ? UtopianDesignFallback.Colors.focusActive.opacity(0.35) : Color.clear,
                 radius: 24,
                 y: 8
             )
@@ -1784,10 +1784,10 @@ enum ActionTrayItemType: String, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
-        case .templates: return Aurora.Colors.borealisViolet
-        case .voice: return Aurora.Colors.error
-        case .calendar: return Aurora.Colors.electricCyan
-        case .category: return Aurora.Colors.cosmicGold
+        case .templates: return UtopianDesignFallback.Colors.aiPurple
+        case .voice: return UtopianDesignFallback.Colors.error
+        case .calendar: return UtopianDesignFallback.Colors.focusActive
+        case .category: return UtopianDesignFallback.Gamification.starGold
         }
     }
 }
@@ -1799,12 +1799,12 @@ struct InputV2ActionTrayButton: View {
     var body: some View {
         Button(action: {
             AuroraSoundEngine.shared.play(.buttonTap)
-            AuroraHaptics.light()
+            HapticsService.shared.impact(.light)
             action()
         }) {
             VStack(spacing: 6) {
                 ZStack {
-                    // Aurora glow background
+                    // Utopian glow background
                     Circle()
                         .fill(item.color.opacity(0.15))
                         .frame(width: 44, height: 44)
@@ -1819,8 +1819,8 @@ struct InputV2ActionTrayButton: View {
                 }
 
                 Text(item.rawValue)
-                    .font(Aurora.Typography.meta)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .font(UtopianDesignFallback.Typography.meta)
+                    .foregroundStyle(.white.opacity(0.7))
             }
         }
         .buttonStyle(.plain)

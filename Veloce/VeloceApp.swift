@@ -168,10 +168,10 @@ struct LoadingView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Aurora background - consistent with auth
-                AuroraBackground.auth
+                // Utopian background - consistent with auth
+                UtopianGradients.background(for: Date())
 
-                VStack(spacing: Aurora.Layout.spacingXL) {
+                VStack(spacing: 32) {
                     Spacer()
 
                     // Animated App Logo
@@ -184,26 +184,26 @@ struct LoadingView: View {
                     .opacity(showContent ? 1 : 0)
 
                     // Editorial thin typography - matching AuthView
-                    VStack(spacing: Aurora.Layout.spacingSmall) {
+                    VStack(spacing: 8) {
                         Text("MyTasksAI")
                             .font(.system(size: 42, weight: .thin, design: .default))
-                            .foregroundStyle(Aurora.Colors.textPrimary)
+                            .foregroundStyle(.white)
                             .opacity(showContent ? 1 : 0)
                             .offset(y: showContent ? 0 : 10)
 
                         Text("AI-Powered Productivity")
                             .dynamicTypeFont(base: 15)
-                            .foregroundStyle(Aurora.Colors.textSecondary)
+                            .foregroundStyle(.white.opacity(0.7))
                             .opacity(showContent ? 1 : 0)
                             .offset(y: showContent ? 0 : 10)
                     }
 
                     // Subtle loading indicator
                     ProgressView()
-                        .tint(Aurora.Colors.electric)
+                        .tint(UtopianDesignFallback.Colors.focusActive)
                         .scaleEffect(0.9)
                         .opacity(showContent ? 0.8 : 0)
-                        .padding(.top, Aurora.Layout.spacing)
+                        .padding(.top, 16)
 
                     Spacer()
                     Spacer()
@@ -217,7 +217,7 @@ struct LoadingView: View {
 
     private func startAnimations() {
         // Fade in content
-        withAnimation(Aurora.Animation.spring.delay(0.2)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.2)) {
             showContent = true
         }
 
@@ -227,7 +227,7 @@ struct LoadingView: View {
         }
 
         // Glow pulse
-        withAnimation(Aurora.Animation.glowPulse) {
+        withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
             logoGlow = 0.9
         }
     }

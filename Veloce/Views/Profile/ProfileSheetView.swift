@@ -2,7 +2,7 @@
 //  ProfileSheetView.swift
 //  Veloce
 //
-//  Aurora Design System - Identity Nexus
+//  Utopian Design System - Identity Nexus
 //  Achievement rings orbit avatar, level up burst with confetti
 //  Stats morph with scale bounce, prismatic profile card
 //
@@ -89,7 +89,7 @@ struct ProfileSheetView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        AuroraHaptics.light()
+                        HapticsService.shared.impact(.light)
                         AuroraSoundEngine.shared.play(.buttonTap)
                         dismiss()
                     } label: {
@@ -97,7 +97,7 @@ struct ProfileSheetView: View {
                             // Glow behind close button
                             Image(systemName: "xmark.circle.fill")
                                 .dynamicTypeFont(base: 28)
-                                .foregroundStyle(Aurora.Colors.borealisViolet)
+                                .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
                                 .blur(radius: 6)
                                 .opacity(0.4)
 
@@ -145,7 +145,7 @@ struct ProfileSheetView: View {
         .alert("Clear Completed Tasks?", isPresented: $showClearCompletedAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Clear", role: .destructive) {
-                AuroraHaptics.medium()
+                HapticsService.shared.impact(.medium)
                 // TODO: Implement clear completed tasks
             }
         } message: {
@@ -159,7 +159,7 @@ struct ProfileSheetView: View {
         VStack(spacing: 20) {
             // Avatar with orbiting achievement rings
             Button {
-                AuroraHaptics.light()
+                HapticsService.shared.impact(.light)
                 AuroraSoundEngine.shared.play(.buttonTap)
                 showImagePicker = true
             } label: {
@@ -169,8 +169,8 @@ struct ProfileSheetView: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Aurora.Colors.borealisViolet.opacity(0.3 * glowPulse),
-                                    Aurora.Colors.electricCyan.opacity(0.15 * glowPulse),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.3 * glowPulse),
+                                    UtopianDesignFallback.Colors.focusActive.opacity(0.15 * glowPulse),
                                     .clear
                                 ],
                                 center: .center,
@@ -193,24 +193,24 @@ struct ProfileSheetView: View {
                         .stroke(
                             AngularGradient(
                                 colors: [
-                                    Aurora.Colors.electricCyan,
-                                    Aurora.Colors.borealisViolet,
-                                    Aurora.Colors.stellarMagenta,
-                                    Aurora.Colors.electricCyan
+                                    UtopianDesignFallback.Colors.focusActive,
+                                    UtopianDesignFallback.Colors.aiPurple,
+                                    UtopianDesignFallback.Colors.aiPurple,
+                                    UtopianDesignFallback.Colors.focusActive
                                 ],
                                 center: .center
                             ),
                             style: StrokeStyle(lineWidth: 2, lineCap: .round)
                         )
                         .frame(width: 120, height: 120)
-                        .shadow(color: Aurora.Colors.electricCyan.opacity(0.4), radius: 8)
+                        .shadow(color: UtopianDesignFallback.Colors.focusActive.opacity(0.4), radius: 8)
 
                     // Level progress ring
                     Circle()
                         .trim(from: 0, to: gamification.levelProgress)
                         .stroke(
                             LinearGradient(
-                                colors: [Aurora.Colors.borealisViolet, Aurora.Colors.electricCyan],
+                                colors: [UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.focusActive],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -218,7 +218,7 @@ struct ProfileSheetView: View {
                         )
                         .frame(width: 112, height: 112)
                         .rotationEffect(.degrees(-90))
-                        .shadow(color: Aurora.Colors.borealisViolet.opacity(0.5), radius: 6)
+                        .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.5), radius: 6)
 
                     // Avatar circle
                     if let image = avatarImage {
@@ -229,16 +229,16 @@ struct ProfileSheetView: View {
                             .clipShape(Circle())
                             .overlay {
                                 Circle()
-                                    .stroke(Aurora.Colors.voidNebula, lineWidth: 2)
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 2)
                             }
                     } else {
-                        // Initial letter avatar with aurora gradient
+                        // Initial letter avatar with Utopian gradient
                         Circle()
                             .fill(
                                 LinearGradient(
                                     colors: [
-                                        Aurora.Colors.borealisViolet.opacity(0.4),
-                                        Aurora.Colors.electricCyan.opacity(0.3)
+                                        UtopianDesignFallback.Colors.aiPurple.opacity(0.4),
+                                        UtopianDesignFallback.Colors.focusActive.opacity(0.3)
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -250,7 +250,7 @@ struct ProfileSheetView: View {
                                 ZStack {
                                     Text(userInitial)
                                         .dynamicTypeFont(base: 40, weight: .light)
-                                        .foregroundStyle(Aurora.Colors.electricCyan)
+                                        .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                                         .blur(radius: 6)
                                         .opacity(0.5)
 
@@ -261,7 +261,7 @@ struct ProfileSheetView: View {
                             }
                             .overlay {
                                 Circle()
-                                    .stroke(Aurora.Colors.voidNebula, lineWidth: 2)
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 2)
                             }
                     }
 
@@ -272,9 +272,9 @@ struct ProfileSheetView: View {
                             Spacer()
                             ZStack {
                                 Circle()
-                                    .fill(Aurora.Colors.borealisViolet)
+                                    .fill(UtopianDesignFallback.Colors.aiPurple)
                                     .frame(width: 28, height: 28)
-                                    .shadow(color: Aurora.Colors.borealisViolet.opacity(0.6), radius: 6)
+                                    .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.6), radius: 6)
 
                                 Image(systemName: "pencil")
                                     .dynamicTypeFont(base: 13, weight: .semibold)
@@ -291,7 +291,7 @@ struct ProfileSheetView: View {
                             ZStack {
                                 Text("Lv.\(gamification.currentLevel)")
                                     .dynamicTypeFont(base: 11, weight: .bold)
-                                    .foregroundStyle(Aurora.Colors.electricCyan)
+                                    .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                                     .blur(radius: 4)
                                     .opacity(0.6)
 
@@ -303,8 +303,8 @@ struct ProfileSheetView: View {
                             .padding(.vertical, 5)
                             .background {
                                 Capsule()
-                                    .fill(Aurora.Colors.borealisViolet)
-                                    .shadow(color: Aurora.Colors.borealisViolet.opacity(0.5), radius: 4)
+                                    .fill(UtopianDesignFallback.Colors.aiPurple)
+                                    .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.5), radius: 4)
                             }
                             Spacer()
                         }
@@ -319,32 +319,32 @@ struct ProfileSheetView: View {
                 ZStack {
                     Text(userName)
                         .dynamicTypeFont(base: 26, weight: .semibold)
-                        .foregroundStyle(Aurora.Colors.electricCyan)
+                        .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                         .blur(radius: 8)
                         .opacity(0.4)
 
                     Text(userName)
                         .dynamicTypeFont(base: 26, weight: .semibold)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
                 }
 
                 Text(settingsViewModel.email.isEmpty ? "Welcome to Veloce" : settingsViewModel.email)
-                    .font(Aurora.Typography.subheadline)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .font(UtopianDesignFallback.Typography.subheadline)
+                    .foregroundStyle(.white.opacity(0.5))
             }
         }
-        .padding(.vertical, Aurora.Spacing.xl)
-        .padding(.horizontal, Aurora.Spacing.lg)
+        .padding(.vertical, UtopianDesignFallback.Spacing.xl)
+        .padding(.horizontal, UtopianDesignFallback.Spacing.lg)
         .background {
             RoundedRectangle(cornerRadius: 28)
-                .fill(Aurora.Colors.voidNebula.opacity(0.8))
+                .fill(Color.white.opacity(0.1).opacity(0.8))
                 .overlay {
                     RoundedRectangle(cornerRadius: 28)
                         .strokeBorder(
                             LinearGradient(
                                 colors: [
-                                    Aurora.Colors.borealisViolet.opacity(0.4),
-                                    Aurora.Colors.electricCyan.opacity(0.2),
+                                    UtopianDesignFallback.Colors.aiPurple.opacity(0.4),
+                                    UtopianDesignFallback.Colors.focusActive.opacity(0.2),
                                     Color.clear
                                 ],
                                 startPoint: .topLeading,
@@ -355,16 +355,16 @@ struct ProfileSheetView: View {
                 }
         }
         .auroraGlass(in: RoundedRectangle(cornerRadius: 28))
-        .shadow(color: Aurora.Colors.borealisViolet.opacity(0.2), radius: 20, y: 8)
+        .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.2), radius: 20, y: 8)
     }
 
     // Orbiting achievement particle
     private func achievementOrbitParticle(index: Int) -> some View {
         let colors: [Color] = [
-            Aurora.Colors.electricCyan,
-            Aurora.Colors.borealisViolet,
-            Aurora.Colors.stellarMagenta,
-            Aurora.Colors.prismaticGreen
+            UtopianDesignFallback.Colors.focusActive,
+            UtopianDesignFallback.Colors.aiPurple,
+            UtopianDesignFallback.Colors.aiPurple,
+            UtopianDesignFallback.Colors.completed
         ]
         let baseAngle = Double(index) * 90
 
@@ -381,25 +381,25 @@ struct ProfileSheetView: View {
 
     private var statsGrid: some View {
         HStack(spacing: 12) {
-            AuroraStatCardProfile(
+            UtopianStatCardProfile(
                 value: "\(gamification.totalTasksCompleted)",
                 label: "Tasks Done",
                 icon: "checkmark.circle.fill",
-                color: Aurora.Colors.prismaticGreen
+                color: UtopianDesignFallback.Colors.completed
             )
 
-            AuroraStatCardProfile(
+            UtopianStatCardProfile(
                 value: "\(gamification.currentStreak)",
                 label: "Day Streak",
                 icon: "flame.fill",
-                color: Aurora.Colors.stellarMagenta
+                color: UtopianDesignFallback.Colors.aiPurple
             )
 
-            AuroraStatCardProfile(
+            UtopianStatCardProfile(
                 value: "\(gamification.totalPoints)",
                 label: "Power",
                 icon: "bolt.fill",
-                color: Aurora.Colors.cosmicGold
+                color: UtopianDesignFallback.Gamification.starGold
             )
         }
     }
@@ -423,12 +423,12 @@ struct ProfileSheetView: View {
     // MARK: - Profile Section
 
     private var profileSection: some View {
-        SettingsSectionCard(title: "Profile", icon: "person.fill", iconColor: Aurora.Colors.borealisViolet) {
+        SettingsSectionCard(title: "Profile", icon: "person.fill", iconColor: UtopianDesignFallback.Colors.aiPurple) {
             VStack(spacing: 0) {
                 // Name field
                 SettingsTextField(
                     icon: "person.text.rectangle",
-                    iconColor: Aurora.Colors.electricCyan,
+                    iconColor: UtopianDesignFallback.Colors.focusActive,
                     title: "Name",
                     text: $settingsViewModel.fullName,
                     placeholder: "Your name"
@@ -443,7 +443,7 @@ struct ProfileSheetView: View {
 
                 // Email (read only)
                 HStack(spacing: 14) {
-                    SettingsIconContainer(icon: "envelope.fill", color: Aurora.Colors.electricCyan)
+                    SettingsIconContainer(icon: "envelope.fill", color: UtopianDesignFallback.Colors.focusActive)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Email")
@@ -464,11 +464,11 @@ struct ProfileSheetView: View {
     // MARK: - Appearance Section
 
     private var appearanceSection: some View {
-        SettingsSectionCard(title: "Appearance", icon: "paintbrush.fill", iconColor: Aurora.Colors.electricCyan) {
+        SettingsSectionCard(title: "Appearance", icon: "paintbrush.fill", iconColor: UtopianDesignFallback.Colors.focusActive) {
             VStack(spacing: 0) {
                 // Theme picker
                 HStack(spacing: 14) {
-                    SettingsIconContainer(icon: "circle.lefthalf.filled", color: Aurora.Colors.borealisViolet)
+                    SettingsIconContainer(icon: "circle.lefthalf.filled", color: UtopianDesignFallback.Colors.aiPurple)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Theme")
@@ -487,9 +487,9 @@ struct ProfileSheetView: View {
                         }
                     }
                     .pickerStyle(.menu)
-                    .tint(Aurora.Colors.borealisViolet)
+                    .tint(UtopianDesignFallback.Colors.aiPurple)
                     .onChange(of: settingsViewModel.theme) { _, _ in
-                        AuroraHaptics.light()
+                        HapticsService.shared.impact(.light)
                         Task {
                             await settingsViewModel.saveThemeSettings()
                         }
@@ -539,7 +539,7 @@ struct ProfileSheetView: View {
                     isOn: $settingsViewModel.notificationsEnabled
                 )
                 .onChange(of: settingsViewModel.notificationsEnabled) { _, _ in
-                    AuroraHaptics.light()
+                    HapticsService.shared.impact(.light)
                     Task {
                         await settingsViewModel.saveNotificationSettings()
                     }
@@ -550,11 +550,11 @@ struct ProfileSheetView: View {
                     title: "Streak Alerts",
                     subtitle: "Remind you to keep your streak alive",
                     icon: "flame.fill",
-                    color: Aurora.Colors.stellarMagenta,
+                    color: UtopianDesignFallback.Colors.aiPurple,
                     isOn: .constant(true)
                 )
                 .onChange(of: settingsViewModel.notificationsEnabled) { _, _ in
-                    AuroraHaptics.light()
+                    HapticsService.shared.impact(.light)
                 }
             }
         }
@@ -564,8 +564,8 @@ struct ProfileSheetView: View {
 
     private var focusSection: some View {
         VStack(spacing: 16) {
-            sectionHeader("Focus Settings", icon: "timer", color: Aurora.Colors.prismaticGreen)
-            
+            sectionHeader("Focus Settings", icon: "timer", color: UtopianDesignFallback.Colors.completed)
+
             LiquidGlassCard(
                 cornerRadius: 16
             ) {
@@ -574,14 +574,14 @@ struct ProfileSheetView: View {
                     HStack(spacing: 14) {
                         ZStack {
                             Circle()
-                                .fill(Aurora.Colors.prismaticGreen.opacity(0.2))
+                                .fill(UtopianDesignFallback.Colors.completed.opacity(0.2))
                                 .frame(width: 40, height: 40)
-                            
+
                             Image(systemName: "clock.fill")
                                 .dynamicTypeFont(base: 18, weight: .semibold)
-                                .foregroundStyle(Aurora.Colors.prismaticGreen)
+                                .foregroundStyle(UtopianDesignFallback.Colors.completed)
                         }
-                        
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Default Timer")
                                 .dynamicTypeFont(base: 16, weight: .semibold)
@@ -590,29 +590,29 @@ struct ProfileSheetView: View {
                                 .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.6))
                         }
-                        
+
                         Spacer()
-                        
+
                         Text("25 min")
                             .dynamicTypeFont(base: 15, weight: .semibold)
-                            .foregroundStyle(Aurora.Colors.prismaticGreen)
+                            .foregroundStyle(UtopianDesignFallback.Colors.completed)
                     }
-                    
+
                     Divider()
                         .background(.white.opacity(0.1))
-                    
+
                     // Break Duration
                     HStack(spacing: 14) {
                         ZStack {
                             Circle()
-                                .fill(Aurora.Colors.electricCyan.opacity(0.2))
+                                .fill(UtopianDesignFallback.Colors.focusActive.opacity(0.2))
                                 .frame(width: 40, height: 40)
-                            
+
                             Image(systemName: "cup.and.saucer.fill")
                                 .dynamicTypeFont(base: 18, weight: .semibold)
-                                .foregroundStyle(Aurora.Colors.electricCyan)
+                                .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                         }
-                        
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Break Duration")
                                 .dynamicTypeFont(base: 16, weight: .semibold)
@@ -621,12 +621,12 @@ struct ProfileSheetView: View {
                                 .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.6))
                         }
-                        
+
                         Spacer()
-                        
+
                         Text("5 min")
                             .dynamicTypeFont(base: 15, weight: .semibold)
-                            .foregroundStyle(Aurora.Colors.electricCyan)
+                            .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                     }
                 }
             }
@@ -636,16 +636,16 @@ struct ProfileSheetView: View {
     // MARK: - Data Section
 
     private var dataSection: some View {
-        SettingsSectionCard(title: "Data", icon: "square.and.arrow.up", iconColor: Aurora.Colors.electricCyan) {
+        SettingsSectionCard(title: "Data", icon: "square.and.arrow.up", iconColor: UtopianDesignFallback.Colors.focusActive) {
             VStack(spacing: 0) {
                 // Export data
                 Button {
-                    AuroraHaptics.light()
+                    HapticsService.shared.impact(.light)
                     AuroraSoundEngine.shared.play(.buttonTap)
                     exportData()
                 } label: {
                     HStack(spacing: 14) {
-                        SettingsIconContainer(icon: "square.and.arrow.up.fill", color: Aurora.Colors.electricCyan)
+                        SettingsIconContainer(icon: "square.and.arrow.up.fill", color: UtopianDesignFallback.Colors.focusActive)
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Export Data")
@@ -670,7 +670,7 @@ struct ProfileSheetView: View {
 
                 // Clear completed
                 Button {
-                    AuroraHaptics.medium()
+                    HapticsService.shared.impact(.medium)
                     showClearCompletedAlert = true
                 } label: {
                     HStack(spacing: 14) {
@@ -699,7 +699,7 @@ struct ProfileSheetView: View {
 
                 // Delete account
                 Button {
-                    AuroraHaptics.heavy()
+                    HapticsService.shared.impact(.heavy)
                     showDeleteAccountAlert = true
                 } label: {
                     HStack(spacing: 14) {
@@ -728,7 +728,7 @@ struct ProfileSheetView: View {
 
     private var signOutButton: some View {
         Button {
-            AuroraHaptics.medium()
+            HapticsService.shared.impact(.medium)
             AuroraSoundEngine.shared.play(.buttonTap)
             Task {
                 await appViewModel.signOut()
@@ -746,7 +746,7 @@ struct ProfileSheetView: View {
             .padding(.vertical, 16)
             .background {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Aurora.Colors.voidNebula.opacity(0.6))
+                    .fill(Color.white.opacity(0.1).opacity(0.6))
                     .overlay {
                         RoundedRectangle(cornerRadius: 16)
                             .strokeBorder(.red.opacity(0.2), lineWidth: 1)
@@ -776,16 +776,16 @@ struct ProfileSheetView: View {
     }
 
     private func startRevealAnimation() {
-        // Card entrance with aurora spring
-        withAnimation(AuroraMotion.Spring.morph) {
+        // Card entrance with Utopian spring
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             showContent = true
             cardScale = 1.0
         }
 
-        // Staggered section reveals with aurora timing
+        // Staggered section reveals with Utopian timing
         for index in 0..<sectionsRevealed.count {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15 + Double(index) * 0.08) {
-                withAnimation(AuroraMotion.Spring.ui) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     sectionsRevealed[index] = true
                 }
             }
@@ -805,7 +805,7 @@ struct ProfileSheetView: View {
 
         // Glow pulse animation
         withAnimation(
-            .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+            .easeInOut(duration: 2.0)
             .repeatForever(autoreverses: true)
         ) {
             glowPulse = 1.0
@@ -826,7 +826,7 @@ struct ProfileSheetView: View {
             _ = try await profileImageService.uploadAvatar(image, for: userId)
             // Notify other views (like header) that avatar changed
             profileImageService.notifyAvatarChanged()
-            AuroraHaptics.dopamineBurst()
+            HapticsService.shared.notification(.success)
             AuroraSoundEngine.shared.play(.taskComplete)
         } catch {
             settingsViewModel.error = error.localizedDescription
@@ -837,7 +837,7 @@ struct ProfileSheetView: View {
         Task {
             do {
                 _ = try await settingsViewModel.exportData()
-                AuroraHaptics.dopamineBurst()
+                HapticsService.shared.notification(.success)
                 AuroraSoundEngine.shared.play(.taskComplete)
             } catch {
                 settingsViewModel.error = error.localizedDescription
@@ -846,9 +846,9 @@ struct ProfileSheetView: View {
     }
 }
 
-// MARK: - Aurora Stat Card Profile
+// MARK: - Utopian Stat Card Profile
 
-private struct AuroraStatCardProfile: View {
+private struct UtopianStatCardProfile: View {
     let value: String
     let label: String
     let icon: String
@@ -874,25 +874,25 @@ private struct AuroraStatCardProfile: View {
             // Value with glow
             ZStack {
                 Text(value)
-                    .font(Aurora.Typography.title2)
+                    .font(UtopianDesignFallback.Typography.title2)
                     .foregroundStyle(color)
                     .blur(radius: 5)
                     .opacity(glowIntensity)
 
                 Text(value)
-                    .font(Aurora.Typography.title2)
+                    .font(UtopianDesignFallback.Typography.title2)
                     .foregroundStyle(color)
             }
 
             Text(label)
-                .font(Aurora.Typography.caption)
-                .foregroundStyle(Aurora.Colors.textSecondary)
+                .font(UtopianDesignFallback.Typography.caption)
+                .foregroundStyle(.white.opacity(0.7))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 18)
         .background {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Aurora.Colors.voidNebula)
+                .fill(Color.white.opacity(0.1))
                 .overlay {
                     RoundedRectangle(cornerRadius: 20)
                         .strokeBorder(
@@ -908,7 +908,7 @@ private struct AuroraStatCardProfile: View {
         .shadow(color: color.opacity(0.25), radius: 10, y: 4)
         .onAppear {
             withAnimation(
-                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .easeInOut(duration: 2.0)
                 .repeatForever(autoreverses: true)
             ) {
                 glowIntensity = 0.5
@@ -927,7 +927,7 @@ private struct SettingsSectionCard<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Header with aurora glow
+            // Header with Utopian glow
             HStack(spacing: 8) {
                 ZStack {
                     Image(systemName: icon)
@@ -943,16 +943,16 @@ private struct SettingsSectionCard<Content: View>: View {
 
                 Text(title.uppercased())
                     .dynamicTypeFont(base: 12, weight: .semibold)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .foregroundStyle(.white.opacity(0.5))
                     .tracking(1.2)
             }
             .padding(.horizontal, 4)
 
-            // Content card with aurora glass
+            // Content card with Utopian glass
             content()
                 .background {
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(Aurora.Colors.voidNebula.opacity(0.6))
+                        .fill(Color.white.opacity(0.1).opacity(0.6))
                         .overlay {
                             RoundedRectangle(cornerRadius: 20)
                                 .strokeBorder(
@@ -1000,7 +1000,7 @@ private struct SettingsDivider: View {
                 LinearGradient(
                     colors: [
                         Color.clear,
-                        Aurora.Colors.electricCyan.opacity(0.15),
+                        UtopianDesignFallback.Colors.focusActive.opacity(0.15),
                         Color.clear
                     ],
                     startPoint: .leading,
@@ -1037,7 +1037,7 @@ private struct SettingsToggleRow: View {
 
             Toggle("", isOn: $isOn)
                 .labelsHidden()
-                .tint(Aurora.Colors.borealisViolet)
+                .tint(UtopianDesignFallback.Colors.aiPurple)
                 .onChange(of: isOn) { _, _ in
                     onChange()
                 }
@@ -1075,8 +1075,8 @@ private struct SettingsTextField: View {
 private struct SettingsRowButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .background(configuration.isPressed ? Aurora.Colors.electricCyan.opacity(0.05) : Color.clear)
-            .animation(AuroraMotion.Spring.ui, value: configuration.isPressed)
+            .background(configuration.isPressed ? UtopianDesignFallback.Colors.focusActive.opacity(0.05) : Color.clear)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: configuration.isPressed)
     }
 }
 
@@ -1085,7 +1085,7 @@ private struct ProfileButtonPressStyle: ButtonStyle {
         configuration.label
             .opacity(configuration.isPressed ? 0.7 : 1.0)
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .animation(AuroraMotion.Spring.ui, value: configuration.isPressed)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: configuration.isPressed)
     }
 }
 
@@ -1093,7 +1093,7 @@ private struct AvatarButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(AuroraMotion.Spring.morph, value: configuration.isPressed)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: configuration.isPressed)
     }
 }
 
@@ -1121,14 +1121,14 @@ private struct ProfileSheetBackground: View {
     var body: some View {
         ZStack {
             // Deep cosmic void base
-            Aurora.Colors.voidCosmos
+            UtopianGradients.background(for: Date())
                 .ignoresSafeArea()
 
             // Ambient glow
             RadialGradient(
                 colors: [
-                    Aurora.Colors.borealisViolet.opacity(0.15),
-                    Aurora.Colors.electricCyan.opacity(0.08),
+                    UtopianDesignFallback.Colors.aiPurple.opacity(0.15),
+                    UtopianDesignFallback.Colors.focusActive.opacity(0.08),
                     .clear
                 ],
                 center: .top,
@@ -1192,7 +1192,7 @@ struct ProfileImagePicker: UIViewControllerRepresentable {
 
 #Preview {
     ZStack {
-        Aurora.Colors.voidCosmos.ignoresSafeArea()
+        UtopianGradients.background(for: Date()).ignoresSafeArea()
 
         ProfileSheetView(settingsViewModel: SettingsViewModel())
             .environment(AppViewModel())

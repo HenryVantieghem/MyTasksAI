@@ -68,7 +68,7 @@ final class CelebrationParticleScene: SKScene {
         case .supernova:
             createSupernova()
         case .aurora:
-            createAurora()
+            createUtopianAurora()
         case .xpTrail:
             createXPTrail()
         }
@@ -304,9 +304,9 @@ final class CelebrationParticleScene: SKScene {
         }
     }
 
-    // MARK: - Aurora Effect
+    // MARK: - Utopian Aurora Effect
 
-    private func createAurora() {
+    private func createUtopianAurora() {
         let position = CGPoint(x: effectPosition.x, y: size.height - effectPosition.y)
 
         for _ in 0..<(particleCount / 2) {

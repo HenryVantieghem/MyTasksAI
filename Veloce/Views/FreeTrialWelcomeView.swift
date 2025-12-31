@@ -2,7 +2,7 @@
 //  FreeTrialWelcomeView.swift
 //  Veloce
 //
-//  Free Trial Welcome View - Aurora Design System
+//  Free Trial Welcome View - Utopian Design System
 //  First screen users see - celestial cosmic welcome experience
 //  matching auth/onboarding flow
 //
@@ -21,17 +21,17 @@ struct FreeTrialWelcomeView: View {
     @State private var showHowItWorks = false
 
     private let features: [(icon: String, title: String, subtitle: String, color: Color)] = [
-        ("brain.head.profile", "AI-Powered Tasks", "Smart suggestions for every task", Aurora.Colors.violet),
-        ("sparkles", "Brain Dump", "Turn thoughts into organized tasks", Aurora.Colors.electric),
-        ("trophy.fill", "Gamification", "Earn XP and unlock achievements", Aurora.Colors.gold),
-        ("calendar.badge.clock", "Smart Scheduling", "AI-optimized planning", Aurora.Colors.cyan)
+        ("brain.head.profile", "AI-Powered Tasks", "Smart suggestions for every task", UtopianDesignFallback.Colors.aiPurple),
+        ("sparkles", "Brain Dump", "Turn thoughts into organized tasks", UtopianDesignFallback.Colors.focusActive),
+        ("trophy.fill", "Gamification", "Earn XP and unlock achievements", UtopianDesignFallback.Gamification.starGold),
+        ("calendar.badge.clock", "Smart Scheduling", "AI-optimized planning", UtopianDesignFallback.Colors.focusActive)
     ]
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Aurora background - consistent with auth
-                AuroraBackground.auth
+                // Utopian background - consistent with auth
+                UtopianGradients.background(for: Date())
 
                 // Animated Logo at top
                 AppLogoView(
@@ -47,7 +47,7 @@ struct FreeTrialWelcomeView: View {
                 )
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: Aurora.Layout.spacingXL) {
+                    VStack(spacing: UtopianDesignFallback.Spacing.xl) {
                         // Spacer for logo
                         Spacer(minLength: logoSpacerHeight(for: geometry))
 
@@ -58,20 +58,20 @@ struct FreeTrialWelcomeView: View {
 
                         // Features list
                         featuresSection
-                            .padding(.horizontal, Aurora.Layout.screenPadding)
+                            .padding(.horizontal, UtopianDesignFallback.Spacing.lg)
 
                         // CTA section
                         ctaSection
                             .opacity(showContent ? 1 : 0)
                             .offset(y: showContent ? 0 : 20)
-                            .padding(.horizontal, Aurora.Layout.screenPadding)
+                            .padding(.horizontal, UtopianDesignFallback.Spacing.lg)
 
                         // Footer
                         footerSection
                             .opacity(showContent ? 1 : 0)
-                            .padding(.bottom, Aurora.Layout.spacingXL)
+                            .padding(.bottom, UtopianDesignFallback.Spacing.xl)
                     }
-                    .padding(.top, Aurora.Layout.spacingLarge)
+                    .padding(.top, UtopianDesignFallback.Spacing.lg)
                 }
             }
         }
@@ -102,39 +102,39 @@ struct FreeTrialWelcomeView: View {
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: Aurora.Layout.spacing) {
+        VStack(spacing: UtopianDesignFallback.Spacing.md) {
             // Editorial thin typography - matching AuthView
             Text("MyTasksAI")
                 .font(.system(size: 42, weight: .thin, design: .default))
-                .foregroundStyle(Aurora.Colors.textPrimary)
+                .foregroundStyle(.white)
 
             // Tagline
             Text("AI-Powered Productivity")
                 .dynamicTypeFont(base: 15)
-                .foregroundStyle(Aurora.Colors.textSecondary)
+                .foregroundStyle(.white.opacity(0.7))
 
-            // Trial badge with aurora glow
+            // Trial badge with Utopian glow
             HStack(spacing: 6) {
                 Image(systemName: "gift.fill")
                     .dynamicTypeFont(base: 14)
                 Text("3 Days Free")
                     .dynamicTypeFont(base: 15, weight: .semibold)
             }
-            .foregroundStyle(Aurora.Colors.violet)
+            .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
             .padding(.horizontal, 18)
             .padding(.vertical, 10)
             .background(
                 Capsule()
-                    .fill(Aurora.Colors.violet.opacity(0.15))
+                    .fill(UtopianDesignFallback.Colors.aiPurple.opacity(0.15))
             )
-            .padding(.top, Aurora.Layout.spacingSmall)
+            .padding(.top, UtopianDesignFallback.Spacing.sm)
         }
     }
 
     // MARK: - Features Section
 
     private var featuresSection: some View {
-        VStack(alignment: .leading, spacing: Aurora.Layout.spacingLarge) {
+        VStack(alignment: .leading, spacing: UtopianDesignFallback.Spacing.lg) {
             ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
                 WelcomeFeatureRow(
                     icon: feature.icon,
@@ -151,7 +151,7 @@ struct FreeTrialWelcomeView: View {
     // MARK: - CTA Section
 
     private var ctaSection: some View {
-        VStack(spacing: Aurora.Layout.spacingLarge) {
+        VStack(spacing: UtopianDesignFallback.Spacing.lg) {
             // Primary button - Start Free Trial
             AuroraButton(
                 "Start Your Free Trial",
@@ -162,10 +162,10 @@ struct FreeTrialWelcomeView: View {
             }
 
             // Secondary link - Already have an account
-            HStack(spacing: Aurora.Layout.spacingTiny) {
+            HStack(spacing: UtopianDesignFallback.Spacing.xs) {
                 Text("Already have an account?")
                     .dynamicTypeFont(base: 15)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
 
                 AuroraLinkButton("Sign In") {
                     HapticsService.shared.selectionFeedback()
@@ -178,23 +178,23 @@ struct FreeTrialWelcomeView: View {
     // MARK: - Footer Section
 
     private var footerSection: some View {
-        VStack(spacing: Aurora.Layout.spacingSmall) {
+        VStack(spacing: UtopianDesignFallback.Spacing.sm) {
             Text("No credit card required")
                 .dynamicTypeFont(base: 13)
-                .foregroundStyle(Aurora.Colors.textTertiary)
+                .foregroundStyle(.white.opacity(0.5))
 
             // How It Works link
-            AuroraLinkButton("How It Works", color: Aurora.Colors.cyan) {
+            AuroraLinkButton("How It Works", color: UtopianDesignFallback.Colors.focusActive) {
                 HapticsService.shared.selectionFeedback()
                 showHowItWorks = true
             }
-            .padding(.top, Aurora.Layout.spacingTiny)
+            .padding(.top, UtopianDesignFallback.Spacing.xs)
 
-            HStack(spacing: Aurora.Layout.spacingLarge) {
-                AuroraLinkButton("Privacy Policy", color: Aurora.Colors.textTertiary) {
+            HStack(spacing: UtopianDesignFallback.Spacing.lg) {
+                AuroraLinkButton("Privacy Policy", color: .white.opacity(0.5)) {
                     openURL("https://yourapp.com/privacy")
                 }
-                AuroraLinkButton("Terms of Use", color: Aurora.Colors.textTertiary) {
+                AuroraLinkButton("Terms of Use", color: .white.opacity(0.5)) {
                     openURL("https://yourapp.com/terms")
                 }
             }
@@ -205,7 +205,7 @@ struct FreeTrialWelcomeView: View {
 
     private func startAnimations() {
         // Logo fade in
-        withAnimation(Aurora.Animation.spring.delay(0.1)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.1)) {
             showLogo = true
         }
 
@@ -215,14 +215,14 @@ struct FreeTrialWelcomeView: View {
         }
 
         // Fade in main content
-        withAnimation(Aurora.Animation.spring.delay(0.3)) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.3)) {
             showContent = true
         }
 
         // Stagger feature rows
         for index in featureAppearance.indices {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(index) * 0.1) {
-                withAnimation(Aurora.Animation.spring) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     featureAppearance[index] = true
                 }
             }
@@ -245,7 +245,7 @@ struct WelcomeFeatureRow: View {
     let isVisible: Bool
 
     var body: some View {
-        HStack(spacing: Aurora.Layout.spacing) {
+        HStack(spacing: UtopianDesignFallback.Spacing.md) {
             // Icon with glow
             ZStack {
                 SwiftUI.Circle()
@@ -265,11 +265,11 @@ struct WelcomeFeatureRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
                     .dynamicTypeFont(base: 17, weight: .semibold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
 
                 Text(subtitle)
                     .dynamicTypeFont(base: 14)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
 
             Spacer()
@@ -277,7 +277,7 @@ struct WelcomeFeatureRow: View {
             // Checkmark
             Image(systemName: "checkmark.circle.fill")
                 .dynamicTypeFont(base: 20)
-                .foregroundStyle(Aurora.Colors.success.opacity(0.8))
+                .foregroundStyle(UtopianDesignFallback.Colors.completed.opacity(0.8))
         }
         .opacity(isVisible ? 1 : 0)
         .offset(x: isVisible ? 0 : -30)

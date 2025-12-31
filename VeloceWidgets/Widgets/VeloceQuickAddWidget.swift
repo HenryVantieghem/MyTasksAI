@@ -3,7 +3,7 @@
 //  VeloceWidgets
 //
 //  Quick Add Widget - Living Cosmos Design
-//  One-tap task capture with aurora-styled button
+//  One-tap task capture with utopian-styled button
 //  Opens app with keyboard ready for quick input
 //
 
@@ -22,8 +22,8 @@ struct VeloceQuickAddWidget: Widget {
                 .containerBackground(for: .widget) {
                     WidgetCosmicBackground(
                         showStars: true,
-                        showAurora: true,
-                        auroraIntensity: 0.4
+                        showGlow: true,
+                        glowIntensity: 0.4
                     )
                 }
         }
@@ -95,18 +95,18 @@ struct QuickAddWidgetView: View {
     private var smallWidget: some View {
         Link(destination: URL(string: "veloce://add-task")!) {
             VStack(spacing: 12) {
-                // Aurora quick add button
+                // Utopian quick add button
                 QuickAddButton(size: 56)
 
                 // Label
                 VStack(spacing: 4) {
                     Text("Add Task")
-                        .font(WidgetAurora.Typography.headline)
-                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                        .font(WidgetUtopian.Typography.headline)
+                        .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                     Text("Tap to capture")
-                        .font(WidgetAurora.Typography.micro)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                        .font(WidgetUtopian.Typography.micro)
+                        .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                 }
 
                 // Pending count
@@ -115,17 +115,17 @@ struct QuickAddWidgetView: View {
                         Image(systemName: "list.bullet")
                             .font(.system(size: 10))
                         Text("\(entry.pendingTasks) pending")
-                            .font(WidgetAurora.Typography.micro)
+                            .font(WidgetUtopian.Typography.micro)
                     }
-                    .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                    .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .background(
                         Capsule()
-                            .fill(WidgetAurora.Colors.glassBase)
+                            .fill(WidgetUtopian.Colors.glassBase)
                             .overlay(
                                 Capsule()
-                                    .stroke(WidgetAurora.Colors.glassBorder, lineWidth: 0.5)
+                                    .stroke(WidgetUtopian.Colors.glassBorder, lineWidth: 0.5)
                             )
                     )
                 }

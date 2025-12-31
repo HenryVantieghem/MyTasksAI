@@ -120,7 +120,7 @@ struct CirclesContentView: View {
     private var friendRequestsBanner: some View {
         Button {
             showFriendRequests = true
-            AuroraHaptics.light()
+            HapticsService.shared.impact(.light)
         } label: {
             HStack(spacing: 14) {
                 // Animated aurora icon container
@@ -128,7 +128,7 @@ struct CirclesContentView: View {
                     // Glow ring
                     Circle()
                         .stroke(
-                            Aurora.Colors.stellarMagenta.opacity(0.3),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.3),
                             lineWidth: 2
                         )
                         .frame(width: 48, height: 48)
@@ -138,7 +138,7 @@ struct CirclesContentView: View {
                     Circle()
                         .fill(
                             LinearGradient(
-                                colors: [Aurora.Colors.stellarMagenta.opacity(0.3), Aurora.Colors.borealisViolet.opacity(0.15)],
+                                colors: [UtopianDesignFallback.Colors.aiPurple.opacity(0.3), UtopianDesignFallback.Colors.aiPurple.opacity(0.15)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -147,18 +147,18 @@ struct CirclesContentView: View {
 
                     Image(systemName: "person.2.fill")
                         .dynamicTypeFont(base: 18, weight: .semibold)
-                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                        .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Friend Requests")
-                        .font(Aurora.Typography.body)
+                        .font(UtopianDesignFallback.Typography.body)
                         .fontWeight(.semibold)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
 
                     Text("\(friendService.pendingCount) people want to connect")
-                        .font(Aurora.Typography.caption)
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .font(UtopianDesignFallback.Typography.caption)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
 
                 Spacer()
@@ -170,23 +170,23 @@ struct CirclesContentView: View {
                     .frame(width: 28, height: 28)
                     .background(
                         Circle()
-                            .fill(Aurora.Colors.stellarMagenta)
-                            .shadow(color: Aurora.Colors.stellarMagenta.opacity(0.5), radius: 8)
+                            .fill(UtopianDesignFallback.Colors.aiPurple)
+                            .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.5), radius: 8)
                     )
 
                 Image(systemName: "chevron.right")
                     .dynamicTypeFont(base: 12, weight: .semibold)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .foregroundStyle(.white.opacity(0.5))
             }
             .padding(16)
             .background {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Aurora.Colors.voidNebula)
+                    .fill(Color.white.opacity(0.1))
                     .overlay {
                         RoundedRectangle(cornerRadius: 20, style: .continuous)
                             .stroke(
                                 LinearGradient(
-                                    colors: [Aurora.Colors.stellarMagenta.opacity(0.4), Aurora.Colors.borealisViolet.opacity(0.1)],
+                                    colors: [UtopianDesignFallback.Colors.aiPurple.opacity(0.4), UtopianDesignFallback.Colors.aiPurple.opacity(0.1)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -202,41 +202,41 @@ struct CirclesContentView: View {
 
     private var circlesSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Section Header with Aurora styling
+            // Section Header with Utopian styling
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Your Circles")
-                        .font(Aurora.Typography.title3)
+                        .font(UtopianDesignFallback.Typography.title3)
                         .fontWeight(.bold)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
 
                     Text(circleService.circles.isEmpty ? "Create or join a circle" : "\(circleService.circles.count) active")
-                        .font(Aurora.Typography.caption)
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .font(UtopianDesignFallback.Typography.caption)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
 
                 Spacer()
 
                 Button {
                     showCreateCircle = true
-                    AuroraHaptics.light()
+                    HapticsService.shared.impact(.light)
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "plus")
                             .dynamicTypeFont(base: 12, weight: .bold)
                         Text("Create")
-                            .font(Aurora.Typography.subheadline)
+                            .font(UtopianDesignFallback.Typography.subheadline)
                             .fontWeight(.semibold)
                     }
-                    .foregroundStyle(Aurora.Colors.stellarMagenta)
+                    .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
                     .background {
                         Capsule()
-                            .fill(Aurora.Colors.stellarMagenta.opacity(0.15))
+                            .fill(UtopianDesignFallback.Colors.aiPurple.opacity(0.15))
                             .overlay {
                                 Capsule()
-                                    .stroke(Aurora.Colors.stellarMagenta.opacity(0.3), lineWidth: 1)
+                                    .stroke(UtopianDesignFallback.Colors.aiPurple.opacity(0.3), lineWidth: 1)
                             }
                     }
                 }
@@ -254,12 +254,12 @@ struct CirclesContentView: View {
                         ForEach(Array(circleService.circles.enumerated()), id: \.element.id) { index, circle in
                             PremiumCircleCard(circle: circle) {
                                 selectedCircle = circle
-                                AuroraHaptics.light()
+                                HapticsService.shared.impact(.light)
                             }
                             .opacity(appearPhase)
                             .offset(y: (1 - appearPhase) * 20)
                             .animation(
-                                AuroraMotion.Spring.ui.delay(Double(index) * 0.08),
+                                .spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.08),
                                 value: appearPhase
                             )
                         }
@@ -275,15 +275,15 @@ struct CirclesContentView: View {
 
     private var circleActionCards: some View {
         HStack(spacing: 12) {
-            // Create Card with Aurora styling
+            // Create Card with Utopian styling
             Button {
                 showCreateCircle = true
-                AuroraHaptics.medium()
+                HapticsService.shared.impact(.medium)
             } label: {
                 VStack(spacing: 14) {
                     ZStack {
                         Circle()
-                            .fill(Aurora.Colors.stellarMagenta)
+                            .fill(UtopianDesignFallback.Colors.aiPurple)
                             .frame(width: 56, height: 56)
                             .blur(radius: 12)
                             .opacity(0.3)
@@ -291,7 +291,7 @@ struct CirclesContentView: View {
                         Circle()
                             .fill(
                                 LinearGradient(
-                                    colors: [Aurora.Colors.stellarMagenta.opacity(0.3), Aurora.Colors.borealisViolet.opacity(0.15)],
+                                    colors: [UtopianDesignFallback.Colors.aiPurple.opacity(0.3), UtopianDesignFallback.Colors.aiPurple.opacity(0.15)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
@@ -300,42 +300,42 @@ struct CirclesContentView: View {
 
                         Image(systemName: "plus.circle.fill")
                             .dynamicTypeFont(base: 26)
-                            .foregroundStyle(Aurora.Colors.stellarMagenta)
+                            .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
                     }
 
                     VStack(spacing: 4) {
                         Text("Create")
-                            .font(Aurora.Typography.body)
+                            .font(UtopianDesignFallback.Typography.body)
                             .fontWeight(.semibold)
-                            .foregroundStyle(Aurora.Colors.textPrimary)
+                            .foregroundStyle(.white)
 
                         Text("Start a new circle")
-                            .font(Aurora.Typography.caption)
-                            .foregroundStyle(Aurora.Colors.textSecondary)
+                            .font(UtopianDesignFallback.Typography.caption)
+                            .foregroundStyle(.white.opacity(0.7))
                     }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)
                 .background {
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Aurora.Colors.voidNebula)
+                        .fill(Color.white.opacity(0.1))
                         .overlay {
                             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                .stroke(Aurora.Colors.stellarMagenta.opacity(0.2), lineWidth: 1)
+                                .stroke(UtopianDesignFallback.Colors.aiPurple.opacity(0.2), lineWidth: 1)
                         }
                 }
             }
             .buttonStyle(PremiumCardButtonStyle())
 
-            // Join Card with Aurora styling
+            // Join Card with Utopian styling
             Button {
                 showJoinCircle = true
-                AuroraHaptics.medium()
+                HapticsService.shared.impact(.medium)
             } label: {
                 VStack(spacing: 14) {
                     ZStack {
                         Circle()
-                            .fill(Aurora.Colors.electricCyan)
+                            .fill(UtopianDesignFallback.Colors.focusActive)
                             .frame(width: 56, height: 56)
                             .blur(radius: 12)
                             .opacity(0.3)
@@ -343,7 +343,7 @@ struct CirclesContentView: View {
                         Circle()
                             .fill(
                                 LinearGradient(
-                                    colors: [Aurora.Colors.electricCyan.opacity(0.3), Aurora.Colors.deepPlasma.opacity(0.15)],
+                                    colors: [UtopianDesignFallback.Colors.focusActive.opacity(0.3), UtopianDesignFallback.Colors.aiPurple.opacity(0.8).opacity(0.15)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
@@ -352,28 +352,28 @@ struct CirclesContentView: View {
 
                         Image(systemName: "person.badge.plus")
                             .dynamicTypeFont(base: 24)
-                            .foregroundStyle(Aurora.Colors.electricCyan)
+                            .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                     }
 
                     VStack(spacing: 4) {
                         Text("Join")
-                            .font(Aurora.Typography.body)
+                            .font(UtopianDesignFallback.Typography.body)
                             .fontWeight(.semibold)
-                            .foregroundStyle(Aurora.Colors.textPrimary)
+                            .foregroundStyle(.white)
 
                         Text("Enter invite code")
-                            .font(Aurora.Typography.caption)
-                            .foregroundStyle(Aurora.Colors.textSecondary)
+                            .font(UtopianDesignFallback.Typography.caption)
+                            .foregroundStyle(.white.opacity(0.7))
                     }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)
                 .background {
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Aurora.Colors.voidNebula)
+                        .fill(Color.white.opacity(0.1))
                         .overlay {
                             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                .stroke(Aurora.Colors.electricCyan.opacity(0.2), lineWidth: 1)
+                                .stroke(UtopianDesignFallback.Colors.focusActive.opacity(0.2), lineWidth: 1)
                         }
                 }
             }
@@ -386,41 +386,41 @@ struct CirclesContentView: View {
 
     private var friendsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Section Header with Aurora styling
+            // Section Header with Utopian styling
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Friends")
-                        .font(Aurora.Typography.title3)
+                        .font(UtopianDesignFallback.Typography.title3)
                         .fontWeight(.bold)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
 
                     Text(friendService.friends.isEmpty ? "Add friends to compete" : "\(friendService.friendCount) connected")
-                        .font(Aurora.Typography.caption)
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .font(UtopianDesignFallback.Typography.caption)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
 
                 Spacer()
 
                 Button {
                     showAddFriend = true
-                    AuroraHaptics.light()
+                    HapticsService.shared.impact(.light)
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "person.badge.plus")
                             .dynamicTypeFont(base: 12, weight: .bold)
                         Text("Add")
-                            .font(Aurora.Typography.subheadline)
+                            .font(UtopianDesignFallback.Typography.subheadline)
                             .fontWeight(.semibold)
                     }
-                    .foregroundStyle(Aurora.Colors.prismaticGreen)
+                    .foregroundStyle(UtopianDesignFallback.Colors.completed)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
                     .background {
                         Capsule()
-                            .fill(Aurora.Colors.prismaticGreen.opacity(0.15))
+                            .fill(UtopianDesignFallback.Colors.completed.opacity(0.15))
                             .overlay {
                                 Capsule()
-                                    .stroke(Aurora.Colors.prismaticGreen.opacity(0.3), lineWidth: 1)
+                                    .stroke(UtopianDesignFallback.Colors.completed.opacity(0.3), lineWidth: 1)
                             }
                     }
                 }
@@ -440,7 +440,7 @@ struct CirclesContentView: View {
                             .opacity(appearPhase)
                             .offset(y: (1 - appearPhase) * 15)
                             .animation(
-                                AuroraMotion.Spring.ui.delay(Double(index) * 0.06 + 0.2),
+                                .spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.06 + 0.2),
                                 value: appearPhase
                             )
                     }
@@ -455,7 +455,7 @@ struct CirclesContentView: View {
                 // Animated aurora rings
                 ForEach(0..<3, id: \.self) { i in
                     Circle()
-                        .stroke(Aurora.Colors.prismaticGreen.opacity(0.2), lineWidth: 1)
+                        .stroke(UtopianDesignFallback.Colors.completed.opacity(0.2), lineWidth: 1)
                         .frame(width: 60 + CGFloat(i) * 20)
                         .scaleEffect(1 + pulsePhase * 0.05 * CGFloat(i + 1))
                         .opacity(0.5 - Double(i) * 0.15)
@@ -463,37 +463,37 @@ struct CirclesContentView: View {
 
                 Image(systemName: "person.2")
                     .dynamicTypeFont(base: 28, weight: .light)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
             .frame(height: 100)
 
             VStack(spacing: 6) {
                 Text("No friends yet")
-                    .font(Aurora.Typography.body)
+                    .font(UtopianDesignFallback.Typography.body)
                     .fontWeight(.semibold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
 
                 Text("Add friends to see their progress and compete on leaderboards")
-                    .font(Aurora.Typography.caption)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .font(UtopianDesignFallback.Typography.caption)
+                    .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
             }
 
             Button {
                 showAddFriend = true
-                AuroraHaptics.medium()
+                HapticsService.shared.impact(.medium)
             } label: {
                 Text("Find Friends")
-                    .font(Aurora.Typography.subheadline)
+                    .font(UtopianDesignFallback.Typography.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background {
                         Capsule()
-                            .fill(Aurora.Colors.prismaticGreen)
-                            .shadow(color: Aurora.Colors.prismaticGreen.opacity(0.4), radius: 12)
+                            .fill(UtopianDesignFallback.Colors.completed)
+                            .shadow(color: UtopianDesignFallback.Colors.completed.opacity(0.4), radius: 12)
                     }
             }
             .buttonStyle(PremiumPillButtonStyle())
@@ -503,10 +503,10 @@ struct CirclesContentView: View {
         .padding(.horizontal, 24)
         .background {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(Aurora.Colors.voidNebula.opacity(0.6))
+                .fill(Color.white.opacity(0.1).opacity(0.6))
                 .overlay {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(Aurora.Colors.stellarWhite.opacity(0.06), lineWidth: 1)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
                 }
         }
         .padding(.horizontal, layout.screenPadding)
@@ -520,13 +520,13 @@ struct CirclesContentView: View {
             HStack {
                 Text("Recent Activity")
                     .dynamicTypeFont(base: 20, weight: .bold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
 
                 Spacer()
 
                 Text("From your circles")
                     .dynamicTypeFont(base: 12, weight: .medium)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .foregroundStyle(.white.opacity(0.5))
             }
             .padding(.horizontal, layout.screenPadding)
 
@@ -544,7 +544,7 @@ struct CirclesContentView: View {
             }
             .background {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Aurora.Colors.voidNebula.opacity(0.6))
+                    .fill(Color.white.opacity(0.1).opacity(0.6))
                     .overlay {
                         RoundedRectangle(cornerRadius: 20, style: .continuous)
                             .stroke(Color.white.opacity(0.06), lineWidth: 1)
@@ -569,7 +569,7 @@ struct CirclesContentView: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Aurora.Colors.borealisViolet.opacity(0.15), .clear],
+                            colors: [UtopianDesignFallback.Colors.aiPurple.opacity(0.15), .clear],
                             center: .center,
                             startRadius: 20,
                             endRadius: 100
@@ -581,7 +581,7 @@ struct CirclesContentView: View {
                 // Orbiting elements
                 ForEach(0..<3, id: \.self) { i in
                     Circle()
-                        .fill(Aurora.Colors.borealisViolet.opacity(0.6))
+                        .fill(UtopianDesignFallback.Colors.aiPurple.opacity(0.6))
                         .frame(width: 8, height: 8)
                         .offset(y: -50)
                         .rotationEffect(.degrees(gradientRotation + Double(i) * 120))
@@ -592,13 +592,13 @@ struct CirclesContentView: View {
                     Circle()
                         .fill(
                             LinearGradient(
-                                colors: [Aurora.Colors.borealisViolet, Aurora.Colors.deepPlasma],
+                                colors: [UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.aiPurple.opacity(0.8)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                         )
                         .frame(width: 80, height: 80)
-                        .shadow(color: Aurora.Colors.borealisViolet.opacity(0.5), radius: 20)
+                        .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.5), radius: 20)
 
                     Image(systemName: "person.3.fill")
                         .dynamicTypeFont(base: 32, weight: .medium)
@@ -610,11 +610,11 @@ struct CirclesContentView: View {
             VStack(spacing: 12) {
                 Text("Build Your Circle")
                     .dynamicTypeFont(base: 24, weight: .bold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
 
                 Text("Connect with friends, join circles, and\nachieve your goals together")
                     .dynamicTypeFont(base: 15, weight: .medium)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
             }
@@ -623,7 +623,7 @@ struct CirclesContentView: View {
             VStack(spacing: 12) {
                 Button {
                     showCreateCircle = true
-                    AuroraHaptics.medium()
+                    HapticsService.shared.impact(.medium)
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill")
@@ -635,22 +635,22 @@ struct CirclesContentView: View {
                     .padding(.vertical, 16)
                     .background {
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(Aurora.Colors.borealisViolet)
-                            .shadow(color: Aurora.Colors.borealisViolet.opacity(0.4), radius: 16)
+                            .fill(UtopianDesignFallback.Colors.aiPurple)
+                            .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.4), radius: 16)
                     }
                 }
                 .buttonStyle(PremiumCardButtonStyle())
 
                 Button {
                     showAddFriend = true
-                    AuroraHaptics.light()
+                    HapticsService.shared.impact(.light)
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "person.badge.plus")
                         Text("Add Friends")
                     }
                     .dynamicTypeFont(base: 16, weight: .semibold)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background {
@@ -669,7 +669,7 @@ struct CirclesContentView: View {
         .padding(.horizontal, 24)
         .background {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(Aurora.Colors.voidNebula.opacity(0.4))
+                .fill(Color.white.opacity(0.1).opacity(0.4))
                 .overlay {
                     RoundedRectangle(cornerRadius: 28, style: .continuous)
                         .stroke(Color.white.opacity(0.05), lineWidth: 1)
@@ -731,10 +731,10 @@ struct PremiumCircleCard: View {
         // Generate consistent color from circle name
         let hash = abs(circle.name.hashValue)
         let colors: [Color] = [
-            Aurora.Colors.borealisViolet,
-            Aurora.Colors.deepPlasma,
-            Aurora.Colors.electricCyan,
-            Aurora.Colors.prismaticGreen,
+            UtopianDesignFallback.Colors.aiPurple,
+            UtopianDesignFallback.Colors.aiPurple.opacity(0.8),
+            UtopianDesignFallback.Colors.focusActive,
+            UtopianDesignFallback.Colors.completed,
             Color(red: 0.98, green: 0.45, blue: 0.65)
         ]
         return colors[hash % colors.count]
@@ -766,13 +766,13 @@ struct PremiumCircleCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(circle.name)
                             .dynamicTypeFont(base: 17, weight: .semibold)
-                            .foregroundStyle(Aurora.Colors.textPrimary)
+                            .foregroundStyle(.white)
                             .lineLimit(1)
 
                         HStack(spacing: 8) {
                             Label("\(circle.memberCount)", systemImage: "person.2.fill")
                                 .dynamicTypeFont(base: 12, weight: .medium)
-                                .foregroundStyle(Aurora.Colors.textSecondary)
+                                .foregroundStyle(.white.opacity(0.7))
 
                             if circle.circleStreak > 0 {
                                 HStack(spacing: 3) {
@@ -781,7 +781,7 @@ struct PremiumCircleCard: View {
                                         .foregroundStyle(.orange)
                                     Text("\(circle.circleStreak)")
                                         .dynamicTypeFont(base: 12, weight: .medium)
-                                        .foregroundStyle(Aurora.Colors.textSecondary)
+                                        .foregroundStyle(.white.opacity(0.7))
                                 }
                             }
                         }
@@ -802,14 +802,14 @@ struct PremiumCircleCard: View {
                         if members.count > 4 {
                             Text("+\(members.count - 4)")
                                 .dynamicTypeFont(base: 10, weight: .bold)
-                                .foregroundStyle(Aurora.Colors.textSecondary)
+                                .foregroundStyle(.white.opacity(0.7))
                                 .frame(width: 28, height: 28)
                                 .background {
                                     Circle()
-                                        .fill(Aurora.Colors.voidNebula)
+                                        .fill(Color.white.opacity(0.1))
                                         .overlay {
                                             Circle()
-                                                .stroke(Aurora.Colors.voidNebula, lineWidth: 2)
+                                                .stroke(Color.white.opacity(0.1), lineWidth: 2)
                                         }
                                 }
                         }
@@ -818,7 +818,7 @@ struct PremiumCircleCard: View {
 
                         Image(systemName: "chevron.right")
                             .dynamicTypeFont(base: 12, weight: .semibold)
-                            .foregroundStyle(Aurora.Colors.textTertiary)
+                            .foregroundStyle(.white.opacity(0.5))
                     }
                 }
             }
@@ -826,7 +826,7 @@ struct PremiumCircleCard: View {
             .frame(width: 260)
             .background {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Aurora.Colors.voidNebula)
+                    .fill(Color.white.opacity(0.1))
                     .overlay {
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
                             .stroke(
@@ -852,10 +852,10 @@ struct PremiumCircleCard: View {
 
     private func memberColor(for index: Int) -> Color {
         let colors: [Color] = [
-            Aurora.Colors.borealisViolet,
-            Aurora.Colors.electricCyan,
-            Aurora.Colors.prismaticGreen,
-            Aurora.Colors.stellarMagenta
+            UtopianDesignFallback.Colors.aiPurple,
+            UtopianDesignFallback.Colors.focusActive,
+            UtopianDesignFallback.Colors.completed,
+            UtopianDesignFallback.Colors.aiPurple
         ]
         return colors[index % colors.count]
     }
@@ -877,7 +877,7 @@ struct MiniAvatarView: View {
                     .fill(color)
                     .overlay {
                         Circle()
-                            .stroke(Aurora.Colors.voidNebula, lineWidth: 2)
+                            .stroke(Color.white.opacity(0.1), lineWidth: 2)
                     }
             }
     }
@@ -916,11 +916,11 @@ struct PremiumFriendCard: View {
 
                     // Online indicator
                     Circle()
-                        .fill(Aurora.Colors.prismaticGreen)
+                        .fill(UtopianDesignFallback.Colors.completed)
                         .frame(width: 12, height: 12)
                         .overlay {
                             Circle()
-                                .stroke(Aurora.Colors.voidNebula, lineWidth: 2)
+                                .stroke(Color.white.opacity(0.1), lineWidth: 2)
                         }
                         .offset(x: 16, y: 16)
                 }
@@ -929,12 +929,12 @@ struct PremiumFriendCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(friend.displayName)
                         .dynamicTypeFont(base: 16, weight: .semibold)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
 
                     if let username = friend.username {
                         Text("@\(username)")
                             .dynamicTypeFont(base: 13, weight: .medium)
-                            .foregroundStyle(Aurora.Colors.textSecondary)
+                            .foregroundStyle(.white.opacity(0.7))
                     }
                 }
 
@@ -950,7 +950,7 @@ struct PremiumFriendCard: View {
                                 .foregroundStyle(.orange)
                             Text("\(streak)")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                .foregroundStyle(Aurora.Colors.textPrimary)
+                                .foregroundStyle(.white)
                         }
                     }
 
@@ -959,10 +959,10 @@ struct PremiumFriendCard: View {
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
                                 .dynamicTypeFont(base: 11)
-                                .foregroundStyle(Aurora.Colors.cosmicGold)
+                                .foregroundStyle(UtopianDesignFallback.Gamification.starGold)
                             Text("Lv\(level)")
                                 .dynamicTypeFont(base: 13, weight: .medium)
-                                .foregroundStyle(Aurora.Colors.textSecondary)
+                                .foregroundStyle(.white.opacity(0.7))
                         }
                     }
                 }
@@ -970,7 +970,7 @@ struct PremiumFriendCard: View {
             .padding(14)
             .background {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Aurora.Colors.voidNebula.opacity(0.6))
+                    .fill(Color.white.opacity(0.1).opacity(0.6))
                     .overlay {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .stroke(Color.white.opacity(0.06), lineWidth: 1)
@@ -989,11 +989,11 @@ struct PremiumFriendCard: View {
         guard let name = friendProfile?.displayName else { return .gray }
         let hash = abs(name.hashValue)
         let colors: [Color] = [
-            Aurora.Colors.borealisViolet,
-            Aurora.Colors.deepPlasma,
-            Aurora.Colors.electricCyan,
-            Aurora.Colors.prismaticGreen,
-            Aurora.Colors.stellarMagenta
+            UtopianDesignFallback.Colors.aiPurple,
+            UtopianDesignFallback.Colors.aiPurple.opacity(0.8),
+            UtopianDesignFallback.Colors.focusActive,
+            UtopianDesignFallback.Colors.completed,
+            UtopianDesignFallback.Colors.aiPurple
         ]
         return colors[hash % colors.count]
     }
@@ -1022,17 +1022,17 @@ struct ActivityFeedItem: View {
                 HStack(spacing: 6) {
                     Text(activity.user?.displayName ?? "Someone")
                         .dynamicTypeFont(base: 14, weight: .semibold)
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
 
                     Text(activity.activityType.displayName.lowercased())
                         .dynamicTypeFont(base: 14, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.textSecondary)
+                        .foregroundStyle(.white.opacity(0.7))
                 }
 
                 if let message = activity.message {
                     Text(message)
                         .dynamicTypeFont(base: 13, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.textTertiary)
+                        .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
                 }
             }
@@ -1043,12 +1043,12 @@ struct ActivityFeedItem: View {
             VStack(alignment: .trailing, spacing: 3) {
                 Text(activity.formattedTime)
                     .dynamicTypeFont(base: 11, weight: .medium)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .foregroundStyle(.white.opacity(0.5))
 
                 if activity.pointsEarned > 0 {
                     Text("+\(activity.pointsEarned)")
                         .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.prismaticGreen)
+                        .foregroundStyle(UtopianDesignFallback.Colors.completed)
                 }
             }
         }
@@ -1081,7 +1081,8 @@ struct PremiumPillButtonStyle: ButtonStyle {
 #Preview {
     NavigationStack {
         ZStack {
-            Aurora.Colors.voidCosmos.ignoresSafeArea()
+            UtopianGradients.background(for: Date())
+                .ignoresSafeArea()
             CirclesContentView()
         }
     }

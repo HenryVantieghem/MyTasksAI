@@ -3,7 +3,7 @@
 //  Veloce
 //
 //  Ultra-Premium Duration Picker with Liquid Glass Design
-//  Aurora Design System + iOS 26 Glass Effects
+//  Utopian Design System + iOS 26 Glass Effects
 //
 
 import SwiftUI

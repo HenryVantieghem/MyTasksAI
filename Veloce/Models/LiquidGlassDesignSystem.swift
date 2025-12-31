@@ -27,8 +27,8 @@ enum LiquidGlassDesignSystem {
         /// Plasma Purple - AI/premium
         static let plasmaPurple = Color(red: 0.65, green: 0.25, blue: 1.0)
 
-        /// Aurora Green - Success
-        static let auroraGreen = Color(red: 0.15, green: 1.0, blue: 0.65)
+        /// Utopian Green - Success
+        static let utopianGreen = Color(red: 0.15, green: 1.0, blue: 0.65)
 
         /// Solar Gold - Achievement
         static let solarGold = Color(red: 1.0, green: 0.85, blue: 0.25)
@@ -62,7 +62,7 @@ enum LiquidGlassDesignSystem {
     // MARK: - Semantic Colors
 
     enum Semantic {
-        static let success = VibrantAccents.auroraGreen
+        static let success = VibrantAccents.utopianGreen
         static let warning = VibrantAccents.solarGold
         static let error = Color(red: 1.0, green: 0.35, blue: 0.40)
         static let info = VibrantAccents.cosmicBlue

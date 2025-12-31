@@ -2,9 +2,9 @@
 //  VeloceProgressWidget.swift
 //  VeloceWidgets
 //
-//  Progress Widget - Aurora Design System
+//  Progress Widget - Utopian Design System
 //  Ethereal cosmic progress ring with crystalline glass
-//  Shows daily goal completion with aurora glow
+//  Shows daily goal completion with utopian glow
 //
 
 import WidgetKit
@@ -19,11 +19,11 @@ struct VeloceProgressWidget: Widget {
         StaticConfiguration(kind: kind, provider: ProgressTimelineProvider()) { entry in
             ProgressWidgetView(entry: entry)
                 .containerBackground(for: .widget) {
-                    WidgetCosmicBackground(showStars: true, showAurora: true, auroraIntensity: 0.4)
+                    WidgetCosmicBackground(showStars: true, showGlow: true, glowIntensity: 0.4)
                 }
         }
         .configurationDisplayName("Daily Progress")
-        .description("Track your daily goal with a beautiful aurora progress ring")
+        .description("Track your daily goal with a beautiful utopian progress ring")
         .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
     }
 }
@@ -122,15 +122,15 @@ struct ProgressWidgetView: View {
 
     private var smallWidget: some View {
         VStack(spacing: 8) {
-            // Main aurora progress ring
+            // Main utopian progress ring
             ZStack {
                 // Ambient glow
                 Circle()
                     .fill(
                         RadialGradient(
                             colors: [
-                                WidgetAurora.Colors.violet.opacity(0.25),
-                                WidgetAurora.Colors.electric.opacity(0.1),
+                                WidgetUtopian.Colors.violet.opacity(0.25),
+                                WidgetUtopian.Colors.electric.opacity(0.1),
                                 Color.clear
                             ],
                             center: .center,
@@ -142,36 +142,36 @@ struct ProgressWidgetView: View {
                     .blur(radius: 8)
 
                 // Progress ring
-                AuroraProgressRing(progress: entry.progress, size: 90, lineWidth: 9)
+                UtopianProgressRing(progress: entry.progress, size: 90, lineWidth: 9)
 
                 // Center content
                 VStack(spacing: 2) {
                     Text("\(entry.completed)")
-                        .font(WidgetAurora.Typography.largeNumber)
-                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                        .font(WidgetUtopian.Typography.largeNumber)
+                        .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                     Text("of \(entry.goal)")
-                        .font(WidgetAurora.Typography.micro)
-                        .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                        .font(WidgetUtopian.Typography.micro)
+                        .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                 }
             }
 
-            // Goal met indicator with aurora styling
+            // Goal met indicator with utopian styling
             if entry.isGoalMet {
                 HStack(spacing: 4) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 10, weight: .semibold))
                     Text("Goal achieved!")
-                        .font(WidgetAurora.Typography.micro)
+                        .font(WidgetUtopian.Typography.micro)
                 }
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [WidgetAurora.Colors.gold, WidgetAurora.Colors.flameInner],
+                        colors: [WidgetUtopian.Colors.gold, WidgetUtopian.Colors.flameInner],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
-                .shadow(color: WidgetAurora.Colors.gold.opacity(0.4), radius: 4)
+                .shadow(color: WidgetUtopian.Colors.gold.opacity(0.4), radius: 4)
             }
         }
         .padding(12)
@@ -183,7 +183,7 @@ struct ProgressWidgetView: View {
         ZStack {
             AccessoryWidgetBackground()
 
-            // Custom gauge with aurora styling
+            // Custom gauge with utopian styling
             ZStack {
                 // Background track
                 Circle()
@@ -220,7 +220,7 @@ struct ProgressWidgetView: View {
 
     private var rectangularAccessory: some View {
         HStack(spacing: 10) {
-            // Mini aurora progress ring
+            // Mini utopian progress ring
             ZStack {
                 Circle()
                     .stroke(.quaternary, lineWidth: 3)

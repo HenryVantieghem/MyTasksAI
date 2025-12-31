@@ -21,8 +21,8 @@ struct VeloceXPWidget: Widget {
                 .containerBackground(for: .widget) {
                     WidgetCosmicBackground(
                         showStars: true,
-                        showAurora: true,
-                        auroraIntensity: entry.isCloseToLevelUp ? 0.5 : 0.35
+                        showGlow: true,
+                        glowIntensity: entry.isCloseToLevelUp ? 0.5 : 0.35
                     )
                 }
         }
@@ -131,11 +131,11 @@ struct XPEntry: TimelineEntry {
 
     var tierColor: Color {
         switch level {
-        case 1...9: return WidgetAurora.Colors.emerald
-        case 10...24: return WidgetAurora.Colors.electric
-        case 25...49: return WidgetAurora.Colors.gold
-        case 50...99: return WidgetAurora.Colors.rose
-        default: return WidgetAurora.Colors.violet
+        case 1...9: return WidgetUtopian.Colors.emerald
+        case 10...24: return WidgetUtopian.Colors.electric
+        case 25...49: return WidgetUtopian.Colors.gold
+        case 50...99: return WidgetUtopian.Colors.rose
+        default: return WidgetUtopian.Colors.violet
         }
     }
 }
@@ -168,12 +168,12 @@ struct XPWidgetView: View {
                 // XP info
                 VStack(spacing: 4) {
                     Text(formatXP(entry.totalXP))
-                        .font(WidgetAurora.Typography.mediumNumber)
-                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                        .font(WidgetUtopian.Typography.mediumNumber)
+                        .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                     Text("Total XP")
-                        .font(WidgetAurora.Typography.micro)
-                        .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                        .font(WidgetUtopian.Typography.micro)
+                        .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                 }
 
                 // Progress to next level
@@ -186,15 +186,15 @@ struct XPWidgetView: View {
 
                     HStack {
                         Text("\(entry.xpToNextLevel) to Lv \(entry.level + 1)")
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                            .font(WidgetUtopian.Typography.micro)
+                            .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
 
                         Spacer()
 
                         if entry.isCloseToLevelUp {
                             Image(systemName: "sparkles")
                                 .font(.system(size: 10))
-                                .foregroundStyle(WidgetAurora.Colors.gold)
+                                .foregroundStyle(WidgetUtopian.Colors.gold)
                         }
                     }
                 }
@@ -205,9 +205,9 @@ struct XPWidgetView: View {
                         Image(systemName: "flame.fill")
                             .font(.system(size: 10))
                         Text("\(entry.streak)")
-                            .font(WidgetAurora.Typography.micro)
+                            .font(WidgetUtopian.Typography.micro)
                     }
-                    .foregroundStyle(WidgetAurora.Colors.flameInner)
+                    .foregroundStyle(WidgetUtopian.Colors.flameInner)
                 }
             }
             .padding(14)
@@ -225,12 +225,12 @@ struct XPWidgetView: View {
 
                     VStack(spacing: 2) {
                         Text(entry.tierName)
-                            .font(WidgetAurora.Typography.caption)
+                            .font(WidgetUtopian.Typography.caption)
                             .foregroundStyle(entry.tierColor)
 
                         Text("Level \(entry.level)")
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.micro)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                     }
                 }
                 .frame(width: 80)
@@ -240,9 +240,9 @@ struct XPWidgetView: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                WidgetAurora.Colors.glassBorder.opacity(0),
-                                WidgetAurora.Colors.gold.opacity(0.3),
-                                WidgetAurora.Colors.glassBorder.opacity(0)
+                                WidgetUtopian.Colors.glassBorder.opacity(0),
+                                WidgetUtopian.Colors.gold.opacity(0.3),
+                                WidgetUtopian.Colors.glassBorder.opacity(0)
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -257,22 +257,22 @@ struct XPWidgetView: View {
                     HStack(spacing: 8) {
                         ZStack {
                             Circle()
-                                .fill(WidgetAurora.Colors.gold.opacity(0.2))
+                                .fill(WidgetUtopian.Colors.gold.opacity(0.2))
                                 .frame(width: 28, height: 28)
 
                             Image(systemName: "star.fill")
                                 .font(.system(size: 12))
-                                .foregroundStyle(WidgetAurora.Colors.gold)
+                                .foregroundStyle(WidgetUtopian.Colors.gold)
                         }
 
                         VStack(alignment: .leading, spacing: 0) {
                             Text(formatXP(entry.totalXP))
-                                .font(WidgetAurora.Typography.mediumNumber)
-                                .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                                .font(WidgetUtopian.Typography.mediumNumber)
+                                .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                             Text("Total XP earned")
-                                .font(WidgetAurora.Typography.micro)
-                                .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                                .font(WidgetUtopian.Typography.micro)
+                                .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                         }
                     }
 
@@ -286,8 +286,8 @@ struct XPWidgetView: View {
 
                         HStack {
                             Text("\(entry.currentXP) / \(entry.xpNeededForLevel)")
-                                .font(WidgetAurora.Typography.micro)
-                                .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                                .font(WidgetUtopian.Typography.micro)
+                                .foregroundStyle(WidgetUtopian.Colors.textTertiary)
 
                             Spacer()
 
@@ -296,13 +296,13 @@ struct XPWidgetView: View {
                                     Image(systemName: "sparkles")
                                         .font(.system(size: 9))
                                     Text("Almost there!")
-                                        .font(WidgetAurora.Typography.micro)
+                                        .font(WidgetUtopian.Typography.micro)
                                 }
-                                .foregroundStyle(WidgetAurora.Colors.gold)
+                                .foregroundStyle(WidgetUtopian.Colors.gold)
                             } else {
                                 Text("\(entry.xpToNextLevel) to go")
-                                    .font(WidgetAurora.Typography.micro)
-                                    .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                    .font(WidgetUtopian.Typography.micro)
+                                    .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                             }
                         }
                     }
@@ -313,14 +313,14 @@ struct XPWidgetView: View {
                             WidgetStatPill(
                                 icon: "flame.fill",
                                 value: "\(entry.streak)",
-                                color: WidgetAurora.Colors.flameInner
+                                color: WidgetUtopian.Colors.flameInner
                             )
                         }
 
                         WidgetStatPill(
                             icon: "checkmark.circle.fill",
                             value: "\(entry.tasksCompletedToday)",
-                            color: WidgetAurora.Colors.success
+                            color: WidgetUtopian.Colors.success
                         )
 
                         Spacer()

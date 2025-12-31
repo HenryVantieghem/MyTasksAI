@@ -257,7 +257,7 @@ struct MainContainerView: View {
         selectedTask = task
         sheetDetent = .medium
         showTaskDetailSheet = true
-        AuroraHaptics.light()
+        HapticsService.shared.impact(.light)
     }
 
     private func setupViewModels() {

@@ -50,9 +50,9 @@ enum KanbanSection: String, CaseIterable {
 
     var color: Color {
         switch self {
-        case .toDo: return Aurora.Colors.electricCyan
-        case .inProgress: return Aurora.Colors.cosmicGold
-        case .done: return Aurora.Colors.prismaticGreen
+        case .toDo: return UtopianDesignFallback.Colors.focusActive
+        case .inProgress: return UtopianDesignFallback.Gamification.starGold
+        case .done: return UtopianDesignFallback.Colors.completed
         }
     }
 }
@@ -68,8 +68,8 @@ struct KanbanSectionHeader: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(spacing: Aurora.Spacing.sm) {
-            // Aurora energy orb indicator
+        HStack(spacing: UtopianDesignFallback.Spacing.sm) {
+            // Utopian energy orb indicator
             ZStack {
                 // Outer aurora glow
                 SwiftUI.Circle()
@@ -95,7 +95,7 @@ struct KanbanSectionHeader: View {
                 SwiftUI.Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Aurora.Colors.stellarWhite, section.color],
+                            colors: [Color.white, section.color],
                             center: .center,
                             startRadius: 0,
                             endRadius: 5
@@ -104,15 +104,15 @@ struct KanbanSectionHeader: View {
                     .frame(width: 8, height: 8)
             }
 
-            // Section title with Aurora typography
+            // Section title with Utopian typography
             Text(section.rawValue.uppercased())
-                .font(Aurora.Typography.caption)
-                .foregroundStyle(Aurora.Colors.textSecondary)
+                .font(UtopianDesignFallback.Typography.caption)
+                .foregroundStyle(.white.opacity(0.7))
                 .tracking(1.5)
 
-            // Aurora count badge
+            // Utopian count badge
             Text("\(count)")
-                .font(Aurora.Typography.statSmall)
+                .font(UtopianDesignFallback.Typography.statSmall)
                 .foregroundStyle(section.color)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
@@ -134,13 +134,13 @@ struct KanbanSectionHeader: View {
 
             Spacer()
         }
-        .padding(.horizontal, Aurora.Spacing.sm)
-        .padding(.vertical, Aurora.Spacing.xs)
+        .padding(.horizontal, UtopianDesignFallback.Spacing.sm)
+        .padding(.vertical, UtopianDesignFallback.Spacing.xs)
         .onAppear {
             guard !reduceMotion else { return }
             // Glow pulse for all sections
             withAnimation(
-                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .easeInOut(duration: 2.0)
                 .repeatForever(autoreverses: true)
             ) {
                 glowPulse = 1
@@ -158,7 +158,7 @@ struct KanbanSectionHeader: View {
     }
 }
 
-// MARK: - Chat Tasks View (Aurora Productivity Constellation)
+// MARK: - Chat Tasks View (Utopian Productivity Constellation)
 
 struct ChatTasksView: View {
     @Bindable var viewModel: ChatTasksViewModel
@@ -302,7 +302,7 @@ struct ChatTasksView: View {
                 }
             }
 
-            // Aurora celebration overlays
+            // Utopian celebration overlays
             celebrationOverlays
         }
         .onAppear {
@@ -606,13 +606,13 @@ struct ChatTasksView: View {
         .padding(.bottom, UtopianDesignFallback.Spacing.sm)
     }
 
-    // MARK: - Aurora Done Section
+    // MARK: - Utopian Done Section
 
     private var doneSection: some View {
-        VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
+        VStack(alignment: .leading, spacing: UtopianDesignFallback.Spacing.sm) {
             KanbanSectionHeader(section: .done, count: filteredRecentlyCompleted.count)
 
-            // Completed task rows (aurora constellation style)
+            // Completed task rows (Utopian constellation style)
             ForEach(filteredRecentlyCompleted) { task in
                 ConstellationTaskRow(task: task) {
                     AuroraSoundEngine.shared.play(.buttonTap)
@@ -620,13 +620,13 @@ struct ChatTasksView: View {
                 }
             }
         }
-        .padding(.bottom, Aurora.Spacing.md)
-        // Achievement aurora glow
+        .padding(.bottom, UtopianDesignFallback.Spacing.md)
+        // Achievement Utopian glow
         .background {
             ZStack {
                 // Primary achievement glow
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Aurora.Colors.prismaticGreen.opacity(0.04))
+                    .fill(UtopianDesignFallback.Colors.completed.opacity(0.04))
                     .blur(radius: 20)
                     .offset(y: 10)
 
@@ -635,7 +635,7 @@ struct ChatTasksView: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Aurora.Colors.cosmicGold.opacity(0.02),
+                                UtopianDesignFallback.Gamification.starGold.opacity(0.02),
                                 Color.clear
                             ],
                             startPoint: .topLeading,
@@ -692,14 +692,14 @@ struct ChatTasksView: View {
         }
     }
 
-    // MARK: - Aurora Celebration Overlays
+    // MARK: - Utopian Celebration Overlays
 
     @ViewBuilder
     private var celebrationOverlays: some View {
-        // Aurora supernova burst for major celebrations
+        // Utopian supernova burst for major celebrations
         if showConfetti {
             ZStack {
-                // Aurora confetti
+                // Utopian confetti
                 AuroraConfettiShower(
                     isActive: .constant(true),
                     particleCount: 80,
@@ -711,7 +711,7 @@ struct ChatTasksView: View {
                 AuroraSupernovaBurst(
                     isActive: .constant(true),
                     particleCount: 32,
-                    color: Aurora.Colors.cosmicGold
+                    color: UtopianDesignFallback.Gamification.starGold
                 )
                 .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 3)
             }
@@ -727,14 +727,14 @@ struct ChatTasksView: View {
         // Points animations
         PointsAnimationContainer(animations: $pointsAnimations)
 
-        // AI Creation Animation with Aurora effects
+        // AI Creation Animation with Utopian effects
         if showAICreationAnimation {
             ZStack {
                 AITaskCreationAnimation {
                     showAICreationAnimation = false
                 }
-                // Aurora mini burst
-                AuroraMiniBurst(color: Aurora.Colors.electricCyan, particleCount: 12)
+                // Utopian mini burst
+                AuroraMiniBurst(color: UtopianDesignFallback.Colors.focusActive, particleCount: 12)
                     .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
             }
             .zIndex(2)
@@ -749,16 +749,16 @@ struct ChatTasksView: View {
             return
         }
 
-        // Aurora-style staggered reveal
+        // Utopian-style staggered reveal
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(AuroraMotion.Spring.fluidMorph) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 hasInitiallyLoaded = true
             }
         }
     }
 
     private func completeTask(_ task: TaskItem) {
-        // Aurora completion feedback
+        // Utopian completion feedback
         AuroraSoundEngine.shared.taskComplete()
         AuroraHaptics.dopamineBurst()
 
@@ -784,7 +784,7 @@ struct ChatTasksView: View {
     }
 }
 
-// MARK: - Aurora Dynamic Nebula Background
+// MARK: - Utopian Dynamic Nebula Background
 
 struct DynamicNebulaBackground: View {
     let productivityLevel: Double
@@ -794,7 +794,7 @@ struct DynamicNebulaBackground: View {
     @State private var auroraWave: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    // Aurora color shifts based on productivity
+    // Utopian color shifts based on productivity
     private var primaryColor: Color {
         if hasOverdueTasks {
             return Aurora.Colors.warning.opacity(0.15)
@@ -802,11 +802,11 @@ struct DynamicNebulaBackground: View {
         // Shift from violet to cyan to green as productivity increases
         let warmth = productivityLevel
         if warmth < 0.3 {
-            return Aurora.Colors.borealisViolet.opacity(0.12)
+            return UtopianDesignFallback.Colors.aiPurple.opacity(0.12)
         } else if warmth < 0.7 {
-            return Aurora.Colors.electricCyan.opacity(0.15)
+            return UtopianDesignFallback.Colors.focusActive.opacity(0.15)
         } else {
-            return Aurora.Colors.prismaticGreen.opacity(0.18)
+            return UtopianDesignFallback.Colors.completed.opacity(0.18)
         }
     }
 
@@ -814,17 +814,17 @@ struct DynamicNebulaBackground: View {
         if hasOverdueTasks {
             return Aurora.Colors.error.opacity(0.08)
         }
-        return Aurora.Colors.prismaticGreen.opacity(0.08 * productivityLevel)
+        return UtopianDesignFallback.Colors.completed.opacity(0.08 * productivityLevel)
     }
 
     private var tertiaryColor: Color {
-        return Aurora.Colors.stellarMagenta.opacity(0.06 * (1 - productivityLevel))
+        return UtopianDesignFallback.Colors.aiPurple.opacity(0.06 * (1 - productivityLevel))
     }
 
     var body: some View {
         ZStack {
-            // Base aurora void
-            Aurora.Colors.voidDeep
+            // Base Utopian void
+            UtopianGradients.background(for: Date())
                 .ignoresSafeArea()
 
             // Primary aurora nebula
@@ -870,7 +870,7 @@ struct DynamicNebulaBackground: View {
             )
             .ignoresSafeArea()
 
-            // Aurora star field
+            // Utopian star field
             if !reduceMotion {
                 AuroraStarField(starCount: 40, twinkleSpeed: 3.0)
                     .opacity(0.5)
@@ -895,7 +895,7 @@ struct DynamicNebulaBackground: View {
     }
 }
 
-// MARK: - Aurora Constellation Task Row
+// MARK: - Utopian Constellation Task Row
 
 struct ConstellationTaskRow: View {
     let task: TaskItem
@@ -906,12 +906,12 @@ struct ConstellationTaskRow: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        HStack(spacing: Aurora.Spacing.sm) {
-            // Aurora star constellation point
+        HStack(spacing: UtopianDesignFallback.Spacing.sm) {
+            // Utopian star constellation point
             ZStack {
-                // Outer aurora glow
+                // Outer Utopian glow
                 SwiftUI.Circle()
-                    .fill(Aurora.Colors.prismaticGreen.opacity(0.4))
+                    .fill(UtopianDesignFallback.Colors.completed.opacity(0.4))
                     .frame(width: 20, height: 20)
                     .blur(radius: 6 + (starTwinkle * 4))
                     .scaleEffect(1 + (glowPulse * 0.2))
@@ -919,7 +919,7 @@ struct ConstellationTaskRow: View {
                 // Inner glow ring
                 SwiftUI.Circle()
                     .stroke(
-                        Aurora.Colors.prismaticGreen.opacity(0.6),
+                        UtopianDesignFallback.Colors.completed.opacity(0.6),
                         lineWidth: 1
                     )
                     .frame(width: 14, height: 14)
@@ -930,7 +930,7 @@ struct ConstellationTaskRow: View {
                     .dynamicTypeFont(base: 10, weight: .semibold)
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Aurora.Colors.cosmicGold, Aurora.Colors.prismaticGreen],
+                            colors: [UtopianDesignFallback.Gamification.starGold, UtopianDesignFallback.Colors.completed],
                             startPoint: .top,
                             endPoint: .bottom
                         )
@@ -940,46 +940,46 @@ struct ConstellationTaskRow: View {
 
             // Title (ethereal, achieved)
             Text(task.title)
-                .font(Aurora.Typography.body)
-                .foregroundStyle(Aurora.Colors.textTertiary)
-                .strikethrough(true, color: Aurora.Colors.prismaticGreen.opacity(0.4))
+                .font(UtopianDesignFallback.Typography.body)
+                .foregroundStyle(.white.opacity(0.5))
+                .strikethrough(true, color: UtopianDesignFallback.Colors.completed.opacity(0.4))
                 .lineLimit(1)
 
             Spacer()
 
-            // Restore button with Aurora glow
+            // Restore button with Utopian glow
             Button {
                 AuroraSoundEngine.shared.play(.buttonTap)
-                AuroraHaptics.light()
+                HapticsService.shared.impact(.light)
                 onUncomplete()
             } label: {
                 Text("Restore")
-                    .font(Aurora.Typography.meta)
-                    .foregroundStyle(Aurora.Colors.electricCyan)
+                    .font(UtopianDesignFallback.Typography.meta)
+                    .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .background {
                         Capsule()
-                            .fill(Aurora.Colors.electricCyan.opacity(0.1))
+                            .fill(UtopianDesignFallback.Colors.focusActive.opacity(0.1))
                             .overlay {
                                 Capsule()
-                                    .strokeBorder(Aurora.Colors.electricCyan.opacity(0.3), lineWidth: 0.5)
+                                    .strokeBorder(UtopianDesignFallback.Colors.focusActive.opacity(0.3), lineWidth: 0.5)
                             }
                     }
             }
         }
-        .padding(.horizontal, Aurora.Spacing.md)
-        .padding(.vertical, Aurora.Spacing.sm)
+        .padding(.horizontal, UtopianDesignFallback.Spacing.md)
+        .padding(.vertical, UtopianDesignFallback.Spacing.sm)
         .background {
-            RoundedRectangle(cornerRadius: Aurora.Radius.card)
-                .fill(Aurora.Colors.voidNebula.opacity(0.6))
+            RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.card)
+                .fill(Color.white.opacity(0.1).opacity(0.6))
                 .overlay {
-                    // Subtle achievement aurora shimmer
-                    RoundedRectangle(cornerRadius: Aurora.Radius.card)
+                    // Subtle achievement Utopian shimmer
+                    RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.card)
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Aurora.Colors.prismaticGreen.opacity(0.05),
+                                    UtopianDesignFallback.Colors.completed.opacity(0.05),
                                     Color.clear
                                 ],
                                 startPoint: .leading,
@@ -999,7 +999,7 @@ struct ConstellationTaskRow: View {
             }
             // Glow pulse animation
             withAnimation(
-                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .easeInOut(duration: 2.0)
                 .repeatForever(autoreverses: true)
             ) {
                 glowPulse = 1
@@ -1008,7 +1008,7 @@ struct ConstellationTaskRow: View {
     }
 }
 
-// MARK: - Aurora Kanban Column
+// MARK: - Utopian Kanban Column
 
 struct KanbanColumn: View {
     let section: KanbanSection
@@ -1036,7 +1036,7 @@ struct KanbanColumn: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Aurora column header
+            // Utopian column header
             columnHeader
 
             // Tasks in column
@@ -1064,8 +1064,8 @@ struct KanbanColumn: View {
     }
 
     private var columnHeader: some View {
-        HStack(spacing: Aurora.Spacing.sm) {
-            // Aurora energy status indicator
+        HStack(spacing: UtopianDesignFallback.Spacing.sm) {
+            // Utopian energy status indicator
             ZStack {
                 // Outer glow
                 SwiftUI.Circle()
@@ -1077,7 +1077,7 @@ struct KanbanColumn: View {
                 SwiftUI.Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Aurora.Colors.stellarWhite, section.color],
+                            colors: [Color.white, section.color],
                             center: .center,
                             startRadius: 0,
                             endRadius: 6
@@ -1087,14 +1087,14 @@ struct KanbanColumn: View {
             }
 
             Text(section.rawValue)
-                .font(Aurora.Typography.headline)
-                .foregroundStyle(Aurora.Colors.textPrimary)
+                .font(UtopianDesignFallback.Typography.headline)
+                .foregroundStyle(.white)
 
             Spacer()
 
-            // Aurora count badge
+            // Utopian count badge
             Text("\(tasks.count)")
-                .font(Aurora.Typography.callout.weight(.semibold))
+                .font(UtopianDesignFallback.Typography.callout.weight(.semibold))
                 .foregroundStyle(section.color)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
@@ -1107,14 +1107,14 @@ struct KanbanColumn: View {
                         }
                 )
         }
-        .padding(.horizontal, Aurora.Spacing.md)
-        .padding(.vertical, Aurora.Spacing.sm)
+        .padding(.horizontal, UtopianDesignFallback.Spacing.md)
+        .padding(.vertical, UtopianDesignFallback.Spacing.sm)
         .background {
-            RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
-                .fill(Aurora.Colors.voidNebula)
+            RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.card, style: .continuous)
+                .fill(Color.white.opacity(0.1))
                 .overlay {
                     // Subtle section glow
-                    RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
+                    RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.card, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [section.color.opacity(0.08), Color.clear],
@@ -1125,7 +1125,7 @@ struct KanbanColumn: View {
                 }
         }
         .overlay {
-            RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
+            RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.card, style: .continuous)
                 .strokeBorder(
                     LinearGradient(
                         colors: [section.color.opacity(0.3), section.color.opacity(0.1)],
@@ -1138,7 +1138,7 @@ struct KanbanColumn: View {
         .onAppear {
             guard !reduceMotion else { return }
             withAnimation(
-                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .easeInOut(duration: 2.0)
                 .repeatForever(autoreverses: true)
             ) {
                 headerGlow = 1
@@ -1147,8 +1147,8 @@ struct KanbanColumn: View {
     }
 
     private var emptyColumnPlaceholder: some View {
-        VStack(spacing: Aurora.Spacing.sm) {
-            // Aurora-styled empty icon
+        VStack(spacing: UtopianDesignFallback.Spacing.sm) {
+            // Utopian-styled empty icon
             ZStack {
                 SwiftUI.Circle()
                     .fill(section.color.opacity(0.1))
@@ -1157,17 +1157,17 @@ struct KanbanColumn: View {
 
                 Image(systemName: section.icon)
                     .dynamicTypeFont(base: 28, weight: .light)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .foregroundStyle(.white.opacity(0.5))
             }
 
             Text("No tasks")
-                .font(Aurora.Typography.callout)
-                .foregroundStyle(Aurora.Colors.textTertiary)
+                .font(UtopianDesignFallback.Typography.callout)
+                .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
         .background {
-            RoundedRectangle(cornerRadius: Aurora.Radius.card, style: .continuous)
+            RoundedRectangle(cornerRadius: UtopianDesignFallback.Radius.card, style: .continuous)
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
                 .foregroundStyle(section.color.opacity(0.2))
         }

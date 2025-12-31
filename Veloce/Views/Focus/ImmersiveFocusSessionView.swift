@@ -3,7 +3,7 @@
 //  Veloce
 //
 //  Full-screen immersive focus session experience
-//  Aurora background, orbital timer, zen atmosphere
+//  Utopian background, orbital timer, zen atmosphere
 //
 
 import SwiftUI
@@ -45,7 +45,7 @@ struct ImmersiveFocusSessionView: View {
 
     var body: some View {
         ZStack {
-            // Aurora background
+            // Utopian background
             auroraBackground
                 .ignoresSafeArea()
 
@@ -91,14 +91,14 @@ struct ImmersiveFocusSessionView: View {
         }
     }
 
-    // MARK: - Aurora Background
+    // MARK: - Utopian Background
 
     private var auroraBackground: some View {
         ZStack {
             // Base void
             Color.black
 
-            // Aurora layers
+            // Utopian layers
             GeometryReader { geometry in
                 ZStack {
                     // Primary aurora wave
@@ -741,7 +741,7 @@ struct ImmersiveFocusSessionView: View {
     private func startAmbientAnimations() {
         guard !reduceMotion else { return }
 
-        // Aurora wave animation
+        // Utopian wave animation
         withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
             auroraPhase = 1
         }

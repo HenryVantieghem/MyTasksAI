@@ -20,12 +20,12 @@ struct ConstellationPasswordStrength: View {
     @State private var glowPulse: Double = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
+        VStack(alignment: .leading, spacing: UtopianDesignFallback.Spacing.sm) {
             // Constellation visualization
             constellationView
 
             // Text label with requirements
-            HStack(spacing: Aurora.Spacing.sm) {
+            HStack(spacing: UtopianDesignFallback.Spacing.sm) {
                 // Strength label
                 HStack(spacing: 4) {
                     SwiftUI.Circle()
@@ -92,7 +92,7 @@ struct ConstellationPasswordStrength: View {
             // Star shape
             Image(systemName: isLit ? "star.fill" : "star")
                 .dynamicTypeFont(base: 14, weight: .medium)
-                .foregroundStyle(isLit ? starColor : Aurora.Colors.textQuaternary)
+                .foregroundStyle(isLit ? starColor : .white.opacity(0.3))
                 .scaleEffect(isLit ? 1.1 : 0.9)
                 .shadow(
                     color: isLit ? starColor.opacity(0.6) : Color.clear,
@@ -100,7 +100,7 @@ struct ConstellationPasswordStrength: View {
                 )
         }
         .animation(
-            Aurora.Animation.spring.delay(Double(index) * 0.1),
+            .spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.1),
             value: animatedStars
         )
     }
@@ -111,11 +111,11 @@ struct ConstellationPasswordStrength: View {
 
     private func colorForStar(at index: Int) -> Color {
         switch index {
-        case 0: return Aurora.Colors.error      // Weak - red star
-        case 1: return Aurora.Colors.warning    // Fair - orange star
-        case 2: return Aurora.Colors.electric   // Good - blue star
-        case 3: return Aurora.Colors.success    // Strong - green star
-        default: return Aurora.Colors.textQuaternary
+        case 0: return UtopianDesignFallback.Colors.error      // Weak - red star
+        case 1: return UtopianDesignFallback.Colors.warning    // Fair - orange star
+        case 2: return UtopianDesignFallback.Colors.focusActive   // Good - blue star
+        case 3: return UtopianDesignFallback.Colors.completed    // Strong - green star
+        default: return .white.opacity(0.3)
         }
     }
 
@@ -140,24 +140,24 @@ struct ConstellationPasswordStrength: View {
             .stroke(
                 LinearGradient(
                     colors: [
-                        Aurora.Colors.error.opacity(0.6),
-                        Aurora.Colors.warning.opacity(0.6),
-                        Aurora.Colors.electric.opacity(0.6),
-                        Aurora.Colors.success.opacity(0.6)
+                        UtopianDesignFallback.Colors.error.opacity(0.6),
+                        UtopianDesignFallback.Colors.warning.opacity(0.6),
+                        UtopianDesignFallback.Colors.focusActive.opacity(0.6),
+                        UtopianDesignFallback.Colors.completed.opacity(0.6)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
                 ),
                 style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
             )
-            .shadow(color: Aurora.Colors.success.opacity(0.3), radius: 4)
+            .shadow(color: UtopianDesignFallback.Colors.completed.opacity(0.3), radius: 4)
         }
     }
 
     // MARK: - Requirements Hints
 
     private var requirementsHints: some View {
-        HStack(spacing: Aurora.Spacing.sm) {
+        HStack(spacing: UtopianDesignFallback.Spacing.sm) {
             requirementDot(met: password.count >= 8, label: "8+")
             requirementDot(met: password.range(of: "[A-Z]", options: .regularExpression) != nil, label: "A-Z")
             requirementDot(met: password.range(of: "[0-9]", options: .regularExpression) != nil, label: "0-9")
@@ -168,12 +168,12 @@ struct ConstellationPasswordStrength: View {
     private func requirementDot(met: Bool, label: String) -> some View {
         HStack(spacing: 2) {
             SwiftUI.Circle()
-                .fill(met ? Aurora.Colors.success : Aurora.Colors.textQuaternary)
+                .fill(met ? UtopianDesignFallback.Colors.completed : .white.opacity(0.3))
                 .frame(width: 5, height: 5)
 
             Text(label)
                 .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(met ? Aurora.Colors.success : Aurora.Colors.textQuaternary)
+                .foregroundStyle(met ? UtopianDesignFallback.Colors.completed : .white.opacity(0.3))
         }
     }
 
@@ -183,22 +183,22 @@ struct ConstellationPasswordStrength: View {
         let starCount = strength.rawValue
 
         // Animate stars one by one
-        withAnimation(Aurora.Animation.spring) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             animatedStars = starCount
         }
 
         // Show constellation lines for strong passwords
         if strength == .strong {
-            withAnimation(Aurora.Animation.slow.delay(0.3)) {
+            withAnimation(.easeInOut(duration: 0.6).delay(0.3)) {
                 connectionOpacity = 1.0
             }
 
             // Pulse glow
-            withAnimation(Aurora.Animation.slow.repeatForever(autoreverses: true)) {
+            withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
                 glowPulse = 1.0
             }
         } else {
-            withAnimation(Aurora.Animation.quick) {
+            withAnimation(.easeInOut(duration: 0.2)) {
                 connectionOpacity = 0
                 glowPulse = 0
             }
@@ -214,7 +214,7 @@ struct ConstellationPasswordStrength: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Strength: \(strength.label)")
                     .font(.caption)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
 
                 ConstellationPasswordStrength(
                     strength: strength,
@@ -226,7 +226,7 @@ struct ConstellationPasswordStrength: View {
         }
     }
     .padding()
-    .background(AuroraBackground.auth)
+    .background(UtopianGradients.background(for: Date()))
 }
 
 private func samplePassword(for strength: PasswordStrength) -> String {

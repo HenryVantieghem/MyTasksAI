@@ -2,10 +2,10 @@
 //  LiquidGlassAuthView.swift
 //  Veloce
 //
-//  Aurora Design System - Authentication Experience
+//  Utopian Design System - Authentication Experience
 //  "Cosmic Consciousness Awakening"
 //  Living orb that recognizes you, portal-style sign-in effects,
-//  Aurora wave backgrounds, and prismatic glass forms.
+//  Utopian wave backgrounds, and prismatic glass forms.
 //
 
 import SwiftUI
@@ -45,19 +45,19 @@ struct LiquidGlassAuthView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Aurora wave background
+                // Utopian wave background
                 AuroraAnimatedWaveBackground(
                     intensity: 0.35,
                     showParticles: false,
-                    customColors: [Aurora.Colors.borealisViolet, Aurora.Colors.electricCyan]
+                    customColors: [UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.focusActive]
                 )
                 .ignoresSafeArea()
 
-                // Aurora firefly particles
+                // Utopian firefly particles
                 if !reduceMotion {
                     AuroraFireflyField(
                         count: 30,
-                        colors: [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet, Aurora.Colors.stellarMagenta]
+                        colors: [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple, UtopianDesignFallback.Colors.aiPurple]
                     )
                     .opacity(showContent ? 0.5 : 0)
                 }
@@ -162,16 +162,16 @@ struct LiquidGlassAuthView: View {
 
     @ViewBuilder
     private var glassHaloRings: some View {
-        // Aurora prismatic halo rings
+        // Utopian prismatic halo rings
         ForEach(0..<4) { index in
             Circle()
                 .stroke(
                     AngularGradient(
                         colors: [
-                            Aurora.Colors.electricCyan.opacity(0.25 - Double(index) * 0.05),
-                            Aurora.Colors.borealisViolet.opacity(0.2 - Double(index) * 0.04),
-                            Aurora.Colors.stellarMagenta.opacity(0.15 - Double(index) * 0.03),
-                            Aurora.Colors.electricCyan.opacity(0.25 - Double(index) * 0.05)
+                            UtopianDesignFallback.Colors.focusActive.opacity(0.25 - Double(index) * 0.05),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.2 - Double(index) * 0.04),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.15 - Double(index) * 0.03),
+                            UtopianDesignFallback.Colors.focusActive.opacity(0.25 - Double(index) * 0.05)
                         ],
                         center: .center
                     ),
@@ -184,32 +184,32 @@ struct LiquidGlassAuthView: View {
                 .blur(radius: CGFloat(index) * 0.5)
                 .opacity(orbIntensity > 1.2 ? 0.9 : 0.5)
                 .scaleEffect(orbIntensity > 1.2 ? 1.08 : 1.0)
-                .animation(AuroraMotion.Spring.ui, value: orbIntensity)
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: orbIntensity)
         }
     }
 
-    // MARK: - Aurora Header Section
+    // MARK: - Utopian Header Section
 
     private var headerSection: some View {
-        VStack(spacing: Aurora.Spacing.sm) {
+        VStack(spacing: UtopianDesignFallback.Spacing.sm) {
             Text("MyTasksAI")
-                .font(Aurora.Typography.display)
+                .font(UtopianDesignFallback.Typography.display)
                 .tracking(3)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Aurora.Colors.stellarWhite, Aurora.Colors.stellarWhite.opacity(0.85)],
+                        colors: [.white, .white.opacity(0.85)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
-                .shadow(color: Aurora.Colors.electricCyan.opacity(0.3), radius: 20)
+                .shadow(color: UtopianDesignFallback.Colors.focusActive.opacity(0.3), radius: 20)
 
             Text("AI-POWERED PRODUCTIVITY")
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .tracking(4)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Aurora.Colors.electricCyan.opacity(0.6), Aurora.Colors.borealisViolet.opacity(0.5)],
+                        colors: [UtopianDesignFallback.Colors.focusActive.opacity(0.6), UtopianDesignFallback.Colors.aiPurple.opacity(0.5)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -384,20 +384,20 @@ struct LiquidGlassAuthView: View {
         }
     }
 
-    // MARK: - Aurora Forgot Password Fields
+    // MARK: - Utopian Forgot Password Fields
 
     @ViewBuilder
     private var forgotPasswordFields: some View {
-        VStack(spacing: Aurora.Spacing.lg) {
-            // Aurora icon with glow
+        VStack(spacing: UtopianDesignFallback.Spacing.lg) {
+            // Utopian icon with glow
             ZStack {
                 // Multi-layer glow bloom
                 Circle()
                     .fill(
                         RadialGradient(
                             colors: [
-                                Aurora.Colors.borealisViolet.opacity(0.4),
-                                Aurora.Colors.electricCyan.opacity(0.2),
+                                UtopianDesignFallback.Colors.aiPurple.opacity(0.4),
+                                UtopianDesignFallback.Colors.focusActive.opacity(0.2),
                                 Color.clear
                             ],
                             center: .center,
@@ -425,21 +425,21 @@ struct LiquidGlassAuthView: View {
                     .dynamicTypeFont(base: 34, weight: .light)
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet],
+                            colors: [UtopianDesignFallback.Colors.focusActive, UtopianDesignFallback.Colors.aiPurple],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
             }
 
-            VStack(spacing: Aurora.Spacing.xs) {
+            VStack(spacing: UtopianDesignFallback.Spacing.xs) {
                 Text("Reset Password")
-                    .font(Aurora.Typography.title2)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .font(UtopianDesignFallback.Typography.title2)
+                    .foregroundStyle(.white)
 
                 Text("Enter your email and we'll send you a link to reset your password")
-                    .font(Aurora.Typography.body)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .font(UtopianDesignFallback.Typography.body)
+                    .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
 
@@ -497,47 +497,47 @@ struct LiquidGlassAuthView: View {
         }
     }
 
-    // MARK: - Aurora Secondary Actions
+    // MARK: - Utopian Secondary Actions
 
     @ViewBuilder
     private var secondaryActions: some View {
-        VStack(spacing: Aurora.Spacing.md) {
+        VStack(spacing: UtopianDesignFallback.Spacing.md) {
             switch currentScreen {
             case .signIn:
                 Button {
                     switchScreen(to: .forgotPassword)
                 } label: {
                     Text("Forgot Password?")
-                        .font(Aurora.Typography.callout)
-                        .foregroundStyle(Aurora.Colors.textTertiary)
+                        .font(UtopianDesignFallback.Typography.callout)
+                        .foregroundStyle(.white.opacity(0.5))
                 }
 
                 HStack(spacing: 6) {
                     Text("Don't have an account?")
-                        .font(Aurora.Typography.callout)
-                        .foregroundStyle(Aurora.Colors.textTertiary)
+                        .font(UtopianDesignFallback.Typography.callout)
+                        .foregroundStyle(.white.opacity(0.5))
 
                     Button {
                         switchScreen(to: .signUp)
                     } label: {
                         Text("Sign Up")
                             .dynamicTypeFont(base: 15, weight: .semibold)
-                            .foregroundStyle(Aurora.Colors.electricCyan)
+                            .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                     }
                 }
 
             case .signUp:
                 HStack(spacing: 6) {
                     Text("Already have an account?")
-                        .font(Aurora.Typography.callout)
-                        .foregroundStyle(Aurora.Colors.textTertiary)
+                        .font(UtopianDesignFallback.Typography.callout)
+                        .foregroundStyle(.white.opacity(0.5))
 
                     Button {
                         switchScreen(to: .signIn)
                     } label: {
                         Text("Sign In")
                             .dynamicTypeFont(base: 15, weight: .semibold)
-                            .foregroundStyle(Aurora.Colors.electricCyan)
+                            .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                     }
                 }
 
@@ -553,26 +553,26 @@ struct LiquidGlassAuthView: View {
         }
     }
 
-    // MARK: - Aurora Terms Section
+    // MARK: - Utopian Terms Section
 
     private var termsSection: some View {
         VStack(spacing: 6) {
             Text("By continuing, you agree to our")
-                .font(Aurora.Typography.caption2)
-                .foregroundStyle(Aurora.Colors.textQuaternary)
+                .font(UtopianDesignFallback.Typography.caption2)
+                .foregroundStyle(.white.opacity(0.3))
 
             HStack(spacing: 6) {
                 Button("Terms of Service") {}
                     .dynamicTypeFont(base: 12, weight: .medium)
-                    .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.8))
+                    .foregroundStyle(UtopianDesignFallback.Colors.aiPurple.opacity(0.8))
 
                 Text("and")
-                    .font(Aurora.Typography.caption2)
-                    .foregroundStyle(Aurora.Colors.textQuaternary)
+                    .font(UtopianDesignFallback.Typography.caption2)
+                    .foregroundStyle(.white.opacity(0.3))
 
                 Button("Privacy Policy") {}
                     .dynamicTypeFont(base: 12, weight: .medium)
-                    .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.8))
+                    .foregroundStyle(UtopianDesignFallback.Colors.aiPurple.opacity(0.8))
             }
         }
     }
@@ -594,13 +594,13 @@ struct LiquidGlassAuthView: View {
         else { return 260 }
     }
 
-    // MARK: - Aurora Actions
+    // MARK: - Utopian Actions
 
     private func signIn() {
         focusedField = nil
         AuroraSoundEngine.shared.play(.aiProcessing)
-        AuroraHaptics.mediumImpact()
-        withAnimation(AuroraMotion.Spring.ui) {
+        HapticsService.shared.impact(.medium)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             orbIntensity = 1.5
         }
         Task {
@@ -611,8 +611,8 @@ struct LiquidGlassAuthView: View {
     private func signUp() {
         focusedField = nil
         AuroraSoundEngine.shared.play(.aiProcessing)
-        AuroraHaptics.mediumImpact()
-        withAnimation(AuroraMotion.Spring.ui) {
+        HapticsService.shared.impact(.medium)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             orbIntensity = 1.5
         }
         Task {
@@ -623,8 +623,8 @@ struct LiquidGlassAuthView: View {
     private func resetPassword() {
         focusedField = nil
         AuroraSoundEngine.shared.play(.tabSwitch)
-        AuroraHaptics.lightImpact()
-        withAnimation(AuroraMotion.Spring.ui) {
+        HapticsService.shared.impact(.light)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             orbIntensity = 1.5
         }
         Task {
@@ -634,19 +634,19 @@ struct LiquidGlassAuthView: View {
 
     private func switchScreen(to screen: AuthScreen) {
         AuroraSoundEngine.shared.play(.dismiss)
-        AuroraHaptics.selection()
+        HapticsService.shared.selectionFeedback()
         focusedField = nil
 
-        withAnimation(AuroraMotion.Spring.fluidMorph) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             currentScreen = screen
             viewModel.clearForm()
         }
     }
 
-    // MARK: - Aurora State Handling
+    // MARK: - Utopian State Handling
 
     private func updateOrbState(for field: AuthField?) {
-        withAnimation(AuroraMotion.Spring.ui) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             if field != nil {
                 orbIntensity = 1.35
                 orbState = .active
@@ -662,7 +662,7 @@ struct LiquidGlassAuthView: View {
         case .success:
             // Epic portal opening celebration
             AuroraSoundEngine.shared.portalOpen()
-            withAnimation(AuroraMotion.Spring.elasticBounce) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 orbIntensity = 1.8
                 orbState = .celebration
             }
@@ -671,20 +671,20 @@ struct LiquidGlassAuthView: View {
             viewModel.error = message
             showError = true
             AuroraSoundEngine.shared.play(.error)
-            AuroraHaptics.error()
-            withAnimation(AuroraMotion.Spring.ui) {
+            HapticsService.shared.notification(.error)
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 orbIntensity = 0.55
                 orbState = .idle
             }
 
         case .signingIn, .signingUp:
-            withAnimation(AuroraMotion.Spring.ui) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 orbIntensity = 1.45
                 orbState = .active
             }
 
         case .idle:
-            withAnimation(AuroraMotion.Spring.ui) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 orbIntensity = focusedField != nil ? 1.35 : 1.0
                 orbState = focusedField != nil ? .active : .idle
             }
@@ -717,7 +717,7 @@ struct LiquidGlassAuthView: View {
     }
 }
 
-// MARK: - Aurora Auth Particle Field (Legacy - now using AuroraFireflyField)
+// MARK: - Utopian Auth Particle Field (Legacy - now using AuroraFireflyField)
 
 private struct AuthGlassParticleField: View {
     let bounds: CGSize
@@ -726,10 +726,10 @@ private struct AuthGlassParticleField: View {
     @State private var floatPhase: Double = 0
 
     private let etherealColors: [Color] = [
-        Aurora.Colors.electricCyan,
-        Aurora.Colors.borealisViolet,
-        Aurora.Colors.stellarMagenta,
-        Aurora.Colors.prismaticGreen
+        UtopianDesignFallback.Colors.focusActive,
+        UtopianDesignFallback.Colors.aiPurple,
+        UtopianDesignFallback.Colors.aiPurple,
+        UtopianDesignFallback.Colors.completed
     ]
 
     var body: some View {

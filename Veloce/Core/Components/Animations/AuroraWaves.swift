@@ -1,5 +1,5 @@
 //
-//  AuroraWaves.swift
+//  UtopianWaves.swift
 //  MyTasksAI
 //
 //  Background atmosphere with radial waves emanating outward
@@ -9,9 +9,9 @@
 
 import SwiftUI
 
-// MARK: - Aurora Waves
+// MARK: - Utopian Waves
 
-struct AuroraWaves: View {
+struct UtopianWaves: View {
     let size: CGFloat
     let isActive: Bool
 
@@ -129,9 +129,9 @@ struct AuroraWaves: View {
     }
 }
 
-// MARK: - Aurora Gradient Background
+// MARK: - Utopian Gradient Background
 
-struct AuroraGradientBackground: View {
+struct UtopianGradientBackground: View {
     let isActive: Bool
 
     @State private var gradientAngle: Double = 0
@@ -146,7 +146,7 @@ struct AuroraGradientBackground: View {
             // Base dark
             Color.black
 
-            // Animated aurora gradient
+            // Animated utopian gradient
             AngularGradient(
                 colors: colors.map { $0.opacity(intensity) } + [colors[0].opacity(intensity)],
                 center: .center,
@@ -273,14 +273,19 @@ struct SpaceTimeDistortion: View {
 
 #Preview {
     ZStack {
-        AuroraGradientBackground(isActive: true)
+        UtopianGradientBackground(isActive: true)
 
         VStack(spacing: 40) {
-            Text("Aurora Waves")
+            Text("Utopian Waves")
                 .font(.headline)
                 .foregroundStyle(.white)
 
-            AuroraWaves(size: 200, isActive: true)
+            UtopianWaves(size: 200, isActive: true)
         }
     }
 }
+
+// MARK: - Legacy Aliases (for backward compatibility)
+
+typealias AuroraWaves = UtopianWaves
+typealias AuroraGradientBackground = UtopianGradientBackground

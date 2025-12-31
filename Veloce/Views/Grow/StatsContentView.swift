@@ -56,7 +56,7 @@ struct StatsContentView: View {
 
                 // Streaks Section with flame effect
                 if streak > 0 {
-                    auroraStreaksCard
+                    utopianStreaksCard
                 }
 
                 Spacer(minLength: layout.bottomSafeArea)
@@ -93,8 +93,8 @@ struct StatsContentView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Aurora.Colors.electricCyan.opacity(0.2 * glowPulse),
-                            Aurora.Colors.borealisViolet.opacity(0.1 * glowPulse),
+                            UtopianDesignFallback.Colors.focusActive.opacity(0.2 * glowPulse),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.1 * glowPulse),
                             Color.clear
                         ],
                         center: .center,
@@ -109,7 +109,7 @@ struct StatsContentView: View {
             if !reduceMotion {
                 ForEach(0..<6, id: \.self) { i in
                     Circle()
-                        .fill(Aurora.Gradients.auroraSpectrum[i % Aurora.Gradients.auroraSpectrum.count])
+                        .fill(utopianSpectrumColor(for: i))
                         .frame(width: 6, height: 6)
                         .blur(radius: 1)
                         .offset(x: circleSize * 0.55)
@@ -117,21 +117,21 @@ struct StatsContentView: View {
                 }
             }
 
-            // Outer ring with aurora gradient
+            // Outer ring with utopian gradient
             Circle()
-                .stroke(Aurora.Colors.voidNebula, lineWidth: layout.deviceType.isTablet ? 10 : 8)
+                .stroke(Color.white.opacity(0.1), lineWidth: layout.deviceType.isTablet ? 10 : 8)
                 .frame(width: circleSize, height: circleSize)
 
-            // Progress ring with prismatic aurora gradient
+            // Progress ring with prismatic utopian gradient
             Circle()
                 .trim(from: 0, to: hasAnimated ? velocityScore / 100 : 0)
                 .stroke(
                     AngularGradient(
                         colors: [
-                            Aurora.Colors.electricCyan,
-                            Aurora.Colors.borealisViolet,
-                            Aurora.Colors.stellarMagenta,
-                            Aurora.Colors.electricCyan
+                            UtopianDesignFallback.Colors.focusActive,
+                            UtopianDesignFallback.Colors.aiPurple,
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.8),
+                            UtopianDesignFallback.Colors.focusActive
                         ],
                         center: .center,
                         startAngle: .degrees(0),
@@ -141,35 +141,47 @@ struct StatsContentView: View {
                 )
                 .frame(width: circleSize, height: circleSize)
                 .rotationEffect(.degrees(-90))
-                .shadow(color: Aurora.Colors.electricCyan.opacity(0.5), radius: 8)
+                .shadow(color: UtopianDesignFallback.Colors.focusActive.opacity(0.5), radius: 8)
 
             // Inner glow
             Circle()
-                .fill(Aurora.Colors.electricCyan.opacity(0.1))
+                .fill(UtopianDesignFallback.Colors.focusActive.opacity(0.1))
                 .frame(width: circleSize * 0.7, height: circleSize * 0.7)
                 .blur(radius: 15)
 
-            // Score display - Aurora style with glow
-            VStack(spacing: Aurora.Spacing.xs) {
+            // Score display - Utopian style with glow
+            VStack(spacing: UtopianDesignFallback.Spacing.xs) {
                 ZStack {
                     Text("\(Int(velocityScore))")
                         .font(.system(size: circleSize * 0.35, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.electricCyan)
+                        .foregroundStyle(UtopianDesignFallback.Colors.focusActive)
                         .blur(radius: 6)
                         .opacity(0.5)
 
                     Text("\(Int(velocityScore))")
                         .font(.system(size: circleSize * 0.35, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.textPrimary)
+                        .foregroundStyle(.white)
                 }
 
                 Text("VELOCITY")
-                    .font(Aurora.Typography.caption)
+                    .font(UtopianDesignFallback.Typography.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(Aurora.Colors.textTertiary)
+                    .foregroundStyle(.white.opacity(0.5))
                     .tracking(2)
             }
         }
+    }
+
+    private func utopianSpectrumColor(for index: Int) -> Color {
+        let colors: [Color] = [
+            UtopianDesignFallback.Colors.focusActive,
+            UtopianDesignFallback.Colors.aiPurple,
+            UtopianDesignFallback.Colors.completed,
+            UtopianDesignFallback.Gamification.starGold,
+            UtopianDesignFallback.Colors.aiPurple.opacity(0.8),
+            UtopianDesignFallback.Colors.focusActive.opacity(0.8)
+        ]
+        return colors[index % colors.count]
     }
 
     private func startOrbAnimation() {
@@ -185,7 +197,7 @@ struct StatsContentView: View {
 
         // Glow pulse
         withAnimation(
-            .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+            .easeInOut(duration: 2.0)
             .repeatForever(autoreverses: true)
         ) {
             glowPulse = 1.0
@@ -196,33 +208,33 @@ struct StatsContentView: View {
 
     private var energyStatsGrid: some View {
         LazyVGrid(columns: gridColumns, spacing: layout.spacing) {
-            // Aurora energy cell stat cards
-            AuroraStatCell(
+            // Utopian energy cell stat cards
+            UtopianStatCell(
                 value: "\(tasksCompletedToday)/\(dailyGoal)",
                 label: "Today",
                 progress: Double(tasksCompletedToday) / Double(max(dailyGoal, 1)),
-                color: Aurora.Colors.prismaticGreen
+                color: UtopianDesignFallback.Colors.completed
             )
 
-            AuroraStatCell(
+            UtopianStatCell(
                 value: "\(tasksCompleted)",
                 label: "All Time",
                 progress: min(Double(tasksCompleted) / 500, 1.0),
-                color: Aurora.Colors.electricCyan
+                color: UtopianDesignFallback.Colors.focusActive
             )
 
-            AuroraStatCell(
+            UtopianStatCell(
                 value: String(format: "%.1fh", focusHours),
                 label: "Focus",
                 progress: min(focusHours / 40, 1.0),
-                color: Aurora.Colors.borealisViolet
+                color: UtopianDesignFallback.Colors.aiPurple
             )
 
-            AuroraStatCell(
+            UtopianStatCell(
                 value: "\(Int(completionRate))%",
                 label: "On Time",
                 progress: completionRate / 100,
-                color: Aurora.Colors.cosmicGold
+                color: UtopianDesignFallback.Gamification.starGold
             )
         }
     }
@@ -239,48 +251,48 @@ struct StatsContentView: View {
             HStack {
                 Image(systemName: "chart.bar.fill")
                     .dynamicTypeFont(base: 14, weight: .medium)
-                    .foregroundStyle(Aurora.Colors.borealisViolet)
+                    .foregroundStyle(UtopianDesignFallback.Colors.aiPurple)
 
                 Text("Weekly Trend")
-                    .font(Aurora.Typography.subheadline)
+                    .font(UtopianDesignFallback.Typography.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .foregroundStyle(.white.opacity(0.7))
             }
 
             HStack(alignment: .bottom, spacing: layout.spacing * 0.75) {
                 ForEach(Array(["M", "T", "W", "T", "F", "S", "S"].enumerated()), id: \.offset) { index, day in
                     VStack(spacing: 6) {
-                        // Aurora gradient bar with glow
+                        // Utopian gradient bar with glow
                         RoundedRectangle(cornerRadius: 4)
                             .fill(
                                 LinearGradient(
                                     colors: [
-                                        Aurora.Colors.borealisViolet,
-                                        Aurora.Colors.stellarMagenta.opacity(0.7)
+                                        UtopianDesignFallback.Colors.aiPurple,
+                                        UtopianDesignFallback.Colors.aiPurple.opacity(0.7)
                                     ],
                                     startPoint: .bottom,
                                     endPoint: .top
                                 )
                             )
                             .frame(width: trendBarWidth, height: CGFloat.random(in: 20...80))
-                            .shadow(color: Aurora.Colors.borealisViolet.opacity(0.3), radius: 4, y: 2)
+                            .shadow(color: UtopianDesignFallback.Colors.aiPurple.opacity(0.3), radius: 4, y: 2)
 
                         Text(day)
-                            .font(Aurora.Typography.caption)
-                            .foregroundStyle(Aurora.Colors.textTertiary)
+                            .font(UtopianDesignFallback.Typography.caption)
+                            .foregroundStyle(.white.opacity(0.5))
                     }
                 }
             }
             .frame(height: layout.deviceType.isTablet ? 120 : 100, alignment: .bottom)
         }
         .padding(layout.cardPadding)
-        .background(Aurora.Colors.voidNebula, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
         .overlay {
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
                     LinearGradient(
                         colors: [
-                            Aurora.Colors.borealisViolet.opacity(0.2),
+                            UtopianDesignFallback.Colors.aiPurple.opacity(0.2),
                             Color.clear
                         ],
                         startPoint: .topLeading,
@@ -291,16 +303,16 @@ struct StatsContentView: View {
         }
     }
 
-    // MARK: - Aurora Streaks Card
+    // MARK: - Utopian Streaks Card
 
-    private var auroraStreaksCard: some View {
+    private var utopianStreaksCard: some View {
         VStack(spacing: layout.spacing) {
             HStack {
                 // Flame icon with glow
                 ZStack {
                     Image(systemName: "flame.fill")
                         .dynamicTypeFont(base: 16, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                        .foregroundStyle(UtopianDesignFallback.Gamification.streakFire)
                         .blur(radius: 4)
                         .opacity(0.6)
 
@@ -308,7 +320,7 @@ struct StatsContentView: View {
                         .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Aurora.Colors.cosmicGold, Aurora.Colors.stellarMagenta],
+                                colors: [UtopianDesignFallback.Gamification.starGold, UtopianDesignFallback.Gamification.streakFire],
                                 startPoint: .bottom,
                                 endPoint: .top
                             )
@@ -316,35 +328,35 @@ struct StatsContentView: View {
                 }
 
                 Text("Current Streak")
-                    .font(Aurora.Typography.body)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .font(UtopianDesignFallback.Typography.body)
+                    .foregroundStyle(.white)
                 Spacer()
 
-                // Aurora streak number with glow
+                // Utopian streak number with glow
                 ZStack {
                     Text("\(streak)")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                        .foregroundStyle(UtopianDesignFallback.Gamification.streakFire)
                         .blur(radius: 4)
                         .opacity(0.4)
 
                     Text("\(streak)")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.stellarMagenta)
+                        .foregroundStyle(UtopianDesignFallback.Gamification.streakFire)
                 }
 
                 Text("days")
-                    .font(Aurora.Typography.caption)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .font(UtopianDesignFallback.Typography.caption)
+                    .foregroundStyle(.white.opacity(0.7))
             }
 
-            // Aurora divider
+            // Utopian divider
             Rectangle()
                 .fill(
                     LinearGradient(
                         colors: [
                             Color.clear,
-                            Aurora.Colors.stellarMagenta.opacity(0.3),
+                            UtopianDesignFallback.Gamification.streakFire.opacity(0.3),
                             Color.clear
                         ],
                         startPoint: .leading,
@@ -358,47 +370,47 @@ struct StatsContentView: View {
                 ZStack {
                     Image(systemName: "trophy.fill")
                         .dynamicTypeFont(base: 16, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                        .foregroundStyle(UtopianDesignFallback.Gamification.starGold)
                         .blur(radius: 4)
                         .opacity(0.6)
 
                     Image(systemName: "trophy.fill")
                         .dynamicTypeFont(base: 16, weight: .medium)
-                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                        .foregroundStyle(UtopianDesignFallback.Gamification.starGold)
                 }
 
                 Text("Longest Streak")
-                    .font(Aurora.Typography.body)
-                    .foregroundStyle(Aurora.Colors.textPrimary)
+                    .font(UtopianDesignFallback.Typography.body)
+                    .foregroundStyle(.white)
                 Spacer()
 
-                // Aurora longest streak number with glow
+                // Utopian longest streak number with glow
                 ZStack {
                     Text("\(longestStreak)")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                        .foregroundStyle(UtopianDesignFallback.Gamification.starGold)
                         .blur(radius: 4)
                         .opacity(0.4)
 
                     Text("\(longestStreak)")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(Aurora.Colors.cosmicGold)
+                        .foregroundStyle(UtopianDesignFallback.Gamification.starGold)
                 }
 
                 Text("days")
-                    .font(Aurora.Typography.caption)
-                    .foregroundStyle(Aurora.Colors.textSecondary)
+                    .font(UtopianDesignFallback.Typography.caption)
+                    .foregroundStyle(.white.opacity(0.7))
             }
         }
         .padding(layout.cardPadding)
-        .background(Aurora.Colors.voidNebula, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
         .overlay {
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
                     LinearGradient(
                         colors: [
-                            Aurora.Colors.stellarMagenta.opacity(0.3),
-                            Aurora.Colors.cosmicGold.opacity(0.2),
+                            UtopianDesignFallback.Gamification.streakFire.opacity(0.3),
+                            UtopianDesignFallback.Gamification.starGold.opacity(0.2),
                             Color.clear
                         ],
                         startPoint: .topLeading,
@@ -407,13 +419,13 @@ struct StatsContentView: View {
                     lineWidth: 1
                 )
         }
-        .shadow(color: Aurora.Colors.stellarMagenta.opacity(0.2), radius: 12, y: 4)
+        .shadow(color: UtopianDesignFallback.Gamification.streakFire.opacity(0.2), radius: 12, y: 4)
     }
 }
 
-// MARK: - Aurora Stat Cell
+// MARK: - Utopian Stat Cell
 
-struct AuroraStatCell: View {
+struct UtopianStatCell: View {
     let value: String
     let label: String
     let progress: Double
@@ -425,7 +437,7 @@ struct AuroraStatCell: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: layout.spacing * 0.75) {
-            // Aurora value with glow effect
+            // Utopian value with glow effect
             ZStack(alignment: .leading) {
                 Text(value)
                     .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -439,12 +451,12 @@ struct AuroraStatCell: View {
             }
 
             Text(label)
-                .font(Aurora.Typography.caption)
+                .font(UtopianDesignFallback.Typography.caption)
                 .fontWeight(.medium)
-                .foregroundStyle(Aurora.Colors.textSecondary)
+                .foregroundStyle(.white.opacity(0.7))
                 .tracking(0.5)
 
-            // Aurora progress bar with shimmer
+            // Utopian progress bar with shimmer
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 3)
@@ -465,7 +477,7 @@ struct AuroraStatCell: View {
             .frame(height: layout.deviceType.isTablet ? 6 : 4)
         }
         .padding(layout.cardPadding)
-        .background(Aurora.Colors.voidNebula, in: RoundedRectangle(cornerRadius: 14))
+        .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 14))
         .overlay {
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(
@@ -479,12 +491,12 @@ struct AuroraStatCell: View {
         }
         .shadow(color: color.opacity(0.15), radius: 8, y: 4)
         .onAppear {
-            withAnimation(AuroraMotion.Spring.morph.delay(0.3)) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(0.3)) {
                 animatedProgress = progress
             }
             // Subtle glow pulse
             withAnimation(
-                .easeInOut(duration: AuroraMotion.Duration.glowPulse)
+                .easeInOut(duration: 2.0)
                 .repeatForever(autoreverses: true)
             ) {
                 glowIntensity = 0.5
@@ -495,7 +507,8 @@ struct AuroraStatCell: View {
 
 #Preview {
     ZStack {
-        Aurora.Colors.voidCosmos.ignoresSafeArea()
+        UtopianGradients.background(for: Date())
+            .ignoresSafeArea()
 
         StatsContentView(
             velocityScore: 67,

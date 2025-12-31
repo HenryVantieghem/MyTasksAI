@@ -3,7 +3,7 @@
 //  Veloce
 //
 //  Wrapper sheet for RecurringSection with Liquid Glass styling
-//  Aurora Design System + iOS 26 Glass Effects
+//  Utopian Design System + iOS 26 Glass Effects
 //
 
 import SwiftUI

@@ -21,8 +21,8 @@ struct VeloceCalendarWidget: Widget {
                 .containerBackground(for: .widget) {
                     WidgetCosmicBackground(
                         showStars: true,
-                        showAurora: true,
-                        auroraIntensity: 0.35
+                        showGlow: true,
+                        glowIntensity: 0.35
                     )
                 }
         }
@@ -101,7 +101,7 @@ struct WidgetCalendarEvent: Codable, Identifiable {
         if let hex = colorHex {
             return Color(hex: hex)
         }
-        return isTask ? WidgetAurora.Colors.violet : WidgetAurora.Colors.electric
+        return isTask ? WidgetUtopian.Colors.violet : WidgetUtopian.Colors.electric
     }
 
     init(id: UUID, title: String, time: String, color: Color, isTask: Bool) {
@@ -194,8 +194,8 @@ struct CalendarWidgetView: View {
                 if let nextEvent = entry.events.first {
                     VStack(spacing: 4) {
                         Text("Next")
-                            .font(WidgetAurora.Typography.micro)
-                            .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                            .font(WidgetUtopian.Typography.micro)
+                            .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
 
                         HStack(spacing: 6) {
                             Circle()
@@ -204,24 +204,24 @@ struct CalendarWidgetView: View {
                                 .shadow(color: nextEvent.color.opacity(0.5), radius: 2)
 
                             Text(nextEvent.time)
-                                .font(WidgetAurora.Typography.caption)
-                                .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                                .font(WidgetUtopian.Typography.caption)
+                                .foregroundStyle(WidgetUtopian.Colors.textSecondary)
                         }
 
                         Text(nextEvent.title)
-                            .font(WidgetAurora.Typography.body)
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                            .font(WidgetUtopian.Typography.body)
+                            .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                             .lineLimit(1)
                     }
                 } else {
                     VStack(spacing: 4) {
                         Image(systemName: "calendar.badge.checkmark")
                             .font(.system(size: 16))
-                            .foregroundStyle(WidgetAurora.Colors.success)
+                            .foregroundStyle(WidgetUtopian.Colors.success)
 
                         Text("All clear!")
-                            .font(WidgetAurora.Typography.caption)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.caption)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                     }
                 }
             }
@@ -242,8 +242,8 @@ struct CalendarWidgetView: View {
                             .fill(
                                 RadialGradient(
                                     colors: [
-                                        WidgetAurora.Colors.cyan.opacity(0.2),
-                                        WidgetAurora.Colors.violet.opacity(0.1),
+                                        WidgetUtopian.Colors.cyan.opacity(0.2),
+                                        WidgetUtopian.Colors.violet.opacity(0.1),
                                         .clear
                                     ],
                                     center: .center,
@@ -263,14 +263,14 @@ struct CalendarWidgetView: View {
                             WidgetStatPill(
                                 icon: "checkmark.circle",
                                 value: "\(entry.tasksToday)",
-                                color: WidgetAurora.Colors.success
+                                color: WidgetUtopian.Colors.success
                             )
                         }
                         if entry.eventsToday > 0 {
                             WidgetStatPill(
                                 icon: "calendar",
                                 value: "\(entry.eventsToday)",
-                                color: WidgetAurora.Colors.electric
+                                color: WidgetUtopian.Colors.electric
                             )
                         }
                     }
@@ -282,9 +282,9 @@ struct CalendarWidgetView: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                WidgetAurora.Colors.glassBorder.opacity(0),
-                                WidgetAurora.Colors.cyan.opacity(0.3),
-                                WidgetAurora.Colors.glassBorder.opacity(0)
+                                WidgetUtopian.Colors.glassBorder.opacity(0),
+                                WidgetUtopian.Colors.cyan.opacity(0.3),
+                                WidgetUtopian.Colors.glassBorder.opacity(0)
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -312,9 +312,9 @@ struct CalendarWidgetView: View {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.system(size: 10))
                                 Text("\(entry.events.count - 3) more")
-                                    .font(WidgetAurora.Typography.micro)
+                                    .font(WidgetUtopian.Typography.micro)
                             }
-                            .foregroundStyle(WidgetAurora.Colors.cyan)
+                            .foregroundStyle(WidgetUtopian.Colors.cyan)
                             .padding(.leading, 4)
                         }
                     }
@@ -337,11 +337,11 @@ struct CalendarWidgetView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(entry.formattedDate)
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                            .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
                         Text("Your schedule")
-                            .font(WidgetAurora.Typography.caption)
-                            .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                            .font(WidgetUtopian.Typography.caption)
+                            .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                     }
 
                     Spacer()
@@ -351,13 +351,13 @@ struct CalendarWidgetView: View {
                         Circle()
                             .fill(
                                 LinearGradient(
-                                    colors: [WidgetAurora.Colors.cyan, WidgetAurora.Colors.electric],
+                                    colors: [WidgetUtopian.Colors.cyan, WidgetUtopian.Colors.electric],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
                             .frame(width: 44, height: 44)
-                            .shadow(color: WidgetAurora.Colors.cyan.opacity(0.4), radius: 6)
+                            .shadow(color: WidgetUtopian.Colors.cyan.opacity(0.4), radius: 6)
 
                         Text("\(Calendar.current.component(.day, from: entry.date))")
                             .font(.system(size: 18, weight: .bold, design: .rounded))
@@ -370,9 +370,9 @@ struct CalendarWidgetView: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                WidgetAurora.Colors.cyan.opacity(0.4),
-                                WidgetAurora.Colors.violet.opacity(0.2),
-                                WidgetAurora.Colors.glassBorder.opacity(0)
+                                WidgetUtopian.Colors.cyan.opacity(0.4),
+                                WidgetUtopian.Colors.violet.opacity(0.2),
+                                WidgetUtopian.Colors.glassBorder.opacity(0)
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
@@ -392,7 +392,7 @@ struct CalendarWidgetView: View {
                                 // Time column
                                 Text(event.time)
                                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                                    .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                                    .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                                     .frame(width: 60, alignment: .trailing)
 
                                 // Color bar
@@ -404,17 +404,17 @@ struct CalendarWidgetView: View {
                                 // Event info
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(event.title)
-                                        .font(WidgetAurora.Typography.subheadline)
-                                        .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                                        .font(WidgetUtopian.Typography.subheadline)
+                                        .foregroundStyle(WidgetUtopian.Colors.textPrimary)
                                         .lineLimit(1)
 
                                     HStack(spacing: 4) {
                                         Image(systemName: event.isTask ? "checkmark.circle" : "calendar")
                                             .font(.system(size: 9))
                                         Text(event.isTask ? "Task" : "Event")
-                                            .font(WidgetAurora.Typography.micro)
+                                            .font(WidgetUtopian.Typography.micro)
                                     }
-                                    .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                                    .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
                                 }
 
                                 Spacer()
@@ -423,7 +423,7 @@ struct CalendarWidgetView: View {
                             .padding(.vertical, 10)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .fill(WidgetAurora.Colors.glassBase)
+                                    .fill(WidgetUtopian.Colors.glassBase)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 10)
                                             .stroke(event.color.opacity(0.15), lineWidth: 0.5)
@@ -437,9 +437,9 @@ struct CalendarWidgetView: View {
                             Image(systemName: "ellipsis.circle.fill")
                                 .font(.system(size: 12))
                             Text("\(entry.events.count - 6) more items")
-                                .font(WidgetAurora.Typography.caption)
+                                .font(WidgetUtopian.Typography.caption)
                         }
-                        .foregroundStyle(WidgetAurora.Colors.cyan)
+                        .foregroundStyle(WidgetUtopian.Colors.cyan)
                         .padding(.top, 4)
                     }
                 }
@@ -447,7 +447,7 @@ struct CalendarWidgetView: View {
                 Spacer()
 
                 // Open button
-                WidgetAuroraButton("View Calendar", icon: "calendar", url: URL(string: "veloce://calendar")!)
+                WidgetUtopianButton("View Calendar", icon: "calendar", url: URL(string: "veloce://calendar")!)
             }
             .padding(16)
         }
@@ -461,21 +461,21 @@ struct CalendarWidgetView: View {
 
             ZStack {
                 Circle()
-                    .fill(WidgetAurora.Colors.success.opacity(0.15))
+                    .fill(WidgetUtopian.Colors.success.opacity(0.15))
                     .frame(width: 48, height: 48)
 
                 Image(systemName: "calendar.badge.checkmark")
                     .font(.system(size: 20))
-                    .foregroundStyle(WidgetAurora.Colors.success)
+                    .foregroundStyle(WidgetUtopian.Colors.success)
             }
 
             Text("All clear today!")
-                .font(WidgetAurora.Typography.subheadline)
-                .foregroundStyle(WidgetAurora.Colors.textSecondary)
+                .font(WidgetUtopian.Typography.subheadline)
+                .foregroundStyle(WidgetUtopian.Colors.textSecondary)
 
             Text("No events scheduled")
-                .font(WidgetAurora.Typography.micro)
-                .foregroundStyle(WidgetAurora.Colors.textQuaternary)
+                .font(WidgetUtopian.Typography.micro)
+                .foregroundStyle(WidgetUtopian.Colors.textQuaternary)
 
             Spacer()
         }
@@ -489,7 +489,7 @@ struct CalendarWidgetView: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                WidgetAurora.Colors.success.opacity(0.2),
+                                WidgetUtopian.Colors.success.opacity(0.2),
                                 .clear
                             ],
                             center: .center,
@@ -502,16 +502,16 @@ struct CalendarWidgetView: View {
 
                 Image(systemName: "calendar.badge.checkmark")
                     .font(.system(size: 40, weight: .light))
-                    .foregroundStyle(WidgetAurora.Colors.success)
+                    .foregroundStyle(WidgetUtopian.Colors.success)
             }
 
             Text("Your day is clear")
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(WidgetAurora.Colors.textPrimary)
+                .foregroundStyle(WidgetUtopian.Colors.textPrimary)
 
             Text("No events or tasks scheduled for today")
-                .font(WidgetAurora.Typography.body)
-                .foregroundStyle(WidgetAurora.Colors.textTertiary)
+                .font(WidgetUtopian.Typography.body)
+                .foregroundStyle(WidgetUtopian.Colors.textTertiary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
