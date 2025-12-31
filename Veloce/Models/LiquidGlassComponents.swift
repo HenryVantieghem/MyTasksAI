@@ -463,7 +463,7 @@ struct LiquidGlassFloatingActionButton: View {
                 LiquidGlassSectionHeader(
                     "Tasks",
                     icon: "checkmark.circle.fill",
-                    color: LiquidGlassDesignSystem.VibrantAccents.auroraGreen
+                    color: LiquidGlassDesignSystem.VibrantAccents.utopianGreen
                 )
 
                 LiquidGlassActionRow(
