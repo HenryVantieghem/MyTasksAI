@@ -273,7 +273,7 @@ struct SpaceTimeDistortion: View {
 
 #Preview {
     ZStack {
-        UtopianGradientBackground(isActive: true)
+        AnimatedUtopianGradientBackground(isActive: true)
 
         VStack(spacing: 40) {
             Text("Utopian Waves")
@@ -288,4 +288,4 @@ struct SpaceTimeDistortion: View {
 // MARK: - Legacy Aliases (for backward compatibility)
 
 typealias AuroraWaves = UtopianWaves
-typealias AuroraGradientBackground = UtopianGradientBackground
+typealias AuroraGradientBackground = AnimatedUtopianGradientBackground
