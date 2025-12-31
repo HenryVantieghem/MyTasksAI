@@ -817,7 +817,7 @@ struct DynamicNebulaBackground: View {
 
     private var secondaryColor: Color {
         if hasOverdueTasks {
-            return Aurora.Colors.error.opacity(0.08)
+            return UtopianDesignFallback.Colors.error.opacity(0.08)
         }
         return UtopianDesignFallback.Colors.completed.opacity(0.08 * productivityLevel)
     }
