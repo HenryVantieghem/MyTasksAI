@@ -129,9 +129,9 @@ struct UtopianWaves: View {
     }
 }
 
-// MARK: - Utopian Gradient Background
+// MARK: - Animated Utopian Gradient Background
 
-struct UtopianGradientBackground: View {
+struct AnimatedUtopianGradientBackground: View {
     let isActive: Bool
 
     @State private var gradientAngle: Double = 0
