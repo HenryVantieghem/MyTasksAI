@@ -314,7 +314,7 @@ extension View {
             HStack(spacing: 12) {
                 Circle().fill(LiquidGlassDesignSystem.VibrantAccents.electricCyan).frame(width: 40, height: 40)
                 Circle().fill(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple).frame(width: 40, height: 40)
-                Circle().fill(LiquidGlassDesignSystem.VibrantAccents.auroraGreen).frame(width: 40, height: 40)
+                Circle().fill(LiquidGlassDesignSystem.VibrantAccents.utopianGreen).frame(width: 40, height: 40)
                 Circle().fill(LiquidGlassDesignSystem.VibrantAccents.solarGold).frame(width: 40, height: 40)
                 Circle().fill(LiquidGlassDesignSystem.VibrantAccents.nebulaPink).frame(width: 40, height: 40)
             }
