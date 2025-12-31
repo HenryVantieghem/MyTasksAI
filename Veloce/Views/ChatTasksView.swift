@@ -722,7 +722,7 @@ struct ChatTasksView: View {
             }
             .onAppear {
                 AuroraSoundEngine.shared.celebration()
-                AuroraHaptics.celebration()
+                HapticsService.shared.celebration()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                     showConfetti = false
                 }
