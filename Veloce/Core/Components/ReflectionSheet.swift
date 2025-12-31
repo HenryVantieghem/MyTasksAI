@@ -106,7 +106,7 @@ struct ReflectionSheet: View {
 
             // Celebration icon
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 60))
+                .dynamicTypeFont(base: 60)
                 .foregroundStyle(Theme.Colors.success)
                 .symbolEffect(.bounce, value: appeared)
 
@@ -129,7 +129,7 @@ struct ReflectionSheet: View {
                         generator.impactOccurred()
                     } label: {
                         Image(systemName: rating <= difficultyRating ? "star.fill" : "star")
-                            .font(.system(size: 36))
+                            .dynamicTypeFont(base: 36)
                             .foregroundStyle(rating <= difficultyRating
                                              ? Theme.Colors.warning
                                              : Theme.Colors.tertiaryText)
@@ -233,7 +233,7 @@ struct ReflectionSheet: View {
         } label: {
             VStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: icon)
-                    .font(.system(size: 36))
+                    .dynamicTypeFont(base: 36)
                     .foregroundStyle(wasEstimateAccurate == isAccurate ? color : Theme.Colors.tertiaryText)
 
                 Text(label)
@@ -263,7 +263,7 @@ struct ReflectionSheet: View {
         VStack(spacing: Theme.Spacing.lg) {
             VStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "lightbulb.fill")
-                    .font(.system(size: 36))
+                    .dynamicTypeFont(base: 36)
                     .foregroundStyle(Theme.Colors.warning)
 
                 Text("What did you learn?")
@@ -313,7 +313,7 @@ struct ReflectionSheet: View {
         VStack(spacing: Theme.Spacing.lg) {
             VStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 36))
+                    .dynamicTypeFont(base: 36)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("Tips for next time")

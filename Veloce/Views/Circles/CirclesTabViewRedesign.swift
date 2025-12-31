@@ -158,7 +158,7 @@ struct CirclesTabViewRedesign: View {
 
                 // Icon
                 Image(systemName: "circle.hexagongrid.fill")
-                    .font(.system(size: 24, weight: .medium))
+                    .dynamicTypeFont(base: 24, weight: .medium)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [selectedTab.accentColor, selectedTab.accentColor.opacity(0.6)],
@@ -188,7 +188,7 @@ struct CirclesTabViewRedesign: View {
                             .frame(width: 40, height: 40)
 
                         Image(systemName: "person.badge.plus")
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(Theme.Colors.aiPurple)
 
                         // Notification dot
@@ -207,7 +207,7 @@ struct CirclesTabViewRedesign: View {
     private var xpBadge: some View {
         HStack(spacing: 6) {
             Image(systemName: "star.fill")
-                .font(.system(size: 12, weight: .bold))
+                .dynamicTypeFont(base: 12, weight: .bold)
                 .foregroundStyle(Theme.Colors.xp)
 
             Text("2,450")
@@ -255,7 +255,7 @@ struct CirclesTabViewRedesign: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: tab.icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
 
                 Text(tab.rawValue)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -363,7 +363,7 @@ struct CirclesTabViewRedesign: View {
                     .shadow(color: selectedTab.accentColor.opacity(0.5), radius: 12, y: 4)
 
                 Image(systemName: fabIcon)
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.white)
             }
         }

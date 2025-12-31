@@ -315,7 +315,7 @@ struct JournalDatePickerSheet: View {
                     dismiss()
                 } label: {
                     Text("Done")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Theme.Spacing.md)

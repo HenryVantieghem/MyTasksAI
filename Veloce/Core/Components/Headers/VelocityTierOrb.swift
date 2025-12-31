@@ -357,7 +357,7 @@ struct VelocityTierOrb: View {
                 HStack(spacing: 20) {
                     VelocityTierOrb(tier: tier, size: 14)
                     Text(tier.label)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
                     Spacer()
                 }
@@ -377,10 +377,10 @@ struct VelocityTierOrb: View {
                     VelocityTierOrb(tier: tier, size: 40)
                     VStack(alignment: .leading) {
                         Text(tier.label)
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(.white)
                         Text(tier.message)
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                     Spacer()

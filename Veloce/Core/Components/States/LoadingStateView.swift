@@ -26,7 +26,7 @@ struct LoadingStateView: View {
             // Optional message
             if let message = message {
                 Text(message)
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
         }

@@ -82,11 +82,11 @@ struct ScheduleTimelineSection: View {
             if let time = scheduledTime {
                 HStack {
                     Image(systemName: "clock.fill")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundColor(taskTypeColor)
 
                     Text(formatDateTime(time))
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundColor(Theme.CelestialColors.starWhite)
 
                     Spacer()
@@ -98,7 +98,7 @@ struct ScheduleTimelineSection: View {
                         onTimeSelected(nil)
                     }) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundColor(Theme.CelestialColors.starDim)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -245,7 +245,7 @@ struct MiniDayTimeline: View {
             .frame(width: 20, height: 14)
             .overlay(
                 Image(systemName: "flag.fill")
-                    .font(.system(size: 8))
+                    .dynamicTypeFont(base: 8)
                     .foregroundColor(.white)
             )
             .offset(x: offset - 10, y: 0)

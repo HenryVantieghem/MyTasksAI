@@ -41,7 +41,7 @@ struct AIStrategyModule: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             // Strategy text
             Text(strategy)
-                .font(.system(size: 14, weight: .regular))
+                .dynamicTypeFont(base: 14, weight: .regular)
                 .foregroundStyle(.white.opacity(0.9))
                 .lineSpacing(4)
                 .lineLimit(viewModel.isStrategyExpanded ? nil : 3)
@@ -50,7 +50,7 @@ struct AIStrategyModule: View {
             if let source = viewModel.strategySource {
                 HStack(spacing: 4) {
                     Image(systemName: "quote.bubble.fill")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text("Based on: \(source)")
                         .font(.system(size: 11, weight: .medium, design: .serif))
                         .italic()
@@ -70,7 +70,7 @@ struct AIStrategyModule: View {
                         Text("Read more")
                         Image(systemName: "chevron.down")
                     }
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(accentColor)
                 }
                 .padding(.top, 4)
@@ -83,11 +83,11 @@ struct AIStrategyModule: View {
                         .background(accentColor.opacity(0.3))
 
                     Text("Thought Process")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(accentColor)
 
                     Text(thoughtProcess)
-                        .font(.system(size: 13, weight: .regular))
+                        .dynamicTypeFont(base: 13, weight: .regular)
                         .foregroundStyle(.white.opacity(0.7))
                         .lineSpacing(3)
                 }
@@ -104,7 +104,7 @@ struct AIStrategyModule: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 ShimmerLoadingText(text: "Analyzing task context...")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
 
                 Rectangle()
                     .fill(Color.white.opacity(0.1))
@@ -120,18 +120,18 @@ struct AIStrategyModule: View {
     private var noStrategyView: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "sparkles")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(accentColor.opacity(0.5))
 
             Text("AI analysis not yet available")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.white.opacity(0.6))
 
             Button {
                 // Trigger AI analysis
             } label: {
                 Text("Generate Insights")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(accentColor)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)

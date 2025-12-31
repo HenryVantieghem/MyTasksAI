@@ -74,16 +74,16 @@ struct BrainDumpView: View {
                     .frame(width: 80, height: 80)
 
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 36))
+                    .dynamicTypeFont(base: 36)
                     .foregroundStyle(Color.red)
             }
 
             Text("Something went wrong")
-                .font(.system(size: 22, weight: .bold))
+                .dynamicTypeFont(base: 22, weight: .bold)
                 .foregroundStyle(Color.white)
 
             Text(message)
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(Color.white.opacity(0.6))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Theme.Spacing.xl)
@@ -96,7 +96,7 @@ struct BrainDumpView: View {
                     Image(systemName: "arrow.counterclockwise")
                     Text("Try Again")
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, Theme.Spacing.xl)
                 .padding(.vertical, Theme.Spacing.md)
@@ -120,16 +120,16 @@ struct BrainDumpView: View {
     private var successToast: some View {
         HStack(spacing: Theme.Spacing.md) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(Theme.Colors.success)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(addedTaskCount) tasks added")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(Color.white)
 
                 Text("Go to Tasks to see them")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Color.white.opacity(0.6))
             }
 

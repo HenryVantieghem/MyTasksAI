@@ -36,7 +36,7 @@ struct TimelineQuickAddView: View {
                     onCancel()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
                 .buttonStyle(.plain)
@@ -45,7 +45,7 @@ struct TimelineQuickAddView: View {
             // Time display
             HStack {
                 Image(systemName: "clock")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiBlue)
 
                 Text(selectedTime.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day().hour().minute()))
@@ -70,7 +70,7 @@ struct TimelineQuickAddView: View {
 
                 // AI sparkle
                 Image(systemName: "sparkles")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
             .padding(Theme.Spacing.md)
@@ -215,7 +215,7 @@ struct EnhancedQuickAddView: View {
                     onCancel()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(.white.opacity(0.4))
                 }
                 .buttonStyle(.plain)
@@ -224,11 +224,11 @@ struct EnhancedQuickAddView: View {
             // Time display
             HStack {
                 Image(systemName: "clock")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiBlue)
 
                 Text(selectedTime.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day().hour().minute()))
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white.opacity(0.7))
 
                 Spacer()
@@ -237,7 +237,7 @@ struct EnhancedQuickAddView: View {
             // Task input
             HStack(spacing: 10) {
                 TextField("What needs to be done?", text: $taskTitle)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white)
                     .focused($isFocused)
                     .submitLabel(.done)
@@ -248,7 +248,7 @@ struct EnhancedQuickAddView: View {
                     }
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
             .padding(16)
@@ -264,7 +264,7 @@ struct EnhancedQuickAddView: View {
             // Duration picker
             VStack(alignment: .leading, spacing: 8) {
                 Text("Duration")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -292,9 +292,9 @@ struct EnhancedQuickAddView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "slider.horizontal.3")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                         Text("More details")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                     }
                     .foregroundStyle(.white.opacity(0.8))
                     .padding(.horizontal, 16)
@@ -316,9 +316,9 @@ struct EnhancedQuickAddView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                         Text("Add")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)

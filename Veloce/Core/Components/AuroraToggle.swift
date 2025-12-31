@@ -207,7 +207,7 @@ struct AuroraToggleRow: View {
                     .frame(width: 44, height: 44)
 
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(isOn ? Aurora.Colors.violet : Aurora.Colors.textTertiary)
             }
             .animation(Aurora.Animation.spring, value: isOn)
@@ -215,11 +215,11 @@ struct AuroraToggleRow: View {
             // Text
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text(description)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Aurora.Colors.textTertiary)
                     .lineLimit(2)
             }

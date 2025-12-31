@@ -95,7 +95,7 @@ struct LiquidGlassButton: View {
                 loadingIndicator
             } else {
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .tracking(0.5)
             }
 
@@ -120,7 +120,7 @@ struct LiquidGlassButton: View {
     @ViewBuilder
     private func iconView(systemName: String) -> some View {
         Image(systemName: systemName)
-            .font(.system(size: 15, weight: .semibold))
+            .dynamicTypeFont(base: 15, weight: .semibold)
             .foregroundStyle(textColor)
     }
 
@@ -134,7 +134,7 @@ struct LiquidGlassButton: View {
                 .scaleEffect(0.85)
 
             Text("Loading...")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
         }
     }
 
@@ -536,11 +536,11 @@ struct LiquidGlassButtonSmall: View {
             HStack(spacing: 6) {
                 if let icon = icon {
                     Image(systemName: icon)
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                 }
 
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
             }
             .foregroundStyle(style == .ghost ? LiquidGlassDesignSystem.VibrantAccents.electricCyan : .white)
             .padding(.horizontal, 16)

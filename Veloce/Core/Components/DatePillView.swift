@@ -173,7 +173,7 @@ struct CompactStatsBar: View {
             // Streak
             HStack(spacing: Theme.Spacing.xxs) {
                 Image(systemName: "flame.fill")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.Colors.streakOrange)
                 Text("\(streakDays) day\(streakDays == 1 ? "" : "s")")
                     .font(Theme.Typography.caption1)
@@ -185,7 +185,7 @@ struct CompactStatsBar: View {
             // Points
             HStack(spacing: Theme.Spacing.xxs) {
                 Image(systemName: "star.fill")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.Colors.xp)
                 Text("\(points) pts")
                     .font(Theme.Typography.caption1)

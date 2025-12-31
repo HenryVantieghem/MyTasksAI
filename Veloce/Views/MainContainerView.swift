@@ -375,17 +375,17 @@ struct TasksPageView: View {
 
             // Clean thin icon
             Image(systemName: emptyStateIcon)
-                .font(.system(size: 64, weight: .thin))
+                .dynamicTypeFont(base: 64, weight: .thin)
                 .foregroundStyle(CosmicWidget.Text.tertiary)
                 .accessibilityHidden(true)
 
             VStack(spacing: 8) {
                 Text(emptyStateTitle)
-                    .font(.system(size: 22, weight: .light))
+                    .dynamicTypeFont(base: 22, weight: .light)
                     .foregroundStyle(.white)
 
                 Text(emptyStateSubtitle)
-                    .font(.system(size: 15, weight: .regular))
+                    .dynamicTypeFont(base: 15, weight: .regular)
                     .foregroundStyle(CosmicWidget.Text.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -523,7 +523,7 @@ struct PremiumFAB: View {
 
                 // Plus icon
                 Image(systemName: "plus")
-                    .font(.system(size: 24, weight: .semibold))
+                    .dynamicTypeFont(base: 24, weight: .semibold)
                     .foregroundStyle(.white)
                     .rotationEffect(.degrees(isPressed ? 90 : 0))
             }
@@ -655,13 +655,13 @@ struct AnimatedEmptyStateIcon: View {
             ZStack {
                 // Icon glow
                 Image(systemName: icon)
-                    .font(.system(size: 64, weight: .light))
+                    .dynamicTypeFont(base: 64, weight: .light)
                     .foregroundStyle(CosmicWidget.Widget.violet.opacity(0.3))
                     .blur(radius: 8)
 
                 // Main icon
                 Image(systemName: icon)
-                    .font(.system(size: 64, weight: .light))
+                    .dynamicTypeFont(base: 64, weight: .light)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [
@@ -810,7 +810,7 @@ struct TaskRow: View {
                 .overlay {
                     if task.isCompleted {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
@@ -826,7 +826,7 @@ struct TaskRow: View {
     private var contentView: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(task.title)
-                .font(.system(size: 17, weight: .regular))
+                .dynamicTypeFont(base: 17, weight: .regular)
                 .foregroundStyle(task.isCompleted ? CosmicWidget.Text.tertiary : .white)
                 .strikethrough(task.isCompleted, color: CosmicWidget.Text.tertiary)
                 .lineLimit(2)
@@ -835,7 +835,7 @@ struct TaskRow: View {
                 HStack(spacing: 2) {
                     ForEach(0..<task.starRating, id: \.self) { _ in
                         Image(systemName: "star.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(CosmicWidget.Widget.gold)
                     }
                 }
@@ -854,7 +854,7 @@ struct TaskRow: View {
                 contentView
                 Spacer()
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(CosmicWidget.Text.tertiary)
             }
             .padding(16)
@@ -1197,12 +1197,12 @@ struct TodayProgressStat: View {
                 // Checkmark when complete
                 if isComplete {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .bold))
+                        .dynamicTypeFont(base: 14, weight: .bold)
                         .foregroundStyle(CosmicWidget.Widget.mint)
                         .scaleEffect(celebratePulse ? 1.2 : 1.0)
                 } else {
                     Image(systemName: "checkmark.circle")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(CosmicWidget.Widget.violet)
                 }
             }
@@ -1259,14 +1259,14 @@ struct StreakStat: View {
                 // Glow effect for active streaks
                 if isOnFire {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(CosmicWidget.Widget.sunsetOrange.opacity(0.4))
                         .blur(radius: 6)
                         .scaleEffect(1.0 + glowIntensity * 0.3)
                 }
 
                 Image(systemName: isOnFire ? "flame.fill" : "flame")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(
                         isOnFire ?
                         LinearGradient(colors: [CosmicWidget.Widget.sunsetOrange, CosmicWidget.Widget.sunsetOrange, CosmicWidget.Widget.gold], startPoint: .bottom, endPoint: .top) :
@@ -1313,12 +1313,12 @@ struct PointsStat: View {
             ZStack {
                 // Background glow
                 Image(systemName: "star.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(CosmicWidget.Widget.gold.opacity(0.3))
                     .blur(radius: 4)
 
                 Image(systemName: "star.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [CosmicWidget.Widget.gold, CosmicWidget.Widget.gold],
@@ -1425,16 +1425,16 @@ struct CalendarPageView: View {
     private var calendarPermissionView: some View {
         VStack(spacing: 24) {
             Image(systemName: "calendar.badge.exclamationmark")
-                .font(.system(size: 64, weight: .thin))
+                .dynamicTypeFont(base: 64, weight: .thin)
                 .foregroundStyle(CosmicWidget.Text.tertiary)
 
             VStack(spacing: 8) {
                 Text("Calendar Access Required")
-                    .font(.system(size: 22, weight: .light))
+                    .dynamicTypeFont(base: 22, weight: .light)
                     .foregroundStyle(.white)
 
                 Text("Enable calendar access to sync your tasks with your schedule.")
-                    .font(.system(size: 15, weight: .regular))
+                    .dynamicTypeFont(base: 15, weight: .regular)
                     .foregroundStyle(CosmicWidget.Text.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -1459,7 +1459,7 @@ struct CalendarPageView: View {
                         HapticsService.shared.selectionFeedback()
                     } label: {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .semibold))
+                            .dynamicTypeFont(base: 18, weight: .semibold)
                             .foregroundStyle(CosmicWidget.Widget.violet)
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
@@ -1480,7 +1480,7 @@ struct CalendarPageView: View {
                         HapticsService.shared.selectionFeedback()
                     } label: {
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 18, weight: .semibold))
+                            .dynamicTypeFont(base: 18, weight: .semibold)
                             .foregroundStyle(CosmicWidget.Widget.violet)
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
@@ -1672,7 +1672,7 @@ struct ScheduledTaskRow: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
                 .foregroundStyle(CosmicWidget.Text.tertiary.opacity(0.5))
         }
         .padding(CosmicWidget.Spacing.md)
@@ -1722,17 +1722,17 @@ struct GoalsPageView: View {
     private var emptyState: some View {
         VStack(spacing: 24) {
             Image(systemName: "target")
-                .font(.system(size: 64, weight: .thin))
+                .dynamicTypeFont(base: 64, weight: .thin)
                 .foregroundStyle(CosmicWidget.Text.tertiary)
                 .accessibilityHidden(true)
 
             VStack(spacing: 8) {
                 Text("No goals yet")
-                    .font(.system(size: 22, weight: .light))
+                    .dynamicTypeFont(base: 22, weight: .light)
                     .foregroundStyle(.white)
 
                 Text("Set SMART goals to stay focused on what matters.")
-                    .font(.system(size: 15, weight: .regular))
+                    .dynamicTypeFont(base: 15, weight: .regular)
                     .foregroundStyle(CosmicWidget.Text.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -1746,7 +1746,7 @@ struct GoalsPageView: View {
                     Image(systemName: "plus.circle.fill")
                     Text("Create Goal")
                 }
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
             }
             .buttonStyle(.glassProminent)
         }
@@ -1800,12 +1800,12 @@ struct GoalRow: View {
                     ZStack {
                         // Glow
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 22))
+                            .dynamicTypeFont(base: 22)
                             .foregroundStyle(CosmicWidget.Widget.mint.opacity(0.3))
                             .blur(radius: 4)
 
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 22))
+                            .dynamicTypeFont(base: 22)
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [CosmicWidget.Widget.mint, CosmicWidget.Widget.electricCyan],
@@ -1870,7 +1870,7 @@ struct GoalRow: View {
                 if let targetDate = goal.targetDate {
                     HStack(spacing: 4) {
                         Image(systemName: "calendar")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text(targetDate, format: .dateTime.month().day())
                             .font(CosmicWidget.Typography.caption2)
                     }
@@ -1942,7 +1942,7 @@ struct SettingsPageView: View {
                 Section("Profile") {
                     HStack {
                         Image(systemName: "person.circle.fill")
-                            .font(.system(size: 50))
+                            .dynamicTypeFont(base: 50)
                             .foregroundStyle(CosmicWidget.Widget.violet)
 
                         VStack(alignment: .leading) {

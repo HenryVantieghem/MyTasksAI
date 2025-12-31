@@ -128,7 +128,7 @@ struct BrainDumpProcessingView: View {
 
                 // Sparkle icon
                 Image(systemName: "sparkles")
-                    .font(.system(size: 28, weight: .medium))
+                    .dynamicTypeFont(base: 28, weight: .medium)
                     .foregroundStyle(.white)
                     .opacity(0.9)
             }
@@ -164,7 +164,7 @@ struct BrainDumpProcessingView: View {
     private var statusText: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Text(statusMessages[statusIndex])
-                .font(.system(size: 18, weight: .medium))
+                .dynamicTypeFont(base: 18, weight: .medium)
                 .foregroundStyle(Color.white.opacity(0.9))
                 .contentTransition(.numericText())
                 .animation(.easeInOut, value: statusIndex)

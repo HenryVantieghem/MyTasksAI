@@ -116,15 +116,15 @@ struct FocusTimerModeCard: View {
                     .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
 
                 Text(mode.rawValue)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
 
                 if mode.duration > 0 {
                     Text("\(mode.duration) min")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(.white.opacity(0.5))
                 } else {
                     Text("∞")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -154,9 +154,9 @@ struct SessionBadge: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: mode.icon)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
             Text("×\(count)")
-                .font(.system(size: 12, weight: .bold))
+                .dynamicTypeFont(base: 12, weight: .bold)
         }
         .foregroundStyle(.white.opacity(0.7))
         .padding(.horizontal, 10)
@@ -184,7 +184,7 @@ struct FocusTimerModePickerSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: mode.icon)
-                                .font(.system(size: 20))
+                                .dynamicTypeFont(base: 20)
                                 .foregroundStyle(Theme.Colors.aiAmber)
                                 .frame(width: 32)
 
@@ -244,7 +244,7 @@ struct FocusAppBlockingConfigSheet: View {
                         .frame(width: 160, height: 160)
 
                     Image(systemName: "shield.lefthalf.filled")
-                        .font(.system(size: 64, weight: .thin))
+                        .dynamicTypeFont(base: 64, weight: .thin)
                         .foregroundStyle(Theme.Colors.aiAmber)
                 }
                 .padding(.top, Theme.Spacing.lg)
@@ -278,7 +278,7 @@ struct FocusAppBlockingConfigSheet: View {
 
                             if blockingService.hasAppsSelected {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 24))
+                                    .dynamicTypeFont(base: 24)
                                     .foregroundStyle(Theme.Colors.success)
                             }
                         }
@@ -296,7 +296,7 @@ struct FocusAppBlockingConfigSheet: View {
                                 Image(systemName: "plus.app")
                                 Text(blockingService.hasAppsSelected ? "Edit Blocked Apps" : "Select Apps to Block")
                             }
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
@@ -332,7 +332,7 @@ struct FocusAppBlockingConfigSheet: View {
                             }
                         } label: {
                             Text("Enable Screen Time Access")
-                                .font(.system(size: 16, weight: .semibold))
+                                .dynamicTypeFont(base: 16, weight: .semibold)
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)

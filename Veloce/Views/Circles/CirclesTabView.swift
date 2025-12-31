@@ -130,15 +130,15 @@ struct CirclesTabView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Text("My Pacts")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 if pactService.hasActivePacts {
                     HStack(spacing: 4) {
                         Image(systemName: "flame.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("\(pactService.activeCount)")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                     }
                     .foregroundStyle(.orange)
                 }
@@ -150,7 +150,7 @@ struct CirclesTabView: View {
                         showCreatePact = true
                     } label: {
                         Image(systemName: "plus")
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(Theme.Colors.aiPurple)
                     }
                 }
@@ -160,16 +160,16 @@ struct CirclesTabView: View {
                 // Empty pacts state
                 VStack(spacing: Theme.Spacing.md) {
                     Image(systemName: "link.circle")
-                        .font(.system(size: 36, weight: .light))
+                        .dynamicTypeFont(base: 36, weight: .light)
                         .foregroundStyle(.white.opacity(0.3))
 
                     VStack(spacing: 4) {
                         Text("No pacts yet")
-                            .font(.system(size: 15, weight: .medium))
+                            .dynamicTypeFont(base: 15, weight: .medium)
                             .foregroundStyle(.white.opacity(0.6))
 
                         Text("Start a mutual accountability streak with a friend")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.4))
                             .multilineTextAlignment(.center)
                     }
@@ -179,7 +179,7 @@ struct CirclesTabView: View {
                             showCreatePact = true
                         } label: {
                             Text("Start a Pact")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 10)
@@ -187,7 +187,7 @@ struct CirclesTabView: View {
                         }
                     } else {
                         Text("Add friends first to start a pact")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(.white.opacity(0.3))
                     }
                 }
@@ -228,17 +228,17 @@ struct CirclesTabView: View {
                         .frame(width: 40, height: 40)
 
                     Image(systemName: "person.badge.plus")
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Friend Requests")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text("\(friendService.pendingCount) pending")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
@@ -264,7 +264,7 @@ struct CirclesTabView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Text("My Circles")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Spacer()
@@ -284,7 +284,7 @@ struct CirclesTabView: View {
                         }
                     } label: {
                         Image(systemName: "plus")
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(Theme.Colors.aiPurple)
                     }
                 }
@@ -294,11 +294,11 @@ struct CirclesTabView: View {
                 // Empty circles state with Liquid Glass
                 VStack(spacing: Theme.Spacing.md) {
                     Image(systemName: "person.3")
-                        .font(.system(size: 36, weight: .light))
+                        .dynamicTypeFont(base: 36, weight: .light)
                         .foregroundStyle(.white.opacity(0.3))
 
                     Text("No circles yet")
-                        .font(.system(size: 15, weight: .medium))
+                        .dynamicTypeFont(base: 15, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
 
                     HStack(spacing: 10) {
@@ -306,7 +306,7 @@ struct CirclesTabView: View {
                             showCreateCircle = true
                         } label: {
                             Text("Create")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
@@ -317,7 +317,7 @@ struct CirclesTabView: View {
                             showJoinCircle = true
                         } label: {
                             Text("Join")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                                 .foregroundStyle(Theme.Colors.aiPurple)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
@@ -349,11 +349,11 @@ struct CirclesTabView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Text("Friends")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("(\(friendService.friendCount))")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
 
                 Spacer()
@@ -362,7 +362,7 @@ struct CirclesTabView: View {
                     showAddFriend = true
                 } label: {
                     Image(systemName: "person.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
             }
@@ -371,14 +371,14 @@ struct CirclesTabView: View {
                 // Empty friends state
                 VStack(spacing: Theme.Spacing.sm) {
                     Text("Add friends to see their progress")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     Button {
                         showAddFriend = true
                     } label: {
                         Label("Find Friends", systemImage: "magnifyingglass")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(Theme.Colors.aiPurple)
                     }
                 }
@@ -402,7 +402,7 @@ struct CirclesTabView: View {
     private var emptyStateView: some View {
         VStack(spacing: Theme.Spacing.lg) {
             Image(systemName: "sparkles")
-                .font(.system(size: 60, weight: .ultraLight))
+                .dynamicTypeFont(base: 60, weight: .ultraLight)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [Theme.Colors.aiPurple, Theme.CelestialColors.plasmaCore],
@@ -413,11 +413,11 @@ struct CirclesTabView: View {
 
             VStack(spacing: Theme.Spacing.xs) {
                 Text("Welcome to Circles")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("Connect with friends and stay accountable together")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .multilineTextAlignment(.center)
             }
@@ -462,7 +462,7 @@ struct CirclesTabView: View {
                     .frame(width: 56, height: 56)
 
                 Image(systemName: "plus")
-                    .font(.system(size: 22, weight: .semibold))
+                    .dynamicTypeFont(base: 22, weight: .semibold)
                     .foregroundStyle(.white)
             }
             .glassEffect(.regular, in: SwiftUI.Circle())
@@ -521,24 +521,24 @@ struct CircleCardView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(circle.name)
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 HStack(spacing: 12) {
                     HStack(spacing: 4) {
                         Image(systemName: "person.2")
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                         Text("\(circle.memberCount)")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                     }
                     .foregroundStyle(.white.opacity(0.5))
 
                     if circle.circleStreak > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                             Text("\(circle.circleStreak)")
-                                .font(.system(size: 12, weight: .semibold))
+                                .dynamicTypeFont(base: 12, weight: .semibold)
                         }
                         .foregroundStyle(.orange)
                     }
@@ -548,7 +548,7 @@ struct CircleCardView: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.3))
         }
         .padding(14)
@@ -570,18 +570,18 @@ struct FriendRowView: View {
                     .frame(width: 44, height: 44)
 
                 Text(friend.displayName.prefix(1).uppercased())
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(friend.displayName)
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 if let username = friend.atUsername {
                     Text(username)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(Theme.CelestialColors.starGhost)
                 }
             }
@@ -592,9 +592,9 @@ struct FriendRowView: View {
             if let streak = friend.currentStreak, streak > 0 {
                 HStack(spacing: 4) {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                     Text("\(streak)")
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                 }
                 .foregroundStyle(.orange)
             }
@@ -623,24 +623,24 @@ struct SentPactCard: View {
                 .frame(width: 44, height: 44)
                 .overlay(
                     Text(partnerInitials)
-                        .font(.system(size: 14, weight: .bold))
+                        .dynamicTypeFont(base: 14, weight: .bold)
                         .foregroundStyle(.white.opacity(0.7))
                 )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Pact with \(partnerName)")
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(.white.opacity(0.8))
 
                 Text("Waiting for acceptance...")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.4))
             }
 
             Spacer()
 
             Image(systemName: "hourglass")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.yellow.opacity(0.6))
         }
         .padding(14)

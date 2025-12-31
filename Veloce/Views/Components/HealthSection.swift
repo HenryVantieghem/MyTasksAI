@@ -19,7 +19,7 @@ struct HealthSection: View {
                 // Icon and title
                 HStack(spacing: 8) {
                     Image(systemName: "heart.fill")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(Theme.Colors.success)
                     Text("Apple Health")
                         .font(Theme.Typography.headline)
@@ -46,7 +46,7 @@ struct HealthSection: View {
             if isHealthTrackingEnabled {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.Colors.success)
                     Text("Focus sessions will be saved to Health")
                         .font(Theme.Typography.caption1)

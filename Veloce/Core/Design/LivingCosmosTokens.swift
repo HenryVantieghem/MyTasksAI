@@ -535,7 +535,7 @@ struct CosmicSectionHeader: View {
         HStack(spacing: Theme.Spacing.sm) {
             if let icon {
                 Image(systemName: icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(iconColor)
             }
 

@@ -184,7 +184,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .blur(radius: 4)
 
                     Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.textSecondary)
                         .frame(width: 32, height: 32)
                 }
@@ -230,7 +230,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .blur(radius: 4)
 
                     Image(systemName: "ellipsis")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.textSecondary)
                         .frame(width: 32, height: 32)
                 }
@@ -307,7 +307,7 @@ struct LiquidGlassTaskDetailSheet: View {
 
                         if task.isCompleted {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
+                                .dynamicTypeFont(base: 14, weight: .bold)
                                 .foregroundStyle(Aurora.Colors.prismaticGreen)
                         }
                     }
@@ -343,7 +343,7 @@ struct LiquidGlassTaskDetailSheet: View {
                             .blur(radius: 4)
 
                         Image(systemName: "pencil")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(Aurora.Colors.electricCyan)
                             .frame(width: 32, height: 32)
                     }
@@ -484,7 +484,7 @@ struct LiquidGlassTaskDetailSheet: View {
             HStack {
                 HStack(spacing: Aurora.Spacing.sm) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Aurora.Colors.electricCyan)
 
                     Text("Constellation Path")
@@ -542,7 +542,7 @@ struct LiquidGlassTaskDetailSheet: View {
                                 .blur(radius: 8)
 
                             Image(systemName: "star.circle")
-                                .font(.system(size: 32))
+                                .dynamicTypeFont(base: 32)
                                 .foregroundStyle(Aurora.Colors.textTertiary.opacity(0.5))
                         }
                         Text("No stepping stones yet")
@@ -585,7 +585,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         viewModel.newSubTaskTitle = ""
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(Aurora.Colors.textTertiary)
                     }
                 }
@@ -608,7 +608,7 @@ struct LiquidGlassTaskDetailSheet: View {
                 } label: {
                     HStack(spacing: Aurora.Spacing.xs) {
                         Image(systemName: "plus")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                         Text("Add Step")
                             .font(Aurora.Typography.callout)
                     }
@@ -625,7 +625,7 @@ struct LiquidGlassTaskDetailSheet: View {
                 } label: {
                     HStack(spacing: Aurora.Spacing.xs) {
                         Image(systemName: "wand.and.stars")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .symbolEffect(.pulse, options: .repeating.speed(0.5))
                         Text("AI Generate")
                             .font(Aurora.Typography.callout)
@@ -722,7 +722,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .blur(radius: 4)
 
                     Image(systemName: "sparkles")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(Aurora.Colors.stellarMagenta)
                         .symbolEffect(.pulse, options: .repeating, value: viewModel.isLoadingAI)
                 }
@@ -733,7 +733,7 @@ struct LiquidGlassTaskDetailSheet: View {
 
                 // Powered by Perplexity badge with aurora styling
                 Text("Perplexity")
-                    .font(.system(size: 9, weight: .medium))
+                    .dynamicTypeFont(base: 9, weight: .medium)
                     .foregroundStyle(Aurora.Colors.borealisViolet)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
@@ -757,7 +757,7 @@ struct LiquidGlassTaskDetailSheet: View {
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .rotationEffect(.degrees(viewModel.isLoadingAI ? 360 : 0))
                         .animation(
                             viewModel.isLoadingAI ? .linear(duration: 1).repeatForever(autoreverses: false) : .default,
@@ -858,7 +858,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .blur(radius: 4)
 
                     Image(systemName: "lightbulb.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Aurora.Colors.cosmicGold)
                 }
 
@@ -882,7 +882,7 @@ struct LiquidGlassTaskDetailSheet: View {
                 } label: {
                     HStack(spacing: Aurora.Spacing.xs) {
                         Image(systemName: "brain")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("Oracle's reasoning")
                             .font(Aurora.Typography.caption)
                     }
@@ -927,7 +927,7 @@ struct LiquidGlassTaskDetailSheet: View {
         VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
             HStack(spacing: Aurora.Spacing.sm) {
                 Image(systemName: "link")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(Aurora.Colors.electricCyan)
 
                 Text("Cosmic Sources")
@@ -947,14 +947,14 @@ struct LiquidGlassTaskDetailSheet: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "globe")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
 
                                 Text(source.source)
                                     .font(Aurora.Typography.caption)
                                     .lineLimit(1)
 
                                 Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 8))
+                                    .dynamicTypeFont(base: 8)
                             }
                             .foregroundStyle(Aurora.Colors.electricCyan)
                             .padding(.horizontal, Aurora.Spacing.md)
@@ -980,7 +980,7 @@ struct LiquidGlassTaskDetailSheet: View {
         VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
             HStack(spacing: Aurora.Spacing.sm) {
                 Image(systemName: "play.rectangle.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Aurora.Colors.stellarMagenta)
 
                 Text("Learning Portals")
@@ -1009,7 +1009,7 @@ struct LiquidGlassTaskDetailSheet: View {
                                     .frame(width: 44, height: 44)
 
                                 Image(systemName: "play.fill")
-                                    .font(.system(size: 16))
+                                    .dynamicTypeFont(base: 16)
                                     .foregroundStyle(Aurora.Colors.stellarMagenta)
                             }
 
@@ -1029,7 +1029,7 @@ struct LiquidGlassTaskDetailSheet: View {
 
                             // Relevance indicator with aurora styling
                             Text("\(Int(resource.relevanceScore * 100))%")
-                                .font(.system(size: 11, weight: .medium))
+                                .dynamicTypeFont(base: 11, weight: .medium)
                                 .foregroundStyle(Aurora.Colors.prismaticGreen)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
@@ -1039,7 +1039,7 @@ struct LiquidGlassTaskDetailSheet: View {
                                 }
 
                             Image(systemName: "arrow.up.right")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(Aurora.Colors.textTertiary)
                         }
                         .padding(Aurora.Spacing.md)
@@ -1061,7 +1061,7 @@ struct LiquidGlassTaskDetailSheet: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Image(systemName: "timer")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Aurora.Colors.cosmicGold)
 
                     Text("Estimated")
@@ -1080,7 +1080,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .frame(width: 6, height: 6)
 
                     Text(viewModel.aiEstimateConfidence.capitalized)
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(Aurora.Colors.textTertiary)
                 }
             }
@@ -1099,7 +1099,7 @@ struct LiquidGlassTaskDetailSheet: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar.badge.clock")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Aurora.Colors.prismaticGreen)
 
                     Text("Best Time")
@@ -1126,7 +1126,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         }
                     } label: {
                         Text("Schedule")
-                            .font(.system(size: 10, weight: .semibold))
+                            .dynamicTypeFont(base: 10, weight: .semibold)
                             .foregroundStyle(Aurora.Colors.voidCosmos)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
@@ -1164,7 +1164,7 @@ struct LiquidGlassTaskDetailSheet: View {
             HStack {
                 HStack(spacing: Aurora.Spacing.sm) {
                     Image(systemName: "list.bullet.clipboard")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Aurora.Colors.electricCyan)
 
                     Text("Oracle's Suggested Steps")
@@ -1172,7 +1172,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .foregroundStyle(Aurora.Colors.textPrimary)
 
                     Text("\(viewModel.aiSuggestedSubTasks.count)")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(Aurora.Colors.electricCyan)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -1191,9 +1191,9 @@ struct LiquidGlassTaskDetailSheet: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("Add All")
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                     }
                     .foregroundStyle(Aurora.Colors.voidCosmos)
                     .padding(.horizontal, 12)
@@ -1213,7 +1213,7 @@ struct LiquidGlassTaskDetailSheet: View {
                             viewModel.addSingleAISuggestedSubTask(suggestion)
                         } label: {
                             Image(systemName: "plus.circle")
-                                .font(.system(size: 18))
+                                .dynamicTypeFont(base: 18)
                                 .foregroundStyle(Aurora.Colors.electricCyan)
                         }
 
@@ -1254,7 +1254,7 @@ struct LiquidGlassTaskDetailSheet: View {
         VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
             HStack(spacing: Aurora.Spacing.sm) {
                 Image(systemName: "bubble.left.and.text.bubble.right")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Aurora.Colors.borealisViolet)
 
                 Text("Cosmic Prompt")
@@ -1291,7 +1291,7 @@ struct LiquidGlassTaskDetailSheet: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "doc.on.doc")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("Copy")
                             .font(Aurora.Typography.callout)
                     }
@@ -1308,7 +1308,7 @@ struct LiquidGlassTaskDetailSheet: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.up.right.circle.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("ChatGPT")
                             .font(Aurora.Typography.callout)
                     }
@@ -1330,7 +1330,7 @@ struct LiquidGlassTaskDetailSheet: View {
     private func aiErrorCard(_ error: String) -> some View {
         HStack(spacing: Aurora.Spacing.md) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Aurora.Colors.warning)
 
             Text(error)
@@ -1345,7 +1345,7 @@ struct LiquidGlassTaskDetailSheet: View {
                 Task { await viewModel.loadAIInsights() }
             } label: {
                 Text("Retry")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(Aurora.Colors.warning)
             }
         }
@@ -1366,7 +1366,7 @@ struct LiquidGlassTaskDetailSheet: View {
         VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
             HStack {
                 Image(systemName: "note.text")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Aurora.Colors.electricCyan)
 
                 Text("Cosmic Notes")
@@ -1418,7 +1418,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .blur(radius: 4)
 
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Aurora.Colors.textPrimary)
                 }
 
@@ -1466,7 +1466,7 @@ struct LiquidGlassTaskDetailSheet: View {
             // App blocking toggle with aurora styling
             HStack {
                 Image(systemName: "shield.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Aurora.Colors.cosmicGold)
 
                 Text("Block Apps")
@@ -1499,7 +1499,7 @@ struct LiquidGlassTaskDetailSheet: View {
         VStack(alignment: .leading, spacing: Aurora.Spacing.md) {
             HStack(spacing: Aurora.Spacing.sm) {
                 Image(systemName: "person.2.circle.fill")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Aurora.Colors.stellarMagenta)
 
                 Text("Cosmic Circles")
@@ -1518,7 +1518,7 @@ struct LiquidGlassTaskDetailSheet: View {
                             .frame(width: 32, height: 32)
 
                         Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                             .foregroundStyle(Aurora.Colors.stellarMagenta)
                     }
 
@@ -1529,7 +1529,7 @@ struct LiquidGlassTaskDetailSheet: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Aurora.Colors.textTertiary)
                 }
                 .padding(Aurora.Spacing.md)
@@ -1583,7 +1583,7 @@ struct LiquidGlassTaskDetailSheet: View {
             } label: {
                 HStack(spacing: Aurora.Spacing.sm) {
                     Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "checkmark")
-                        .font(.system(size: 16, weight: .bold))
+                        .dynamicTypeFont(base: 16, weight: .bold)
                     Text(task.isCompleted ? "Completed" : "Complete")
                         .font(Aurora.Typography.headline)
                 }
@@ -1607,7 +1607,7 @@ struct LiquidGlassTaskDetailSheet: View {
             } label: {
                 HStack(spacing: Aurora.Spacing.sm) {
                     Image(systemName: "play.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                     Text("Focus")
                         .font(Aurora.Typography.headline)
                 }
@@ -1660,7 +1660,7 @@ struct LiquidGlassTaskDetailSheet: View {
                         .blur(radius: 4)
 
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(Aurora.Colors.prismaticGreen)
                 }
 
@@ -2208,9 +2208,9 @@ struct QuickActionPill: View {
         Button(action: onTap) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text(text)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
             }
             .foregroundStyle(color)
             .padding(.horizontal, 12)
@@ -2250,7 +2250,7 @@ struct SubTaskRow: View {
 
                     if subTask.status == .completed {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .dynamicTypeFont(base: 11, weight: .bold)
                             .foregroundStyle(Aurora.Colors.prismaticGreen)
                     }
                 }
@@ -2275,19 +2275,19 @@ struct SubTaskRow: View {
             if subTask.isAIGenerated {
                 ZStack {
                     Image(systemName: "sparkle")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.5))
                         .blur(radius: 2)
 
                     Image(systemName: "sparkle")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.8))
                 }
             }
 
             Button(action: onDelete) {
                 Image(systemName: "trash")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(Aurora.Colors.error.opacity(0.7))
             }
         }
@@ -2326,7 +2326,7 @@ struct AIInsightRow<Content: View>: View {
                         .blur(radius: 3)
 
                     Image(systemName: icon)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(color)
                 }
 
@@ -2362,7 +2362,7 @@ struct AuroraFocusModeOption: View {
                     }
 
                     Image(systemName: icon)
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(isSelected ? color : Aurora.Colors.textTertiary)
                 }
 
@@ -2477,7 +2477,7 @@ struct AuroraSubTaskRow: View {
             // Delete button
             Button(action: onDelete) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Aurora.Colors.textTertiary)
             }
             .buttonStyle(.plain)

@@ -176,7 +176,7 @@ struct CompactDateSelector: View {
                 navigateToDate(offset: -1)
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textTertiary)
             }
             .buttonStyle(.plain)
@@ -193,7 +193,7 @@ struct CompactDateSelector: View {
                 navigateToDate(offset: 1)
             } label: {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textTertiary)
             }
             .buttonStyle(.plain)

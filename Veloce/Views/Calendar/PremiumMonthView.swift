@@ -67,7 +67,7 @@ struct PremiumMonthView: View {
             HStack(spacing: 0) {
                 ForEach(weekDays, id: \.self) { day in
                     Text(day)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.4))
                         .frame(maxWidth: .infinity)
                 }

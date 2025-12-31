@@ -588,7 +588,7 @@ struct SuccessCheckModifier: ViewModifier {
 
                         // Check icon
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 44))
+                            .dynamicTypeFont(base: 44)
                             .foregroundStyle(Theme.Colors.success)
                             .scaleEffect(checkScale)
                     }

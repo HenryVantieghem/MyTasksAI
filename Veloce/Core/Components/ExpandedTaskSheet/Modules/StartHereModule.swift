@@ -29,12 +29,12 @@ struct StartHereModule: View {
             VStack(alignment: .leading, spacing: Theme.Spacing.md) {
                 // First step description
                 Text(viewModel.firstStepTitle)
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
 
                 // Motivation text
                 Text("This tiny step gets your brain engaged. Once you start, momentum takes over.")
-                    .font(.system(size: 13, weight: .regular))
+                    .dynamicTypeFont(base: 13, weight: .regular)
                     .foregroundStyle(.white.opacity(0.7))
 
                 // Challenge button or countdown
@@ -57,9 +57,9 @@ struct StartHereModule: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "bolt.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                 Text("START \(viewModel.firstStepSeconds)s CHALLENGE")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
             }
             .foregroundStyle(.black)
             .frame(maxWidth: .infinity)
@@ -108,11 +108,11 @@ struct StartHereModule: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Challenge in progress...")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("You're doing it! Keep going.")
-                    .font(.system(size: 12, weight: .regular))
+                    .dynamicTypeFont(base: 12, weight: .regular)
                     .foregroundStyle(.white.opacity(0.7))
             }
 
@@ -139,17 +139,17 @@ struct StartHereModule: View {
                     .frame(width: 50, height: 50)
 
                 Image(systemName: "checkmark")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(accentColor)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Challenge completed!")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("+10 points earned 🔥")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.TaskCardColors.pointsGlow)
             }
 

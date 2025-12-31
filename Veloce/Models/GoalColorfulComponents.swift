@@ -254,7 +254,7 @@ struct MilestoneBadge: View {
                     .frame(width: 32, height: 32)
                 
                 Image(systemName: "flag.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(color)
             }
             .glassEffect(.regular, in: .circle)

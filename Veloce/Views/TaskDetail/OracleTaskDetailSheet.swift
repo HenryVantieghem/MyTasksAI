@@ -269,7 +269,7 @@ struct OracleTaskDetailSheet: View {
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
 
                 Text("Copied to clipboard!")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white)
             }
             .padding(.horizontal, 20)
@@ -659,10 +659,10 @@ struct OracleHeader: View {
     private var categoryPill: some View {
         HStack(spacing: 8) {
             Image(systemName: task.taskType.icon)
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
 
             Text(task.taskType.displayName)
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
         }
         .foregroundStyle(task.taskType.color)
         .padding(.horizontal, 14)
@@ -714,7 +714,7 @@ struct OracleHeader: View {
         HStack(spacing: 6) {
             ForEach(1...3, id: \.self) { index in
                 Image(systemName: index <= starRating ? "star.fill" : "star")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(
                         index <= starRating
                             ? Theme.Colors.aiAmber
@@ -730,7 +730,7 @@ struct OracleHeader: View {
             }
 
             Text("Priority")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .padding(.leading, 4)
         }
@@ -739,11 +739,11 @@ struct OracleHeader: View {
     private var estimatedTimeDisplay: some View {
         HStack(spacing: 6) {
             Image(systemName: "clock")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
             Text("\(estimatedMinutes) min")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white.opacity(0.9))
         }
         .padding(.horizontal, 12)
@@ -786,17 +786,17 @@ struct OracleNotesSection: View {
             } label: {
                 HStack {
                     Image(systemName: "note.text")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
                     Text("Context & Notes")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
             }
@@ -804,7 +804,7 @@ struct OracleNotesSection: View {
             // Expandable content
             if isExpanded {
                 TextEditor(text: $notes)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.9))
                     .scrollContentBackground(.hidden)
                     .frame(minHeight: 80, maxHeight: 150)
@@ -817,7 +817,7 @@ struct OracleNotesSection: View {
                     .overlay(alignment: .topLeading) {
                         if notes.isEmpty && !isEditing {
                             Text(placeholder)
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.6))
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 20)
@@ -865,7 +865,7 @@ struct AIInsightOracle: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text("Oracle Insight")
-                            .font(.system(size: 16, weight: .bold))
+                            .dynamicTypeFont(base: 16, weight: .bold)
                             .foregroundStyle(.white)
 
                         Spacer()
@@ -875,7 +875,7 @@ struct AIInsightOracle: View {
                             onRefresh()
                         } label: {
                             Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 14, weight: .medium))
+                                .dynamicTypeFont(base: 14, weight: .medium)
                                 .foregroundStyle(Theme.CelestialColors.nebulaCore)
                                 .rotationEffect(.degrees(isThinking ? 360 : 0))
                                 .animation(
@@ -889,11 +889,11 @@ struct AIInsightOracle: View {
                     // Success prediction
                     HStack(spacing: 6) {
                         Text("Success likelihood:")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.starDim)
 
                         Text("\(successPrediction)%")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .foregroundStyle(successColor)
                     }
                 }
@@ -991,7 +991,7 @@ struct AIInsightOracle: View {
 
             // Core sparkle
             Image(systemName: "sparkle")
-                .font(.system(size: 14, weight: .bold))
+                .dynamicTypeFont(base: 14, weight: .bold)
                 .foregroundStyle(.white)
         }
     }
@@ -1068,7 +1068,7 @@ struct StrategyCrystal: View {
             // Header
             HStack {
                 Image(systemName: "diamond.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [.cyan, Theme.CelestialColors.nebulaCore],
@@ -1078,7 +1078,7 @@ struct StrategyCrystal: View {
                     )
 
                 Text("Strategy Crystal")
-                    .font(.system(size: 16, weight: .bold))
+                    .dynamicTypeFont(base: 16, weight: .bold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -1095,19 +1095,19 @@ struct StrategyCrystal: View {
                                 .frame(width: 24, height: 24)
 
                             Text("\(index + 1)")
-                                .font(.system(size: 12, weight: .bold))
+                                .dynamicTypeFont(base: 12, weight: .bold)
                                 .foregroundStyle(Theme.CelestialColors.nebulaCore)
                         }
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(point)
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.9))
 
                             // First step CTA
                             if index == 0 {
                                 Text("Start here • \(firstStepTime)")
-                                    .font(.system(size: 11, weight: .medium))
+                                    .dynamicTypeFont(base: 11, weight: .medium)
                                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
                                     .padding(.top, 2)
                             }
@@ -1129,17 +1129,17 @@ struct StrategyCrystal: View {
                     } label: {
                         HStack {
                             Image(systemName: "exclamationmark.triangle")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(Theme.Colors.aiAmber)
 
                             Text("Potential Blockers")
-                                .font(.system(size: 13, weight: .medium))
+                                .dynamicTypeFont(base: 13, weight: .medium)
                                 .foregroundStyle(Theme.Colors.aiAmber)
 
                             Spacer()
 
                             Image(systemName: expandedBlockers ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                                 .foregroundStyle(Theme.CelestialColors.starDim)
                         }
                     }
@@ -1153,7 +1153,7 @@ struct StrategyCrystal: View {
                                     .padding(.top, 6)
 
                                 Text(blocker)
-                                    .font(.system(size: 13))
+                                    .dynamicTypeFont(base: 13)
                                     .foregroundStyle(.white.opacity(0.7))
                             }
                         }
@@ -1228,11 +1228,11 @@ struct SubTaskConstellations: View {
             // Header with progress
             HStack {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
 
                 Text("Sub-tasks")
-                    .font(.system(size: 16, weight: .bold))
+                    .dynamicTypeFont(base: 16, weight: .bold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -1240,7 +1240,7 @@ struct SubTaskConstellations: View {
                 // Progress indicator
                 HStack(spacing: 6) {
                     Text("\(completedCount)/\(subTasks.count)")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     // Mini progress ring
@@ -1290,10 +1290,10 @@ struct SubTaskConstellations: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "plus")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
 
                         Text("Add Step")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
                     .padding(.horizontal, 14)
@@ -1310,10 +1310,10 @@ struct SubTaskConstellations: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "wand.and.stars")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
 
                         Text("AI Generate")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
@@ -1345,11 +1345,11 @@ struct SubTaskConstellations: View {
             Spacer()
             VStack(spacing: 8) {
                 Image(systemName: "list.bullet.indent")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.5))
 
                 Text("No sub-tasks yet")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.7))
             }
             .padding(.vertical, 20)
@@ -1375,7 +1375,7 @@ struct SubTaskConstellations: View {
 
                     if subTask.status == .completed {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .dynamicTypeFont(base: 11, weight: .bold)
                             .foregroundStyle(Theme.CelestialColors.auroraGreen)
                     }
                 }
@@ -1383,7 +1383,7 @@ struct SubTaskConstellations: View {
 
             // Title
             Text(subTask.title)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(subTask.status == .completed ? Theme.CelestialColors.starDim : .white)
                 .strikethrough(subTask.status == .completed, color: Theme.CelestialColors.starDim)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -1391,7 +1391,7 @@ struct SubTaskConstellations: View {
             // AI badge
             if subTask.isAIGenerated {
                 Image(systemName: "sparkle")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.nebulaCore.opacity(0.7))
             }
 
@@ -1402,7 +1402,7 @@ struct SubTaskConstellations: View {
                 }
             } label: {
                 Image(systemName: "trash")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.red.opacity(0.8))
             }
         }
@@ -1417,7 +1417,7 @@ struct SubTaskConstellations: View {
     private var addSubTaskInput: some View {
         HStack(spacing: 12) {
             TextField("Add a step...", text: $newSubTaskTitle)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white)
                 .focused($isInputFocused)
                 .submitLabel(.done)
@@ -1434,7 +1434,7 @@ struct SubTaskConstellations: View {
                 newSubTaskTitle = ""
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
         }
@@ -1477,21 +1477,21 @@ struct AIPromptGenerator: View {
             } label: {
                 HStack {
                     Image(systemName: "text.bubble.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                     Text("AI Prompt Generator")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     Text("Copy for ChatGPT/Claude")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
             }
@@ -1501,7 +1501,7 @@ struct AIPromptGenerator: View {
                 VStack(alignment: .leading, spacing: 12) {
                     // Generated prompt
                     Text(generatedPrompt)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.85))
                         .lineSpacing(3)
                         .padding(14)
@@ -1517,10 +1517,10 @@ struct AIPromptGenerator: View {
                     } label: {
                         HStack {
                             Image(systemName: "doc.on.doc")
-                                .font(.system(size: 13))
+                                .dynamicTypeFont(base: 13)
 
                             Text("Copy Prompt")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                         }
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -1585,11 +1585,11 @@ struct KnowledgeStars: View {
             // Header
             HStack {
                 Image(systemName: "book.closed.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiBlue)
 
                 Text("Knowledge Stars")
-                    .font(.system(size: 16, weight: .bold))
+                    .dynamicTypeFont(base: 16, weight: .bold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -1631,11 +1631,11 @@ struct KnowledgeStars: View {
             Spacer()
             VStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.5))
 
                 Text("No resources found")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.7))
             }
             .padding(.vertical, 20)
@@ -1653,12 +1653,12 @@ struct KnowledgeStars: View {
                 // Type icon
                 HStack {
                     Image(systemName: resource.type.icon)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(resource.type.color)
 
                     if let duration = resource.duration {
                         Text(duration)
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
 
@@ -1667,14 +1667,14 @@ struct KnowledgeStars: View {
 
                 // Title
                 Text(resource.title)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
 
                 // Source
                 Text(resource.source)
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .lineLimit(1)
             }
@@ -1734,17 +1734,17 @@ struct TimeOrbit: View {
             // Header
             HStack {
                 Image(systemName: "clock.arrow.circlepath")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiAmber)
 
                 Text("Time Orbit")
-                    .font(.system(size: 16, weight: .bold))
+                    .dynamicTypeFont(base: 16, weight: .bold)
                     .foregroundStyle(.white)
 
                 Spacer()
 
                 Text("~\(estimatedMinutes) min")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
 
@@ -1761,10 +1761,10 @@ struct TimeOrbit: View {
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: "calendar.badge.plus")
-                                .font(.system(size: 16))
+                                .dynamicTypeFont(base: 16)
 
                             Text("Custom")
-                                .font(.system(size: 11, weight: .medium))
+                                .dynamicTypeFont(base: 11, weight: .medium)
                         }
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .frame(width: 70, height: 70)
@@ -1781,11 +1781,11 @@ struct TimeOrbit: View {
             if let scheduled = task.scheduledTime {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.auroraGreen)
 
                     Text("Scheduled: \(formattedDate(scheduled))")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.auroraGreen)
                 }
                 .padding(.horizontal, 12)
@@ -1856,7 +1856,7 @@ struct TimeOrbit: View {
         } label: {
             VStack(spacing: 6) {
                 Image(systemName: slot.icon)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(
                         selectedSlot?.id == slot.id
                             ? Theme.Colors.aiAmber
@@ -1864,7 +1864,7 @@ struct TimeOrbit: View {
                     )
 
                 Text(slot.label)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(
                         selectedSlot?.id == slot.id
                             ? .white
@@ -1872,7 +1872,7 @@ struct TimeOrbit: View {
                     )
 
                 Text(slot.sublabel)
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.7))
             }
             .frame(width: 80, height: 80)
@@ -1986,23 +1986,23 @@ struct OracleChatSection: View {
             } label: {
                 HStack {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
                     Text("Ask the Oracle")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     if !messages.isEmpty {
                         Text("\(messages.count) messages")
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
 
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
             }
@@ -2037,7 +2037,7 @@ struct OracleChatSection: View {
                                         sendMessage(suggestion)
                                     } label: {
                                         Text(suggestion)
-                                            .font(.system(size: 12))
+                                            .dynamicTypeFont(base: 12)
                                             .foregroundStyle(Theme.CelestialColors.nebulaCore)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 8)
@@ -2054,7 +2054,7 @@ struct OracleChatSection: View {
                     // Input field
                     HStack(spacing: 12) {
                         TextField("Ask a question...", text: $input)
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white)
                             .focused($isInputFocused)
                             .submitLabel(.send)
@@ -2066,7 +2066,7 @@ struct OracleChatSection: View {
                             sendMessage(input)
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
-                                .font(.system(size: 28))
+                                .dynamicTypeFont(base: 28)
                                 .foregroundStyle(
                                     input.isEmpty
                                         ? Theme.CelestialColors.starDim.opacity(0.5)
@@ -2102,11 +2102,11 @@ struct OracleChatSection: View {
     private var emptyState: some View {
         VStack(spacing: 8) {
             Image(systemName: "sparkle")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(Theme.CelestialColors.nebulaCore.opacity(0.5))
 
             Text("Ask me anything about this task")
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .multilineTextAlignment(.center)
         }
@@ -2122,7 +2122,7 @@ struct OracleChatSection: View {
 
             VStack(alignment: message.isUser ? .trailing : .leading, spacing: 4) {
                 Text(message.content)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
@@ -2136,7 +2136,7 @@ struct OracleChatSection: View {
                     }
 
                 Text(formattedTime(message.timestamp))
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.6))
             }
 
@@ -2206,17 +2206,17 @@ struct FocusModeRecommendation: View {
                         .scaleEffect(reduceMotion ? 1.0 : 1 + pulsePhase * 0.15)
 
                     Image(systemName: "brain.head.profile")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiAmber)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Focus Mode")
-                        .font(.system(size: 16, weight: .bold))
+                        .dynamicTypeFont(base: 16, weight: .bold)
                         .foregroundStyle(.white)
 
                     Text("Recommended: \(recommendedDuration) min session")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
 
@@ -2237,10 +2237,10 @@ struct FocusModeRecommendation: View {
             } label: {
                 HStack {
                     Image(systemName: "play.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
 
                     Text("Start Focus Session")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                 }
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
@@ -2290,12 +2290,12 @@ struct FocusModeRecommendation: View {
     private func focusBenefit(icon: String, text: String) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.aiAmber.opacity(0.8))
                 .frame(width: 20)
 
             Text(text)
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(.white.opacity(0.8))
         }
     }
@@ -2388,12 +2388,12 @@ struct OracleActionBar: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "checkmark")
-                        .font(.system(size: 20, weight: .bold))
+                        .dynamicTypeFont(base: 20, weight: .bold)
                         .foregroundStyle(.black)
                 }
 
                 Text("Complete")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
             }
         }
@@ -2411,12 +2411,12 @@ struct OracleActionBar: View {
                     .frame(width: 44, height: 44)
                     .overlay {
                         Image(systemName: "doc.on.doc")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundStyle(.white)
                     }
 
                 Text("Duplicate")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
         }
@@ -2434,12 +2434,12 @@ struct OracleActionBar: View {
                     .frame(width: 44, height: 44)
                     .overlay {
                         Image(systemName: "clock.arrow.circlepath")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundStyle(.white)
                     }
 
                 Text("Snooze")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
         }
@@ -2457,12 +2457,12 @@ struct OracleActionBar: View {
                     .frame(width: 44, height: 44)
                     .overlay {
                         Image(systemName: "trash")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundStyle(.red.opacity(0.8))
                     }
 
                 Text("Delete")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.red.opacity(0.7))
             }
         }

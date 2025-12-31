@@ -24,7 +24,7 @@ struct StatsPillView: View {
                 // Streak
                 HStack(spacing: 4) {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.Colors.aiGold)
                         .symbolEffect(.pulse, options: .repeating, value: streak > 0)
 
@@ -36,7 +36,7 @@ struct StatsPillView: View {
                 // Points
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Theme.Colors.aiGold)
 
                     Text(formatPoints(points))

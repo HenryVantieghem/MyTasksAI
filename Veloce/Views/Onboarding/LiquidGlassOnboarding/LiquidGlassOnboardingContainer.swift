@@ -17,6 +17,7 @@ import FamilyControls
 
 struct LiquidGlassOnboardingContainer: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.responsiveLayout) private var layout
     @Environment(AppViewModel.self) private var appViewModel
     @Bindable var viewModel: CosmicOnboardingViewModel
 
@@ -36,8 +37,9 @@ struct LiquidGlassOnboardingContainer: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    // Use ResponsiveLayout for horizontal padding
     private var horizontalPadding: CGFloat {
-        horizontalSizeClass == .regular ? 48 : Aurora.Spacing.lg
+        layout.screenPadding
     }
 
     // Aurora colors per step (ascending through the nebula)
@@ -206,7 +208,7 @@ struct LiquidGlassOnboardingContainer: View {
                     endPoint: .trailing
                 )
             )
-            .frame(width: 250, height: geometry.size.height)
+            .frame(width: layout.heroOrbSize * 0.9, height: geometry.size.height)
             .blur(radius: 50)
             .offset(x: glassShimmerOffset)
             .opacity(0.6)
@@ -222,9 +224,9 @@ struct LiquidGlassOnboardingContainer: View {
                     goToPrevious()
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.8))
-                        .frame(width: 40, height: 40)
+                        .frame(width: layout.minTouchTarget, height: layout.minTouchTarget)
                 }
                 .background {
                     if #available(iOS 26.0, *) {
@@ -235,7 +237,7 @@ struct LiquidGlassOnboardingContainer: View {
                 }
                 .transition(.scale.combined(with: .opacity))
             } else {
-                Spacer().frame(width: 40)
+                Spacer().frame(width: layout.minTouchTarget)
             }
 
             Spacer()
@@ -255,10 +257,10 @@ struct LiquidGlassOnboardingContainer: View {
                     skipToLaunch()
                 } label: {
                     Text("Skip")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, layout.spacing)
+                        .padding(.vertical, layout.spacing / 2)
                 }
                 .background {
                     if #available(iOS 26.0, *) {
@@ -268,7 +270,7 @@ struct LiquidGlassOnboardingContainer: View {
                     }
                 }
             } else {
-                Spacer().frame(width: 40)
+                Spacer().frame(width: layout.minTouchTarget)
             }
         }
         .padding(.horizontal, horizontalPadding)
@@ -618,9 +620,9 @@ struct LiquidGlassWelcomePage: View {
             } label: {
                 HStack(spacing: 12) {
                     Text("Begin Journey")
-                        .font(.system(size: 17, weight: .semibold))
+                        .dynamicTypeFont(base: 17, weight: .semibold)
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -704,17 +706,17 @@ struct LiquidGlassPermissionPage: View {
                 }
 
                 Image(systemName: type.icon)
-                    .font(.system(size: 48))
+                    .dynamicTypeFont(base: 48)
                     .foregroundStyle(type.color)
             }
 
             VStack(spacing: 12) {
                 Text(type.title)
-                    .font(.system(size: 28, weight: .semibold))
+                    .dynamicTypeFont(base: 28, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text(type.subtitle)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
             }
@@ -743,7 +745,7 @@ struct LiquidGlassPermissionPage: View {
                     Button("Maybe Later") {
                         onSkip()
                     }
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -808,17 +810,17 @@ struct LiquidGlassFeaturePage: View {
                 }
 
                 Image(systemName: feature.icon)
-                    .font(.system(size: 48))
+                    .dynamicTypeFont(base: 48)
                     .foregroundStyle(feature.color)
             }
 
             VStack(spacing: 12) {
                 Text(feature.title)
-                    .font(.system(size: 28, weight: .semibold))
+                    .dynamicTypeFont(base: 28, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text(feature.subtitle)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
             }
@@ -846,12 +848,12 @@ struct LiquidGlassGoalSetupPage: View {
         ScrollView {
             VStack(spacing: 24) {
                 Text("Set Your Goal")
-                    .font(.system(size: 28, weight: .semibold))
+                    .dynamicTypeFont(base: 28, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.top, 32)
 
                 Text("What would you like to achieve?")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.6))
 
                 // Goal category selection
@@ -894,11 +896,11 @@ struct GoalCategoryCard: View {
         Button(action: onTap) {
             VStack(spacing: 12) {
                 Image(systemName: category.icon)
-                    .font(.system(size: 28))
+                    .dynamicTypeFont(base: 28)
                     .foregroundStyle(isSelected ? category.color : .white.opacity(0.6))
 
                 Text(category.rawValue)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
             }
             .frame(maxWidth: .infinity)
@@ -1073,9 +1075,9 @@ struct LiquidGlassTrialInfoPage: View {
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                     Text("Start Free Trial")
-                        .font(.system(size: 17, weight: .semibold))
+                        .dynamicTypeFont(base: 17, weight: .semibold)
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -1103,7 +1105,7 @@ struct LiquidGlassTrialInfoPage: View {
     private func trialFeatureRow(icon: String, text: String, color: Color) -> some View {
         HStack(spacing: Aurora.Spacing.sm) {
             Image(systemName: icon)
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(color)
                 .frame(width: 28)
 
@@ -1114,7 +1116,7 @@ struct LiquidGlassTrialInfoPage: View {
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Aurora.Colors.prismaticGreen)
         }
         .padding(.horizontal, Aurora.Spacing.md)
@@ -1227,7 +1229,7 @@ struct LiquidGlassLaunchPage: View {
 
                         // Rocket icon with bloom
                         Image(systemName: "rocket.fill")
-                            .font(.system(size: 36, weight: .medium))
+                            .dynamicTypeFont(base: 36, weight: .medium)
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [Aurora.Colors.stellarWhite, Aurora.Colors.electricCyan],
@@ -1267,9 +1269,9 @@ struct LiquidGlassLaunchPage: View {
                 } label: {
                     HStack(spacing: 12) {
                         Text("Launch")
-                            .font(.system(size: 18, weight: .semibold))
+                            .dynamicTypeFont(base: 18, weight: .semibold)
                         Image(systemName: "arrow.up.forward")
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)

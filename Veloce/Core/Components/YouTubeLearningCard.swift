@@ -55,7 +55,7 @@ struct YouTubeLearningCard: View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "play.rectangle.fill")
                 .foregroundStyle(.red)
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
 
             Text("Learn How")
                 .font(Theme.Typography.headline)
@@ -108,7 +108,7 @@ struct YouTubeLearningCard: View {
     private var emptyStateView: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "play.rectangle")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(Theme.Colors.tertiaryText)
 
             Text("No videos found yet")
@@ -233,14 +233,14 @@ struct YouTubeResourceRow: View {
                             // Channel name
                             if let channel = resource.channelName {
                                 Text(channel)
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(Theme.Colors.secondaryText)
                             }
 
                             // Duration
                             if let duration = resource.formattedDuration {
                                 Text("• \(duration)")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(Theme.Colors.tertiaryText)
                             }
                         }
@@ -249,13 +249,13 @@ struct YouTubeResourceRow: View {
                         HStack(spacing: Theme.Spacing.sm) {
                             if let views = resource.formattedViewCount {
                                 Text(views)
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(Theme.Colors.tertiaryText)
                             }
 
                             if let relevance = resource.relevanceLabel {
                                 Text("• \(relevance)")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(Theme.Colors.success)
                             }
                         }
@@ -319,7 +319,7 @@ struct YouTubeResourceRow: View {
                     HStack {
                         Spacer()
                         Text(duration)
-                            .font(.system(size: 9, weight: .medium))
+                            .dynamicTypeFont(base: 9, weight: .medium)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 2)

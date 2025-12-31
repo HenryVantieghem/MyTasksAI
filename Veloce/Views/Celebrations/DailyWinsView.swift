@@ -113,7 +113,7 @@ struct DailyWinsView: View {
                     onDismiss()
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(.secondary)
                         .padding(12)
                         .background(SwiftUI.Circle().fill(.ultraThinMaterial))
@@ -125,7 +125,7 @@ struct DailyWinsView: View {
                     onShare()
                 } label: {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Theme.Celebration.plasmaCore)
                         .padding(12)
                         .background(SwiftUI.Circle().fill(.ultraThinMaterial))
@@ -164,7 +164,7 @@ struct DailyWinsView: View {
                 .contentTransition(.numericText())
 
             Text("XP")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 24)
@@ -204,7 +204,7 @@ struct DailyWinsView: View {
                     .frame(width: 120, height: 120)
 
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 56))
+                    .dynamicTypeFont(base: 56)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [
@@ -385,7 +385,7 @@ struct DailyWinRow: View {
                     .scaleEffect(isChecked ? 1.0 : 0)
 
                 Image(systemName: "checkmark")
-                    .font(.system(size: 18, weight: .bold))
+                    .dynamicTypeFont(base: 18, weight: .bold)
                     .foregroundStyle(.white)
                     .scaleEffect(checkScale)
             }
@@ -403,7 +403,7 @@ struct DailyWinRow: View {
             // Task info
             VStack(alignment: .leading, spacing: 4) {
                 Text(win.title)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.white)
                     .lineLimit(2)
 
@@ -435,7 +435,7 @@ struct DailyWinRow: View {
                     .foregroundStyle(Theme.Celebration.starGold)
 
                 Text("XP")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(Theme.Celebration.starGold.opacity(0.7))
             }
         }

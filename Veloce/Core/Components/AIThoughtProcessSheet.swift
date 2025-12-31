@@ -72,7 +72,7 @@ struct AIThoughtProcessSheet: View {
         } label: {
             VStack(spacing: Theme.Spacing.xs) {
                 Image(systemName: tab.icon)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
 
                 Text(tab.title)
                     .font(Theme.Typography.caption)
@@ -251,7 +251,7 @@ struct AIThoughtProcessSheet: View {
     private var emptyBreakdownState: some View {
         VStack(spacing: Theme.Spacing.md) {
             Image(systemName: "sparkles")
-                .font(.system(size: 40))
+                .dynamicTypeFont(base: 40)
                 .foregroundStyle(Theme.Colors.textTertiary)
 
             Text("No breakdown generated yet")
@@ -316,7 +316,7 @@ struct AIThoughtProcessSheet: View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: subTask.status.icon)
                 .foregroundStyle(statusColor(for: subTask.status))
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(subTask.orderIndex). \(subTask.title)")

@@ -97,7 +97,7 @@ struct SendChallengeSheet: View {
 
                         if index < currentStep {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 12, weight: .bold))
+                                .dynamicTypeFont(base: 12, weight: .bold)
                                 .foregroundStyle(.white)
                         } else {
                             Text("\(index + 1)")
@@ -139,7 +139,7 @@ struct SendChallengeSheet: View {
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text("What kind of challenge are you in the mood for?")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .opacity(showContent ? 1 : 0)
@@ -180,7 +180,7 @@ struct SendChallengeSheet: View {
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text("Select friends to challenge")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .padding(.top, 20)
@@ -211,7 +211,7 @@ struct SendChallengeSheet: View {
                 if !circleService.circles.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Or challenge a Circle")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                             .padding(.horizontal, 20)
 
@@ -241,7 +241,7 @@ struct SendChallengeSheet: View {
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text("Define the challenge parameters")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .padding(.top, 20)
@@ -249,7 +249,7 @@ struct SendChallengeSheet: View {
                 // Target value
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Target")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     HStack {
@@ -260,7 +260,7 @@ struct SendChallengeSheet: View {
                             }
                         } label: {
                             Image(systemName: "minus")
-                                .font(.system(size: 16, weight: .bold))
+                                .dynamicTypeFont(base: 16, weight: .bold)
                                 .foregroundStyle(Theme.CelestialColors.starWhite)
                                 .frame(width: 44, height: 44)
                                 .background(Color.white.opacity(0.1), in: SwiftUI.Circle())
@@ -274,7 +274,7 @@ struct SendChallengeSheet: View {
                                 .foregroundStyle(selectedType.color)
 
                             Text(selectedType.unitLabel)
-                                .font(.system(size: 14, weight: .medium))
+                                .dynamicTypeFont(base: 14, weight: .medium)
                                 .foregroundStyle(Theme.CelestialColors.starDim)
                         }
 
@@ -287,7 +287,7 @@ struct SendChallengeSheet: View {
                             }
                         } label: {
                             Image(systemName: "plus")
-                                .font(.system(size: 16, weight: .bold))
+                                .dynamicTypeFont(base: 16, weight: .bold)
                                 .foregroundStyle(Theme.CelestialColors.starWhite)
                                 .frame(width: 44, height: 44)
                                 .background(Color.white.opacity(0.1), in: SwiftUI.Circle())
@@ -301,7 +301,7 @@ struct SendChallengeSheet: View {
                 // Duration
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Duration")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -326,16 +326,16 @@ struct SendChallengeSheet: View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text("Stakes")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(Theme.CelestialColors.starDim)
 
                         Text("(optional)")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.starGhost)
                     }
 
                     TextField("e.g., Loser buys coffee", text: $stakes)
-                        .font(.system(size: 15))
+                        .dynamicTypeFont(base: 15)
                         .padding(16)
                         .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12))
                         .foregroundStyle(Theme.CelestialColors.starWhite)
@@ -360,7 +360,7 @@ struct SendChallengeSheet: View {
                             .frame(width: 80, height: 80)
 
                         Image(systemName: selectedType.icon)
-                            .font(.system(size: 36, weight: .semibold))
+                            .dynamicTypeFont(base: 36, weight: .semibold)
                             .foregroundStyle(selectedType.color)
                     }
 
@@ -379,7 +379,7 @@ struct SendChallengeSheet: View {
                     // Recipients
                     VStack(spacing: 8) {
                         Text("Challenging")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(Theme.CelestialColors.starGhost)
 
                         HStack(spacing: -8) {
@@ -389,7 +389,7 @@ struct SendChallengeSheet: View {
                                     .frame(width: 36, height: 36)
                                     .overlay {
                                         Text("?")
-                                            .font(.system(size: 14, weight: .bold))
+                                            .dynamicTypeFont(base: 14, weight: .bold)
                                             .foregroundStyle(Theme.CelestialColors.starDim)
                                     }
                                     .overlay {
@@ -404,7 +404,7 @@ struct SendChallengeSheet: View {
                                     .frame(width: 36, height: 36)
                                     .overlay {
                                         Text("+\(selectedRecipients.count - 5)")
-                                            .font(.system(size: 11, weight: .bold))
+                                            .dynamicTypeFont(base: 11, weight: .bold)
                                             .foregroundStyle(selectedType.color)
                                     }
                             }
@@ -415,9 +415,9 @@ struct SendChallengeSheet: View {
                     if !stakes.isEmpty {
                         HStack(spacing: 6) {
                             Image(systemName: "sparkles")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                             Text("Stakes: \(stakes)")
-                                .font(.system(size: 13, weight: .medium))
+                                .dynamicTypeFont(base: 13, weight: .medium)
                         }
                         .foregroundStyle(Theme.CelestialColors.solarFlare)
                         .padding(.horizontal, 16)
@@ -440,7 +440,7 @@ struct SendChallengeSheet: View {
 
                 // Ready text
                 Text("Ready to send this challenge?")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
             .padding(.bottom, 100)
@@ -451,14 +451,14 @@ struct SendChallengeSheet: View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text(value)
                     .font(.system(size: 18, weight: .bold, design: .rounded))
             }
             .foregroundStyle(Theme.CelestialColors.starWhite)
 
             Text(label)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         }
     }
@@ -475,7 +475,7 @@ struct SendChallengeSheet: View {
                     }
                 } label: {
                     Image(systemName: "arrow.left")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .frame(width: 52, height: 52)
                         .background(Color.white.opacity(0.08), in: SwiftUI.Circle())
@@ -500,10 +500,10 @@ struct SendChallengeSheet: View {
                             .tint(.white)
                     } else {
                         Text(currentStep == steps.count - 1 ? "Send Challenge" : "Next")
-                            .font(.system(size: 16, weight: .bold))
+                            .dynamicTypeFont(base: 16, weight: .bold)
 
                         Image(systemName: currentStep == steps.count - 1 ? "paperplane.fill" : "arrow.right")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                     }
                 }
                 .foregroundStyle(.white)
@@ -643,7 +643,7 @@ struct ChallengeTypeSelectionCard: View {
                         .frame(width: 48, height: 48)
 
                     Image(systemName: type.icon)
-                        .font(.system(size: 22, weight: .semibold))
+                        .dynamicTypeFont(base: 22, weight: .semibold)
                         .foregroundStyle(type.color)
                 }
 
@@ -653,7 +653,7 @@ struct ChallengeTypeSelectionCard: View {
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text(type.description)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .lineLimit(2)
                 }
@@ -715,9 +715,9 @@ struct FriendSelectionRow: View {
                     if let streak = friend.currentStreak, streak > 0 {
                         HStack(spacing: 3) {
                             Image(systemName: "flame.fill")
-                                .font(.system(size: 10))
+                                .dynamicTypeFont(base: 10)
                             Text("\(streak) day streak")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                         }
                         .foregroundStyle(Theme.Colors.streakOrange)
                     }
@@ -737,7 +737,7 @@ struct FriendSelectionRow: View {
                             .frame(width: 16, height: 16)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
@@ -772,7 +772,7 @@ struct CircleSelectionPill: View {
                     .frame(width: 32, height: 32)
 
                 Text(circle.name.prefix(2).uppercased())
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(.white)
             }
 
@@ -782,7 +782,7 @@ struct CircleSelectionPill: View {
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("\(circle.memberCount) members")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
         }

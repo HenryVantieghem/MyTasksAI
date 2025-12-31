@@ -203,11 +203,11 @@ struct AuroraButton: View {
             } else {
                 if let icon {
                     Image(systemName: icon)
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                 }
 
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
             }
         }
         .foregroundStyle(contentColor)
@@ -264,7 +264,7 @@ struct AuroraLinkButton: View {
             action()
         } label: {
             Text(title)
-                .font(.system(size: 15, weight: .medium))
+                .dynamicTypeFont(base: 15, weight: .medium)
                 .foregroundStyle(color)
         }
         .buttonStyle(.plain)
@@ -347,7 +347,7 @@ struct AuroraIconButton: View {
         // Link buttons
         HStack(spacing: 4) {
             Text("Don't have an account?")
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(Aurora.Colors.textSecondary)
 
             AuroraLinkButton("Sign Up") { }

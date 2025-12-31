@@ -29,7 +29,7 @@ struct EmotionalCheckInModule: View {
             VStack(alignment: .leading, spacing: Theme.Spacing.md) {
                 // Intro text
                 Text("This task has been waiting. That's okay—let's make it feel possible.")
-                    .font(.system(size: 14, weight: .regular))
+                    .dynamicTypeFont(base: 14, weight: .regular)
                     .foregroundStyle(.white.opacity(0.8))
 
                 // Emotion buttons
@@ -64,9 +64,9 @@ struct EmotionalCheckInModule: View {
         } label: {
             VStack(spacing: 4) {
                 Text(emotion.emoji)
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                 Text(emotion.rawValue)
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
@@ -96,11 +96,11 @@ struct EmotionalCheckInModule: View {
         HStack(alignment: .top, spacing: Theme.Spacing.sm) {
             // Quote mark
             Image(systemName: "quote.opening")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(accentColor.opacity(0.6))
 
             Text(response)
-                .font(.system(size: 14, weight: .regular))
+                .dynamicTypeFont(base: 14, weight: .regular)
                 .foregroundStyle(.white.opacity(0.9))
                 .lineSpacing(4)
         }

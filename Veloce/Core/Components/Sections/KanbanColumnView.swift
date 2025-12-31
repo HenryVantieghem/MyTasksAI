@@ -243,7 +243,7 @@ struct KanbanColumnHeader: View {
 
             // Icon
             Image(systemName: section.icon)
-                .font(.system(size: 10, weight: .bold))
+                .dynamicTypeFont(base: 10, weight: .bold)
                 .foregroundStyle(.white)
         }
         .scaleEffect(1 + orbPulse * 0.1)
@@ -313,11 +313,11 @@ struct KanbanEmptyColumnPlaceholder: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: section.icon)
-                .font(.system(size: 32, weight: .light))
+                .dynamicTypeFont(base: 32, weight: .light)
                 .foregroundStyle(section.primaryColor.opacity(0.4))
 
             Text(emptyMessage)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
@@ -358,7 +358,7 @@ struct TaskCardDragPreview: View {
                 .frame(width: 8, height: 8)
 
             Text(task.title)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
         }

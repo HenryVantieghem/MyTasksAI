@@ -94,15 +94,15 @@ struct ResourcesModule: View {
     private var emptyState: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "sparkles")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(accentColor.opacity(0.5))
 
             Text("No resources found")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.white.opacity(0.6))
 
             Text("AI will suggest helpful resources based on your task")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
         }
@@ -146,7 +146,7 @@ struct ResourceRow: View {
                     // Content
                     VStack(alignment: .leading, spacing: 3) {
                         Text(resource.title)
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(.white)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
@@ -155,9 +155,9 @@ struct ResourceRow: View {
                             // Type badge
                             HStack(spacing: 3) {
                                 Image(systemName: resource.type.icon)
-                                    .font(.system(size: 9))
+                                    .dynamicTypeFont(base: 9)
                                 Text(resource.type.displayName)
-                                    .font(.system(size: 10, weight: .medium))
+                                    .dynamicTypeFont(base: 10, weight: .medium)
                             }
                             .foregroundStyle(resource.type.color)
                             .padding(.horizontal, 6)
@@ -168,14 +168,14 @@ struct ResourceRow: View {
                             )
 
                             Text(resource.source)
-                                .font(.system(size: 11, weight: .regular))
+                                .dynamicTypeFont(base: 11, weight: .regular)
                                 .foregroundStyle(.white.opacity(0.6))
 
                             if let duration = resource.duration {
                                 Text("•")
                                     .foregroundStyle(.white.opacity(0.4))
                                 Text(duration)
-                                    .font(.system(size: 11, weight: .regular))
+                                    .dynamicTypeFont(base: 11, weight: .regular)
                                     .foregroundStyle(.white.opacity(0.6))
                             }
                         }
@@ -184,9 +184,9 @@ struct ResourceRow: View {
                         if let reasoning = resource.reasoning {
                             HStack(spacing: 4) {
                                 Image(systemName: "sparkles")
-                                    .font(.system(size: 8))
+                                    .dynamicTypeFont(base: 8)
                                 Text(reasoning)
-                                    .font(.system(size: 10, weight: .medium))
+                                    .dynamicTypeFont(base: 10, weight: .medium)
                             }
                             .foregroundStyle(accentColor)
                             .padding(.horizontal, 6)
@@ -201,7 +201,7 @@ struct ResourceRow: View {
                     Spacer()
 
                     Image(systemName: showActions ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.4))
                 }
                 .padding(Theme.Spacing.sm)
@@ -217,9 +217,9 @@ struct ResourceRow: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "play.rectangle.fill")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                             Text("Open in App")
-                                .font(.system(size: 12, weight: .semibold))
+                                .dynamicTypeFont(base: 12, weight: .semibold)
                         }
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -237,9 +237,9 @@ struct ResourceRow: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: resource.type == .youtube ? "play.rectangle" : "safari")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                             Text(resource.type == .youtube ? "YouTube" : "Safari")
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                         }
                         .foregroundStyle(accentColor)
                         .frame(maxWidth: .infinity)
@@ -289,7 +289,7 @@ struct ResourceRow: View {
                                     .fill(.black.opacity(0.5))
                                     .frame(width: 24, height: 24)
                                 Image(systemName: "play.fill")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(.white)
                             }
                         )
@@ -307,7 +307,7 @@ struct ResourceRow: View {
                     .frame(width: 50, height: 50)
 
                 Image(systemName: resource.type.icon)
-                    .font(.system(size: 20, weight: .medium))
+                    .dynamicTypeFont(base: 20, weight: .medium)
                     .foregroundStyle(resource.type.color)
             }
         }
@@ -320,7 +320,7 @@ struct ResourceRow: View {
                 .frame(width: 80, height: 45)
 
             Image(systemName: "play.rectangle.fill")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(.white.opacity(0.4))
         }
         .shimmer()

@@ -61,7 +61,7 @@ struct AuthButton: View {
                             .scaleEffect(0.9)
                     } else if showSuccess {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 18, weight: .bold))
+                            .dynamicTypeFont(base: 18, weight: .bold)
                             .foregroundStyle(contentColor)
                             .transition(.scale.combined(with: .opacity))
                     } else {

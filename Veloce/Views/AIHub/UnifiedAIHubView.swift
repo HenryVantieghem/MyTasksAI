@@ -97,7 +97,7 @@ struct UnifiedAIHubView: View {
                             .font(.system(size: 12, weight: selectedMode == mode ? .semibold : .regular))
                         if selectedMode == mode {
                             Text(mode.rawValue)
-                                .font(.system(size: 12, weight: .semibold))
+                                .dynamicTypeFont(base: 12, weight: .semibold)
                         }
                     }
                     .foregroundStyle(selectedMode == mode ? .white : .white.opacity(0.5))
@@ -165,11 +165,11 @@ struct AIHubJournalCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             Text("What's on your mind?")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             TextEditor(text: $entryText)
-                .font(.system(size: 16, weight: .regular))
+                .dynamicTypeFont(base: 16, weight: .regular)
                 .foregroundStyle(.white)
                 .scrollContentBackground(.hidden)
                 .focused($isFocused)
@@ -200,19 +200,19 @@ struct AIReflectionCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "sparkles")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Theme.Colors.aiPurple)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(reflection)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.85))
 
                 Button {
                     // Action
                 } label: {
                     Text("Create Focus Block")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
             }
@@ -241,9 +241,9 @@ struct ActionPill: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text(label)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
             }
             .foregroundStyle(.white.opacity(0.6))
             .padding(.horizontal, 10)
@@ -269,14 +269,14 @@ struct ProcessModeView: View {
             // Input area
             VStack(spacing: Theme.Spacing.md) {
                 Text("Let it all out...")
-                    .font(.system(size: 24, weight: .thin))
+                    .dynamicTypeFont(base: 24, weight: .thin)
                     .foregroundStyle(.white.opacity(0.6))
 
                 TextEditor(text: Binding(
                     get: { viewModel.inputText },
                     set: { viewModel.inputText = $0 }
                 ))
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white)
                     .scrollContentBackground(.hidden)
                     .frame(height: 200)
@@ -304,7 +304,7 @@ struct ProcessModeView: View {
                         Image(systemName: "sparkles")
                     }
                     Text(viewModel.isProcessing ? "Processing..." : "Process Thoughts")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -353,7 +353,7 @@ struct ChatModeView: View {
             // Input bar
             HStack(spacing: 12) {
                 TextField("Ask anything...", text: $inputText)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                     .background {
@@ -365,7 +365,7 @@ struct ChatModeView: View {
                     sendMessage()
                 } label: {
                     Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
                 .disabled(inputText.isEmpty)
@@ -419,7 +419,7 @@ struct ChatBubble: View {
             if message.role == .user { Spacer() }
 
             Text(message.content)
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(.white)
                 .padding(12)
                 .background {
@@ -497,7 +497,7 @@ struct ContentCard: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(accentColor)
                 .frame(width: 44, height: 44)
                 .background {
@@ -507,11 +507,11 @@ struct ContentCard: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text(subtitle)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -519,12 +519,12 @@ struct ContentCard: View {
 
             if let duration = duration {
                 Text(duration)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.3))
         }
         .padding(Theme.Spacing.md)

@@ -334,7 +334,7 @@ struct SparkleExplosion: View {
         ZStack {
             ForEach(sparkles) { sparkle in
                 Image(systemName: "sparkle")
-                    .font(.system(size: 8))
+                    .dynamicTypeFont(base: 8)
                     .foregroundStyle(color)
                     .scaleEffect(sparkle.scale)
                     .rotationEffect(.degrees(sparkle.rotation))

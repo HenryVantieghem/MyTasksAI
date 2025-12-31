@@ -239,7 +239,7 @@ struct ImmersiveFocusOverlay: View {
             } label: {
                 VStack(spacing: 8) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 20, weight: .medium))
+                        .dynamicTypeFont(base: 20, weight: .medium)
                         .frame(width: 56, height: 56)
                         .background(Color.white.opacity(0.1))
                         .clipShape(Circle())
@@ -260,7 +260,7 @@ struct ImmersiveFocusOverlay: View {
             } label: {
                 VStack(spacing: 8) {
                     Image(systemName: isPaused ? "play.fill" : "pause.fill")
-                        .font(.system(size: 28, weight: .medium))
+                        .dynamicTypeFont(base: 28, weight: .medium)
                         .frame(width: 80, height: 80)
                         .background(
                             isPaused
@@ -289,7 +289,7 @@ struct ImmersiveFocusOverlay: View {
             } label: {
                 VStack(spacing: 8) {
                     Image(systemName: "plus")
-                        .font(.system(size: 20, weight: .medium))
+                        .dynamicTypeFont(base: 20, weight: .medium)
                         .frame(width: 56, height: 56)
                         .background(Color.white.opacity(0.1))
                         .clipShape(Circle())

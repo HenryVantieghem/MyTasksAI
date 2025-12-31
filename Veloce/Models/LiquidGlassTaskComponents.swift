@@ -29,7 +29,7 @@ struct LiquidGlassTaskCard: View {
                 VStack(alignment: .leading, spacing: 8) {
                     // Title
                     Text(task.title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .strikethrough(task.isCompleted, color: .white.opacity(0.5))
@@ -40,9 +40,9 @@ struct LiquidGlassTaskCard: View {
                         if let dueDate = task.scheduledTime {
                             HStack(spacing: 4) {
                                 Image(systemName: "calendar")
-                                    .font(.system(size: 11))
+                                    .dynamicTypeFont(base: 11)
                                 Text(dueDate, style: .relative)
-                                    .font(.system(size: 12, weight: .medium))
+                                    .dynamicTypeFont(base: 12, weight: .medium)
                             }
                             .foregroundStyle(task.isOverdue ? LiquidGlassDesignSystem.VibrantAccents.nebulaPink : .white.opacity(0.6))
                         }
@@ -68,7 +68,7 @@ struct LiquidGlassTaskCard: View {
                 
                 // Chevron for details
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.3))
             }
             .padding(16)
@@ -128,7 +128,7 @@ struct LiquidGlassTaskCard: View {
                 
                 if task.isCompleted {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .bold))
+                        .dynamicTypeFont(base: 14, weight: .bold)
                         .foregroundStyle(taskAccentColor)
                         .transition(.scale.combined(with: .opacity))
                 }
@@ -196,7 +196,7 @@ struct LiquidGlassTaskInputBar: View {
                 HapticsService.shared.lightImpact()
             } label: {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 24, weight: .semibold))
+                    .dynamicTypeFont(base: 24, weight: .semibold)
                     .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
                     .frame(width: 40, height: 40)
                     .background(.ultraThinMaterial)
@@ -206,7 +206,7 @@ struct LiquidGlassTaskInputBar: View {
             // Input field container
             HStack(spacing: 12) {
                 TextField("Add a task...", text: $text)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white)
                     .tint(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
                     .focused($isFocused)
@@ -219,7 +219,7 @@ struct LiquidGlassTaskInputBar: View {
                 if text.isEmpty && showMicrophone {
                     Button(action: onVoiceInput) {
                         Image(systemName: "waveform")
-                            .font(.system(size: 18, weight: .medium))
+                            .dynamicTypeFont(base: 18, weight: .medium)
                             .foregroundStyle(.white.opacity(0.6))
                             .frame(width: 40, height: 40)
                     }
@@ -241,7 +241,7 @@ struct LiquidGlassTaskInputBar: View {
                                 .frame(width: 36, height: 36)
                             
                             Image(systemName: "arrow.up")
-                                .font(.system(size: 16, weight: .bold))
+                                .dynamicTypeFont(base: 16, weight: .bold)
                                 .foregroundStyle(.white)
                         }
                         .shadow(
@@ -324,18 +324,18 @@ struct LiquidGlassTaskSection: View {
                         .blur(radius: 8)
                     
                     Image(systemName: icon)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(accentColor)
                 }
                 
                 // Title
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(.white)
                 
                 // Count badge
                 Text("\(taskCount)")
-                    .font(.system(size: 13, weight: .bold))
+                    .dynamicTypeFont(base: 13, weight: .bold)
                     .foregroundStyle(.white.opacity(0.7))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
@@ -348,7 +348,7 @@ struct LiquidGlassTaskSection: View {
                 
                 // Expand/collapse chevron
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.5))
                     .rotationEffect(.degrees(isExpanded ? 0 : -90))
             }
@@ -420,17 +420,17 @@ struct TaskComponentsEmptyState: View {
                     .blur(radius: 20)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 48, weight: .light))
+                    .dynamicTypeFont(base: 48, weight: .light)
                     .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple)
             }
             
             VStack(spacing: 12) {
                 Text(title)
-                    .font(.system(size: 22, weight: .semibold))
+                    .dynamicTypeFont(base: 22, weight: .semibold)
                     .foregroundStyle(.white)
                 
                 Text(message)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
                     .lineLimit(3)
@@ -534,12 +534,12 @@ struct LiquidGlassQuickActionMenu: View {
         }) {
             HStack(spacing: 16) {
                 Image(systemName: icon)
-                    .font(.system(size: 22, weight: .semibold))
+                    .dynamicTypeFont(base: 22, weight: .semibold)
                     .foregroundStyle(color)
                     .frame(width: 28)
                 
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(.white)
                 
                 Spacer()

@@ -50,7 +50,7 @@ struct TextFormattingToolbar: View {
                 onDismiss()
             } label: {
                 Image(systemName: "keyboard.chevron.compact.down")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
                     .frame(width: 44, height: 44)
             }

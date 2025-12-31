@@ -72,7 +72,7 @@ struct WeeklyCheckInSheet: View {
                         } else {
                             HStack(spacing: 4) {
                                 Image(systemName: "chevron.left")
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .dynamicTypeFont(base: 12, weight: .semibold)
                                 Text("Back")
                             }
                             .foregroundStyle(.white.opacity(0.7))
@@ -140,11 +140,11 @@ struct WeeklyCheckInSheet: View {
                 checkInOrb
 
                 Text("How are you feeling?")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("About your progress on \(goal.displayTitle)")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
@@ -181,12 +181,12 @@ struct WeeklyCheckInSheet: View {
                         .frame(width: 80, height: 80)
 
                     Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(Theme.Colors.aiCyan)
                 }
 
                 Text("Update Your Progress")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
             }
 
@@ -218,7 +218,7 @@ struct WeeklyCheckInSheet: View {
                             .contentTransition(.numericText())
 
                         Text("complete")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                 }
@@ -236,7 +236,7 @@ struct WeeklyCheckInSheet: View {
                             }
                         } label: {
                             Text("\(Int(value * 100))%")
-                                .font(.system(size: 13, weight: .medium))
+                                .dynamicTypeFont(base: 13, weight: .medium)
                                 .foregroundStyle(updatedProgress == value ? .white : .white.opacity(0.6))
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 8)
@@ -270,23 +270,23 @@ struct WeeklyCheckInSheet: View {
                         .frame(width: 80, height: 80)
 
                     Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(Theme.Colors.warning)
                 }
 
                 Text("Any Blockers?")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("What's getting in your way?")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
             // Add blocker input
             HStack(spacing: 12) {
                 TextField("Add a blocker...", text: $newBlocker)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white)
                     .padding(14)
                     .background(
@@ -301,7 +301,7 @@ struct WeeklyCheckInSheet: View {
                     addBlocker()
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(newBlocker.isEmpty ? .white.opacity(0.3) : Theme.Colors.warning)
                 }
                 .buttonStyle(.plain)
@@ -316,11 +316,11 @@ struct WeeklyCheckInSheet: View {
                         ForEach(blockers, id: \.self) { blocker in
                             HStack {
                                 Image(systemName: "exclamationmark.circle")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(Theme.Colors.warning)
 
                                 Text(blocker)
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.8))
 
                                 Spacer()
@@ -329,7 +329,7 @@ struct WeeklyCheckInSheet: View {
                                     blockers.removeAll { $0 == blocker }
                                 } label: {
                                     Image(systemName: "xmark.circle.fill")
-                                        .font(.system(size: 18))
+                                        .dynamicTypeFont(base: 18)
                                         .foregroundStyle(.white.opacity(0.3))
                                 }
                                 .buttonStyle(.plain)
@@ -357,7 +357,7 @@ struct WeeklyCheckInSheet: View {
                         goToNext()
                     } label: {
                         Text("No blockers this week")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                     .buttonStyle(.plain)
@@ -380,23 +380,23 @@ struct WeeklyCheckInSheet: View {
                         .frame(width: 80, height: 80)
 
                     Image(systemName: "star.fill")
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(Theme.Colors.success)
                 }
 
                 Text("Celebrate Wins!")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("What progress are you proud of?")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
             // Add win input
             HStack(spacing: 12) {
                 TextField("Add a win...", text: $newWin)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white)
                     .padding(14)
                     .background(
@@ -411,7 +411,7 @@ struct WeeklyCheckInSheet: View {
                     addWin()
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(newWin.isEmpty ? .white.opacity(0.3) : Theme.Colors.success)
                 }
                 .buttonStyle(.plain)
@@ -426,11 +426,11 @@ struct WeeklyCheckInSheet: View {
                         ForEach(wins, id: \.self) { win in
                             HStack {
                                 Image(systemName: "star.fill")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(Theme.Colors.success)
 
                                 Text(win)
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.8))
 
                                 Spacer()
@@ -439,7 +439,7 @@ struct WeeklyCheckInSheet: View {
                                     wins.removeAll { $0 == win }
                                 } label: {
                                     Image(systemName: "xmark.circle.fill")
-                                        .font(.system(size: 18))
+                                        .dynamicTypeFont(base: 18)
                                         .foregroundStyle(.white.opacity(0.3))
                                 }
                                 .buttonStyle(.plain)
@@ -476,22 +476,22 @@ struct WeeklyCheckInSheet: View {
                         .frame(width: 80, height: 80)
 
                     Image(systemName: "text.alignleft")
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
 
                 Text("Any Other Notes?")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Reflect on your journey this week")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
             // Notes input
             TextEditor(text: $notes)
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(.white)
                 .scrollContentBackground(.hidden)
                 .frame(minHeight: 120, maxHeight: 180)
@@ -518,7 +518,7 @@ struct WeeklyCheckInSheet: View {
                         goToNext()
                     } label: {
                         Text("Skip for now")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                     .buttonStyle(.plain)
@@ -542,12 +542,12 @@ struct WeeklyCheckInSheet: View {
                             .frame(width: 80, height: 80)
 
                         Image(systemName: "checkmark.seal")
-                            .font(.system(size: 32))
+                            .dynamicTypeFont(base: 32)
                             .foregroundStyle(Theme.Colors.success)
                     }
 
                     Text("Review Check-In")
-                        .font(.system(size: 28, weight: .bold))
+                        .dynamicTypeFont(base: 28, weight: .bold)
                         .foregroundStyle(.white)
                 }
 
@@ -564,16 +564,16 @@ struct WeeklyCheckInSheet: View {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack(spacing: 6) {
                                 Image(systemName: "exclamationmark.triangle")
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                                     .foregroundStyle(Theme.Colors.warning)
                                 Text("Blockers")
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .dynamicTypeFont(base: 13, weight: .semibold)
                                     .foregroundStyle(.white.opacity(0.7))
                             }
 
                             ForEach(blockers, id: \.self) { blocker in
                                 Text("• \(blocker)")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.8))
                             }
                         }
@@ -590,16 +590,16 @@ struct WeeklyCheckInSheet: View {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack(spacing: 6) {
                                 Image(systemName: "star.fill")
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                                     .foregroundStyle(Theme.Colors.success)
                                 Text("Wins")
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .dynamicTypeFont(base: 13, weight: .semibold)
                                     .foregroundStyle(.white.opacity(0.7))
                             }
 
                             ForEach(wins, id: \.self) { win in
                                 Text("• \(win)")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.8))
                             }
                         }
@@ -616,15 +616,15 @@ struct WeeklyCheckInSheet: View {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack(spacing: 6) {
                                 Image(systemName: "text.alignleft")
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                                     .foregroundStyle(Theme.Colors.aiPurple)
                                 Text("Notes")
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .dynamicTypeFont(base: 13, weight: .semibold)
                                     .foregroundStyle(.white.opacity(0.7))
                             }
 
                             Text(notes)
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.8))
                         }
                         .padding(16)
@@ -647,10 +647,10 @@ struct WeeklyCheckInSheet: View {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "paperplane.fill")
-                            .font(.system(size: 18))
+                            .dynamicTypeFont(base: 18)
 
                         Text("Submit Check-In")
-                            .font(.system(size: 17, weight: .semibold))
+                            .dynamicTypeFont(base: 17, weight: .semibold)
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -706,11 +706,11 @@ struct WeeklyCheckInSheet: View {
 
             VStack(spacing: 12) {
                 Text("Saving Check-In")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Getting AI coach feedback...")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -748,7 +748,7 @@ struct WeeklyCheckInSheet: View {
                         .shadow(color: Theme.Colors.success.opacity(0.5), radius: 20)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 48, weight: .bold))
+                        .dynamicTypeFont(base: 48, weight: .bold)
                         .foregroundStyle(.white)
                 }
                 .scaleEffect(showSuccess ? 1 : 0)
@@ -757,17 +757,17 @@ struct WeeklyCheckInSheet: View {
 
             VStack(spacing: 16) {
                 Text("Check-In Complete!")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 // Streak badge
                 HStack(spacing: 8) {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(.orange)
 
                     Text("\(goal.checkInStreak + 1) week streak!")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(.white)
                 }
                 .padding(.horizontal, 16)
@@ -782,14 +782,14 @@ struct WeeklyCheckInSheet: View {
                     VStack(spacing: 8) {
                         HStack(spacing: 6) {
                             Image(systemName: "sparkles")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                             Text("AI Coach")
-                                .font(.system(size: 12, weight: .semibold))
+                                .dynamicTypeFont(base: 12, weight: .semibold)
                         }
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                         Text(response)
-                            .font(.system(size: 15))
+                            .dynamicTypeFont(base: 15)
                             .foregroundStyle(.white.opacity(0.8))
                             .multilineTextAlignment(.center)
                             .lineSpacing(4)
@@ -813,7 +813,7 @@ struct WeeklyCheckInSheet: View {
                 dismiss()
             } label: {
                 Text("Done")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 18)
@@ -871,7 +871,7 @@ struct WeeklyCheckInSheet: View {
                 )
 
             Image(systemName: "bell.badge.fill")
-                .font(.system(size: 28))
+                .dynamicTypeFont(base: 28)
                 .foregroundStyle(Theme.Colors.aiPurple)
         }
     }
@@ -882,10 +882,10 @@ struct WeeklyCheckInSheet: View {
         } label: {
             HStack(spacing: 8) {
                 Text("Continue")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
 
                 Image(systemName: "arrow.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -1126,7 +1126,7 @@ private struct MoodButton: View {
                         .frame(width: 56, height: 56)
 
                     Image(systemName: mood.icon)
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(isSelected ? .white : mood.color)
                 }
 
@@ -1150,15 +1150,15 @@ private struct ReviewCard: View {
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 22))
+                .dynamicTypeFont(base: 22)
                 .foregroundStyle(color)
 
             Text(value)
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
 
             Text(label)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)

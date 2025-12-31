@@ -19,7 +19,7 @@ struct KeyboardDismissButton: View {
             onDismiss()
         } label: {
             Image(systemName: "keyboard.chevron.compact.down")
-                .font(.system(size: 18, weight: .medium))
+                .dynamicTypeFont(base: 18, weight: .medium)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .frame(width: 36, height: 36)
                 .background(

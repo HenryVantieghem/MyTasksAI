@@ -176,7 +176,7 @@ struct TaskRowView: View {
             // Checkmark
             if task.isCompleted {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(Theme.CelestialColors.void)
                     .transition(.asymmetric(
                         insertion: .scale.combined(with: .opacity),
@@ -200,7 +200,7 @@ struct TaskRowView: View {
         HStack(spacing: 2) {
             ForEach(1...3, id: \.self) { index in
                 Image(systemName: index <= priorityStars ? "star.fill" : "star")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundColor(index <= priorityStars ? Color(hex: "FFD700") : Theme.CelestialColors.starGhost)
             }
 
@@ -228,7 +228,7 @@ struct TaskRowView: View {
                 .foregroundColor(Theme.CelestialColors.starWhite)
 
             Image(systemName: "clock.fill")
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
                 .foregroundColor(Theme.CelestialColors.plasmaCore)
         }
         .padding(.horizontal, 10)
@@ -300,11 +300,11 @@ struct TaskRowView: View {
 
                 VStack(spacing: 4) {
                     Image(systemName: "trash.fill")
-                        .font(.system(size: 20, weight: .semibold))
+                        .dynamicTypeFont(base: 20, weight: .semibold)
                         .foregroundColor(Theme.CelestialColors.errorNebula)
 
                     Text("Delete")
-                        .font(.system(size: 10, weight: .medium))
+                        .dynamicTypeFont(base: 10, weight: .medium)
                         .foregroundColor(Theme.CelestialColors.errorNebula)
                 }
                 .opacity(-swipeOffset > deleteThreshold * 0.5 ? 1 : 0.5)

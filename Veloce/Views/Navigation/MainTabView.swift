@@ -41,6 +41,7 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             // Tasks Tab
             tasksTab
+                .maxWidthConstrained()
                 .tabItem {
                     Label(AppTab.tasks.title, systemImage: selectedTab == .tasks ? AppTab.tasks.selectedIcon : AppTab.tasks.icon)
                 }
@@ -48,6 +49,7 @@ struct MainTabView: View {
 
             // Plan Tab (Calendar)
             EnhancedCalendarView(viewModel: calendarViewModel)
+                .maxWidthConstrained()
                 .tabItem {
                     Label(AppTab.plan.title, systemImage: selectedTab == .plan ? AppTab.plan.selectedIcon : AppTab.plan.icon)
                 }
@@ -55,6 +57,7 @@ struct MainTabView: View {
 
             // Grow Tab (Stats/Goals/Circles)
             GrowView()
+                .maxWidthConstrained()
                 .tabItem {
                     Label(AppTab.grow.title, systemImage: selectedTab == .grow ? AppTab.grow.selectedIcon : AppTab.grow.icon)
                 }
@@ -62,6 +65,7 @@ struct MainTabView: View {
 
             // Flow Tab (Focus)
             FocusTabView()
+                .maxWidthConstrained()
                 .tabItem {
                     Label(AppTab.flow.title, systemImage: selectedTab == .flow ? AppTab.flow.selectedIcon : AppTab.flow.icon)
                 }
@@ -69,6 +73,7 @@ struct MainTabView: View {
 
             // Journal Tab
             JournalTabView(tasksViewModel: tasksViewModel)
+                .maxWidthConstrained()
                 .tabItem {
                     Label(AppTab.journal.title, systemImage: selectedTab == .journal ? AppTab.journal.selectedIcon : AppTab.journal.icon)
                 }

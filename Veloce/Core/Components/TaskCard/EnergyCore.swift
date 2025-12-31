@@ -340,7 +340,7 @@ struct EnergyPointsBadge: View {
 
             // Energy bolt icon
             Image(systemName: "bolt.fill")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
         }
         .foregroundStyle(badgeTextColor)
         .padding(.horizontal, 8)

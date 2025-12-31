@@ -586,10 +586,10 @@ struct StaticCelestialOrb: View {
     VStack(spacing: 60) {
         HStack(spacing: 40) {
             StaticCelestialOrb(state: .dormant, size: 40, showRings: false)
-            StaticCelestialOrb(state: .active, size: 60, showRings: true)
+            StaticCelestialOrb(state: .awake, size: 60, showRings: true)
         }
 
-        StaticCelestialOrb(state: .processing, size: 100, showRings: true, showParticles: true)
+        StaticCelestialOrb(state: .thinking, size: 100, showRings: true, showParticles: true)
 
         StaticCelestialOrb(state: .celebration, size: 140, showRings: true, showParticles: true)
     }

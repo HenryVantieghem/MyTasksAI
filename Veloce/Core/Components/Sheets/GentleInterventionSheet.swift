@@ -77,7 +77,7 @@ struct GentleInterventionSheet: View {
                     .frame(width: 64, height: 64)
 
                 Image(systemName: "heart.fill")
-                    .font(.system(size: 28))
+                    .dynamicTypeFont(base: 28)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color(hex: "8B5CF6"), Color(hex: "06B6D4")],
@@ -89,11 +89,11 @@ struct GentleInterventionSheet: View {
 
             VStack(spacing: 4) {
                 Text("Let's talk about this task")
-                    .font(.system(size: 20, weight: .semibold))
+                    .dynamicTypeFont(base: 20, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("It's been rescheduled a few times. That's okay—let's figure out what's going on.")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
             }
@@ -110,14 +110,14 @@ struct GentleInterventionSheet: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.white)
                     .lineLimit(2)
 
                 HStack(spacing: 8) {
                     if let times = task.timesRescheduled, times > 0 {
                         Label("Rescheduled \(times)x", systemImage: "arrow.clockwise")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                 }
@@ -151,16 +151,16 @@ struct GentleInterventionSheet: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Color(hex: "06B6D4"))
 
                 Text("Here's a thought...")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white.opacity(0.7))
             }
 
             Text(blocker.suggestion)
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(.white.opacity(0.9))
                 .lineSpacing(4)
         }
@@ -189,7 +189,7 @@ struct GentleInterventionSheet: View {
                     Image(systemName: "rectangle.split.3x1")
                     Text("Break it into smaller steps")
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -213,7 +213,7 @@ struct GentleInterventionSheet: View {
                     Image(systemName: "calendar.badge.clock")
                     Text("Reschedule to another day")
                 }
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -235,7 +235,7 @@ struct GentleInterventionSheet: View {
                     Image(systemName: "trash")
                     Text("Remove this task")
                 }
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white.opacity(0.6))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -247,7 +247,7 @@ struct GentleInterventionSheet: View {
                 onDismiss()
             } label: {
                 Text("Keep it for now")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.5))
             }
             .buttonStyle(.plain)

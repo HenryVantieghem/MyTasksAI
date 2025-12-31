@@ -498,7 +498,7 @@ public struct InteractiveGlowBorder<S: Shape>: View {
 
             // Chromatic aberration
             Image(systemName: "sparkles")
-                .font(.system(size: 60))
+                .dynamicTypeFont(base: 60)
                 .foregroundStyle(Aurora.Colors.electricCyan)
                 .chromaticAberration(offset: 3)
         }

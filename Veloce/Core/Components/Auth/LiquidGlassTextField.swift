@@ -181,7 +181,7 @@ struct LiquidGlassTextField: View {
 
             // Icon
             Image(systemName: systemName)
-                .font(.system(size: 18, weight: .medium))
+                .dynamicTypeFont(base: 18, weight: .medium)
                 .foregroundStyle(
                     isFocused
                     ? LiquidGlassDesignSystem.VibrantAccents.electricCyan
@@ -220,7 +220,7 @@ struct LiquidGlassTextField: View {
                 TextField("", text: $text)
             }
         }
-        .font(.system(size: 16, weight: .regular))
+        .dynamicTypeFont(base: 16, weight: .regular)
         .foregroundStyle(.white)
         .tint(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
         .keyboardType(keyboardType)
@@ -251,13 +251,13 @@ struct LiquidGlassTextField: View {
 
             case .valid:
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.auroraGreen)
                     .transition(.scale.combined(with: .opacity))
 
             case .invalid:
                 Image(systemName: "exclamationmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(Color.red)
                     .transition(.scale.combined(with: .opacity))
             }
@@ -274,7 +274,7 @@ struct LiquidGlassTextField: View {
             showSecureText.toggle()
         } label: {
             Image(systemName: showSecureText ? "eye.slash.fill" : "eye.fill")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Color.white.opacity(0.5))
         }
         .buttonStyle(PlainButtonStyle())
@@ -346,10 +346,10 @@ struct LiquidGlassTextField: View {
     private func errorMessage(_ message: String) -> some View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
 
             Text(message)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
         }
         .foregroundStyle(Color.red.opacity(0.9))
         .padding(.leading, icon != nil ? 52 : 16)
@@ -444,7 +444,7 @@ struct LiquidGlassPasswordStrength: View {
 
             // Label
             Text(strength.label)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(strength.color)
         }
         .padding(.leading, 4)

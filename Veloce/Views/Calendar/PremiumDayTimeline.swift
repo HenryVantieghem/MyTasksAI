@@ -20,11 +20,16 @@ struct PremiumDayTimeline: View {
     let onTaskComplete: (TaskItem) -> Void
     let onTaskDrag: (TaskItem, Date) -> Void
 
+    // ResponsiveLayout for device-aware sizing
+    @Environment(\.responsiveLayout) private var layout
+
     // Timeline configuration
     private let startHour = 6
     private let endHour = 22
-    private let hourHeight: CGFloat = 64
-    private let timeGutterWidth: CGFloat = 52
+
+    // Use ResponsiveLayout values for sizing
+    private var hourHeight: CGFloat { layout.hourHeight }
+    private var timeGutterWidth: CGFloat { layout.timeGutterWidth }
 
     private let calendar = Calendar.current
 
@@ -64,7 +69,7 @@ struct PremiumDayTimeline: View {
                 }
                 .frame(height: CGFloat(endHour - startHour) * hourHeight)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, layout.screenPadding)
             .onAppear {
                 if isToday {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -85,7 +90,7 @@ struct PremiumDayTimeline: View {
                 HStack(alignment: .top, spacing: 0) {
                     // Hour label
                     Text(formatHour(hour))
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white.opacity(0.35))
                         .frame(width: timeGutterWidth, alignment: .trailing)
                         .padding(.trailing, 12)
@@ -194,7 +199,7 @@ struct PremiumDayTimeline: View {
 
         return HStack(spacing: 0) {
             Text(event.title ?? "Event")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(.white.opacity(0.9))
                 .lineLimit(1)
                 .padding(.horizontal, 10)
@@ -233,7 +238,7 @@ struct PremiumDayTimeline: View {
             HStack(spacing: 0) {
                 // Time label
                 Text(now.formatted(.dateTime.hour().minute()))
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                    .dynamicTypeFont(base: 10, weight: .bold)
                     .foregroundStyle(Theme.Colors.aiCyan)
                     .frame(width: timeGutterWidth, alignment: .trailing)
                     .padding(.trailing, 8)
@@ -342,6 +347,7 @@ struct PremiumTaskBlock: View {
     let onTap: () -> Void
     let onComplete: () -> Void
 
+    @Environment(\.responsiveLayout) private var layout
     @State private var isPressed = false
 
     private var taskColor: Color {
@@ -369,7 +375,7 @@ struct PremiumTaskBlock: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(task.title)
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                         .foregroundStyle(.white)
                         .lineLimit(height > 50 ? 2 : 1)
 
@@ -377,10 +383,10 @@ struct PremiumTaskBlock: View {
                     if height > 44, let minutes = task.estimatedMinutes ?? task.duration {
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
-                                .font(.system(size: 10))
+                                .dynamicTypeFont(base: 10)
 
                             Text(formatDuration(minutes))
-                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .dynamicTypeFont(base: 11, weight: .medium)
                         }
                         .foregroundStyle(.white.opacity(0.6))
                     }
@@ -396,7 +402,7 @@ struct PremiumTaskBlock: View {
                         onComplete()
                     } label: {
                         Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 20, weight: .light))
+                            .dynamicTypeFont(base: 20, weight: .light)
                             .foregroundStyle(task.isCompleted ? Theme.Colors.success : .white.opacity(0.4))
                     }
                     .buttonStyle(.plain)

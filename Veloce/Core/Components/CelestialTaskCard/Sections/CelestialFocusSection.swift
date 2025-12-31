@@ -32,11 +32,11 @@ struct CelestialFocusSection: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Image(systemName: "brain.head.profile")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("AI Recommendation")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -44,7 +44,7 @@ struct CelestialFocusSection: View {
 
             HStack(alignment: .top, spacing: Theme.Spacing.sm) {
                 Image(systemName: viewModel.suggestedWorkMode.icon)
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(viewModel.suggestedWorkMode.color)
                     .frame(width: 36, height: 36)
                     .background(
@@ -54,11 +54,11 @@ struct CelestialFocusSection: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(viewModel.suggestedWorkMode.displayName)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text(viewModel.workModeReason)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .lineLimit(2)
                 }
@@ -80,7 +80,7 @@ struct CelestialFocusSection: View {
     private var workModeSelector: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("Choose Your Mode")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             HStack(spacing: Theme.Spacing.sm) {
@@ -104,24 +104,24 @@ struct CelestialFocusSection: View {
             VStack(spacing: 8) {
                 ZStack(alignment: .topTrailing) {
                     Image(systemName: mode.icon)
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(isSelected ? .white : mode.color)
 
                     if isRecommended {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 8))
+                            .dynamicTypeFont(base: 8)
                             .foregroundStyle(Theme.Colors.xp)
                             .offset(x: 4, y: -4)
                     }
                 }
 
                 Text(mode.displayName)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(isSelected ? .white : Theme.CelestialColors.starDim)
                     .lineLimit(1)
 
                 Text(mode.durationText)
-                    .font(.system(size: 9))
+                    .dynamicTypeFont(base: 9)
                     .foregroundStyle(isSelected ? .white.opacity(0.7) : Theme.CelestialColors.starDim.opacity(0.7))
             }
             .frame(maxWidth: .infinity)
@@ -150,14 +150,14 @@ struct CelestialFocusSection: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "scope")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
 
                 Text("Start Focus Session")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
 
                 if let mode = viewModel.selectedWorkMode {
                     Text("• \(mode.durationText)")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.8))
                 }
             }

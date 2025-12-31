@@ -62,7 +62,7 @@ struct CirclesTabContent: View {
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: filter.icon)
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
 
                 Text(filter.displayName)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -121,7 +121,7 @@ struct CirclesTabContent: View {
                 }
 
                 Image(systemName: "circle.hexagongrid.fill")
-                    .font(.system(size: 32, weight: .light))
+                    .dynamicTypeFont(base: 32, weight: .light)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Colors.aiPurple, Theme.CelestialColors.plasmaCore],
@@ -137,7 +137,7 @@ struct CirclesTabContent: View {
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("Invite friends and stay accountable together")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
@@ -147,10 +147,10 @@ struct CirclesTabContent: View {
                 Button(action: onCreateCircle) {
                     HStack(spacing: 6) {
                         Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                         Text("Create")
                     }
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
@@ -161,10 +161,10 @@ struct CirclesTabContent: View {
                 Button(action: onJoinCircle) {
                     HStack(spacing: 6) {
                         Image(systemName: "link")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                         Text("Join")
                     }
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
@@ -258,7 +258,7 @@ struct EnhancedCircleCard: View {
                                     .frame(width: 24, height: 24)
 
                                 Text("+\(circle.memberCount - 4)")
-                                    .font(.system(size: 9, weight: .bold))
+                                    .dynamicTypeFont(base: 9, weight: .bold)
                                     .foregroundStyle(Theme.Colors.aiPurple)
                             }
                             .overlay {
@@ -268,7 +268,7 @@ struct EnhancedCircleCard: View {
                         }
 
                         Text("\(circle.memberCount) members")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.starGhost)
                             .padding(.leading, 8)
                     }
@@ -282,7 +282,7 @@ struct EnhancedCircleCard: View {
                     if circle.circleStreak > 0 {
                         HStack(spacing: 3) {
                             Image(systemName: "flame.fill")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                             Text("\(circle.circleStreak)")
                                 .font(.system(size: 13, weight: .bold, design: .rounded))
                         }
@@ -292,7 +292,7 @@ struct EnhancedCircleCard: View {
                     // XP
                     HStack(spacing: 3) {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("\(circle.circleXp)")
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
                     }
@@ -304,10 +304,10 @@ struct EnhancedCircleCard: View {
             if hasActiveChallenge {
                 HStack(spacing: 8) {
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
 
                     Text("Circle Challenge Active")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
 
                     Spacer()
 
@@ -323,7 +323,7 @@ struct EnhancedCircleCard: View {
             // Description if available
             if let description = circle.description, !description.isEmpty {
                 Text(description)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .lineLimit(2)
                     .frame(maxWidth: .infinity, alignment: .leading)

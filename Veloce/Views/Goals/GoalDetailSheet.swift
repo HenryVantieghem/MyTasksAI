@@ -61,7 +61,7 @@ struct GoalDetailSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 28))
+                            .dynamicTypeFont(base: 28)
                             .foregroundStyle(.white.opacity(0.3))
                     }
                 }
@@ -107,7 +107,7 @@ struct GoalDetailSheet: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
-                            .font(.system(size: 22))
+                            .dynamicTypeFont(base: 22)
                             .foregroundStyle(.white.opacity(0.7))
                     }
                 }
@@ -169,13 +169,13 @@ struct GoalDetailSheet: View {
             // Title
             VStack(spacing: 8) {
                 Text(goal.displayTitle)
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
                 if let aiTitle = goal.aiRefinedTitle, aiTitle != goal.title {
                     Text(goal.title)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -196,9 +196,9 @@ struct GoalDetailSheet: View {
                 if let category = goal.categoryEnum {
                     HStack(spacing: 4) {
                         Image(systemName: category.icon)
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                         Text(category.displayName)
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                     }
                     .foregroundStyle(category.color)
                     .padding(.horizontal, 10)
@@ -245,14 +245,14 @@ struct GoalDetailSheet: View {
 
             HStack {
                 Text("\(Int(goal.progress * 100))% complete")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
 
                 Spacer()
 
                 if goal.milestoneCount > 0 {
                     Text("\(goal.completedMilestoneCount)/\(goal.milestoneCount) milestones")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -314,10 +314,10 @@ struct GoalDetailSheet: View {
                 } label: {
                     VStack(spacing: 8) {
                         Image(systemName: tab.icon)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
 
                         Text(tab.title)
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                     }
                     .foregroundStyle(selectedTab == tab ? .white : .white.opacity(0.4))
                     .frame(maxWidth: .infinity)
@@ -379,11 +379,11 @@ struct GoalDetailSheet: View {
                         .scaleEffect(1.2)
                 } else if goalsVM.error != nil {
                     Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(Theme.Colors.warning)
                 } else {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
             }
@@ -392,32 +392,32 @@ struct GoalDetailSheet: View {
             VStack(spacing: 6) {
                 if goalsVM.isRefiningGoal || goalsVM.isGeneratingRoadmap {
                     Text("Analyzing Your Goal...")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text(aiGenerationElapsed > 10 ?
                          "This is taking longer than usual..." :
                          "Creating your personalized roadmap")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.6))
                         .multilineTextAlignment(.center)
                 } else if let error = goalsVM.error {
                     Text("Generation Failed")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text(error)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.6))
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                 } else {
                     Text("Unlock AI Insights")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text("Get SMART analysis, milestones, and personalized guidance")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.6))
                         .multilineTextAlignment(.center)
                 }
@@ -430,9 +430,9 @@ struct GoalDetailSheet: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: goalsVM.error != nil ? "arrow.clockwise" : "sparkles")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                         Text(goalsVM.error != nil ? "Try Again" : "Generate AI Analysis")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                     }
                     .foregroundStyle(.white)
                     .padding(.horizontal, 28)
@@ -454,7 +454,7 @@ struct GoalDetailSheet: View {
                     cancelAIGeneration()
                 } label: {
                     Text("Cancel")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .buttonStyle(.plain)
@@ -567,7 +567,7 @@ struct GoalOverviewSection: View {
             if let description = goal.aiRefinedDescription ?? goal.goalDescription {
                 SectionCard(title: "About This Goal", icon: "text.alignleft") {
                     Text(description)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.8))
                         .lineSpacing(4)
                 }
@@ -580,11 +580,11 @@ struct GoalOverviewSection: View {
                         ForEach(metrics, id: \.self) { metric in
                             HStack(alignment: .top, spacing: 10) {
                                 Image(systemName: "checkmark.circle")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(Theme.Colors.success)
 
                                 Text(metric)
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.8))
                             }
                         }
@@ -599,11 +599,11 @@ struct GoalOverviewSection: View {
                         ForEach(obstacles, id: \.self) { obstacle in
                             HStack(alignment: .top, spacing: 10) {
                                 Image(systemName: "exclamationmark.circle")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(Theme.Colors.warning)
 
                                 Text(obstacle)
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.8))
                             }
                         }
@@ -616,7 +616,7 @@ struct GoalOverviewSection: View {
                 SectionCard(title: "AI Coach Says", icon: "sparkles") {
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: "quote.opening")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundStyle(Theme.Colors.aiPurple.opacity(0.6))
 
                         Text(quote)
@@ -684,7 +684,7 @@ struct GoalRoadmapSection: View {
                     .foregroundStyle(Theme.Colors.success)
 
                 Text("Completed")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -698,7 +698,7 @@ struct GoalRoadmapSection: View {
                     .foregroundStyle(.white)
 
                 Text("Remaining")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -713,7 +713,7 @@ struct GoalRoadmapSection: View {
                     .foregroundStyle(Color(hex: "FFD700"))
 
                 Text("XP Total")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(.white.opacity(0.5))
             }
         }
@@ -728,15 +728,15 @@ struct GoalRoadmapSection: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "map")
-                .font(.system(size: 40))
+                .dynamicTypeFont(base: 40)
                 .foregroundStyle(.white.opacity(0.3))
 
             Text("No roadmap generated yet")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white.opacity(0.7))
 
             Text("Generate an AI roadmap to get personalized milestones")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.5))
                 .multilineTextAlignment(.center)
 
@@ -755,7 +755,7 @@ struct GoalRoadmapSection: View {
                         }
                         Text(goalsVM.isGeneratingRoadmap ? "Generating..." : "Generate Roadmap")
                     }
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 14)
@@ -814,7 +814,7 @@ struct GoalTasksSection: View {
                     VStack(spacing: 12) {
                         HStack {
                             Text("\(goal.linkedTaskCount) tasks connected to this goal")
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.7))
 
                             Spacer()
@@ -841,15 +841,15 @@ struct GoalTasksSection: View {
             if pendingSuggestions.isEmpty && goal.linkedTaskCount == 0 {
                 VStack(spacing: 16) {
                     Image(systemName: "checklist")
-                        .font(.system(size: 40))
+                        .dynamicTypeFont(base: 40)
                         .foregroundStyle(.white.opacity(0.3))
 
                     Text("No tasks linked yet")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
 
                     Text("Generate a roadmap to get AI-suggested tasks, or link existing tasks to this goal")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.5))
                         .multilineTextAlignment(.center)
                 }
@@ -877,12 +877,12 @@ struct GoalInsightsSection: View {
                                 .foregroundStyle(.white)
 
                             Text("weeks")
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
 
                         Text("\(goal.totalCheckIns) total check-ins")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.6))
                     }
 
@@ -895,7 +895,7 @@ struct GoalInsightsSection: View {
                                 .frame(width: 56, height: 56)
 
                             Image(systemName: "flame.fill")
-                                .font(.system(size: 28))
+                                .dynamicTypeFont(base: 28)
                                 .foregroundStyle(
                                     LinearGradient(
                                         colors: [.orange, .yellow],
@@ -923,7 +923,7 @@ struct GoalInsightsSection: View {
                                     .frame(width: 12, height: 12)
 
                                 Text("\(Int(milestone * 100))%")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(isReached ? .white : .white.opacity(0.4))
                             }
 
@@ -936,7 +936,7 @@ struct GoalInsightsSection: View {
                     }
 
                     Text("Current Progress: \(Int(goal.progress * 100))%")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.6))
                 }
             }
@@ -987,7 +987,7 @@ struct GoalInsightsSection: View {
                                 )
 
                             Text("XP Earned")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
 
@@ -1002,7 +1002,7 @@ struct GoalInsightsSection: View {
                                     .foregroundStyle(.white)
 
                                 Text("Multiplier")
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                                     .foregroundStyle(.white.opacity(0.5))
                             }
                         }
@@ -1024,18 +1024,18 @@ private struct TimelineRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(color)
                 .frame(width: 24)
 
             Text(label)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.6))
 
             Spacer()
 
             Text(value)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white)
         }
     }
@@ -1052,11 +1052,11 @@ struct SectionCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.8))
             }
 
@@ -1084,13 +1084,13 @@ struct SMARTCriteriaRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.7))
 
             Spacer()
 
             Image(systemName: isMet ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(isMet ? Theme.Colors.success : .white.opacity(0.3))
         }
     }
@@ -1123,20 +1123,20 @@ struct MilestoneCard: View {
                             .frame(width: 28, height: 28)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(milestone.title)
-                        .font(.system(size: 15, weight: .medium))
+                        .dynamicTypeFont(base: 15, weight: .medium)
                         .foregroundStyle(milestone.isCompleted ? .white.opacity(0.5) : .white)
                         .strikethrough(milestone.isCompleted)
 
                     if let description = milestone.milestoneDescription {
                         Text(description)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.5))
                             .lineLimit(2)
                     }
@@ -1145,9 +1145,9 @@ struct MilestoneCard: View {
                         if let targetDate = milestone.targetDate {
                             HStack(spacing: 4) {
                                 Image(systemName: "calendar")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                 Text(targetDate.formatted(.dateTime.month(.abbreviated).day()))
-                                    .font(.system(size: 11))
+                                    .dynamicTypeFont(base: 11)
                             }
                             .foregroundStyle(milestone.isOverdue && !milestone.isCompleted ?
                                 Theme.Colors.error.opacity(0.8) : .white.opacity(0.4))
@@ -1155,9 +1155,9 @@ struct MilestoneCard: View {
 
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
-                                .font(.system(size: 10))
+                                .dynamicTypeFont(base: 10)
                             Text("+\(milestone.pointsValue) XP")
-                                .font(.system(size: 11, weight: .medium))
+                                .dynamicTypeFont(base: 11, weight: .medium)
                         }
                         .foregroundStyle(Color(hex: "FFD700").opacity(milestone.isCompleted ? 0.4 : 0.8))
                     }
@@ -1204,12 +1204,12 @@ struct PendingTaskRow: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(suggestion.title)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white)
 
                 if let reasoning = suggestion.aiReasoning {
                     Text(reasoning)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(2)
                 }
@@ -1217,15 +1217,15 @@ struct PendingTaskRow: View {
                 HStack(spacing: 8) {
                     HStack(spacing: 4) {
                         Image(systemName: suggestion.linkType.icon)
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text(suggestion.linkType.displayName)
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                     }
                     .foregroundStyle(Theme.Colors.aiPurple.opacity(0.7))
 
                     if let minutes = suggestion.estimatedMinutes, minutes > 0 {
                         Text("\(minutes)min")
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                             .foregroundStyle(.white.opacity(0.4))
                     }
                 }
@@ -1236,7 +1236,7 @@ struct PendingTaskRow: View {
             HStack(spacing: 8) {
                 Button(action: onReject) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                         .frame(width: 32, height: 32)
                         .background(Circle().fill(.white.opacity(0.1)))
@@ -1244,7 +1244,7 @@ struct PendingTaskRow: View {
 
                 Button(action: onApprove) {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white)
                         .frame(width: 32, height: 32)
                         .background(Circle().fill(Theme.Colors.success))
@@ -1284,7 +1284,7 @@ struct GoalEditSheet: View {
                         // Title
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Goal Title", systemImage: "target")
-                                .font(.system(size: 13, weight: .semibold))
+                                .dynamicTypeFont(base: 13, weight: .semibold)
                                 .foregroundStyle(.white.opacity(0.6))
 
                             CrystallineTextField(text: $title, placeholder: "Goal title", icon: "target")
@@ -1293,11 +1293,11 @@ struct GoalEditSheet: View {
                         // Description
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Description", systemImage: "text.alignleft")
-                                .font(.system(size: 13, weight: .semibold))
+                                .dynamicTypeFont(base: 13, weight: .semibold)
                                 .foregroundStyle(.white.opacity(0.6))
 
                             TextEditor(text: $description)
-                                .font(.system(size: 15))
+                                .dynamicTypeFont(base: 15)
                                 .foregroundStyle(.white)
                                 .scrollContentBackground(.hidden)
                                 .frame(minHeight: 80, maxHeight: 120)
@@ -1312,7 +1312,7 @@ struct GoalEditSheet: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 Label("Progress", systemImage: "chart.line.uptrend.xyaxis")
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .dynamicTypeFont(base: 13, weight: .semibold)
                                     .foregroundStyle(.white.opacity(0.6))
 
                                 Spacer()
@@ -1329,7 +1329,7 @@ struct GoalEditSheet: View {
                         // Target date
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Target Date", systemImage: "calendar")
-                                .font(.system(size: 13, weight: .semibold))
+                                .dynamicTypeFont(base: 13, weight: .semibold)
                                 .foregroundStyle(.white.opacity(0.6))
 
                             DatePicker("Target", selection: $targetDate, displayedComponents: .date)
@@ -1428,7 +1428,7 @@ struct GoalStepsSection: View {
             VStack(spacing: 12) {
                 HStack {
                     Text("\(completedCount) of \(steps.count) completed")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
 
                     Spacer()
@@ -1469,7 +1469,7 @@ struct GoalStepsSection: View {
             VStack(spacing: 12) {
                 if let motivation = goal.whyItMatters, !motivation.isEmpty {
                     Text(motivation)
-                        .font(.system(size: 15))
+                        .dynamicTypeFont(base: 15)
                         .foregroundStyle(.white.opacity(0.8))
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -1477,13 +1477,13 @@ struct GoalStepsSection: View {
                         // Edit motivation
                     } label: {
                         Text("Edit")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                             .foregroundStyle(goal.themeColor)
                     }
                 } else {
                     VStack(spacing: 8) {
                         Text("Connect to your deeper motivation")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
 
@@ -1504,7 +1504,7 @@ struct GoalStepsSection: View {
                 if plans.isEmpty {
                     VStack(spacing: 8) {
                         Text("Prepare for obstacles with If-Then plans")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white.opacity(0.6))
 
                         Text("\"If I feel unmotivated, then I will...\"")
@@ -1533,11 +1533,11 @@ struct GoalStepsSection: View {
                 if steps.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "list.bullet.rectangle")
-                            .font(.system(size: 32))
+                            .dynamicTypeFont(base: 32)
                             .foregroundStyle(.white.opacity(0.3))
 
                         Text("Break your goal into small, actionable steps")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
                     }
@@ -1559,10 +1559,10 @@ struct GoalStepsSection: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: showingAddStep ? "xmark" : "plus")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
 
                         Text(showingAddStep ? "Cancel" : "Add Step")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                     }
                     .foregroundStyle(goal.themeColor)
                     .padding(.vertical, 12)
@@ -1577,7 +1577,7 @@ struct GoalStepsSection: View {
     private var addStepInput: some View {
         HStack(spacing: 12) {
             TextField("What's the next action?", text: $newStepText)
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(.white)
                 .focused($isInputFocused)
                 .submitLabel(.done)
@@ -1589,7 +1589,7 @@ struct GoalStepsSection: View {
                 addStep()
             } label: {
                 Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 28))
+                    .dynamicTypeFont(base: 28)
                     .foregroundStyle(newStepText.isEmpty ? .white.opacity(0.3) : goal.themeColor)
             }
             .disabled(newStepText.isEmpty)
@@ -1654,13 +1654,13 @@ struct ActionStepRow: View {
                             .frame(width: 24, height: 24)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .dynamicTypeFont(base: 11, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
 
                 Text(step.title)
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(step.isCompleted ? .white.opacity(0.5) : .white)
                     .strikethrough(step.isCompleted)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -1673,7 +1673,7 @@ struct ActionStepRow: View {
                     }
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.3))
                         .frame(width: 28, height: 28)
                 }
@@ -1698,9 +1698,9 @@ struct MotivationPromptButton: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "plus")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                 Text("Add Your Why")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
             }
             .foregroundStyle(goal.themeColor)
             .padding(.horizontal, 16)
@@ -1732,11 +1732,11 @@ struct MotivationInputSheet: View {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
                         Text("Why does this goal matter to you?")
-                            .font(.system(size: 20, weight: .semibold))
+                            .dynamicTypeFont(base: 20, weight: .semibold)
                             .foregroundStyle(.white)
 
                         Text("Connecting to your deeper motivation increases follow-through by 3x")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
                     }
@@ -1753,7 +1753,7 @@ struct MotivationInputSheet: View {
                                 }
                             } label: {
                                 Text(prompt)
-                                    .font(.system(size: 13))
+                                    .dynamicTypeFont(base: 13)
                                     .foregroundStyle(.white.opacity(0.7))
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 8)
@@ -1830,9 +1830,9 @@ struct AddIfThenButton: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "plus")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                 Text("Add Obstacle Plan")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
             }
             .foregroundStyle(Theme.Colors.aiCyan)
         }
@@ -1859,11 +1859,11 @@ struct IfThenInputSheet: View {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
                         Text("Create an Obstacle Plan")
-                            .font(.system(size: 20, weight: .semibold))
+                            .dynamicTypeFont(base: 20, weight: .semibold)
                             .foregroundStyle(.white)
 
                         Text("If-Then plans help you overcome obstacles automatically")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
                     }
@@ -1877,12 +1877,12 @@ struct IfThenInputSheet: View {
                                 .foregroundStyle(Theme.Colors.warning)
 
                             Text("this obstacle happens...")
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.6))
                         }
 
                         TextField("I feel unmotivated...", text: $obstacle, axis: .vertical)
-                            .font(.system(size: 15))
+                            .dynamicTypeFont(base: 15)
                             .foregroundStyle(.white)
                             .lineLimit(2...4)
                             .padding(14)
@@ -1900,12 +1900,12 @@ struct IfThenInputSheet: View {
                                 .foregroundStyle(Theme.Colors.success)
 
                             Text("I will...")
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.6))
                         }
 
                         TextField("Start with just 5 minutes...", text: $response, axis: .vertical)
-                            .font(.system(size: 15))
+                            .dynamicTypeFont(base: 15)
                             .foregroundStyle(.white)
                             .lineLimit(2...4)
                             .padding(14)
@@ -1918,7 +1918,7 @@ struct IfThenInputSheet: View {
                     // Common obstacles
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Common obstacles:")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
 
                         GoalTagFlowLayout(spacing: 8) {
@@ -1927,7 +1927,7 @@ struct IfThenInputSheet: View {
                                     obstacle = obs
                                 } label: {
                                     Text(obs)
-                                        .font(.system(size: 12))
+                                        .dynamicTypeFont(base: 12)
                                         .foregroundStyle(.white.opacity(0.7))
                                         .padding(.horizontal, 10)
                                         .padding(.vertical, 6)
@@ -1998,7 +1998,7 @@ struct IfThenPlanRow: View {
                     .foregroundStyle(Theme.Colors.warning)
 
                 Text(plan.obstacle)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.8))
             }
 
@@ -2008,7 +2008,7 @@ struct IfThenPlanRow: View {
                     .foregroundStyle(Theme.Colors.success)
 
                 Text(plan.response)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.8))
             }
         }
@@ -2054,9 +2054,9 @@ struct GoalNotesSection: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: showingAddNote ? "xmark" : "plus")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                     Text(showingAddNote ? "Cancel" : "Add Progress Note")
-                        .font(.system(size: 15, weight: .medium))
+                        .dynamicTypeFont(base: 15, weight: .medium)
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 20)
@@ -2089,16 +2089,16 @@ struct GoalNotesSection: View {
     private var emptyNotesState: some View {
         VStack(spacing: 16) {
             Image(systemName: "note.text")
-                .font(.system(size: 40))
+                .dynamicTypeFont(base: 40)
                 .foregroundStyle(.white.opacity(0.3))
 
             VStack(spacing: 4) {
                 Text("Track Your Journey")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("Record thoughts, wins, and learnings as you progress")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
             }
@@ -2113,7 +2113,7 @@ struct GoalNotesSection: View {
             // Mood selector
             HStack(spacing: 8) {
                 Text("How are you feeling?")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.6))
 
                 Spacer()
@@ -2124,7 +2124,7 @@ struct GoalNotesSection: View {
                         HapticsService.shared.selectionFeedback()
                     } label: {
                         Image(systemName: mood.icon)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundStyle(selectedMood == mood ? mood.color : .white.opacity(0.4))
                             .frame(width: 32, height: 32)
                             .background(
@@ -2139,7 +2139,7 @@ struct GoalNotesSection: View {
             // Text input
             HStack(spacing: 12) {
                 TextField("What's happening with your goal?", text: $newNoteText, axis: .vertical)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white)
                     .lineLimit(3...6)
                     .focused($isInputFocused)
@@ -2148,7 +2148,7 @@ struct GoalNotesSection: View {
                     addNote()
                 } label: {
                     Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(newNoteText.isEmpty ? .white.opacity(0.3) : goal.themeColor)
                 }
                 .disabled(newNoteText.isEmpty)
@@ -2194,11 +2194,11 @@ struct NoteRow: View {
                 if let mood = note.mood {
                     HStack(spacing: 4) {
                         Image(systemName: mood.icon)
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(mood.color)
 
                         Text(mood.rawValue.capitalized)
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(mood.color)
                     }
                     .padding(.horizontal, 8)
@@ -2212,12 +2212,12 @@ struct NoteRow: View {
                 Spacer()
 
                 Text(note.createdAt.formatted(.relative(presentation: .named)))
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.white.opacity(0.4))
             }
 
             Text(note.content)
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(.white.opacity(0.85))
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

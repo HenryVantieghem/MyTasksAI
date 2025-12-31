@@ -26,11 +26,11 @@ struct CelestialSchedulePickerSheet: View {
                 // Task title reference
                 HStack {
                     Text("Schedule:")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.Colors.textSecondary)
 
                     Text(task.title)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(1)
                 }
@@ -59,7 +59,7 @@ struct CelestialSchedulePickerSheet: View {
                         dismiss()
                     } label: {
                         Text("Set Schedule")
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
@@ -78,7 +78,7 @@ struct CelestialSchedulePickerSheet: View {
                             dismiss()
                         } label: {
                             Text("Remove Schedule")
-                                .font(.system(size: 14, weight: .medium))
+                                .dynamicTypeFont(base: 14, weight: .medium)
                                 .foregroundStyle(Theme.Colors.destructive)
                         }
                     }

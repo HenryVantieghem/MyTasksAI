@@ -28,20 +28,20 @@ struct CelestialCollapsibleSection<Content: View>: View {
                 HStack(spacing: 12) {
                     // Section icon
                     Image(systemName: section.icon)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(section.accentColor)
                         .frame(width: 24)
 
                     // Section title
                     Text(section.rawValue)
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     // Chevron indicator
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
@@ -93,18 +93,18 @@ struct SimpleCollapsibleSection<Content: View>: View {
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: icon)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(accentColor)
                         .frame(width: 24)
 
                     Text(title)
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }

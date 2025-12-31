@@ -647,12 +647,12 @@ struct CosmicConfettiBurst: View {
 
             case .star:
                 Image(systemName: "star.fill")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(piece.color)
 
             case .sparkle:
                 Image(systemName: "sparkle")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(piece.color)
 
             case .rectangle:

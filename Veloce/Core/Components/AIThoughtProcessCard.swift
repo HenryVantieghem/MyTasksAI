@@ -58,7 +58,7 @@ struct AIThoughtProcessCard: View {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "brain.head.profile")
                     .foregroundStyle(Theme.Colors.aiPurple)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
 
                 Text("AI Reasoning")
                     .font(Theme.Typography.headline)
@@ -189,7 +189,7 @@ struct AIThoughtProcessCard: View {
                     .foregroundStyle(Theme.Colors.primaryText)
             }
             Text(label)
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.Colors.tertiaryText)
         }
         .frame(maxWidth: .infinity)
@@ -225,7 +225,7 @@ struct AIThoughtProcessCard: View {
             }
 
             Text("Based on task clarity, available context, and pattern matching.")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.Colors.tertiaryText)
         }
     }

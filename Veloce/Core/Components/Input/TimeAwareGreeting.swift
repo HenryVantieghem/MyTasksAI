@@ -21,7 +21,7 @@ struct TimeAwareGreeting: View {
 
     var body: some View {
         Text(currentGreeting.message)
-            .font(.system(size: 14, weight: .medium))
+            .dynamicTypeFont(base: 14, weight: .medium)
             .foregroundStyle(Theme.InputBarColors.greetingText)
             .multilineTextAlignment(.center)
             .opacity(opacity)
@@ -210,7 +210,7 @@ enum TimeAwareGreetingGenerator {
 
             ForEach(0..<6, id: \.self) { _ in
                 Text(TimeAwareGreetingGenerator.generate().message)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.InputBarColors.greetingText)
             }
         }

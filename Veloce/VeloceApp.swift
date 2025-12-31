@@ -75,13 +75,16 @@ struct VeloceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environment(appViewModel)
-                .modelContainer(modelContainer)
-                .preferredColorScheme(.dark)
-                .task {
-                    await appViewModel.initialize(context: modelContainer.mainContext)
-                }
+            // Wrap in ResponsiveContainer to provide layout environment to all views
+            ResponsiveContainer { _ in
+                RootView()
+                    .environment(appViewModel)
+                    .modelContainer(modelContainer)
+                    .preferredColorScheme(.dark)
+                    .task {
+                        await appViewModel.initialize(context: modelContainer.mainContext)
+                    }
+            }
         }
         .commands {
             VeloceCommands()
@@ -189,7 +192,7 @@ struct LoadingView: View {
                             .offset(y: showContent ? 0 : 10)
 
                         Text("AI-Powered Productivity")
-                            .font(.system(size: 15))
+                            .dynamicTypeFont(base: 15)
                             .foregroundStyle(Aurora.Colors.textSecondary)
                             .opacity(showContent ? 1 : 0)
                             .offset(y: showContent ? 0 : 10)

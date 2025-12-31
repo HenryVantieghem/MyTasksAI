@@ -37,7 +37,7 @@ struct TaskCardView: View {
                 VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
                     // Title - larger and more prominent
                     Text(task.title)
-                        .font(.system(size: 17, weight: .medium))
+                        .dynamicTypeFont(base: 17, weight: .medium)
                         .foregroundStyle(task.isCompleted ? Theme.Colors.textTertiary : Theme.Colors.textPrimary)
                         .strikethrough(task.isCompleted, color: Theme.Colors.textTertiary)
                         .lineLimit(2)
@@ -50,7 +50,7 @@ struct TaskCardView: View {
                                 HStack(spacing: Theme.Spacing.xxs) {
                                     ForEach(0..<task.starRating, id: \.self) { _ in
                                         Image(systemName: "star.fill")
-                                            .font(.system(size: 10))
+                                            .dynamicTypeFont(base: 10)
                                             .foregroundStyle(Theme.Colors.xp)
                                     }
                                 }
@@ -70,9 +70,9 @@ struct TaskCardView: View {
                             if task.aiProcessedAt != nil {
                                 HStack(spacing: Theme.Spacing.xxs) {
                                     Image(systemName: "sparkles")
-                                        .font(.system(size: 10, weight: .medium))
+                                        .dynamicTypeFont(base: 10, weight: .medium)
                                     Text("AI")
-                                        .font(.system(size: 10, weight: .semibold))
+                                        .dynamicTypeFont(base: 10, weight: .semibold)
                                 }
                                 .foregroundStyle(Theme.CelestialColors.nebulaCore)
                             }
@@ -91,7 +91,7 @@ struct TaskCardView: View {
                     }
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(task.hasAIProcessing ? Theme.CelestialColors.nebulaCore : Theme.Colors.textTertiary.opacity(0.5))
                 }
             }
@@ -116,12 +116,12 @@ struct TaskCardView: View {
                                 .frame(width: 24, height: 24)
 
                             Image(systemName: "lightbulb.fill")
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                                 .foregroundStyle(Theme.Colors.xp)
                         }
 
                         Text(aiAdvice)
-                            .font(.system(size: 14, weight: .regular))
+                            .dynamicTypeFont(base: 14, weight: .regular)
                             .foregroundStyle(Theme.Colors.textSecondary)
                             .lineLimit(3)
                             .fixedSize(horizontal: false, vertical: true)
@@ -307,7 +307,7 @@ struct TaskCardCheckbox: View {
 
                     // Checkmark
                     Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
+                        .dynamicTypeFont(base: 12, weight: .bold)
                         .foregroundStyle(.white)
                         .scaleEffect(checkmarkProgress)
                 }
@@ -339,10 +339,10 @@ struct DueDateBadge: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "clock")
-                .font(.system(size: 9, weight: .medium))
+                .dynamicTypeFont(base: 9, weight: .medium)
 
             Text(formattedDate)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
         }
         .foregroundStyle(dateColor)
         .padding(.horizontal, 6)
@@ -387,10 +387,10 @@ struct TimeEstimateBadge: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "timer")
-                .font(.system(size: 9, weight: .medium))
+                .dynamicTypeFont(base: 9, weight: .medium)
 
             Text(formattedTime)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
         }
         .foregroundStyle(Theme.Colors.aiBlue)
         .padding(.horizontal, 6)

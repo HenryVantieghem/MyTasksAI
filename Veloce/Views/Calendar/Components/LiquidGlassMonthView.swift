@@ -106,7 +106,7 @@ struct LiquidGlassMonthView: View {
         HStack(spacing: 0) {
             ForEach(Array(weekDayLabels.enumerated()), id: \.offset) { index, day in
                 Text(day)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
@@ -200,7 +200,7 @@ struct LiquidGlassMonthView: View {
 
                 if total > 3 {
                     Text("+\(total - 3)")
-                        .font(.system(size: 8, weight: .medium))
+                        .dynamicTypeFont(base: 8, weight: .medium)
                         .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
                 }
             }
@@ -252,13 +252,13 @@ struct LiquidGlassMonthView: View {
             // Section header
             HStack {
                 Text("Upcoming")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.primary)
 
                 Spacer()
 
                 Text("\(upcomingTasksAndEvents.count) items")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.secondary)
             }
             .padding(.top, 16)
@@ -283,12 +283,12 @@ struct LiquidGlassMonthView: View {
             // Content
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
                 Text(item.date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day().hour().minute()))
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.secondary)
             }
 
@@ -296,7 +296,7 @@ struct LiquidGlassMonthView: View {
 
             // Type indicator
             Image(systemName: item.isTask ? "checkmark.circle" : "calendar")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.tertiary)
         }
         .padding(.horizontal, 12)

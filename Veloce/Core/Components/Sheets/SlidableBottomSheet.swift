@@ -268,7 +268,7 @@ struct TaskDetailBottomSheet: View {
 
             // Sheet title
             Text("Task Details")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
         .padding(.top, 8)
@@ -309,7 +309,7 @@ struct TaskDetailBottomSheet: View {
                             .frame(width: 26, height: 26)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                             .foregroundStyle(.black)
                     }
                 }
@@ -334,12 +334,12 @@ struct TaskDetailBottomSheet: View {
                 HStack(spacing: 4) {
                     ForEach(1...3, id: \.self) { index in
                         Image(systemName: index <= task.starRating ? "star.fill" : "star")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundColor(index <= task.starRating ? Color(hex: "FFD700") : Theme.CelestialColors.starGhost)
                     }
 
                     Text(priorityLabel)
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundColor(Theme.CelestialColors.starDim)
                         .padding(.leading, 4)
                 }
@@ -353,7 +353,7 @@ struct TaskDetailBottomSheet: View {
                 viewModel.isEditingTitle.toggle()
             } label: {
                 Image(systemName: "pencil")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
                     .frame(width: 36, height: 36)
                     .background(.ultraThinMaterial, in: Circle())
@@ -428,7 +428,7 @@ struct TaskDetailBottomSheet: View {
             // Header
             HStack {
                 Text("Sub-tasks")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -436,7 +436,7 @@ struct TaskDetailBottomSheet: View {
                 // Progress
                 HStack(spacing: 6) {
                     Text(viewModel.subTasks.progressString)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     // Mini progress ring
@@ -477,9 +477,9 @@ struct TaskDetailBottomSheet: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "plus")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                         Text("Add Step")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
                     .padding(.horizontal, 14)
@@ -493,9 +493,9 @@ struct TaskDetailBottomSheet: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "wand.and.stars")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                         Text("AI Generate")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
@@ -521,10 +521,10 @@ struct TaskDetailBottomSheet: View {
             Spacer()
             VStack(spacing: 8) {
                 Image(systemName: "list.bullet.indent")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.5))
                 Text("No sub-tasks yet")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.7))
             }
             .padding(.vertical, 16)
@@ -537,11 +537,11 @@ struct TaskDetailBottomSheet: View {
     private var aiInsightsHeader: some View {
         HStack {
             Image(systemName: "sparkles")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
             Text("AI Insights")
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
 
             Spacer()
@@ -551,7 +551,7 @@ struct TaskDetailBottomSheet: View {
                 Task { await viewModel.loadAIInsights() }
             } label: {
                 Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
                     .rotationEffect(.degrees(viewModel.isLoadingAI ? 360 : 0))
                     .animation(
@@ -568,7 +568,7 @@ struct TaskDetailBottomSheet: View {
             ProgressView()
                 .tint(Theme.CelestialColors.nebulaCore)
             Text("Analyzing task...")
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
         .padding(.vertical, 12)
@@ -577,11 +577,11 @@ struct TaskDetailBottomSheet: View {
     private var aiPromptSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("AI Assistant Prompt")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.white.opacity(0.9))
 
             Text(viewModel.aiPrompt)
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(.white.opacity(0.75))
                 .lineLimit(3)
                 .padding(12)
@@ -597,9 +597,9 @@ struct TaskDetailBottomSheet: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "doc.on.doc")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                     Text("Copy Prompt")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 14)
@@ -620,14 +620,14 @@ struct TaskDetailBottomSheet: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 Image(systemName: "timer")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(Theme.Colors.aiAmber)
                 Text("Estimated")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
             Text(viewModel.aiEstimatedTimeDisplay)
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -639,14 +639,14 @@ struct TaskDetailBottomSheet: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 Image(systemName: "calendar.badge.clock")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
                 Text("Best Time")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
             Text(viewModel.aiBestTimeDisplay)
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -695,18 +695,18 @@ struct TaskDetailBottomSheet: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "note.text")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
                 Text("Notes")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
             }
 
             TextEditor(text: $viewModel.editableNotes)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.9))
                 .scrollContentBackground(.hidden)
                 .frame(minHeight: 80, maxHeight: 120)
@@ -718,7 +718,7 @@ struct TaskDetailBottomSheet: View {
                 .overlay(alignment: .topLeading) {
                     if viewModel.editableNotes.isEmpty {
                         Text("Add notes to help focus...")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.6))
                             .padding(.horizontal, 16)
                             .padding(.vertical, 20)
@@ -743,7 +743,7 @@ struct TaskDetailBottomSheet: View {
     private var focusModeSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Focus Mode")
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
 
             // Focus mode options
@@ -773,11 +773,11 @@ struct TaskDetailBottomSheet: View {
             // App blocking toggle
             HStack {
                 Image(systemName: "shield.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiAmber)
 
                 Text("Block Distracting Apps")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -816,9 +816,9 @@ struct TaskDetailBottomSheet: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "checkmark")
-                        .font(.system(size: 16, weight: .bold))
+                        .dynamicTypeFont(base: 16, weight: .bold)
                     Text(task.isCompleted ? "Completed" : "Complete")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                 }
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
@@ -834,9 +834,9 @@ struct TaskDetailBottomSheet: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "play.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                     Text("Focus")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
@@ -858,7 +858,7 @@ struct TaskDetailBottomSheet: View {
                 }
             } label: {
                 Image(systemName: "ellipsis")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(width: 48, height: 48)
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
@@ -887,7 +887,7 @@ struct TaskDetailBottomSheet: View {
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
 
                 Text("Copied to clipboard!")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white)
             }
             .padding(.horizontal, 20)
@@ -945,11 +945,11 @@ struct FocusModeOption: View {
         Button(action: onTap) {
             VStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(isSelected ? Theme.Colors.accent : .white.opacity(0.7))
 
                 Text(title)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.7))
             }
             .frame(maxWidth: .infinity)

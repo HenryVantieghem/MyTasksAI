@@ -187,9 +187,9 @@ struct FriendsArenaView: View {
                         } label: {
                             HStack(spacing: 4) {
                                 Text("Full Rankings")
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .dynamicTypeFont(base: 12, weight: .semibold)
                                 Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 10, weight: .bold))
+                                    .dynamicTypeFont(base: 10, weight: .bold)
                             }
                             .foregroundStyle(ArenaColors.champion)
                         }
@@ -605,14 +605,14 @@ struct WeeklyShowdownBanner: View {
                 ZStack {
                     if !reduceMotion {
                         Image(systemName: "trophy.fill")
-                            .font(.system(size: 28))
+                            .dynamicTypeFont(base: 28)
                             .foregroundStyle(ArenaColors.champion)
                             .blur(radius: 8)
                             .scaleEffect(pulseScale)
                     }
 
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(ArenaColors.gold)
                 }
 
@@ -624,7 +624,7 @@ struct WeeklyShowdownBanner: View {
 
                     HStack(spacing: 8) {
                         Text("You're")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(.white.opacity(0.7))
 
                         Text("#\(yourRank)")
@@ -635,9 +635,9 @@ struct WeeklyShowdownBanner: View {
                         if rankChange != 0 {
                             HStack(spacing: 2) {
                                 Image(systemName: rankChange > 0 ? "arrow.up" : "arrow.down")
-                                    .font(.system(size: 10, weight: .bold))
+                                    .dynamicTypeFont(base: 10, weight: .bold)
                                 Text("\(abs(rankChange))")
-                                    .font(.system(size: 11, weight: .bold))
+                                    .dynamicTypeFont(base: 11, weight: .bold)
                             }
                             .foregroundStyle(rankChange > 0 ? ArenaColors.tasks : Color.red)
                             .padding(.horizontal, 6)
@@ -658,7 +658,7 @@ struct WeeklyShowdownBanner: View {
                         .font(.system(size: 28, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                     Text("days left")
-                        .font(.system(size: 10, weight: .medium))
+                        .dynamicTypeFont(base: 10, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -712,7 +712,7 @@ struct WeeklyShowdownBanner: View {
             // Rival callout
             HStack(spacing: 6) {
                 Image(systemName: "person.fill.viewfinder")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                 Text("Chasing: \(topRivalName)")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
             }
@@ -822,9 +822,9 @@ struct YourStatusOrb: View {
                 // Metric label
                 HStack(spacing: 4) {
                     Image(systemName: metric.icon)
-                        .font(.system(size: 11, weight: .bold))
+                        .dynamicTypeFont(base: 11, weight: .bold)
                     Text(metric.displayName.uppercased())
-                        .font(.system(size: 10, weight: .bold))
+                        .dynamicTypeFont(base: 10, weight: .bold)
                         .tracking(1)
                 }
                 .foregroundStyle(metric.color)
@@ -832,7 +832,7 @@ struct YourStatusOrb: View {
                 // Percentile
                 let percentile = Int((1 - Double(rank) / Double(totalParticipants)) * 100)
                 Text("Top \(percentile)%")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.white.opacity(0.4))
                     .padding(.top, 4)
             }
@@ -883,7 +883,7 @@ struct ArenaMetricSelector: View {
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: metric.icon)
-                                    .font(.system(size: 12, weight: .bold))
+                                    .dynamicTypeFont(base: 12, weight: .bold)
                                     .symbolEffect(.bounce, value: selectedMetric == metric)
 
                                 Text(metric.displayName)
@@ -1017,7 +1017,7 @@ struct ChampionThrone: View {
             // Crown for 1st place
             if showCrown {
                 Image(systemName: "crown.fill")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(ArenaColors.gold)
                     .shadow(color: ArenaColors.champion.opacity(0.8), radius: 8)
                     .offset(y: crownFloat)
@@ -1063,7 +1063,7 @@ struct ChampionThrone: View {
             // Value
             HStack(spacing: 3) {
                 Image(systemName: metric.icon)
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                 Text(metric.format(metricValue))
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
             }
@@ -1119,7 +1119,7 @@ struct XPRaceTrack: View {
                         .foregroundStyle(.white.opacity(0.4))
 
                     Text("\(nextMilestone - yourXP) XP to go")
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.7))
                 }
 
@@ -1131,7 +1131,7 @@ struct XPRaceTrack: View {
                         .fill(ArenaColors.xp)
                         .frame(width: 8, height: 8)
                     Text("You")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
             }
@@ -1185,7 +1185,7 @@ struct XPRaceTrack: View {
                             .frame(width: 10, height: 10)
                             .overlay(
                                 Text("\(rival.rank)")
-                                    .font(.system(size: 6, weight: .bold))
+                                    .dynamicTypeFont(base: 6, weight: .bold)
                                     .foregroundStyle(.white)
                             )
                             .offset(x: trackWidth * min(rivalProgress, 0.98) - 5)
@@ -1322,9 +1322,9 @@ struct RivalCard: View {
                     // Difference
                     HStack(spacing: 3) {
                         Image(systemName: isAhead ? "arrow.up" : "arrow.down")
-                            .font(.system(size: 9, weight: .bold))
+                            .dynamicTypeFont(base: 9, weight: .bold)
                         Text(metric.format(abs(difference)))
-                            .font(.system(size: 11, weight: .semibold))
+                            .dynamicTypeFont(base: 11, weight: .semibold)
                     }
                     .foregroundStyle(isAhead ? Color.red.opacity(0.8) : ArenaColors.tasks)
                 }
@@ -1445,9 +1445,9 @@ struct RivalCardMock: View {
 
                 HStack(spacing: 3) {
                     Image(systemName: isAhead ? "arrow.up" : "arrow.down")
-                        .font(.system(size: 9, weight: .bold))
+                        .dynamicTypeFont(base: 9, weight: .bold)
                     Text(metric.format(abs(difference)))
-                        .font(.system(size: 11, weight: .semibold))
+                        .dynamicTypeFont(base: 11, weight: .semibold)
                 }
                 .foregroundStyle(isAhead ? Color.red.opacity(0.8) : ArenaColors.tasks)
             }
@@ -1514,7 +1514,7 @@ struct StreakFireBadge: View {
 
             if !compact {
                 Text("day streak")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(ArenaColors.streak.opacity(0.7))
             }
         }
@@ -1610,7 +1610,7 @@ struct VSBattleSheet: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .bold))
+                            .dynamicTypeFont(base: 16, weight: .bold)
                             .foregroundStyle(.white.opacity(0.6))
                             .frame(width: 36, height: 36)
                             .background(Circle().fill(.white.opacity(0.1)))
@@ -1779,7 +1779,7 @@ struct VSBattleSheet: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "bolt.fill")
-                            .font(.system(size: 16, weight: .bold))
+                            .dynamicTypeFont(base: 16, weight: .bold)
                         Text("SEND CHALLENGE")
                             .font(.system(size: 14, weight: .black, design: .rounded))
                             .tracking(1)
@@ -1908,10 +1908,10 @@ struct StatComparisonRow: View {
             // Label
             HStack {
                 Image(systemName: icon)
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(color)
                 Text(label)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
                 Spacer()
             }
@@ -2028,7 +2028,7 @@ struct OrbitalFriendsRing: View {
                             .font(.system(size: 16, weight: .black, design: .rounded))
                             .foregroundStyle(.white)
                         Text("YOU")
-                            .font(.system(size: 8, weight: .bold))
+                            .dynamicTypeFont(base: 8, weight: .bold)
                             .foregroundStyle(.white.opacity(0.6))
                     }
                 )
@@ -2065,7 +2065,7 @@ struct OrbitalFriendDot: View {
                 .frame(width: 20)
                 .overlay(
                     Text(friend.displayName.prefix(1).uppercased())
-                        .font(.system(size: 9, weight: .bold))
+                        .dynamicTypeFont(base: 9, weight: .bold)
                         .foregroundStyle(.white)
                 )
         }
@@ -2106,7 +2106,7 @@ struct FriendsLeaderboardSheet: View {
                                 } label: {
                                     HStack(spacing: 6) {
                                         Image(systemName: metric.icon)
-                                            .font(.system(size: 12, weight: .bold))
+                                            .dynamicTypeFont(base: 12, weight: .bold)
                                         Text(metric.displayName)
                                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                                     }
@@ -2245,7 +2245,7 @@ struct LeaderboardFullRow: View {
 
                     if isCurrentUser {
                         Text("YOU")
-                            .font(.system(size: 9, weight: .bold))
+                            .dynamicTypeFont(base: 9, weight: .bold)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)

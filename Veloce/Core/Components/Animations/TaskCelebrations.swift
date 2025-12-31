@@ -437,7 +437,7 @@ struct RankUpCelebration: View {
             // Rank number
             VStack(spacing: 4) {
                 Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
 
                 HStack(spacing: 0) {
@@ -456,7 +456,7 @@ struct RankUpCelebration: View {
                 )
 
                 Text("Moved up \(oldRank - newRank) spot\(oldRank - newRank > 1 ? "s" : "")")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.7))
             }
             .scaleEffect(numberScale)
@@ -583,7 +583,7 @@ struct MilestoneToast: View {
                         .frame(width: 48, height: 48)
 
                     Image(systemName: icon)
-                        .font(.system(size: 22, weight: .bold))
+                        .dynamicTypeFont(base: 22, weight: .bold)
                         .foregroundStyle(color)
                         .scaleEffect(iconPulse)
                 }
@@ -594,7 +594,7 @@ struct MilestoneToast: View {
                         .foregroundStyle(.white)
 
                     Text(subtitle)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
 
@@ -689,14 +689,14 @@ struct ChallengeWonCelebration: View {
             ZStack {
                 // Glow
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 100, weight: .medium))
+                    .dynamicTypeFont(base: 100, weight: .medium)
                     .foregroundStyle(Color(hex: "FFD700"))
                     .blur(radius: 30)
                     .opacity(trophyGlow)
 
                 // Trophy
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 80, weight: .medium))
+                    .dynamicTypeFont(base: 80, weight: .medium)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color(hex: "FFD700"), Color(hex: "FFA500")],
@@ -778,14 +778,14 @@ struct FriendAcceptedCelebration: View {
             ZStack {
                 // Glow
                 Image(systemName: "heart.fill")
-                    .font(.system(size: 70, weight: .medium))
+                    .dynamicTypeFont(base: 70, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .blur(radius: 20)
                     .opacity(heartGlow)
 
                 // Heart
                 Image(systemName: "heart.fill")
-                    .font(.system(size: 50, weight: .medium))
+                    .dynamicTypeFont(base: 50, weight: .medium)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Colors.aiPurple, Theme.CelestialColors.plasmaCore],
@@ -862,7 +862,7 @@ struct SparklePiece: View {
 
     var body: some View {
         Image(systemName: "sparkle")
-            .font(.system(size: 12, weight: .bold))
+            .dynamicTypeFont(base: 12, weight: .bold)
             .foregroundStyle(Theme.Colors.aiPurple)
             .rotationEffect(.degrees(rotation))
             .offset(

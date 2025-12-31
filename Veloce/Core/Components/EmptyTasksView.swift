@@ -24,7 +24,7 @@ struct EmptyTasksView: View {
             VStack(spacing: Theme.Spacing.xl) {
                 // Icon with gentle pulse
                 Image(systemName: "checkmark.circle.dashed")
-                    .font(.system(size: 56, weight: .ultraLight))
+                    .dynamicTypeFont(base: 56, weight: .ultraLight)
                     .foregroundStyle(Theme.Colors.textTertiary.opacity(0.6))
                     .scaleEffect(iconPulse ? 1.04 : 1.0)
                     .opacity(showContent ? 1 : 0)
@@ -37,7 +37,7 @@ struct EmptyTasksView: View {
                         .foregroundStyle(Theme.Colors.textPrimary)
 
                     Text("Your tasks will appear here")
-                        .font(.system(size: 15, weight: .regular))
+                        .dynamicTypeFont(base: 15, weight: .regular)
                         .foregroundStyle(Theme.Colors.textSecondary)
                 }
                 .opacity(showContent ? 1 : 0)
@@ -49,7 +49,7 @@ struct EmptyTasksView: View {
             // Arrow pointing to input bar
             VStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "arrow.down")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(Theme.Colors.textTertiary.opacity(0.4))
                     .offset(y: arrowBounce ? 4 : 0)
             }

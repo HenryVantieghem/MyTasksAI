@@ -230,7 +230,7 @@ struct GlassSectionHeader: View {
         HStack(spacing: 12) {
             if let icon = icon {
                 Image(systemName: icon)
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(color)
             }
             
@@ -241,7 +241,7 @@ struct GlassSectionHeader: View {
                 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(.system(size: 15, weight: .medium))
+                        .dynamicTypeFont(base: 15, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
                 }
             }
@@ -251,7 +251,7 @@ struct GlassSectionHeader: View {
             if let action = action {
                 Button(action: action) {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 16, weight: .bold))
+                        .dynamicTypeFont(base: 16, weight: .bold)
                         .foregroundStyle(color)
                 }
             }
@@ -271,7 +271,7 @@ struct GlassStatCard: View {
         VStack(spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(color)
                 
                 Text(value)
@@ -280,7 +280,7 @@ struct GlassStatCard: View {
             }
             
             Text(label)
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
         }
         .frame(maxWidth: .infinity)
@@ -299,7 +299,7 @@ struct GlassProgressCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
-                .font(.system(size: 17, weight: .bold))
+                .dynamicTypeFont(base: 17, weight: .bold)
                 .foregroundStyle(.white)
             
             HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -309,7 +309,7 @@ struct GlassProgressCard: View {
                     .contentTransition(.numericText())
                 
                 Text("%")
-                    .font(.system(size: 24, weight: .semibold))
+                    .dynamicTypeFont(base: 24, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.7))
             }
             
@@ -365,10 +365,10 @@ struct GlassActionButton: View {
         }) {
             HStack(spacing: 10) {
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .bold))
+                    .dynamicTypeFont(base: 18, weight: .bold)
                 
                 Text(title)
-                    .font(.system(size: 17, weight: .bold))
+                    .dynamicTypeFont(base: 17, weight: .bold)
             }
             .foregroundStyle(.white)
             .glassButton(colors: colors)
@@ -456,12 +456,12 @@ struct GlassExamplesView: View {
                 // Pills
                 HStack(spacing: 12) {
                     Text("Active")
-                        .font(.system(size: 15, weight: .bold))
+                        .dynamicTypeFont(base: 15, weight: .bold)
                         .foregroundStyle(.white)
                         .glassPill(color: .blue, isSelected: true)
                     
                     Text("Completed")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.7))
                         .glassPill(color: .green, isSelected: false)
                 }
@@ -471,7 +471,7 @@ struct GlassExamplesView: View {
                     Image(systemName: "star.fill")
                     Text("Premium")
                 }
-                .font(.system(size: 14, weight: .bold))
+                .dynamicTypeFont(base: 14, weight: .bold)
                 .foregroundStyle(.white)
                 .glassBadge(color: .orange)
             }

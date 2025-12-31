@@ -677,7 +677,7 @@ extension View {
         Spacer()
 
         Text("Veloce")
-            .font(.system(size: 40, weight: .bold))
+            .dynamicTypeFont(base: 40, weight: .bold)
             .foregroundStyle(.white)
 
         Text("AI-Powered Productivity")

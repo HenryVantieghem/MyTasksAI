@@ -63,7 +63,7 @@ struct PomodoroTimerSection: View {
             // Header
             HStack {
                 Image(systemName: "timer")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.Colors.accent)
                 Text("Focus Timer")
                     .font(Theme.Typography.headline)
@@ -112,9 +112,9 @@ struct PomodoroTimerSection: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: buttonState.icon)
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                     Text(buttonState.title)
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -139,9 +139,9 @@ struct PomodoroTimerSection: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "stop.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("Stop Timer")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .frame(maxWidth: .infinity)
@@ -190,7 +190,7 @@ struct PomodoroTimerSection: View {
             HStack(spacing: 4) {
                 if isAI {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                 }
                 Text("\(minutes)m")
                     .font(.system(size: 13, weight: .medium, design: .default))

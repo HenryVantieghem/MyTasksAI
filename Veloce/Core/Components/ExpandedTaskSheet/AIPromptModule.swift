@@ -81,9 +81,9 @@ struct AIPromptModule: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: style.icon)
-                                .font(.system(size: 10, weight: .semibold))
+                                .dynamicTypeFont(base: 10, weight: .semibold)
                             Text(style.rawValue)
-                                .font(.system(size: 11, weight: .semibold))
+                                .dynamicTypeFont(base: 11, weight: .semibold)
                         }
                         .foregroundStyle(selectedStyle == style ? .white : .white.opacity(0.6))
                         .padding(.horizontal, 10)
@@ -109,7 +109,7 @@ struct AIPromptModule: View {
     private var promptPreview: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(isExpanded ? generatedPrompt : truncatedPrompt)
-                .font(.system(size: 13, weight: .regular))
+                .dynamicTypeFont(base: 13, weight: .regular)
                 .foregroundStyle(.white.opacity(0.85))
                 .lineLimit(isExpanded ? nil : 4)
                 .animation(.easeInOut(duration: 0.2), value: isExpanded)
@@ -122,7 +122,7 @@ struct AIPromptModule: View {
                     }
                 } label: {
                     Text(isExpanded ? "Show less" : "Show more")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
             }
@@ -150,11 +150,11 @@ struct AIPromptModule: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: showCopiedFeedback ? "checkmark" : "doc.on.doc")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .contentTransition(.symbolEffect(.replace))
 
                 Text(showCopiedFeedback ? "Copied!" : "Copy to Clipboard")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)

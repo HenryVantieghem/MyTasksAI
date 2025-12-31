@@ -41,7 +41,7 @@ struct GlassTextField: View {
         HStack(spacing: Theme.Spacing.md) {
             // Icon
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .medium))
+                .dynamicTypeFont(base: 18, weight: .medium)
                 .foregroundStyle(iconColor)
                 .frame(width: 24)
 
@@ -96,12 +96,12 @@ struct GlassTextField: View {
             // Validation indicator
             if case .valid = validation {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(Theme.Colors.success)
                     .transition(.scale.combined(with: .opacity))
             } else if case .invalid = validation {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(Theme.Colors.error)
                     .transition(.scale.combined(with: .opacity))
             }
@@ -113,7 +113,7 @@ struct GlassTextField: View {
                     HapticsService.shared.selectionFeedback()
                 } label: {
                     Image(systemName: showSecureText ? "eye.slash.fill" : "eye.fill")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(Theme.Colors.textSecondary)
                 }
                 .buttonStyle(.plain)

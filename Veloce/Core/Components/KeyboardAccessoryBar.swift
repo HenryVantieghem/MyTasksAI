@@ -160,7 +160,7 @@ struct KeyboardAccessoryBar: View {
                         HapticsService.shared.selectionFeedback()
                     } label: {
                         Image(systemName: "keyboard.chevron.compact.down")
-                            .font(.system(size: 18, weight: .medium))
+                            .dynamicTypeFont(base: 18, weight: .medium)
                             .foregroundStyle(Theme.Colors.textSecondary)
                             .padding(Theme.Spacing.sm)
                     }
@@ -214,13 +214,13 @@ struct KeyboardAccessoryBar: View {
                             .overlay {
                                 if selectedPriority == priority {
                                     Image(systemName: "checkmark")
-                                        .font(.system(size: 12, weight: .bold))
+                                        .dynamicTypeFont(base: 12, weight: .bold)
                                         .foregroundStyle(.white)
                                 }
                             }
 
                         Text(priority.label)
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
                 }
@@ -282,12 +282,12 @@ struct KeyboardAccessoryBar: View {
                                 .frame(width: 36, height: 36)
 
                             Image(systemName: dueOption.icon)
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                                 .foregroundStyle(dueOption.color)
                         }
 
                         Text(dueOption.label)
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
                 }
@@ -330,12 +330,12 @@ struct KeyboardAccessoryBar: View {
                                 }
 
                             Image(systemName: taskType.icon)
-                                .font(.system(size: 14, weight: .medium))
+                                .dynamicTypeFont(base: 14, weight: .medium)
                                 .foregroundStyle(taskType.color)
                         }
 
                         Text(taskType.shortLabel)
-                            .font(.system(size: 10, weight: .medium))
+                            .dynamicTypeFont(base: 10, weight: .medium)
                             .foregroundStyle(Theme.Colors.textSecondary)
                             .lineLimit(1)
                     }
@@ -402,11 +402,11 @@ struct AccessoryButton: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
 
                 if let label = label {
                     Text(label)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                 }
             }
             .foregroundStyle(isActive ? color : Theme.Colors.textSecondary)
@@ -462,7 +462,7 @@ struct AIMagicAccessoryButton: View {
                 }
 
                 Text("AI")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Colors.aiOrange, Theme.Colors.aiPurple],
@@ -599,7 +599,7 @@ struct ExpandedKeyboardToolbar: View {
                     HapticsService.shared.selectionFeedback()
                 } label: {
                     Image(systemName: showingQuickActions ? "chevron.down" : "chevron.up")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.Colors.textSecondary)
                         .frame(width: 36, height: 36)
                         .background(
@@ -622,7 +622,7 @@ struct ExpandedKeyboardToolbar: View {
                     onDismiss()
                 } label: {
                     Image(systemName: "keyboard.chevron.compact.down")
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(Theme.Colors.textSecondary)
                 }
 
@@ -633,7 +633,7 @@ struct ExpandedKeyboardToolbar: View {
                         HapticsService.shared.impact()
                     } label: {
                         Text("Add")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -720,9 +720,9 @@ struct QuickActionChip: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                 Text(label)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
             }
             .foregroundStyle(color)
             .padding(.horizontal, 14)
@@ -746,9 +746,9 @@ struct AIQuickActionChip: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                 Text("AI Suggest")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
             }
             .foregroundStyle(
                 LinearGradient(

@@ -20,12 +20,12 @@ struct ConstellationPasswordStrength: View {
     @State private var glowPulse: Double = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Aurora.Layout.spacingSmall) {
+        VStack(alignment: .leading, spacing: Aurora.Spacing.sm) {
             // Constellation visualization
             constellationView
 
             // Text label with requirements
-            HStack(spacing: Aurora.Layout.spacingSmall) {
+            HStack(spacing: Aurora.Spacing.sm) {
                 // Strength label
                 HStack(spacing: 4) {
                     SwiftUI.Circle()
@@ -34,7 +34,7 @@ struct ConstellationPasswordStrength: View {
                         .shadow(color: strength.color.opacity(0.5), radius: 3)
 
                     Text(strength.label)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(strength.color)
                 }
 
@@ -91,7 +91,7 @@ struct ConstellationPasswordStrength: View {
 
             // Star shape
             Image(systemName: isLit ? "star.fill" : "star")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(isLit ? starColor : Aurora.Colors.textQuaternary)
                 .scaleEffect(isLit ? 1.1 : 0.9)
                 .shadow(
@@ -157,7 +157,7 @@ struct ConstellationPasswordStrength: View {
     // MARK: - Requirements Hints
 
     private var requirementsHints: some View {
-        HStack(spacing: Aurora.Layout.spacingSmall) {
+        HStack(spacing: Aurora.Spacing.sm) {
             requirementDot(met: password.count >= 8, label: "8+")
             requirementDot(met: password.range(of: "[A-Z]", options: .regularExpression) != nil, label: "A-Z")
             requirementDot(met: password.range(of: "[0-9]", options: .regularExpression) != nil, label: "0-9")
@@ -194,7 +194,7 @@ struct ConstellationPasswordStrength: View {
             }
 
             // Pulse glow
-            withAnimation(Aurora.Animation.glowPulse) {
+            withAnimation(Aurora.Animation.slow.repeatForever(autoreverses: true)) {
                 glowPulse = 1.0
             }
         } else {

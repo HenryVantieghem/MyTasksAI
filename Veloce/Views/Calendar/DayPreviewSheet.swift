@@ -71,7 +71,7 @@ struct DayPreviewSheet: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(date.formatted(.dateTime.weekday(.wide)))
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     Text(date.formatted(.dateTime.month(.wide).day()))
@@ -87,10 +87,10 @@ struct DayPreviewSheet: View {
                 } label: {
                     HStack(spacing: 4) {
                         Text("View Day")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
 
                         Image(systemName: "arrow.right")
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                     }
                     .foregroundStyle(Theme.CelestialColors.plasmaCore)
                     .padding(.horizontal, 12)
@@ -175,7 +175,7 @@ struct DayPreviewSheet: View {
                     .frame(width: 80, height: 80)
 
                 Image(systemName: "calendar.badge.checkmark")
-                    .font(.system(size: 36, weight: .light))
+                    .dynamicTypeFont(base: 36, weight: .light)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
 
@@ -185,7 +185,7 @@ struct DayPreviewSheet: View {
                     .foregroundStyle(.white)
 
                 Text("No tasks or events scheduled")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
 
@@ -228,7 +228,7 @@ struct DayPreviewTaskRow: View {
 
                     if task.isCompleted {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
@@ -236,7 +236,7 @@ struct DayPreviewTaskRow: View {
                 // Content
                 VStack(alignment: .leading, spacing: 2) {
                     Text(task.title)
-                        .font(.system(size: 15, weight: .medium))
+                        .dynamicTypeFont(base: 15, weight: .medium)
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .strikethrough(task.isCompleted, color: .white.opacity(0.5))
@@ -266,7 +266,7 @@ struct DayPreviewTaskRow: View {
                 }
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
             .padding(12)
@@ -326,7 +326,7 @@ struct DayPreviewEventRow: View {
             // Content
             VStack(alignment: .leading, spacing: 2) {
                 Text(event.title ?? "Event")
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(.white.opacity(0.9))
                     .lineLimit(1)
 
@@ -345,7 +345,7 @@ struct DayPreviewEventRow: View {
 
             // Calendar name
             Text(event.calendar.title)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(eventColor)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)

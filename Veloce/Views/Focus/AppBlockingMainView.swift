@@ -125,7 +125,7 @@ struct AppBlockingMainView: View {
                 dismiss()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 36, height: 36)
                     .background(Circle().fill(.ultraThinMaterial))
@@ -134,7 +134,7 @@ struct AppBlockingMainView: View {
             Spacer()
 
             Text("App Blocking")
-                .font(.system(size: 18, weight: .semibold))
+                .dynamicTypeFont(base: 18, weight: .semibold)
                 .foregroundStyle(.white)
 
             Spacer()
@@ -144,7 +144,7 @@ struct AppBlockingMainView: View {
                 showAppPicker = true
             } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(width: 36, height: 36)
                     .background(Circle().fill(Theme.Colors.aiCyan))
@@ -165,7 +165,7 @@ struct AppBlockingMainView: View {
                     }
                 } label: {
                     Text(tab.title)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(selectedTab == tab ? .white : .white.opacity(0.5))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -248,7 +248,7 @@ struct AppBlockingMainView: View {
                         .foregroundStyle(.white)
 
                     Text("today")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -258,14 +258,14 @@ struct AppBlockingMainView: View {
                 VStack(spacing: 2) {
                     HStack(spacing: 4) {
                         Image(systemName: todayScreenTime < weeklyAverage ? "arrow.down" : "arrow.up")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                         Text(formatTimeDifference(todayScreenTime - weeklyAverage))
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                     }
                     .foregroundStyle(todayScreenTime < weeklyAverage ? Theme.Colors.success : Theme.Colors.aiOrange)
 
                     Text("vs weekly avg")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
@@ -275,11 +275,11 @@ struct AppBlockingMainView: View {
 
                 VStack(spacing: 2) {
                     Text("\(pickupsToday)")
-                        .font(.system(size: 18, weight: .bold))
+                        .dynamicTypeFont(base: 18, weight: .bold)
                         .foregroundStyle(.white)
 
                     Text("pickups")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -322,17 +322,17 @@ struct AppBlockingMainView: View {
                     .frame(width: 44, height: 44)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(.white)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("AI Insight")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("Your social media usage spikes after 9 PM. Consider enabling blocking during that time for better sleep.")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white.opacity(0.9))
                     .lineLimit(3)
             }
@@ -378,15 +378,15 @@ struct AppBlockingMainView: View {
     private func quickStatCard(title: String, value: String, icon: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(color)
 
             Text(value)
-                .font(.system(size: 16, weight: .bold))
+                .dynamicTypeFont(base: 16, weight: .bold)
                 .foregroundStyle(.white)
 
             Text(title)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)
@@ -400,7 +400,7 @@ struct AppBlockingMainView: View {
     private var mostUsedAppsSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             Text("Most Used Today")
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
 
             ForEach(mostUsedApps.prefix(5)) { app in
@@ -422,17 +422,17 @@ struct AppBlockingMainView: View {
                 .frame(width: 40, height: 40)
                 .overlay {
                     Image(systemName: app.icon)
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(app.color)
                 }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(app.name)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text(app.category)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -440,7 +440,7 @@ struct AppBlockingMainView: View {
 
             VStack(alignment: .trailing, spacing: 2) {
                 Text(formatTime(app.duration))
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 // Usage bar
@@ -463,7 +463,7 @@ struct AppBlockingMainView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Text("Active Blocks")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -474,7 +474,7 @@ struct AppBlockingMainView: View {
                             .fill(Theme.Colors.success)
                             .frame(width: 8, height: 8)
                         Text("Active")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(Theme.Colors.success)
                     }
                 }
@@ -497,11 +497,11 @@ struct AppBlockingMainView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Focus Session")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("12 apps blocked")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -511,7 +511,7 @@ struct AppBlockingMainView: View {
                 Task { await blockingService.endSession() }
             } label: {
                 Text("End")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -535,11 +535,11 @@ struct AppBlockingMainView: View {
     private var noActiveBlocksView: some View {
         HStack {
             Image(systemName: "shield.slash")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(.white.opacity(0.3))
 
             Text("No apps currently blocked")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
 
             Spacer()
@@ -548,7 +548,7 @@ struct AppBlockingMainView: View {
                 showAppPicker = true
             } label: {
                 Text("Block Apps")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
@@ -570,15 +570,15 @@ struct AppBlockingMainView: View {
             } label: {
                 HStack {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
 
                     Text("Create Schedule")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.5))
                 }
                 .foregroundStyle(.white)
@@ -625,12 +625,12 @@ struct AppBlockingMainView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Text(name)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(.white)
 
                     if isActive {
                         Text("ACTIVE")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                             .foregroundStyle(Theme.Colors.success)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -644,18 +644,18 @@ struct AppBlockingMainView: View {
                 HStack(spacing: Theme.Spacing.sm) {
                     HStack(spacing: 4) {
                         Image(systemName: "clock")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text(time)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                     }
 
                     Text("•")
 
                     HStack(spacing: 4) {
                         Image(systemName: "calendar")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text(days)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                     }
                 }
                 .foregroundStyle(.white.opacity(0.6))
@@ -684,15 +684,15 @@ struct AppBlockingMainView: View {
             } label: {
                 HStack {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
 
                     Text("Create App Group")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.5))
                 }
                 .foregroundStyle(.white)
@@ -750,24 +750,24 @@ struct AppBlockingMainView: View {
                     .frame(width: 48, height: 48)
 
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(color)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(name)
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("\(appCount) apps")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.3))
         }
         .padding(Theme.Spacing.lg)

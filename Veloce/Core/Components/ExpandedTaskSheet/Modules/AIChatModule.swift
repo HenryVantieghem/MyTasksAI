@@ -68,7 +68,7 @@ struct AIChatModule: View {
             if isUser { Spacer(minLength: 40) }
 
             Text(message.content)
-                .font(.system(size: 13, weight: .regular))
+                .dynamicTypeFont(base: 13, weight: .regular)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
@@ -92,7 +92,7 @@ struct AIChatModule: View {
             MiniThinkingOrb(isActive: true, size: 16)
 
             Text("AI is thinking...")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(.white.opacity(0.6))
 
             Spacer()
@@ -110,7 +110,7 @@ struct AIChatModule: View {
     private var chatInputField: some View {
         HStack(spacing: 10) {
             TextField("Ask anything about this task...", text: $viewModel.chatInput)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white)
                 .focused($isInputFocused)
                 .submitLabel(.send)
@@ -122,7 +122,7 @@ struct AIChatModule: View {
                 sendMessage()
             } label: {
                 Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 26))
+                    .dynamicTypeFont(base: 26)
                     .foregroundStyle(
                         viewModel.chatInput.isEmpty
                             ? Color.white.opacity(0.3)
@@ -159,7 +159,7 @@ struct AIChatModule: View {
                         sendMessage()
                     } label: {
                         Text(suggestion)
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white.opacity(0.8))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)

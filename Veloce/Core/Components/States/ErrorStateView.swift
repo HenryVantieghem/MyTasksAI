@@ -58,7 +58,7 @@ struct ErrorStateView: View {
 
             // Icon
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 44, weight: .light))
+                .dynamicTypeFont(base: 44, weight: .light)
                 .foregroundStyle(Theme.CelestialColors.errorNebula)
                 .offset(x: iconShake ? -3 : 0)
         }
@@ -73,7 +73,7 @@ struct ErrorStateView: View {
                 .foregroundStyle(Theme.Colors.textPrimary)
 
             Text(message)
-                .font(.system(size: 15, weight: .regular))
+                .dynamicTypeFont(base: 15, weight: .regular)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)
@@ -89,7 +89,7 @@ struct ErrorStateView: View {
         }) {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
 
                 Text("Try Again")
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
@@ -168,11 +168,11 @@ struct ErrorBanner: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.circle.fill")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(Theme.CelestialColors.errorNebula)
 
             Text(message)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white)
                 .lineLimit(2)
 
@@ -181,7 +181,7 @@ struct ErrorBanner: View {
             if let dismissAction = dismissAction {
                 Button(action: dismissAction) {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
             }
@@ -225,11 +225,11 @@ struct WarningBanner: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(Theme.CelestialColors.warningNebula)
 
             Text(message)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white)
                 .lineLimit(2)
 
@@ -238,7 +238,7 @@ struct WarningBanner: View {
             if let actionTitle = actionTitle, let action = action {
                 Button(action: action) {
                     Text(actionTitle)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.warningNebula)
                 }
             }
@@ -274,11 +274,11 @@ struct SuccessBanner: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(Theme.CelestialColors.successNebula)
 
             Text(message)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white)
         }
         .padding(.horizontal, 16)

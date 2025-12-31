@@ -118,14 +118,14 @@ struct ConstellationProgress: View {
             // Checkmark for completed
             if state == .completed {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 8, weight: .bold))
+                    .dynamicTypeFont(base: 8, weight: .bold)
                     .foregroundStyle(.white)
             }
 
             // Step number for upcoming
             if state == .upcoming {
                 Text("\(index + 1)")
-                    .font(.system(size: 9, weight: .medium))
+                    .dynamicTypeFont(base: 9, weight: .medium)
                     .foregroundStyle(Theme.Colors.textTertiary)
             }
         }

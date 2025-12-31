@@ -90,12 +90,12 @@ struct DailyBriefView: View {
         VStack(spacing: Theme.Spacing.md) {
             // Date
             Text(brief.formattedDate)
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.secondary)
 
             // Greeting
             Text(brief.greeting)
-                .font(.system(size: 28, weight: .bold))
+                .dynamicTypeFont(base: 28, weight: .bold)
                 .foregroundStyle(.primary)
 
             // Velocity Score
@@ -112,10 +112,10 @@ struct DailyBriefView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Velocity Score")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.secondary)
                     Text(brief.summaryText)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.primary)
                 }
 
@@ -135,7 +135,7 @@ struct DailyBriefView: View {
     private var streakSection: some View {
         HStack(spacing: Theme.Spacing.md) {
             Image(systemName: brief.streakStatus.icon)
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [.orange, .red],
@@ -145,7 +145,7 @@ struct DailyBriefView: View {
                 )
 
             Text(brief.streakStatus.message)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.primary)
 
             Spacer()
@@ -167,10 +167,10 @@ struct DailyBriefView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Image(systemName: "star.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.yellow)
                 Text("Priority Tasks")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                 Spacer()
             }
 
@@ -181,14 +181,14 @@ struct DailyBriefView: View {
                         .frame(width: 20, height: 20)
 
                     Text(task.title)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .lineLimit(1)
 
                     Spacer()
 
                     if let time = task.scheduledTime {
                         Text(time.formatted(.dateTime.hour().minute()))
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -209,14 +209,14 @@ struct DailyBriefView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.accent)
                 Text("AI Schedule Suggestions")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                 Spacer()
 
                 Text("\(brief.suggestedSchedule.count) tasks")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.secondary)
             }
 
@@ -231,11 +231,11 @@ struct DailyBriefView: View {
                     // Task title
                     VStack(alignment: .leading, spacing: 2) {
                         Text(suggestion.task?.title ?? "Task")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .lineLimit(1)
 
                         Text(suggestion.reason)
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
@@ -244,7 +244,7 @@ struct DailyBriefView: View {
 
                     // Confidence
                     Text("\(suggestion.confidencePercentage)%")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 6)
@@ -267,7 +267,7 @@ struct DailyBriefView: View {
                         Text("Accept Schedule")
                     }
                 }
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -296,11 +296,11 @@ struct DailyBriefView: View {
     private var insightSection: some View {
         HStack(spacing: Theme.Spacing.md) {
             Image(systemName: "lightbulb.fill")
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(.yellow)
 
             Text(brief.insight)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.primary)
 
             Spacer()
@@ -321,22 +321,22 @@ struct DailyBriefView: View {
     private var focusSuggestionSection: some View {
         HStack(spacing: Theme.Spacing.md) {
             Image(systemName: "timer")
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(Theme.Colors.aiAmber)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Focus Tip")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.secondary)
                 Text(brief.focusSuggestion)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.primary)
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(.tertiary)
         }
         .padding(Theme.Spacing.md)
@@ -356,14 +356,14 @@ struct DailyBriefView: View {
 
             VStack(spacing: Theme.Spacing.lg) {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 64))
+                    .dynamicTypeFont(base: 64)
                     .foregroundStyle(.green)
 
                 Text("Schedule Accepted!")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
 
                 Text("Your tasks have been scheduled")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.secondary)
             }
             .padding(Theme.Spacing.xl)

@@ -82,7 +82,7 @@ struct AIWhisper: View {
 
     private var sparkleIcon: some View {
         Image(systemName: "sparkle")
-            .font(.system(size: 10, weight: .medium))
+            .dynamicTypeFont(base: 10, weight: .medium)
             .foregroundStyle(
                 LinearGradient(
                     colors: [
@@ -151,10 +151,10 @@ struct WhisperPill: View {
     var body: some View {
         HStack(spacing: 3) {
             Image(systemName: icon)
-                .font(.system(size: 8, weight: .medium))
+                .dynamicTypeFont(base: 8, weight: .medium)
 
             Text(text)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
         }
         .foregroundStyle(color.opacity(0.8))
         .padding(.horizontal, 6)
@@ -177,7 +177,7 @@ struct AIWhisperLoading: View {
             // Spinning sparkle
             if #available(iOS 18.0, *) {
                 Image(systemName: "sparkle")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(
                         LinearGradient(
                             colors: Theme.Colors.aiGradient,
@@ -188,7 +188,7 @@ struct AIWhisperLoading: View {
                     .symbolEffect(.rotate, options: .repeating.speed(0.5))
             } else {
                 Image(systemName: "sparkle")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(
                         LinearGradient(
                             colors: Theme.Colors.aiGradient,
@@ -235,7 +235,7 @@ struct AISuggestionCard: View {
             // Header
             HStack(spacing: 6) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("Suggestion")
@@ -246,7 +246,7 @@ struct AISuggestionCard: View {
 
                 Button(action: onDismiss) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 10, weight: .medium))
+                        .dynamicTypeFont(base: 10, weight: .medium)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
             }

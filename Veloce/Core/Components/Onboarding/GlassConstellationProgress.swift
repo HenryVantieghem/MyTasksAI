@@ -136,7 +136,7 @@ private struct ConstellationNode: View {
             // Checkmark for completed nodes
             if isComplete {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 4, weight: .bold))
+                    .dynamicTypeFont(base: 4, weight: .bold)
                     .foregroundStyle(.white)
             }
         }
@@ -261,7 +261,7 @@ where Step.AllCases: RandomAccessCollection, Step.RawValue == Int {
                     // Label (if provided)
                     if let label = labels[step] {
                         Text(label)
-                            .font(.system(size: 9, weight: .medium))
+                            .dynamicTypeFont(base: 9, weight: .medium)
                             .foregroundStyle(
                                 index <= currentIndex
                                 ? Color.white.opacity(0.8)
@@ -341,7 +341,7 @@ private struct ExpandedNode: View {
             // Checkmark
             if isComplete {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 6, weight: .bold))
+                    .dynamicTypeFont(base: 6, weight: .bold)
                     .foregroundStyle(.white)
             }
         }

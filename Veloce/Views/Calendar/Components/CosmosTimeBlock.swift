@@ -161,7 +161,7 @@ struct CosmosTimeBlock: View {
             // Completion checkmark
             if task.isCompleted {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(.white)
                     .transition(.scale.combined(with: .opacity))
             }
@@ -233,7 +233,7 @@ struct CosmosTimeBlock: View {
     private var pointsBadge: some View {
         HStack(spacing: 2) {
             Image(systemName: "bolt.fill")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
 
             Text("+\(task.potentialPoints)")
                 .font(Theme.Typography.cosmosPoints)
@@ -370,7 +370,7 @@ struct CosmosCompactTimeBlock: View {
 
                 // Title
                 Text(task.title)
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(.white.opacity(task.isCompleted ? 0.5 : 0.9))
                     .lineLimit(1)
                     .strikethrough(task.isCompleted, color: .white.opacity(0.5))

@@ -129,13 +129,13 @@ struct FocusHistoryView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("This Week")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
 
                 Text("\(weeklyData.reduce(0) { $0 + $1.minutes }) min")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiAmber)
             }
 
@@ -200,7 +200,7 @@ struct FocusHistoryView: View {
                         .frame(width: 80, height: 80)
 
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Theme.Colors.fire, Theme.Colors.streakOrange],
@@ -215,7 +215,7 @@ struct FocusHistoryView: View {
                     .foregroundStyle(.white)
 
                 Text("Day Streak")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
             }
             .frame(maxWidth: .infinity)
@@ -244,7 +244,7 @@ struct FocusHistoryView: View {
                         .frame(width: 80, height: 80)
 
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(Theme.Colors.gold)
                 }
 
@@ -253,7 +253,7 @@ struct FocusHistoryView: View {
                     .foregroundStyle(.white)
 
                 Text("Best Streak")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
             }
             .frame(maxWidth: .infinity)
@@ -272,7 +272,7 @@ struct FocusHistoryView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Session History")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -294,9 +294,9 @@ struct FocusHistoryView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Text(selectedFilter.rawValue)
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                         Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .semibold))
+                            .dynamicTypeFont(base: 10, weight: .semibold)
                     }
                     .foregroundStyle(.white.opacity(0.6))
                     .padding(.horizontal, 10)
@@ -312,11 +312,11 @@ struct FocusHistoryView: View {
                 // Empty state
                 VStack(spacing: 12) {
                     Image(systemName: "clock.badge.questionmark")
-                        .font(.system(size: 40, weight: .thin))
+                        .dynamicTypeFont(base: 40, weight: .thin)
                         .foregroundStyle(.white.opacity(0.4))
 
                     Text("No sessions yet")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.5))
                 }
                 .frame(maxWidth: .infinity)
@@ -376,7 +376,7 @@ struct HistoryStatCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: icon)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(color)
 
                 Spacer()
@@ -387,7 +387,7 @@ struct HistoryStatCard: View {
                 .foregroundStyle(.white)
 
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(.white.opacity(0.6))
         }
         .padding(Theme.Spacing.md)
@@ -427,25 +427,25 @@ struct SessionHistoryRow: View {
         HStack(spacing: 12) {
             // Status icon
             Image(systemName: statusIcon)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(statusColor)
 
             // Session info
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.title)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white)
 
                 HStack(spacing: 8) {
                     Text(session.startedAt, format: .dateTime.month().day().hour().minute())
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
 
                     Text("•")
                         .foregroundStyle(.white.opacity(0.3))
 
                     Text(session.formattedDuration)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
             }
@@ -456,9 +456,9 @@ struct SessionHistoryRow: View {
             if session.pointsEarned > 0 {
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text("+\(session.pointsEarned)")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                 }
                 .foregroundStyle(Theme.Colors.gold)
             }
@@ -466,7 +466,7 @@ struct SessionHistoryRow: View {
             // Deep Focus badge
             if session.isDeepFocus {
                 Image(systemName: "lock.fill")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(Theme.Colors.aiAmber)
             }
         }

@@ -169,7 +169,7 @@ struct CreateCircleSheet: View {
             // Icon or initials
             if circleName.isEmpty {
                 Image(systemName: selectedIcon.rawValue)
-                    .font(.system(size: 28, weight: .medium))
+                    .dynamicTypeFont(base: 28, weight: .medium)
                     .foregroundStyle(.white)
             } else {
                 Text(circleName.prefix(2).uppercased())
@@ -185,11 +185,11 @@ struct CreateCircleSheet: View {
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Circle Name")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             TextField("e.g., Morning Warriors", text: $circleName)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
                 .padding(16)
                 .background(
@@ -209,11 +209,11 @@ struct CreateCircleSheet: View {
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Description (optional)")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             TextField("What's this circle about?", text: $circleDescription, axis: .vertical)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
                 .lineLimit(3...5)
                 .padding(16)
@@ -234,7 +234,7 @@ struct CreateCircleSheet: View {
     private var iconPickerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Circle Icon")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 5), spacing: 12) {
@@ -251,7 +251,7 @@ struct CreateCircleSheet: View {
                                 .frame(width: 50, height: 50)
 
                             Image(systemName: icon.rawValue)
-                                .font(.system(size: 18))
+                                .dynamicTypeFont(base: 18)
                                 .foregroundStyle(selectedIcon == icon ? selectedColor.value : Theme.CelestialColors.starDim)
 
                             if selectedIcon == icon {
@@ -272,7 +272,7 @@ struct CreateCircleSheet: View {
     private var colorPickerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Circle Color")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             HStack(spacing: 16) {
@@ -295,7 +295,7 @@ struct CreateCircleSheet: View {
                                     .frame(width: 38, height: 38)
 
                                 Image(systemName: "checkmark")
-                                    .font(.system(size: 14, weight: .bold))
+                                    .dynamicTypeFont(base: 14, weight: .bold)
                                     .foregroundStyle(.white)
                             }
                         }
@@ -311,7 +311,7 @@ struct CreateCircleSheet: View {
     private var memberLimitSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Maximum Members")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             HStack(spacing: 12) {
@@ -323,7 +323,7 @@ struct CreateCircleSheet: View {
                         hapticFeedback()
                     } label: {
                         Text("\(limit)")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(maxMembers == limit ? .white : Theme.CelestialColors.starDim)
                             .frame(width: 50, height: 40)
                             .background(
@@ -354,7 +354,7 @@ struct CreateCircleSheet: View {
                     .tint(.white)
             } else {
                 Text("Create")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
             }
         }
@@ -439,7 +439,7 @@ struct CircleCreatedSuccess: View {
                 // Sparkles
                 ForEach(0..<12, id: \.self) { i in
                     Image(systemName: "sparkle")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(Theme.Colors.aiPurple)
                         .offset(y: -50 - phase * 30)
                         .rotationEffect(.degrees(Double(i) * 30))
@@ -475,7 +475,7 @@ struct CircleCreatedSuccess: View {
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text(circle.name)
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
             .opacity(phase > 0.3 ? 1 : 0)
@@ -485,7 +485,7 @@ struct CircleCreatedSuccess: View {
             if showInviteCode {
                 VStack(spacing: 16) {
                     Text("Your Invite Code")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     Text(circle.formattedInviteCode)
@@ -512,7 +512,7 @@ struct CircleCreatedSuccess: View {
                             Image(systemName: copied ? "checkmark" : "doc.on.doc")
                             Text(copied ? "Copied!" : "Copy Code")
                         }
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
@@ -538,7 +538,7 @@ struct CircleCreatedSuccess: View {
                 onDismiss()
             } label: {
                 Text("Start Inviting Friends")
-                    .font(.system(size: 17, weight: .bold))
+                    .dynamicTypeFont(base: 17, weight: .bold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)

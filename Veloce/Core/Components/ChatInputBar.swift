@@ -86,7 +86,7 @@ struct ChatInputBar: View {
                     .frame(width: 32, height: 32)
 
                 Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(showQuickActions ? Theme.Colors.accent : Theme.Colors.textSecondary)
                     .rotationEffect(.degrees(showQuickActions ? 45 : 0))
             }
@@ -128,7 +128,7 @@ struct ChatInputBar: View {
 
     private var textFieldView: some View {
         TextField("What needs to be done?", text: $text, axis: .vertical)
-            .font(.system(size: 16, weight: .regular))
+            .dynamicTypeFont(base: 16, weight: .regular)
             .lineLimit(1...6)
             .focused($isFocused)
             .submitLabel(.send)
@@ -147,7 +147,7 @@ struct ChatInputBar: View {
             // Future: Voice input
         } label: {
             Image(systemName: "mic")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(Theme.Colors.textTertiary)
                 .frame(width: 32, height: 32)
         }
@@ -180,7 +180,7 @@ struct ChatInputBar: View {
 
                 // Arrow icon
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
                     .foregroundStyle(canSend ? .white : Theme.Colors.textTertiary)
             }
         }
@@ -250,10 +250,10 @@ private struct ChatQuickActionPill: View {
         Button(action: action) {
             HStack(spacing: Theme.Spacing.xs + 2) {
                 Image(systemName: icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
 
                 Text(label)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
             }
             .foregroundStyle(color)
             .padding(.horizontal, Theme.Spacing.md)
@@ -295,7 +295,7 @@ struct QuickActionButton: View {
                     .frame(width: 36, height: 36)
 
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(color)
             }
         }

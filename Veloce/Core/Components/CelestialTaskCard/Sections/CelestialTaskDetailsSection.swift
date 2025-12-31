@@ -43,11 +43,11 @@ struct CelestialTaskDetailsSection: View {
             // Header
             HStack {
                 Image(systemName: "text.quote")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Context & Notes")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -57,14 +57,14 @@ struct CelestialTaskDetailsSection: View {
             ZStack(alignment: .topLeading) {
                 if viewModel.editedContextNotes.isEmpty && !isContextFocused {
                     Text("Add context, notes, or links to help you complete this task...")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
                 }
 
                 TextEditor(text: $viewModel.editedContextNotes)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white)
                     .scrollContentBackground(.hidden)
                     .focused($isContextFocused)
@@ -97,16 +97,16 @@ struct CelestialTaskDetailsSection: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack(spacing: 6) {
                 Image(systemName: "brain.head.profile")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("AI Analysis")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
 
             Text(viewModel.aiThoughtProcessText)
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(.white.opacity(0.7))
                 .lineLimit(4)
         }
@@ -124,18 +124,18 @@ struct CelestialTaskDetailsSection: View {
             // Header with progress
             HStack {
                 Image(systemName: "list.bullet.clipboard")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Sub-Tasks")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
 
                 if !viewModel.subTasks.isEmpty {
                     Text(viewModel.subTaskProgressString)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.Colors.accent)
                 }
             }
@@ -218,11 +218,11 @@ struct CelestialTaskDetailsSection: View {
     private var emptyState: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "sparkles")
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             Text("No sub-tasks yet")
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
         .frame(maxWidth: .infinity)
@@ -268,11 +268,11 @@ struct CelestialTaskDetailsSection: View {
         } label: {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Add sub-task")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starDim)
 
                 Spacer()
@@ -292,11 +292,11 @@ struct CelestialTaskDetailsSection: View {
     private var addSubTaskInput: some View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "circle")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             TextField("What's the step?", text: $newSubTaskTitle)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white)
                 .focused($isNewSubTaskFocused)
                 .onSubmit { addNewSubTask() }
@@ -306,7 +306,7 @@ struct CelestialTaskDetailsSection: View {
                 addNewSubTask()
             } label: {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(newSubTaskTitle.isEmpty ? Theme.CelestialColors.starDim : Theme.Colors.success)
             }
             .disabled(newSubTaskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -315,7 +315,7 @@ struct CelestialTaskDetailsSection: View {
                 cancelAddSubTask()
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
         }
@@ -336,11 +336,11 @@ struct CelestialTaskDetailsSection: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Image(systemName: "clock")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.TaskCardColors.schedule)
 
                 Text("Estimated Duration")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -370,7 +370,7 @@ struct CelestialTaskDetailsSection: View {
             HapticsService.shared.selectionFeedback()
         } label: {
             Text(formatDuration(minutes))
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(isSelected ? .white : Theme.CelestialColors.starDim)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
@@ -458,7 +458,7 @@ struct CelestialSubTaskRow: View {
                                 .foregroundStyle(Theme.CelestialColors.starDim)
 
                             TextField("Step title", text: $editedTitle)
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white)
                                 .focused($isTitleFocused)
                                 .submitLabel(.done)
@@ -472,7 +472,7 @@ struct CelestialSubTaskRow: View {
                                 .foregroundStyle(Theme.CelestialColors.starDim)
 
                             Text(subTask.title)
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(subTask.status == .completed
                                                  ? Theme.CelestialColors.starDim
                                                  : .white)
@@ -485,7 +485,7 @@ struct CelestialSubTaskRow: View {
 
                     if let minutes = subTask.estimatedMinutes {
                         Text(formatDuration(minutes))
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
                 }
@@ -500,7 +500,7 @@ struct CelestialSubTaskRow: View {
                             saveEdit()
                         } label: {
                             Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 18))
+                                .dynamicTypeFont(base: 18)
                                 .foregroundStyle(Theme.Colors.success)
                         }
                         .buttonStyle(.plain)
@@ -509,7 +509,7 @@ struct CelestialSubTaskRow: View {
                             cancelEdit()
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 18))
+                                .dynamicTypeFont(base: 18)
                                 .foregroundStyle(Theme.CelestialColors.starDim)
                         }
                         .buttonStyle(.plain)
@@ -522,7 +522,7 @@ struct CelestialSubTaskRow: View {
                             startEditing()
                         } label: {
                             Image(systemName: "pencil")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.6))
                         }
                         .buttonStyle(.plain)
@@ -530,7 +530,7 @@ struct CelestialSubTaskRow: View {
                         // Delete button
                         Button(action: onDelete) {
                             Image(systemName: "trash")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(Theme.Colors.error.opacity(0.6))
                         }
                         .buttonStyle(.plain)
@@ -539,7 +539,7 @@ struct CelestialSubTaskRow: View {
                         if subTask.aiReasoning != nil {
                             Button(action: onExpand) {
                                 Image(systemName: isExpanded ? "chevron.up" : "info.circle")
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                                     .foregroundStyle(Theme.Colors.aiPurple.opacity(0.7))
                             }
                             .buttonStyle(.plain)
@@ -554,11 +554,11 @@ struct CelestialSubTaskRow: View {
             if isExpanded, let reasoning = subTask.aiReasoning {
                 HStack(alignment: .top, spacing: 6) {
                     Image(systemName: "brain.head.profile")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(Theme.Colors.aiPurple.opacity(0.6))
 
                     Text(reasoning)
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .padding(.horizontal, Theme.Spacing.sm)
@@ -625,7 +625,7 @@ struct CelestialSubTaskRow: View {
                     SwiftUI.Circle()
                         .fill(Theme.Colors.success)
                     Image(systemName: "checkmark")
-                        .font(.system(size: 9, weight: .bold))
+                        .dynamicTypeFont(base: 9, weight: .bold)
                         .foregroundStyle(.white)
                 }
                 .frame(width: 18, height: 18)

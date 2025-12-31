@@ -119,12 +119,12 @@ struct PaywallView: View {
                 .foregroundStyle(Aurora.Colors.textPrimary)
 
             Text("Your Trial Has Ended")
-                .font(.system(size: 20, weight: .semibold))
+                .dynamicTypeFont(base: 20, weight: .semibold)
                 .foregroundStyle(Aurora.Colors.textPrimary)
                 .padding(.top, Aurora.Layout.spacingSmall)
 
             Text("Subscribe to continue using all AI features")
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(Aurora.Colors.textSecondary)
                 .multilineTextAlignment(.center)
         }
@@ -155,12 +155,12 @@ struct PaywallView: View {
                     .blur(radius: 6)
 
                 Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
                     .foregroundStyle(Aurora.Colors.success)
             }
 
             Text(feature)
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(Aurora.Colors.textPrimary)
 
             Spacer()
@@ -176,9 +176,9 @@ struct PaywallView: View {
             // Crown badge
             HStack(spacing: 6) {
                 Image(systemName: "crown.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                 Text("Unlock Pro")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
             }
             .foregroundStyle(Aurora.Colors.violet)
             .padding(.horizontal, 18)
@@ -191,17 +191,17 @@ struct PaywallView: View {
             // Price display
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text("$9.99")
-                    .font(.system(size: 44, weight: .bold))
+                    .dynamicTypeFont(base: 44, weight: .bold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text("/month")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(Aurora.Colors.textSecondary)
             }
 
             // Cancel info
             Text("Cancel anytime • Automatic renewal")
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(Aurora.Colors.textTertiary)
         }
         .padding(Aurora.Layout.spacingXL)
@@ -266,7 +266,7 @@ struct PaywallView: View {
 
             // Fine print
             Text("Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless it is canceled at least 24 hours before the end of the current period.")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Aurora.Colors.textQuaternary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, Aurora.Layout.spacingXL)

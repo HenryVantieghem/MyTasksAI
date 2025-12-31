@@ -24,13 +24,13 @@ struct PriorityChipView: View {
                 HStack(spacing: 2) {
                     ForEach(1...3, id: \.self) { index in
                         Image(systemName: index <= priority.rawValue ? "star.fill" : "star")
-                            .font(.system(size: 10, weight: .medium))
+                            .dynamicTypeFont(base: 10, weight: .medium)
                             .foregroundStyle(index <= priority.rawValue ? priority.color : Color.white.opacity(0.3))
                     }
                 }
 
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 8, weight: .bold))
+                    .dynamicTypeFont(base: 8, weight: .bold)
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 10)
@@ -63,7 +63,7 @@ struct PriorityPickerPopover: View {
     var body: some View {
         VStack(spacing: 8) {
             Text("Priority")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.secondary)
                 .padding(.top, 8)
 
@@ -78,20 +78,20 @@ struct PriorityPickerPopover: View {
                         HStack(spacing: 2) {
                             ForEach(1...3, id: \.self) { index in
                                 Image(systemName: index <= priority.rawValue ? "star.fill" : "star")
-                                    .font(.system(size: 12, weight: .medium))
+                                    .dynamicTypeFont(base: 12, weight: .medium)
                                     .foregroundStyle(index <= priority.rawValue ? priority.color : Color.white.opacity(0.3))
                             }
                         }
 
                         Text(priority.label)
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(.primary)
 
                         Spacer()
 
                         if selection == priority {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 12, weight: .bold))
+                                .dynamicTypeFont(base: 12, weight: .bold)
                                 .foregroundStyle(priority.color)
                         }
                     }
@@ -155,17 +155,17 @@ struct DateChipView: View {
             Button(action: onTap) {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 10, weight: .semibold))
+                        .dynamicTypeFont(base: 10, weight: .semibold)
 
                     Text(displayText)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                 }
             }
             .buttonStyle(.plain)
 
             Button(action: onRemove) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 8, weight: .bold))
+                    .dynamicTypeFont(base: 8, weight: .bold)
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
@@ -196,14 +196,14 @@ struct CategoryChipView: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: category.icon)
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
 
             Text(category.displayName)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
 
             Button(action: onRemove) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 8, weight: .bold))
+                    .dynamicTypeFont(base: 8, weight: .bold)
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
@@ -248,14 +248,14 @@ struct DurationChipView: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "clock")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
 
             Text("~\(displayText)")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
 
             Button(action: onRemove) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 8, weight: .bold))
+                    .dynamicTypeFont(base: 8, weight: .bold)
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
@@ -291,13 +291,13 @@ struct AddChipButton: View {
         }) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
 
                 Text(label)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
 
                 Image(systemName: "plus")
-                    .font(.system(size: 8, weight: .bold))
+                    .dynamicTypeFont(base: 8, weight: .bold)
             }
             .foregroundStyle(.secondary)
             .padding(.horizontal, 10)
@@ -459,12 +459,12 @@ struct InputQuickDateButton: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: icon)
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(isSelected ? .white : .secondary)
                 }
 
                 Text(title)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(isSelected ? Theme.Colors.aiBlue : .secondary)
             }
         }
@@ -497,19 +497,19 @@ struct CategoryPickerSheet: View {
                                     .frame(width: 40, height: 40)
 
                                 Image(systemName: category.icon)
-                                    .font(.system(size: 16, weight: .medium))
+                                    .dynamicTypeFont(base: 16, weight: .medium)
                                     .foregroundStyle(category.color)
                             }
 
                             Text(category.displayName)
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                                 .foregroundStyle(.primary)
 
                             Spacer()
 
                             if selectedCategories.contains(category) {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 22))
+                                    .dynamicTypeFont(base: 22)
                                     .foregroundStyle(category.color)
                             } else {
                                 Circle()

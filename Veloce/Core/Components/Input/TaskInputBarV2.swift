@@ -218,6 +218,7 @@ struct TaskInputBarV2: View {
 
     // MARK: - Environment
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.responsiveLayout) private var layout
 
     // MARK: - iOS 26 Namespaces for Morphing
     @Namespace private var inputBarNamespace
@@ -552,7 +553,7 @@ struct TaskInputBarV2: View {
 
     private var expandingTextField: some View {
         TextField("", text: $text, prompt: placeholderText, axis: .vertical)
-            .font(.system(size: 16, weight: .regular))
+            .dynamicTypeFont(base: 16)
             .foregroundStyle(.primary)
             .lineLimit(isFocused.wrappedValue ? 1...6 : 1...2)
             .focused(isFocused)
@@ -761,7 +762,7 @@ struct TaskInputBarV2: View {
 
                 // Arrow icon
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 16, weight: .bold))
+                    .dynamicTypeFont(base: 16, weight: .bold)
                     .foregroundStyle(.white)
             }
         }
@@ -913,10 +914,10 @@ struct TaskInputBarV2: View {
     private var categoryBadgeView: some View {
         HStack(spacing: 6) {
             Image(systemName: "sparkles")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
 
             Text(categoryText)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
         }
         .foregroundStyle(Aurora.Colors.electricCyan)
         .padding(.horizontal, 12)
@@ -1813,7 +1814,7 @@ struct InputV2ActionTrayButton: View {
                         }
 
                     Image(systemName: item.icon)
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(item.color)
                 }
 

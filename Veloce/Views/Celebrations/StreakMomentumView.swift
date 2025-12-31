@@ -254,16 +254,16 @@ struct MomentumTooltip: View {
     var body: some View {
         VStack(spacing: 4) {
             Text("Cosmic Flow")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(Theme.Celebration.flameInner)
 
             Text("\(state.streakCount) tasks in a row")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(.secondary)
 
             if !state.displayMultiplier.isEmpty {
                 Text("\(state.displayMultiplier) XP bonus!")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(Theme.Celebration.starGold)
             }
 
@@ -271,9 +271,9 @@ struct MomentumTooltip: View {
             if let remaining = state.comboTimeRemaining {
                 HStack(spacing: 4) {
                     Image(systemName: "clock")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text(formatTimeRemaining(remaining))
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                 }
                 .foregroundStyle(.secondary)
                 .padding(.top, 2)
@@ -330,7 +330,7 @@ struct MomentumActivationBanner: View {
                         .frame(width: 50, height: 50)
 
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
@@ -360,7 +360,7 @@ struct MomentumActivationBanner: View {
                         )
 
                     Text("\(streakCount) tasks completed • XP bonus active!")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.secondary)
                 }
 
@@ -454,7 +454,7 @@ struct MomentumProgressRing: View {
             // Center content
             VStack(spacing: 2) {
                 Image(systemName: "flame.fill")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.Celebration.flameInner)
 
                 Text("\(state.streakCount)")

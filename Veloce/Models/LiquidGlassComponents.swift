@@ -47,10 +47,10 @@ struct LiquidGlassPill: View {
         HStack(spacing: 4) {
             if let icon = icon {
                 Image(systemName: icon)
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
             }
             Text(text)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
         }
         .foregroundStyle(color)
         .padding(.horizontal, 8)
@@ -148,7 +148,7 @@ struct LiquidGlassSectionHeader: View {
             HStack(spacing: 8) {
                 if let icon = icon {
                     Image(systemName: icon)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(color)
                 }
                 
@@ -163,7 +163,7 @@ struct LiquidGlassSectionHeader: View {
             if let action = action {
                 Button(action: action) {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(LiquidGlassDesignSystem.Text.tertiary)
                         .frame(width: 24, height: 24)
                 }
@@ -245,11 +245,11 @@ struct LiquidGlassBadge: View {
         HStack(spacing: 4) {
             if let icon = icon {
                 Image(systemName: icon)
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
             }
             
             Text(text)
-                .font(.system(size: 11, weight: .semibold))
+                .dynamicTypeFont(base: 11, weight: .semibold)
         }
         .foregroundStyle(color)
         .padding(.horizontal, 8)
@@ -283,7 +283,7 @@ struct LiquidGlassToggleRow: View {
                     .frame(width: 48, height: 48)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 22, weight: .medium))
+                    .dynamicTypeFont(base: 22, weight: .medium)
                     .foregroundStyle(color)
             }
             
@@ -331,7 +331,7 @@ struct LiquidGlassActionRow: View {
                         .frame(width: 48, height: 48)
                     
                     Image(systemName: icon)
-                        .font(.system(size: 22, weight: .medium))
+                        .dynamicTypeFont(base: 22, weight: .medium)
                         .foregroundStyle(color)
                 }
                 
@@ -351,7 +351,7 @@ struct LiquidGlassActionRow: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(LiquidGlassDesignSystem.Text.tertiary)
             }
             .padding(LiquidGlassDesignSystem.Spacing.lg)
@@ -403,7 +403,7 @@ struct LiquidGlassEmptyState: View {
                     .frame(width: 120, height: 120)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 48, weight: .light))
+                    .dynamicTypeFont(base: 48, weight: .light)
                     .foregroundStyle(LiquidGlassDesignSystem.Text.tertiary)
             }
             
@@ -446,7 +446,7 @@ struct LiquidGlassSearchBar: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(LiquidGlassDesignSystem.Text.tertiary)
             
             TextField(placeholder, text: $text)
@@ -460,7 +460,7 @@ struct LiquidGlassSearchBar: View {
                     text = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(LiquidGlassDesignSystem.Text.tertiary)
                 }
                 .buttonStyle(.plain)
@@ -502,7 +502,7 @@ struct LiquidGlassFloatingActionButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 22, weight: .semibold))
+                .dynamicTypeFont(base: 22, weight: .semibold)
                 .foregroundStyle(.white)
                 .frame(width: 56, height: 56)
                 .background(
@@ -562,7 +562,7 @@ struct LiquidGlassAlert: View {
                         .frame(width: 60, height: 60)
                     
                     Image(systemName: icon)
-                        .font(.system(size: 28, weight: .medium))
+                        .dynamicTypeFont(base: 28, weight: .medium)
                         .foregroundStyle(color)
                 }
             }

@@ -42,7 +42,7 @@ struct CalendarAISuggestionsOverlay: View {
             HStack {
                 HStack(spacing: Theme.Spacing.sm) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                     Text("AI Scheduling")
@@ -68,7 +68,7 @@ struct CalendarAISuggestionsOverlay: View {
                     onDismiss()
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.textTertiary)
                         .frame(width: 28, height: 28)
                 }
@@ -141,7 +141,7 @@ struct CalendarAISuggestionsOverlay: View {
                     }
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.Colors.accent)
                 }
                 .buttonStyle(.plain)
@@ -264,7 +264,7 @@ struct UnscheduledTaskChip: View {
                     .lineLimit(1)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
             .padding(.horizontal, Theme.Spacing.sm)
@@ -310,7 +310,7 @@ struct SuggestionSlotButton: View {
                 // Confidence
                 HStack(spacing: 4) {
                     Image(systemName: "sparkle")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text("\(Int(suggestion.confidence * 100))% match")
                         .font(Theme.Typography.caption2)
                 }

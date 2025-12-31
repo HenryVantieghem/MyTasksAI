@@ -528,7 +528,7 @@ struct FloatingIslandSection<Content: View>: View {
                         .blur(radius: 4)
 
                     Image(systemName: icon)
-                        .font(.system(size: 11, weight: .semibold))
+                        .dynamicTypeFont(base: 11, weight: .semibold)
                         .foregroundStyle(accentColor)
                 }
 
@@ -690,7 +690,7 @@ struct CosmicQuickActions: View {
 
                         // Icon
                         Image(systemName: type.icon)
-                            .font(.system(size: 18, weight: .medium))
+                            .dynamicTypeFont(base: 18, weight: .medium)
                             .foregroundStyle(type.color)
                     }
                     .frame(width: 48, height: 48)

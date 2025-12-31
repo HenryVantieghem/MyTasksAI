@@ -83,7 +83,7 @@ struct TaskCardV3: View {
         HStack(spacing: 3) {
             ForEach(0..<3, id: \.self) { index in
                 Image(systemName: index < task.starRating ? "star.fill" : "star")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(
                         index < task.starRating
                             ? Theme.Colors.xp
@@ -130,7 +130,7 @@ struct TaskCardV3: View {
                     // Title + Points + Timer
                     HStack(alignment: .center) {
                         Text(task.title)
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundColor(Theme.CelestialColors.starWhite)
                             .lineLimit(1)
 
@@ -168,7 +168,7 @@ struct TaskCardV3: View {
                     // AI whisper (1 line, italic)
                     if let guidance = guidanceText, !task.isCompleted {
                         Text(guidance)
-                            .font(.system(size: 13, weight: .light))
+                            .dynamicTypeFont(base: 13, weight: .light)
                             .foregroundColor(Theme.CelestialColors.starDim)
                             .lineLimit(1)
                             .italic()
@@ -222,7 +222,7 @@ struct TaskCardV3: View {
             onStartTimer?(task)
         } label: {
             Image(systemName: "play.fill")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
                 .foregroundColor(taskTypeColor)
                 .frame(width: 28, height: 28)
                 .background(
@@ -241,10 +241,10 @@ struct TaskCardV3: View {
             if let duration = task.estimatedMinutes, duration > 0 {
                 Label {
                     Text("\(duration)m")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                 } icon: {
                     Image(systemName: "clock")
-                        .font(.system(size: 9))
+                        .dynamicTypeFont(base: 9)
                 }
                 .foregroundColor(Theme.CelestialColors.starDim)
             }
@@ -253,10 +253,10 @@ struct TaskCardV3: View {
             if let scheduledTime = task.scheduledTime {
                 Label {
                     Text(formatTime(scheduledTime))
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                 } icon: {
                     Image(systemName: "calendar")
-                        .font(.system(size: 9))
+                        .dynamicTypeFont(base: 9)
                 }
                 .foregroundColor(urgencyColor)
             }
@@ -324,7 +324,7 @@ struct TaskCardV3: View {
                     Theme.CelestialColors.auroraGreen.opacity(0.3)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundColor(Theme.CelestialColors.auroraGreen)
                         .opacity(swipeOffset > swipeCompleteThreshold * 0.5 ? 1 : 0)
                 }
@@ -342,7 +342,7 @@ struct TaskCardV3: View {
                     (isDelete ? Theme.CelestialColors.errorNebula : Theme.CelestialColors.warningNebula).opacity(0.3)
 
                     Image(systemName: isDelete ? "trash.fill" : "moon.fill")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundColor(isDelete ? Theme.CelestialColors.errorNebula : Theme.CelestialColors.warningNebula)
                         .opacity(-swipeOffset > swipeSnoozeThreshold * 0.5 ? 1 : 0)
                 }

@@ -152,13 +152,13 @@ struct GrowView: View {
                     // Glow behind icon when selected
                     if isSelected {
                         Image(systemName: segment.icon)
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                             .foregroundStyle(segment.auroraColor)
                             .blur(radius: 4)
                     }
 
                     Image(systemName: segment.icon)
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                 }
 
                 Text(segment.rawValue)

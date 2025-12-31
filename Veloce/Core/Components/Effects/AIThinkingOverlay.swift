@@ -122,7 +122,7 @@ struct AIThinkingOverlay: View {
                     // Phase text with dots
                     HStack(spacing: 4) {
                         Text(showCheckmark ? "Done" : currentPhase.message)
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(.primary)
 
                         if !showCheckmark {
@@ -133,7 +133,7 @@ struct AIThinkingOverlay: View {
 
                     // Subtitle
                     Text(showCheckmark ? "Task optimized" : "AI is enhancing your task")
-                        .font(.system(size: 11, weight: .regular))
+                        .dynamicTypeFont(base: 11, weight: .regular)
                         .foregroundStyle(.secondary)
                 }
                 .opacity(textOpacity)
@@ -408,12 +408,12 @@ struct AIThinkingBadge: View {
                     .scaleEffect(glowPulse)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
 
             Text("AI")
-                .font(.system(size: 11, weight: .semibold))
+                .dynamicTypeFont(base: 11, weight: .semibold)
                 .foregroundStyle(Theme.Colors.aiPurple)
 
             // Dots

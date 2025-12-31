@@ -105,10 +105,10 @@ struct FocusPresetsView: View {
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Block Presets")
-                .font(.system(size: 24, weight: .bold))
+                .dynamicTypeFont(base: 24, weight: .bold)
                 .foregroundStyle(.white)
             Text("Quick profiles for different focus scenarios")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.6))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -119,15 +119,15 @@ struct FocusPresetsView: View {
     private var authorizationCard: some View {
         VStack(spacing: Theme.Spacing.md) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 40))
+                .dynamicTypeFont(base: 40)
                 .foregroundStyle(Theme.Colors.warning)
 
             Text("Screen Time Access Required")
-                .font(.system(size: 18, weight: .semibold))
+                .dynamicTypeFont(base: 18, weight: .semibold)
                 .foregroundStyle(.white)
 
             Text("Enable Screen Time access to use app blocking presets")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.6))
                 .multilineTextAlignment(.center)
 
@@ -140,7 +140,7 @@ struct FocusPresetsView: View {
                     Image(systemName: "lock.open.fill")
                     Text("Enable Access")
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 14)
@@ -165,7 +165,7 @@ struct FocusPresetsView: View {
     private var builtInPresetsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Start")
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.8))
 
             VStack(spacing: 10) {
@@ -183,7 +183,7 @@ struct FocusPresetsView: View {
     private var userPresetsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Your Presets")
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.8))
 
             VStack(spacing: 10) {
@@ -224,23 +224,23 @@ struct FocusPresetsView: View {
                         .frame(width: 48, height: 48)
 
                     Image(systemName: "plus")
-                        .font(.system(size: 20, weight: .semibold))
+                        .dynamicTypeFont(base: 20, weight: .semibold)
                         .foregroundStyle(Theme.Colors.aiAmber)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Create Custom Preset")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(.white)
                     Text("Build your own app blocking profile")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.3))
             }
             .padding(Theme.Spacing.md)
@@ -339,17 +339,17 @@ struct BuiltInPresetCard: View {
                         .frame(width: 48, height: 48)
 
                     Image(systemName: preset.icon)
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(presetColor)
                 }
 
                 // Info
                 VStack(alignment: .leading, spacing: 4) {
                     Text(preset.name)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(.white)
                     Text(preset.description)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
                 }
@@ -358,7 +358,7 @@ struct BuiltInPresetCard: View {
 
                 // Add button
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(presetColor)
             }
             .padding(Theme.Spacing.md)
@@ -401,7 +401,7 @@ struct PresetCard: View {
                         .frame(width: 48, height: 48)
 
                     Image(systemName: preset.iconName)
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(presetColor)
                 }
 
@@ -409,12 +409,12 @@ struct PresetCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Text(preset.name)
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(.white)
 
                         if preset.isAllowList {
                             Text("Allow List")
-                                .font(.system(size: 10, weight: .medium))
+                                .dynamicTypeFont(base: 10, weight: .medium)
                                 .foregroundStyle(presetColor)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -427,7 +427,7 @@ struct PresetCard: View {
 
                     if let description = preset.listDescription {
                         Text(description)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.5))
                             .lineLimit(1)
                     }
@@ -438,7 +438,7 @@ struct PresetCard: View {
                 // Use count
                 if preset.useCount > 0 {
                     Text("Used \(preset.useCount)x")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white.opacity(0.4))
                 }
             }
@@ -452,9 +452,9 @@ struct PresetCard: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: hasAppsConfigured ? "checkmark.circle.fill" : "app.badge.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text(hasAppsConfigured ? "Apps Set" : "Select Apps")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                     }
                     .foregroundStyle(hasAppsConfigured ? Theme.Colors.success : .white.opacity(0.7))
                     .padding(.horizontal, 12)
@@ -473,7 +473,7 @@ struct PresetCard: View {
                     showDeleteConfirmation = true
                 } label: {
                     Image(systemName: "trash")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.Colors.error.opacity(0.7))
                         .frame(width: 32, height: 32)
                         .background {
@@ -490,9 +490,9 @@ struct PresetCard: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "play.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("Apply")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                     }
                     .foregroundStyle(.white)
                     .padding(.horizontal, 16)
@@ -567,11 +567,11 @@ struct PresetCreationSheet: View {
                     // Name
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Name")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         TextField("e.g., Study Mode", text: $name)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .padding(14)
                             .background {
                                 RoundedRectangle(cornerRadius: 12)
@@ -583,11 +583,11 @@ struct PresetCreationSheet: View {
                     // Description
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Description")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         TextField("What this preset blocks", text: $description)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .padding(14)
                             .background {
                                 RoundedRectangle(cornerRadius: 12)
@@ -599,7 +599,7 @@ struct PresetCreationSheet: View {
                     // Icon Picker
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Icon")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 5), spacing: 12) {
@@ -609,7 +609,7 @@ struct PresetCreationSheet: View {
                                     selectedIcon = icon
                                 } label: {
                                     Image(systemName: icon)
-                                        .font(.system(size: 20))
+                                        .dynamicTypeFont(base: 20)
                                         .foregroundStyle(selectedIcon == icon ? .white : .white.opacity(0.5))
                                         .frame(width: 48, height: 48)
                                         .background {
@@ -625,7 +625,7 @@ struct PresetCreationSheet: View {
                     // Color Picker
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Color")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         HStack(spacing: 12) {
@@ -655,9 +655,9 @@ struct PresetCreationSheet: View {
                     Toggle(isOn: $isAllowList) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Allow List Mode")
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                             Text("Block everything EXCEPT selected apps")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
                     }

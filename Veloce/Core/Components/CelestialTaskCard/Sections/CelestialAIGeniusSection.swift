@@ -147,7 +147,7 @@ struct CelestialAIGeniusSection: View {
                     .frame(width: 20, height: 20)
 
                 Text("Strategy Crystal")
-                    .font(.system(size: 13, weight: .bold))
+                    .dynamicTypeFont(base: 13, weight: .bold)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Spacer()
@@ -157,7 +157,7 @@ struct CelestialAIGeniusSection: View {
                         Task { await viewModel.refreshAIStrategy() }
                     } label: {
                         Image(systemName: "arrow.trianglehead.2.clockwise")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                             .rotationEffect(.degrees(crystalRotation * 0.5))
                     }
@@ -286,7 +286,7 @@ struct CelestialAIGeniusSection: View {
                     .frame(width: 18, height: 18)
 
                 Text("Summon Strategy")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -337,12 +337,12 @@ struct CelestialAIGeniusSection: View {
                         .frame(width: 24, height: 24)
 
                     Image(systemName: "play.fill")
-                        .font(.system(size: 10, weight: .bold))
+                        .dynamicTypeFont(base: 10, weight: .bold)
                         .foregroundStyle(.red)
                 }
 
                 Text("Knowledge Stars")
-                    .font(.system(size: 13, weight: .bold))
+                    .dynamicTypeFont(base: 13, weight: .bold)
                     .foregroundStyle(.red)
 
                 Spacer()
@@ -352,7 +352,7 @@ struct CelestialAIGeniusSection: View {
                         Task { await viewModel.loadYouTubeResources() }
                     } label: {
                         Image(systemName: "arrow.trianglehead.2.clockwise")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
                     .buttonStyle(.plain)
@@ -415,7 +415,7 @@ struct CelestialAIGeniusSection: View {
                 Image(systemName: "sparkle.magnifyingglass")
                 Text("Discover Resources")
             }
-            .font(.system(size: 13, weight: .semibold))
+            .dynamicTypeFont(base: 13, weight: .semibold)
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
@@ -447,12 +447,12 @@ struct CelestialAIGeniusSection: View {
                         .frame(width: 24, height: 24)
 
                     Image(systemName: "clock.fill")
-                        .font(.system(size: 10, weight: .bold))
+                        .dynamicTypeFont(base: 10, weight: .bold)
                         .foregroundStyle(Theme.TaskCardColors.schedule)
                 }
 
                 Text("Time Orbit")
-                    .font(.system(size: 13, weight: .bold))
+                    .dynamicTypeFont(base: 13, weight: .bold)
                     .foregroundStyle(Theme.TaskCardColors.schedule)
 
                 Spacer()
@@ -482,7 +482,7 @@ struct CelestialAIGeniusSection: View {
                             Image(systemName: "calendar.badge.plus")
                             Text("Lock into Orbit")
                         }
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -539,7 +539,7 @@ struct CelestialAIGeniusSection: View {
                     Image(systemName: "scope")
                     Text("Set coordinates manually")
                 }
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(Theme.TaskCardColors.schedule)
             }
             .buttonStyle(.plain)
@@ -575,18 +575,18 @@ struct CelestialAIGeniusSection: View {
                             .frame(width: 24, height: 24)
 
                         Image(systemName: "heart.fill")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                             .foregroundStyle(Theme.TaskCardColors.emotional)
                     }
 
                     Text("Emotional Check-In")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.9))
 
                     Spacer()
 
                     Image(systemName: showEmotionalExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .rotationEffect(.degrees(showEmotionalExpanded ? 0 : 0))
                 }
@@ -655,18 +655,18 @@ struct CelestialAIGeniusSection: View {
                             .frame(width: 24, height: 24)
 
                         Image(systemName: "bubble.left.and.bubble.right.fill")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                             .foregroundStyle(Theme.Colors.aiBlue)
                     }
 
                     Text("Commune with the Oracle")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.9))
 
                     Spacer()
 
                     Image(systemName: showChatExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .padding(Theme.Spacing.md)
@@ -710,7 +710,7 @@ struct CelestialAIGeniusSection: View {
             // Input field
             HStack(spacing: Theme.Spacing.sm) {
                 TextField("Seek wisdom...", text: $viewModel.chatInput)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 11)
@@ -738,7 +738,7 @@ struct CelestialAIGeniusSection: View {
                             .frame(width: 36, height: 36)
 
                         Image(systemName: "arrow.up")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                             .foregroundStyle(
                                 viewModel.chatInput.isEmpty
                                     ? Theme.CelestialColors.starDim
@@ -938,7 +938,7 @@ struct CrystalKeyPoint: View {
             .offset(y: 4)
 
             Text(point)
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(.white.opacity(0.85))
         }
     }
@@ -957,12 +957,12 @@ struct GlowingActionStep: View {
                     .frame(width: 24, height: 24)
 
                 Image(systemName: "bolt.fill")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.Colors.success)
             }
 
             Text("Start: \(step)")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.white.opacity(0.9))
         }
         .padding(Theme.Spacing.sm)
@@ -986,7 +986,7 @@ struct OracleEstimate: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "hourglass")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
 
             Text("Estimated: \(formatDuration(minutes))")
@@ -995,7 +995,7 @@ struct OracleEstimate: View {
 
             if let confidence = confidence {
                 Text("(\(confidence))")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
         }
@@ -1065,13 +1065,13 @@ struct ConstellationResourceRow: View {
                         .frame(width: 30, height: 30)
 
                     Image(systemName: "play.fill")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.red)
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(resource.displayTitle)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white)
                         .lineLimit(1)
 
@@ -1086,7 +1086,7 @@ struct ConstellationResourceRow: View {
                 Spacer()
 
                 Image(systemName: "arrow.up.right")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
             .padding(Theme.Spacing.sm)
@@ -1122,7 +1122,7 @@ struct OrbitalTimeDisplay: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Optimal: \(date.formatted(date: .abbreviated, time: .shortened))")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("AI calculated from your patterns")
@@ -1144,7 +1144,7 @@ struct OrbitalDurationChip: View {
     var body: some View {
         Button(action: action) {
             Text(formatDuration(minutes))
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(isSelected ? .white : Theme.CelestialColors.starWhite)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
@@ -1192,11 +1192,11 @@ struct EmotionOrb: View {
                     }
 
                     Text(emotion.emoji)
-                        .font(.system(size: 22))
+                        .dynamicTypeFont(base: 22)
                 }
 
                 Text(emotion.rawValue)
-                    .font(.system(size: 9, weight: .medium))
+                    .dynamicTypeFont(base: 9, weight: .medium)
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
             }
             .frame(maxWidth: .infinity)
@@ -1214,7 +1214,7 @@ struct OracleResponseBubble: View {
     var body: some View {
         HStack(alignment: .top, spacing: Theme.Spacing.sm) {
             Image(systemName: "sparkle")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(color.opacity(0.7))
 
             Text(response)
@@ -1243,7 +1243,7 @@ struct OracleChatBubble: View {
             if message.role == .user { Spacer() }
 
             Text(message.content)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)

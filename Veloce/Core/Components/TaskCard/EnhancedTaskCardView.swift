@@ -108,7 +108,7 @@ struct EnhancedTaskCardView: View {
 
             // Task title
             Text(task.title)
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(task.isCompleted ? .secondary : .primary)
                 .strikethrough(task.isCompleted)
                 .lineLimit(2)
@@ -157,7 +157,7 @@ struct EnhancedTaskCardView: View {
                 // Checkmark overlay when completed
                 if task.isCompleted {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
+                        .dynamicTypeFont(base: 12, weight: .bold)
                         .foregroundStyle(.white)
                         .scaleEffect(checkmarkScale)
                 }
@@ -182,10 +182,10 @@ struct EnhancedTaskCardView: View {
     private func aiQuickTipView(_ tip: String) -> some View {
         HStack(spacing: 4) {
             Text("💡")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
 
             Text(tip)
-                .font(.system(size: 13, weight: .regular))
+                .dynamicTypeFont(base: 13, weight: .regular)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
         }
@@ -198,16 +198,16 @@ struct EnhancedTaskCardView: View {
         HStack(spacing: Theme.Spacing.sm) {
             // Priority stars
             Text(task.priorityStars)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(task.priority.color)
 
             // Time estimate
             if let estimate = task.estimatedTimeFormatted {
                 HStack(spacing: 2) {
                     Image(systemName: "clock")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text(estimate)
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                 }
                 .foregroundStyle(.secondary)
             }
@@ -223,9 +223,9 @@ struct EnhancedTaskCardView: View {
             if let scheduledDate = task.scheduledDateFormatted {
                 HStack(spacing: 2) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text(scheduledDate)
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                 }
                 .foregroundStyle(task.isOverdue ? Theme.Colors.error : .secondary)
             }
@@ -241,9 +241,9 @@ struct EnhancedTaskCardView: View {
 
             HStack(spacing: 4) {
                 Text("more")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
             }
             .foregroundStyle(task.hasAIProcessing ? taskTypeColor : .secondary)
             .opacity(task.hasAIProcessing ? 0.8 + breathePhase * 0.2 : 0.6)
@@ -396,7 +396,7 @@ struct TaskPointsBadge: View {
             Text("+\(points)")
                 .font(.system(size: 12, weight: .bold, design: .rounded))
             Text("🔥")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
         }
         .foregroundStyle(isEarned ? Theme.TaskCardColors.startHere : .secondary)
         .padding(.horizontal, 8)
@@ -442,11 +442,11 @@ struct AIMotivationPill: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "lightbulb.fill")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.TaskCardColors.strategy)
 
             Text(text)
-                .font(.system(size: 12, weight: .regular))
+                .dynamicTypeFont(base: 12, weight: .regular)
                 .foregroundStyle(.secondary)
                 .lineLimit(3)
         }

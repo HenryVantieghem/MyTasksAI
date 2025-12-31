@@ -70,7 +70,7 @@ struct ContextInputModule: View {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "text.bubble.fill")
                     .foregroundStyle(Theme.Colors.accent)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
 
                 Text("Add Context")
                     .font(Theme.Typography.headline)
@@ -128,7 +128,7 @@ struct ContextInputModule: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: selectedTags.contains(tag) ? "checkmark" : "plus")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
                 Text(tag.label)
                     .font(Theme.Typography.caption)
             }
@@ -186,7 +186,7 @@ struct ContextInputModule: View {
             HStack {
                 Spacer()
                 Text("\(contextNotes.count) characters")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.Colors.tertiaryText)
             }
         }

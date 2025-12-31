@@ -22,11 +22,11 @@ struct AIAdviceSection: View {
             // Section header
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(iconColor)
 
                 Text(title)
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
 
@@ -54,11 +54,11 @@ struct AIGuidanceSection: View {
             // Section header
             HStack(spacing: 6) {
                 Image(systemName: "link.circle.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiBlue)
 
                 Text("Best Guidance")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
 
@@ -84,11 +84,11 @@ struct GuidanceLinkRow: View {
     var body: some View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "arrow.up.right.circle")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.aiBlue.opacity(0.8))
 
             Text(source)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.Colors.textPrimary)
                 .lineLimit(1)
 
@@ -114,11 +114,11 @@ struct AIWorkflowSection: View {
             // Section header
             HStack(spacing: 6) {
                 Image(systemName: "flowchart.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiCyan)
 
                 Text("Best Workflow")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
 
@@ -230,11 +230,11 @@ struct WorkflowStepRow: View {
             // Step content
             VStack(alignment: .leading, spacing: 2) {
                 Text(step.title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textPrimary)
 
                 Text(step.description)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }

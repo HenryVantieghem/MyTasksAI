@@ -120,15 +120,15 @@ struct CreatePactSheet: View {
                 // Header
                 VStack(spacing: 8) {
                     Image(systemName: "person.2.fill")
-                        .font(.system(size: 40))
+                        .dynamicTypeFont(base: 40)
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                     Text("Who do you want to commit with?")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text("Choose a friend to start your pact")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .padding(.top, 20)
@@ -166,15 +166,15 @@ struct CreatePactSheet: View {
     private var emptyFriendsState: some View {
         VStack(spacing: 16) {
             Image(systemName: "person.badge.plus")
-                .font(.system(size: 48, weight: .light))
+                .dynamicTypeFont(base: 48, weight: .light)
                 .foregroundStyle(.white.opacity(0.3))
 
             Text("No friends yet")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white.opacity(0.6))
 
             Text("Add some friends first to start a pact")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
         }
@@ -189,15 +189,15 @@ struct CreatePactSheet: View {
                 // Header
                 VStack(spacing: 8) {
                     Image(systemName: "target")
-                        .font(.system(size: 40))
+                        .dynamicTypeFont(base: 40)
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                     Text("What will you commit to?")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text("Both of you must complete this daily")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .padding(.top, 20)
@@ -261,23 +261,23 @@ struct CreatePactSheet: View {
                         .frame(width: 50, height: 50)
                         .overlay(
                             Text("You")
-                                .font(.system(size: 12, weight: .bold))
+                                .dynamicTypeFont(base: 12, weight: .bold)
                                 .foregroundStyle(.white)
                         )
 
                     Text("You")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
 
                 // Connection
                 VStack(spacing: 4) {
                     Image(systemName: "link")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(.orange)
                 }
 
@@ -294,12 +294,12 @@ struct CreatePactSheet: View {
                         .frame(width: 50, height: 50)
                         .overlay(
                             Text(selectedFriend?.displayName.prefix(2).uppercased() ?? "??")
-                                .font(.system(size: 14, weight: .bold))
+                                .dynamicTypeFont(base: 14, weight: .bold)
                                 .foregroundStyle(.white)
                         )
 
                     Text(selectedFriend?.displayName ?? "Partner")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                         .lineLimit(1)
                 }
@@ -308,12 +308,12 @@ struct CreatePactSheet: View {
             // Commitment summary
             VStack(spacing: 4) {
                 Text(commitmentSummary)
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
                 Text("Every day, together")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.5))
             }
         }
@@ -324,7 +324,7 @@ struct CreatePactSheet: View {
     private var targetSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Daily Target")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             HStack {
@@ -334,7 +334,7 @@ struct CreatePactSheet: View {
                     }
                 } label: {
                     Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(targetValue > 1 ? Theme.Colors.aiPurple : .gray)
                 }
                 .disabled(targetValue <= 1)
@@ -348,7 +348,7 @@ struct CreatePactSheet: View {
                         .contentTransition(.numericText())
 
                     Text(selectedType.unit)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
@@ -358,7 +358,7 @@ struct CreatePactSheet: View {
                     targetValue += 1
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
             }
@@ -371,7 +371,7 @@ struct CreatePactSheet: View {
     private var customDescriptionSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("What's your commitment?")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             TextField("e.g., Read for 30 minutes", text: $customDescription)
@@ -384,11 +384,11 @@ struct CreatePactSheet: View {
     private var warningSection: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(.orange)
 
             Text("If either of you misses a day, **both** lose the streak. Choose wisely!")
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(.white.opacity(0.7))
         }
         .padding(14)
@@ -425,18 +425,18 @@ struct CreatePactSheet: View {
                     .frame(width: 120, height: 120)
 
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 60))
+                    .dynamicTypeFont(base: 60)
                     .foregroundStyle(Theme.Colors.completionMint)
                     .symbolEffect(.bounce)
             }
 
             VStack(spacing: 8) {
                 Text("Pact Sent!")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Waiting for \(selectedFriend?.displayName ?? "partner") to accept")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -446,7 +446,7 @@ struct CreatePactSheet: View {
                 dismiss()
             } label: {
                 Text("Done")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -470,7 +470,7 @@ struct CreatePactSheet: View {
             }
         } label: {
             Text(currentStep < 2 ? "Next" : "Create Pact")
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(canProceed ? Theme.Colors.aiPurple : .gray)
         }
         .disabled(!canProceed || isCreating)
@@ -544,18 +544,18 @@ struct FriendSelectRow: View {
                     .frame(width: 44, height: 44)
                     .overlay(
                         Text(friend.displayName.prefix(2).uppercased())
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                             .foregroundStyle(.white)
                     )
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(friend.displayName)
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     if let username = friend.username {
                         Text("@\(username)")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                 }
@@ -601,17 +601,17 @@ struct CommitmentTypeCard: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: type.icon)
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(type.displayName)
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text(typeDescription)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
@@ -619,7 +619,7 @@ struct CommitmentTypeCard: View {
 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 22))
+                        .dynamicTypeFont(base: 22)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
             }

@@ -26,7 +26,7 @@ struct AnimatedSettingsGear: View {
 
                 // Gear icon
                 Image(systemName: "gearshape.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(LinearGradient(colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue], startPoint: .top, endPoint: .bottom))
                     .rotationEffect(.degrees(rotation * 0.5))
 

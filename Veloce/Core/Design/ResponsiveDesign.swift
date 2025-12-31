@@ -304,6 +304,199 @@ struct ResponsiveLayout {
         case .iPadPro11, .iPadPro13: return 120
         }
     }
+
+    // MARK: - Calendar-specific sizes
+
+    var hourHeight: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 56
+        case .iPhoneStandard, .iPhoneProMax: return 64
+        case .iPadMini, .iPad: return 72
+        case .iPadPro11, .iPadPro13: return 80
+        }
+    }
+
+    var timeGutterWidth: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 44
+        case .iPhoneStandard, .iPhoneProMax: return 52
+        case .iPadMini, .iPad: return 60
+        case .iPadPro11, .iPadPro13: return 68
+        }
+    }
+
+    var calendarCellPadding: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 4
+        case .iPhoneStandard, .iPhoneProMax: return 6
+        case .iPadMini, .iPad: return 8
+        case .iPadPro11, .iPadPro13: return 10
+        }
+    }
+
+    // MARK: - Avatar sizes
+
+    var avatarTiny: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 20
+        case .iPhoneStandard, .iPhoneProMax: return 24
+        case .iPadMini, .iPad: return 28
+        case .iPadPro11, .iPadPro13: return 32
+        }
+    }
+
+    var avatarSmall: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 32
+        case .iPhoneStandard, .iPhoneProMax: return 36
+        case .iPadMini, .iPad: return 44
+        case .iPadPro11, .iPadPro13: return 48
+        }
+    }
+
+    var avatarMedium: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 48
+        case .iPhoneStandard, .iPhoneProMax: return 56
+        case .iPadMini, .iPad: return 64
+        case .iPadPro11, .iPadPro13: return 72
+        }
+    }
+
+    var avatarLarge: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 80
+        case .iPhoneStandard, .iPhoneProMax: return 100
+        case .iPadMini, .iPad: return 120
+        case .iPadPro11, .iPadPro13: return 140
+        }
+    }
+
+    var avatarProfile: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 120
+        case .iPhoneStandard, .iPhoneProMax: return 160
+        case .iPadMini, .iPad: return 200
+        case .iPadPro11, .iPadPro13: return 240
+        }
+    }
+
+    // MARK: - Input component sizes
+
+    var inputBarHeight: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 48
+        case .iPhoneStandard, .iPhoneProMax: return 56
+        case .iPadMini, .iPad: return 60
+        case .iPadPro11, .iPadPro13: return 64
+        }
+    }
+
+    var inputBarExpandedHeight: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 120
+        case .iPhoneStandard, .iPhoneProMax: return 140
+        case .iPadMini, .iPad: return 160
+        case .iPadPro11, .iPadPro13: return 180
+        }
+    }
+
+    var textFieldHeight: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 40
+        case .iPhoneStandard, .iPhoneProMax: return 48
+        case .iPadMini, .iPad: return 52
+        case .iPadPro11, .iPadPro13: return 56
+        }
+    }
+
+    // MARK: - Onboarding-specific sizes (extended)
+
+    var heroOrbSize: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 200
+        case .iPhoneStandard, .iPhoneProMax: return 280
+        case .iPadMini, .iPad: return 360
+        case .iPadPro11, .iPadPro13: return 440
+        }
+    }
+
+    var iconContainerSize: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 100
+        case .iPhoneStandard, .iPhoneProMax: return 120
+        case .iPadMini, .iPad: return 150
+        case .iPadPro11, .iPadPro13: return 180
+        }
+    }
+
+    var permissionCardWidth: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return screenWidth - 32
+        case .iPhoneStandard, .iPhoneProMax: return screenWidth - 40
+        case .iPadMini: return 500
+        case .iPad, .iPadPro11: return 560
+        case .iPadPro13: return 640
+        }
+    }
+
+    var onboardingTitleSize: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 24
+        case .iPhoneStandard, .iPhoneProMax: return 28
+        case .iPadMini, .iPad: return 34
+        case .iPadPro11, .iPadPro13: return 40
+        }
+    }
+
+    var onboardingSubtitleSize: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 15
+        case .iPhoneStandard, .iPhoneProMax: return 17
+        case .iPadMini, .iPad: return 19
+        case .iPadPro11, .iPadPro13: return 21
+        }
+    }
+
+    // MARK: - Emoji picker sizes
+
+    var emojiGridSize: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 36
+        case .iPhoneStandard, .iPhoneProMax: return 44
+        case .iPadMini, .iPad: return 52
+        case .iPadPro11, .iPadPro13: return 60
+        }
+    }
+
+    var emojiLargeDisplay: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 60
+        case .iPhoneStandard, .iPhoneProMax: return 80
+        case .iPadMini, .iPad: return 100
+        case .iPadPro11, .iPadPro13: return 120
+        }
+    }
+
+    // MARK: - Sheet and modal sizes
+
+    var sheetCornerRadius: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 24
+        case .iPhoneStandard, .iPhoneProMax: return 32
+        case .iPadMini, .iPad: return 36
+        case .iPadPro11, .iPadPro13: return 40
+        }
+    }
+
+    var modalPadding: CGFloat {
+        switch deviceType {
+        case .iPhoneSE: return 16
+        case .iPhoneStandard, .iPhoneProMax: return 20
+        case .iPadMini, .iPad: return 28
+        case .iPadPro11, .iPadPro13: return 36
+        }
+    }
 }
 
 // MARK: - Environment Key

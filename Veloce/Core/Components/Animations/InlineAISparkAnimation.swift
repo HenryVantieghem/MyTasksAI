@@ -61,7 +61,7 @@ struct InlineAISparkAnimation: View {
 
             // Micro-message
             Text(messages[currentMessageIndex])
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
                 .foregroundStyle(.white.opacity(0.8))
                 .opacity(messageOpacity)
         }
@@ -375,11 +375,11 @@ struct AIBadgeAnimated: View {
                 MiniThinkingOrb(isActive: true, size: 12)
             } else {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
             }
 
             Text(isProcessing ? "AI" : "AI")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
         }
         .foregroundStyle(.white)
         .padding(.horizontal, 6)

@@ -59,7 +59,7 @@ struct AIPromptCard: View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "sparkles")
                 .foregroundStyle(Theme.Colors.aiPurple)
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
 
             Text("AI Prompt")
                 .font(Theme.Typography.headline)

@@ -24,13 +24,14 @@ struct LiquidGlassWeekView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.responsiveLayout) private var layout
 
     // Timeline configuration
     private let startHour = 6
     private let endHour = 23
-    private let hourHeight: CGFloat = 56
-    private let timeGutterWidth: CGFloat = 48
-    private let allDayHeight: CGFloat = 44
+    private var hourHeight: CGFloat { layout.hourHeight }
+    private var timeGutterWidth: CGFloat { layout.timeGutterWidth }
+    private var allDayHeight: CGFloat { layout.minTouchTarget }
 
     private let calendar = Calendar.current
 
@@ -39,7 +40,7 @@ struct LiquidGlassWeekView: View {
 
     // Responsive padding
     private var horizontalPadding: CGFloat {
-        horizontalSizeClass == .regular ? 24 : 8
+        layout.screenPadding
     }
 
     private var isCurrentWeek: Bool {
@@ -81,7 +82,7 @@ struct LiquidGlassWeekView: View {
                 }
             }
         }
-        .frame(height: 60) // Compact header height
+        .frame(height: layout.buttonHeight + 12) // Compact header height
         .background {
             VStack {
                 Spacer()
@@ -105,7 +106,7 @@ struct LiquidGlassWeekView: View {
             VStack(spacing: 6) {
                 // Day of week
                 Text(date.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(
                         isToday ? Color.accentColor :
                         isSelected ? .primary :
@@ -117,15 +118,15 @@ struct LiquidGlassWeekView: View {
                     if isSelected {
                         Circle()
                             .fill(Color.accentColor)
-                            .frame(width: 36, height: 36)
+                            .frame(width: layout.avatarSmall, height: layout.avatarSmall)
                     } else if isToday {
                         Circle()
                             .stroke(Color.accentColor, lineWidth: 2)
-                            .frame(width: 36, height: 36)
+                            .frame(width: layout.avatarSmall, height: layout.avatarSmall)
                     }
 
                     Text("\(calendar.component(.day, from: date))")
-                        .font(.system(size: 16, weight: isSelected || isToday ? .semibold : .regular))
+                        .dynamicTypeFont(base: 16, weight: isSelected || isToday ? .semibold : .regular)
                         .foregroundStyle(
                             isSelected ? .white :
                             isToday ? Color.accentColor :
@@ -153,7 +154,7 @@ struct LiquidGlassWeekView: View {
             HStack(spacing: 0) {
                 // Label
                 Text("all-day")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(.secondary)
                     .frame(width: timeGutterWidth, alignment: .trailing)
                     .padding(.trailing, 4)
@@ -180,7 +181,7 @@ struct LiquidGlassWeekView: View {
 
             if dayAllDayEvents.count > 2 {
                 Text("+\(dayAllDayEvents.count - 2)")
-                    .font(.system(size: 9))
+                    .dynamicTypeFont(base: 9)
                     .foregroundStyle(.secondary)
             }
         }
@@ -196,7 +197,7 @@ struct LiquidGlassWeekView: View {
         }()
 
         return Text(event.title ?? "")
-            .font(.system(size: 10, weight: .medium))
+            .dynamicTypeFont(base: 10, weight: .medium)
             .foregroundStyle(.white)
             .lineLimit(1)
             .padding(.horizontal, 4)
@@ -254,7 +255,7 @@ struct LiquidGlassWeekView: View {
                 HStack(alignment: .top, spacing: 0) {
                     // Hour label
                     Text(formatHour(hour))
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.secondary)
                         .frame(width: timeGutterWidth, alignment: .trailing)
                         .padding(.trailing, 8)
@@ -329,7 +330,7 @@ struct LiquidGlassWeekView: View {
 
                 // Title
                 Text(task.title)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.primary)
                     .lineLimit(height > 32 ? 2 : 1)
                     .padding(.horizontal, 4)
@@ -411,7 +412,7 @@ struct LiquidGlassWeekView: View {
         }()
 
         return Text(event.title ?? "")
-            .font(.system(size: 10, weight: .medium))
+            .dynamicTypeFont(base: 10, weight: .medium)
             .foregroundStyle(color)
             .lineLimit(1)
             .padding(.horizontal, 4)

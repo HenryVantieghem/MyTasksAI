@@ -84,7 +84,7 @@ struct SubTaskBreakdownCard: View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "list.bullet.clipboard.fill")
                 .foregroundStyle(Theme.Colors.accent)
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
 
             Text("Task Breakdown")
                 .font(Theme.Typography.headline)
@@ -208,7 +208,7 @@ struct SubTaskBreakdownCard: View {
     private var emptyStateView: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "sparkles")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(Theme.Colors.tertiaryText)
 
             Text("No breakdown yet")
@@ -285,7 +285,7 @@ struct SubTaskBreakdownCard: View {
         } label: {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Add subtask")
@@ -309,7 +309,7 @@ struct SubTaskBreakdownCard: View {
     private var addSubTaskInputView: some View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "circle")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Theme.Colors.tertiaryText)
 
             TextField("What's the step?", text: $newSubTaskTitle)
@@ -326,7 +326,7 @@ struct SubTaskBreakdownCard: View {
                 addNewSubTask()
             } label: {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 22))
+                    .dynamicTypeFont(base: 22)
                     .foregroundStyle(newSubTaskTitle.isEmpty ? Theme.Colors.tertiaryText : Theme.Colors.success)
             }
             .disabled(newSubTaskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -336,7 +336,7 @@ struct SubTaskBreakdownCard: View {
                 cancelAddSubTask()
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 22))
+                    .dynamicTypeFont(base: 22)
                     .foregroundStyle(Theme.Colors.tertiaryText)
             }
         }
@@ -564,7 +564,7 @@ fileprivate struct BreakdownSubTaskRow: View {
             // Time estimate
             if let minutes = subTask.estimatedMinutes {
                 Text(minutes.formattedDuration)
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.Colors.tertiaryText)
             }
         }
@@ -587,13 +587,13 @@ fileprivate struct BreakdownSubTaskRow: View {
 
             Button { onCommitEdit() } label: {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(Theme.Colors.success)
             }
 
             Button { onCancelEdit() } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(Theme.Colors.tertiaryText)
             }
         }
@@ -609,7 +609,7 @@ fileprivate struct BreakdownSubTaskRow: View {
                     if let moveUp = onMoveUp {
                         Button { moveUp() } label: {
                             Image(systemName: "chevron.up")
-                                .font(.system(size: 10, weight: .semibold))
+                                .dynamicTypeFont(base: 10, weight: .semibold)
                                 .foregroundStyle(Theme.Colors.tertiaryText)
                         }
                         .buttonStyle(.plain)
@@ -618,7 +618,7 @@ fileprivate struct BreakdownSubTaskRow: View {
                     if let moveDown = onMoveDown {
                         Button { moveDown() } label: {
                             Image(systemName: "chevron.down")
-                                .font(.system(size: 10, weight: .semibold))
+                                .dynamicTypeFont(base: 10, weight: .semibold)
                                 .foregroundStyle(Theme.Colors.tertiaryText)
                         }
                         .buttonStyle(.plain)
@@ -667,7 +667,7 @@ fileprivate struct BreakdownSubTaskRow: View {
                     SwiftUI.Circle()
                         .fill(Theme.Colors.success)
                     Image(systemName: "checkmark")
-                        .font(.system(size: 10, weight: .bold))
+                        .dynamicTypeFont(base: 10, weight: .bold)
                         .foregroundStyle(.white)
                 }
                 .frame(width: 20, height: 20)
@@ -704,7 +704,7 @@ fileprivate struct BreakdownSubTaskRow: View {
                 .foregroundStyle(Theme.Colors.aiPurple.opacity(0.6))
 
             Text(reasoning)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.Colors.secondaryText)
         }
         .padding(.horizontal, Theme.Spacing.sm)

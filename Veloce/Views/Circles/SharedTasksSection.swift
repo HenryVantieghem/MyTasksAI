@@ -34,7 +34,7 @@ struct SharedTasksSection: View {
                     HStack {
                         HStack(spacing: 8) {
                             Image(systemName: "person.2.badge.plus.fill")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                                 .foregroundStyle(Theme.Colors.aiPurple)
 
                             Text("SHARED WITH YOU")
@@ -44,7 +44,7 @@ struct SharedTasksSection: View {
 
                             if !sharedTaskService.incomingInvitations.isEmpty {
                                 Text("\(sharedTaskService.incomingInvitations.count)")
-                                    .font(.system(size: 10, weight: .bold))
+                                    .dynamicTypeFont(base: 10, weight: .bold)
                                     .foregroundStyle(.white)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
@@ -55,7 +55,7 @@ struct SharedTasksSection: View {
                         Spacer()
 
                         Image(systemName: "chevron.down")
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                             .foregroundStyle(Color.white.opacity(0.3))
                             .rotationEffect(.degrees(isExpanded ? 0 : -90))
                     }
@@ -115,9 +115,9 @@ struct SharedTasksSection: View {
                 } label: {
                     HStack(spacing: 6) {
                         Text("Show \(sharedTaskService.incomingInvitations.count - 3) more")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                         Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                     }
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .frame(maxWidth: .infinity)
@@ -140,7 +140,7 @@ struct SharedTasksSection: View {
             // Subsection header
             HStack {
                 Text("Active")
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
                 Spacer()
             }
@@ -222,14 +222,14 @@ private struct SharedTaskInvitationCard: View {
 
                 HStack(spacing: 6) {
                     Text("from \(invitation.inviter?.displayName ?? "Friend")")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
 
                     Text("•")
                         .foregroundStyle(.white.opacity(0.3))
 
                     Text(invitation.timeSinceInvited)
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white.opacity(0.4))
                 }
             }
@@ -245,7 +245,7 @@ private struct SharedTaskInvitationCard: View {
                     // Decline
                     Button(action: onDecline) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .foregroundStyle(Theme.CelestialColors.errorNebula)
                             .frame(width: 32, height: 32)
                             .background(
@@ -258,7 +258,7 @@ private struct SharedTaskInvitationCard: View {
                     // Accept
                     Button(action: onAccept) {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .foregroundStyle(.white)
                             .frame(width: 32, height: 32)
                             .background(
@@ -310,7 +310,7 @@ private struct ActiveSharedTaskCard: View {
                 Image(systemName: sharedTask.task?.isCompleted == true
                       ? "checkmark.circle.fill"
                       : sharedTask.task?.displayIcon ?? "doc.fill")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(sharedTask.task?.isCompleted == true
                                     ? Theme.CelestialColors.auroraGreen
                                     : Theme.Colors.aiPurple)
@@ -330,16 +330,16 @@ private struct ActiveSharedTaskCard: View {
                     // Inviter
                     HStack(spacing: 4) {
                         Image(systemName: "person.fill")
-                            .font(.system(size: 9))
+                            .dynamicTypeFont(base: 9)
                         Text(sharedTask.inviter?.displayName ?? "Friend")
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                     }
                     .foregroundStyle(.white.opacity(0.4))
 
                     // Priority stars
                     if let stars = sharedTask.task?.starRating, stars > 0 {
                         Text(String(repeating: "★", count: stars))
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                             .foregroundStyle(Theme.Colors.warning)
                     }
 
@@ -347,9 +347,9 @@ private struct ActiveSharedTaskCard: View {
                     if let time = sharedTask.task?.estimatedTimeFormatted {
                         HStack(spacing: 3) {
                             Image(systemName: "clock")
-                                .font(.system(size: 9))
+                                .dynamicTypeFont(base: 9)
                             Text(time)
-                                .font(.system(size: 10, weight: .medium))
+                                .dynamicTypeFont(base: 10, weight: .medium)
                         }
                         .foregroundStyle(.white.opacity(0.4))
                     }
@@ -362,9 +362,9 @@ private struct ActiveSharedTaskCard: View {
             if sharedTask.task?.isCompleted == true {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 10, weight: .bold))
+                        .dynamicTypeFont(base: 10, weight: .bold)
                     Text("Done")
-                        .font(.system(size: 11, weight: .semibold))
+                        .dynamicTypeFont(base: 11, weight: .semibold)
                 }
                 .foregroundStyle(Theme.CelestialColors.auroraGreen)
                 .padding(.horizontal, 8)
@@ -376,7 +376,7 @@ private struct ActiveSharedTaskCard: View {
             } else {
                 // Arrow to navigate
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.3))
             }
         }

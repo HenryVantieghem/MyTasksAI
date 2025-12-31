@@ -184,7 +184,7 @@ struct FriendProfileSheet: View {
 
             if let username = friend.atUsername {
                 Text(username)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
         }
@@ -193,7 +193,7 @@ struct FriendProfileSheet: View {
     private var levelBadgeView: some View {
         HStack(spacing: 6) {
             Image(systemName: "star.fill")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.xp)
 
             Text("Level \(friend.currentLevel ?? 1)")
@@ -216,7 +216,7 @@ struct FriendProfileSheet: View {
                 .frame(width: 8, height: 8)
 
             Text(friend.isActiveNow ? "Active now" : "Last active \(friend.formattedLastActive)")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
     }
@@ -263,7 +263,7 @@ struct FriendProfileSheet: View {
                     .frame(width: 44, height: 44)
 
                 Image(systemName: icon)
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(color)
             }
 
@@ -273,7 +273,7 @@ struct FriendProfileSheet: View {
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text(label)
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
         }
@@ -304,7 +304,7 @@ struct FriendProfileSheet: View {
                     }
 
                     Text(friend.displayName)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .lineLimit(1)
                 }
@@ -313,7 +313,7 @@ struct FriendProfileSheet: View {
                 // VS
                 VStack(spacing: 4) {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(Theme.Colors.streakOrange)
 
                     Text("VS")
@@ -334,7 +334,7 @@ struct FriendProfileSheet: View {
                     }
 
                     Text("You")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .frame(maxWidth: .infinity)
@@ -355,15 +355,15 @@ struct FriendProfileSheet: View {
 
                 if myStreak > (friend.currentStreak ?? 0) {
                     Label("You're ahead!", systemImage: "arrow.up.circle.fill")
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.auroraGreen)
                 } else if myStreak < (friend.currentStreak ?? 0) {
                     Label("\(friend.displayName) is ahead", systemImage: "arrow.down.circle.fill")
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                         .foregroundStyle(Theme.Colors.streakOrange)
                 } else {
                     Label("You're tied!", systemImage: "equal.circle.fill")
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.plasmaCore)
                 }
 
@@ -384,7 +384,7 @@ struct FriendProfileSheet: View {
                 Spacer()
 
                 Text("View All")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
 
@@ -407,12 +407,12 @@ struct FriendProfileSheet: View {
                     .frame(width: 48, height: 48)
 
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(color)
             }
 
             Text(title)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .lineLimit(1)
         }
@@ -440,20 +440,20 @@ struct FriendProfileSheet: View {
     private func activityRow(icon: String, text: String, time: String, color: Color) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(color)
                 .frame(width: 32, height: 32)
                 .background(color.opacity(0.15), in: SwiftUI.Circle())
 
             Text(text)
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
                 .lineLimit(1)
 
             Spacer()
 
             Text(time)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         }
         .padding(10)
@@ -468,10 +468,10 @@ struct FriendProfileSheet: View {
             Button(action: onSendChallenge) {
                 HStack(spacing: 8) {
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
 
                     Text("Send Challenge")
-                        .font(.system(size: 16, weight: .bold))
+                        .dynamicTypeFont(base: 16, weight: .bold)
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -492,7 +492,7 @@ struct FriendProfileSheet: View {
                 showRemoveConfirmation = true
             } label: {
                 Text("Remove Friend")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.errorNebula)
             }
             .padding(.top, 8)

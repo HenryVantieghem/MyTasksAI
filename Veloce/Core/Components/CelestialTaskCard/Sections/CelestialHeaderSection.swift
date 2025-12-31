@@ -53,10 +53,10 @@ struct CelestialHeaderSection: View {
     private var taskTypeBadge: some View {
         HStack(spacing: 6) {
             Image(systemName: viewModel.task.taskType.icon)
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
 
             Text(viewModel.task.taskType.displayName)
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
         }
         .foregroundStyle(viewModel.taskTypeColor)
         .padding(.horizontal, 12)
@@ -76,9 +76,9 @@ struct CelestialHeaderSection: View {
     private func durationBadge(_ duration: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "clock")
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
             Text(duration)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
         }
         .foregroundStyle(Theme.CelestialColors.starWhite)
         .padding(.horizontal, 10)
@@ -98,11 +98,11 @@ struct CelestialHeaderSection: View {
     private func aiDurationBadge(_ minutes: Int) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "sparkles")
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
             Image(systemName: "clock")
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
             Text(formatAIDuration(minutes))
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
 
             // Confidence indicator
             if let confidence = viewModel.durationConfidence {
@@ -139,7 +139,7 @@ struct CelestialHeaderSection: View {
         }
 
         return Image(systemName: icon)
-            .font(.system(size: 9))
+            .dynamicTypeFont(base: 9)
             .foregroundStyle(color)
     }
 
@@ -158,7 +158,7 @@ struct CelestialHeaderSection: View {
         VStack(alignment: .leading, spacing: 8) {
             if isEditingTitle {
                 TextField("Task title", text: $viewModel.editedTitle)
-                    .font(.system(size: 22, weight: .bold))
+                    .dynamicTypeFont(base: 22, weight: .bold)
                     .foregroundStyle(.white)
                     .focused($isTitleFocused)
                     .submitLabel(.done)
@@ -183,7 +183,7 @@ struct CelestialHeaderSection: View {
                 } label: {
                     HStack {
                         Text(viewModel.editedTitle)
-                            .font(.system(size: 22, weight: .bold))
+                            .dynamicTypeFont(base: 22, weight: .bold)
                             .foregroundStyle(.white)
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
@@ -191,7 +191,7 @@ struct CelestialHeaderSection: View {
                         Spacer()
 
                         Image(systemName: "pencil")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
                 }
@@ -218,7 +218,7 @@ struct CelestialHeaderSection: View {
                     HapticsService.shared.selectionFeedback()
                 } label: {
                     Image(systemName: index <= viewModel.editedPriority ? "star.fill" : "star")
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(
                             index <= viewModel.editedPriority
                                 ? Theme.Colors.xp
@@ -230,7 +230,7 @@ struct CelestialHeaderSection: View {
             }
 
             Text("Priority")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .padding(.leading, 4)
         }
@@ -241,10 +241,10 @@ struct CelestialHeaderSection: View {
     private func scheduledTimeBadge(_ date: Date) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "calendar")
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
 
             Text(formatScheduledTime(date))
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
         }
         .foregroundStyle(Theme.TaskCardColors.schedule)
         .padding(.horizontal, 10)

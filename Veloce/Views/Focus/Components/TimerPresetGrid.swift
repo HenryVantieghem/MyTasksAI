@@ -106,7 +106,7 @@ private struct PresetButton: View {
 
                 if preset.isExtended {
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 8))
+                        .dynamicTypeFont(base: 8)
                         .foregroundStyle(isSelected ? .white.opacity(0.8) : accentColor.opacity(0.6))
                 }
             }
@@ -251,7 +251,7 @@ private struct CompactPresetChip: View {
 
         VStack(spacing: 32) {
             Text("Select Duration")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             TimerPresetGrid(
@@ -266,7 +266,7 @@ private struct CompactPresetChip: View {
                 .background(.white.opacity(0.2))
 
             Text("Compact Version")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             CompactPresetRow(

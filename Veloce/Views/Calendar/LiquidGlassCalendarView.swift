@@ -231,10 +231,10 @@ struct LiquidGlassCalendarView: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
 
                 Text("Add Task")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
             }
             .foregroundStyle(.primary)
             .frame(maxWidth: .infinity)
@@ -321,7 +321,7 @@ struct CalendarPermissionRequestView: View {
                     .frame(width: 120, height: 120)
 
                 Image(systemName: "calendar.badge.checkmark")
-                    .font(.system(size: 48, weight: .light))
+                    .dynamicTypeFont(base: 48, weight: .light)
                     .foregroundStyle(Color.accentColor)
             }
 
@@ -331,7 +331,7 @@ struct CalendarPermissionRequestView: View {
                     .foregroundStyle(.primary)
 
                 Text("See your Apple Calendar events alongside\nyour tasks for a complete view of your day")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
@@ -340,10 +340,10 @@ struct CalendarPermissionRequestView: View {
             Button(action: onRequest) {
                 HStack(spacing: 8) {
                     Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
 
                     Text("Connect Calendar")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                 }
                 .foregroundStyle(.white)
                 .frame(height: 50)

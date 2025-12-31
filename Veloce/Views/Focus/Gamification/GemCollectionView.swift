@@ -45,7 +45,7 @@ struct GemCollectionView: View {
             // Header
             HStack {
                 Image(systemName: "diamond.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
@@ -55,13 +55,13 @@ struct GemCollectionView: View {
                     )
 
                 Text("Focus Gems")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.8))
 
                 Spacer()
 
                 Text("\(earnedCount)/\(gems.count)")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
             .padding(.horizontal, 16)
@@ -143,7 +143,7 @@ struct GemCollectionItem: View {
 
                 // Label
                 Text(gem.gemType.rawValue)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.white.opacity(gem.isEarned ? 0.8 : 0.5))
                     .lineLimit(1)
 
@@ -151,14 +151,14 @@ struct GemCollectionItem: View {
                 if gem.isEarned {
                     HStack(spacing: 2) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("Earned")
-                            .font(.system(size: 9, weight: .medium))
+                            .dynamicTypeFont(base: 9, weight: .medium)
                     }
                     .foregroundStyle(Theme.Colors.success)
                 } else {
                     Text("\(Int(gem.progress * 100))%")
-                        .font(.system(size: 10, weight: .semibold))
+                        .dynamicTypeFont(base: 10, weight: .semibold)
                         .foregroundStyle(gem.gemType.color.opacity(0.8))
                 }
             }
@@ -192,12 +192,12 @@ struct CompactGemBadge: View {
                 .frame(width: 28, height: 28)
 
             Image(systemName: gemType.icon)
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(isEarned ? .white : .white.opacity(0.4))
 
             if !isEarned {
                 Image(systemName: "lock.fill")
-                    .font(.system(size: 8))
+                    .dynamicTypeFont(base: 8)
                     .foregroundStyle(.white.opacity(0.6))
                     .offset(x: 8, y: 8)
             }

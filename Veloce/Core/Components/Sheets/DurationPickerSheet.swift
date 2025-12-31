@@ -109,7 +109,7 @@ struct DurationPickerSheet: View {
         VStack(spacing: Theme.Spacing.sm) {
             HStack {
                 Image(systemName: "timer")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
                 Text("Set Duration")
@@ -122,7 +122,7 @@ struct DurationPickerSheet: View {
                     dismiss()
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .frame(width: 32, height: 32)
                 }
@@ -150,7 +150,7 @@ struct DurationPickerSheet: View {
 
             HStack {
                 Text("Custom")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starDim)
 
                 Spacer()
@@ -164,7 +164,7 @@ struct DurationPickerSheet: View {
                         }
                     } label: {
                         Image(systemName: "minus")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                             .foregroundStyle(.white)
                             .frame(width: 36, height: 36)
                     }
@@ -182,7 +182,7 @@ struct DurationPickerSheet: View {
                         }
                     } label: {
                         Image(systemName: "plus")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                             .foregroundStyle(.white)
                             .frame(width: 36, height: 36)
                     }
@@ -200,10 +200,10 @@ struct DurationPickerSheet: View {
         } label: {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
 
                 Text("Set \(formatDuration(currentSelection))")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
             }
             .foregroundStyle(.black)
             .frame(maxWidth: .infinity)
@@ -255,7 +255,7 @@ private struct DurationOptionRow: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: icon)
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(isSelected ? Theme.CelestialColors.nebulaCore : Theme.CelestialColors.starDim)
                 }
 

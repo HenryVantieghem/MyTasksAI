@@ -42,12 +42,12 @@ struct CosmicToggleRow: View {
             // Text content
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
             }
@@ -133,12 +133,12 @@ struct CosmicNavigationRow: View {
                 // Text content
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     if let subtitle {
                         Text(subtitle)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
                 }
@@ -148,12 +148,12 @@ struct CosmicNavigationRow: View {
                 // Value or chevron
                 if let value {
                     Text(value)
-                        .font(.system(size: 15))
+                        .dynamicTypeFont(base: 15)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
             .padding(.horizontal, LivingCosmos.Controls.rowPadding)

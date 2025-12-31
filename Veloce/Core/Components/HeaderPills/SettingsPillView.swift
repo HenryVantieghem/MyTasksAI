@@ -90,7 +90,7 @@ struct SettingsPillView: View {
                 .foregroundStyle(Theme.Colors.accent)
         } else {
             Image(systemName: "gearshape.fill")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
     }

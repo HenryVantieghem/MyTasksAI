@@ -96,11 +96,11 @@ struct RecurringSection: View {
         HStack {
             HStack(spacing: 8) {
                 Image(systemName: "repeat")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(accentColor)
 
                 Text("REPEAT")
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(.white.opacity(0.8))
             }
 
@@ -108,7 +108,7 @@ struct RecurringSection: View {
 
             if selectedType != .once {
                 Text(selectedType.displayName)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(accentColor)
             }
         }
@@ -136,9 +136,9 @@ struct RecurringSection: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: type.icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text(type.shortLabel)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
             }
             .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
             .padding(.horizontal, 14)
@@ -155,7 +155,7 @@ struct RecurringSection: View {
     private var customDaysPicker: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("Repeat on:")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(.white.opacity(0.6))
 
             HStack(spacing: 8) {
@@ -180,7 +180,7 @@ struct RecurringSection: View {
             HapticsService.shared.selectionFeedback()
         } label: {
             Text(dayLabels[day])
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .frame(width: 38, height: 38)
                 .background(
                     SwiftUI.Circle()
@@ -207,9 +207,9 @@ struct RecurringSection: View {
             )) {
                 HStack(spacing: 6) {
                     Image(systemName: "calendar.badge.minus")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                     Text("Set end date")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                 }
                 .foregroundStyle(.white.opacity(0.7))
             }
@@ -242,9 +242,9 @@ struct RecurringBadge: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "repeat")
-                .font(.system(size: 9))
+                .dynamicTypeFont(base: 9)
             Text(type.shortLabel)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
         }
         .foregroundStyle(Theme.Colors.aiPurple)
         .padding(.horizontal, 8)

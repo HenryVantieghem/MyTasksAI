@@ -149,7 +149,7 @@ struct IconEmojiPicker: View {
             ForEach(emojiCategories, id: \.name) { category in
                 VStack(alignment: .leading, spacing: 8) {
                     Text(category.name)
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.5))
                         .padding(.horizontal, 4)
 
@@ -209,7 +209,7 @@ struct SymbolButton: View {
     var body: some View {
         Button(action: onTap) {
             Image(systemName: symbol)
-                .font(.system(size: 22))
+                .dynamicTypeFont(base: 22)
                 .foregroundStyle(isSelected ? Theme.Colors.aiCyan : .white)
                 .frame(width: 48, height: 48)
                 .background(
@@ -244,7 +244,7 @@ struct EmojiButton: View {
     var body: some View {
         Button(action: onTap) {
             Text(emoji)
-                .font(.system(size: 26))
+                .dynamicTypeFont(base: 26)
                 .frame(width: 40, height: 40)
                 .background(
                     RoundedRectangle(cornerRadius: 10)

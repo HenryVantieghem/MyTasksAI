@@ -74,7 +74,7 @@ struct AppPickerView: View {
                 dismiss()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 36, height: 36)
             }
@@ -93,7 +93,7 @@ struct AppPickerView: View {
                 dismiss()
             } label: {
                 Text("Done")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
@@ -108,15 +108,15 @@ struct AppPickerView: View {
     private var authorizationCard: some View {
         VStack(spacing: 16) {
             Image(systemName: "shield.lefthalf.filled")
-                .font(.system(size: 40))
+                .dynamicTypeFont(base: 40)
                 .foregroundStyle(Theme.CelestialColors.warningNebula)
 
             Text("Screen Time Access Required")
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
 
             Text("To block apps during focus sessions, you need to grant Screen Time access.")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .multilineTextAlignment(.center)
 
@@ -129,7 +129,7 @@ struct AppPickerView: View {
                     Image(systemName: "checkmark.shield")
                     Text("Grant Access")
                 }
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
@@ -161,11 +161,11 @@ struct AppPickerView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Image(systemName: "app.badge.checkmark")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(Theme.CelestialColors.nebulaCore)
 
                 Text("Selected Apps")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -176,7 +176,7 @@ struct AppPickerView: View {
                         focusBlockingService.clearSelection()
                         HapticsService.shared.selectionFeedback()
                     }
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.errorNebula)
                 }
             }
@@ -211,10 +211,10 @@ struct AppPickerView: View {
                     Spacer()
                     VStack(spacing: 8) {
                         Image(systemName: "apps.iphone")
-                            .font(.system(size: 28))
+                            .dynamicTypeFont(base: 28)
                             .foregroundStyle(.white.opacity(0.3))
                         Text("No apps selected")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.4))
                     }
                     .padding(.vertical, 16)
@@ -230,14 +230,14 @@ struct AppPickerView: View {
         VStack(spacing: 6) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text("\(count)")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
             }
             .foregroundStyle(count > 0 ? color : Theme.CelestialColors.starGhost)
 
             Text(label)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
         .frame(maxWidth: .infinity)
@@ -263,24 +263,24 @@ struct AppPickerView: View {
                         .frame(width: 42, height: 42)
 
                     Image(systemName: "plus.app.fill")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(Theme.CelestialColors.nebulaCore)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Select Apps to Block")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text("Choose apps, categories, or websites")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.3))
             }
             .padding(14)
@@ -296,7 +296,7 @@ struct AppPickerView: View {
     private var presetsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("QUICK PRESETS")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
                 .tracking(1)
 
@@ -338,24 +338,24 @@ struct AppPickerView: View {
                         .frame(width: 38, height: 38)
 
                     Image(systemName: icon)
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(color)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white)
 
                     Text(subtitle)
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.white.opacity(0.3))
             }
             .padding(12)
@@ -371,16 +371,16 @@ struct AppPickerView: View {
     private var infoCard: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "info.circle.fill")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(Theme.CelestialColors.nebulaEdge)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("How it works")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("Selected apps will be blocked during your focus sessions. You can always edit this list later.")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .fixedSize(horizontal: false, vertical: true)
             }

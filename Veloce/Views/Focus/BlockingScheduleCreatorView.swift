@@ -66,21 +66,21 @@ struct BlockingScheduleCreatorView: View {
                 dismiss()
             } label: {
                 Text("Cancel")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.white.opacity(0.7))
             }
 
             Spacer()
 
             Text("New Schedule")
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
                 .foregroundStyle(.white)
 
             Spacer()
 
             // Invisible balance
             Text("Cancel")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.clear)
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
@@ -93,11 +93,11 @@ struct BlockingScheduleCreatorView: View {
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("Schedule Name")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
 
             TextField("e.g., Morning Focus", text: $scheduleName)
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white)
                 .padding(Theme.Spacing.md)
                 .background {
@@ -117,7 +117,7 @@ struct BlockingScheduleCreatorView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Text("Time")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.7))
 
                 Spacer()
@@ -127,7 +127,7 @@ struct BlockingScheduleCreatorView: View {
                     .tint(Theme.Colors.aiCyan)
 
                 Text("All Day")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white.opacity(0.7))
             }
 
@@ -135,7 +135,7 @@ struct BlockingScheduleCreatorView: View {
                 HStack(spacing: Theme.Spacing.lg) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("From")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
 
                         DatePicker("", selection: $startTime, displayedComponents: .hourAndMinute)
@@ -153,7 +153,7 @@ struct BlockingScheduleCreatorView: View {
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text("To")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
 
                         DatePicker("", selection: $endTime, displayedComponents: .hourAndMinute)
@@ -178,7 +178,7 @@ struct BlockingScheduleCreatorView: View {
     private var daysSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             Text("Days")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
 
             // Day buttons
@@ -216,7 +216,7 @@ struct BlockingScheduleCreatorView: View {
             }
         } label: {
             Text(day.shortName)
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(isSelected ? .white : .white.opacity(0.5))
                 .frame(width: 40, height: 40)
                 .background {
@@ -235,7 +235,7 @@ struct BlockingScheduleCreatorView: View {
     private func quickSelectButton(_ title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(.white.opacity(0.7))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
@@ -251,7 +251,7 @@ struct BlockingScheduleCreatorView: View {
     private var appsSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             Text("Apps to Block")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
 
             Button {
@@ -259,17 +259,17 @@ struct BlockingScheduleCreatorView: View {
             } label: {
                 HStack {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(Theme.Colors.aiCyan)
 
                     Text(selectedApps.applicationTokens.isEmpty ? "Select Apps" : "\(selectedApps.applicationTokens.count) apps selected")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.3))
                 }
                 .padding(Theme.Spacing.lg)
@@ -286,7 +286,7 @@ struct BlockingScheduleCreatorView: View {
             // App group shortcuts
             VStack(spacing: Theme.Spacing.sm) {
                 Text("Or use a group")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
 
                 HStack(spacing: Theme.Spacing.sm) {
@@ -303,7 +303,7 @@ struct BlockingScheduleCreatorView: View {
             // Would select the app group
         } label: {
             Text(name)
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
@@ -325,7 +325,7 @@ struct BlockingScheduleCreatorView: View {
                 saveSchedule()
             } label: {
                 Text("Save Schedule")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)

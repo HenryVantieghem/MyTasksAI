@@ -22,7 +22,7 @@ struct InlineEditableTitle: View {
         VStack(alignment: .leading, spacing: 4) {
             if isEditing {
                 TextField("Task title", text: $editedText)
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundColor(Theme.CelestialColors.starWhite)
                     .focused($isFocused)
                     .submitLabel(.done)
@@ -37,14 +37,14 @@ struct InlineEditableTitle: View {
                 HStack(spacing: 12) {
                     Button(action: cancelEdit) {
                         Text("Cancel")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                             .foregroundColor(Theme.CelestialColors.starDim)
                     }
                     .buttonStyle(PlainButtonStyle())
 
                     Button(action: saveAndDismiss) {
                         Text("Save")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                             .foregroundColor(taskTypeColor)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -56,7 +56,7 @@ struct InlineEditableTitle: View {
                 Button(action: startEditing) {
                     HStack {
                         Text(title)
-                            .font(.system(size: 24, weight: .bold))
+                            .dynamicTypeFont(base: 24, weight: .bold)
                             .foregroundColor(Theme.CelestialColors.starWhite)
                             .lineLimit(3)
                             .multilineTextAlignment(.leading)
@@ -64,7 +64,7 @@ struct InlineEditableTitle: View {
                         Spacer()
 
                         Image(systemName: "pencil")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundColor(Theme.CelestialColors.starGhost)
                     }
                 }

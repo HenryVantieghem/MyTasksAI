@@ -82,21 +82,21 @@ struct AppGroupCreatorView: View {
                 dismiss()
             } label: {
                 Text("Cancel")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.white.opacity(0.7))
             }
 
             Spacer()
 
             Text("New Group")
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
                 .foregroundStyle(.white)
 
             Spacer()
 
             // Invisible balance
             Text("Cancel")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.clear)
         }
         .padding(.horizontal, Theme.Spacing.screenPadding)
@@ -115,18 +115,18 @@ struct AppGroupCreatorView: View {
                     .frame(width: 80, height: 80)
 
                 Image(systemName: selectedIcon)
-                    .font(.system(size: 32))
+                    .dynamicTypeFont(base: 32)
                     .foregroundStyle(selectedColor.color)
             }
 
             // Name preview
             Text(groupName.isEmpty ? "Group Name" : groupName)
-                .font(.system(size: 20, weight: .semibold))
+                .dynamicTypeFont(base: 20, weight: .semibold)
                 .foregroundStyle(groupName.isEmpty ? .white.opacity(0.3) : .white)
 
             // App count
             Text("\(selectedApps.applicationTokens.count) apps")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)
@@ -146,11 +146,11 @@ struct AppGroupCreatorView: View {
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("Group Name")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
 
             TextField("e.g., Social Media", text: $groupName)
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white)
                 .padding(Theme.Spacing.md)
                 .background {
@@ -169,7 +169,7 @@ struct AppGroupCreatorView: View {
     private var colorSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             Text("Color")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
@@ -187,7 +187,7 @@ struct AppGroupCreatorView: View {
                                     Circle()
                                         .stroke(.white, lineWidth: 3)
                                     Image(systemName: "checkmark")
-                                        .font(.system(size: 16, weight: .bold))
+                                        .dynamicTypeFont(base: 16, weight: .bold)
                                         .foregroundStyle(.white)
                                 }
                             }
@@ -202,7 +202,7 @@ struct AppGroupCreatorView: View {
     private var iconSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             Text("Icon")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
@@ -218,7 +218,7 @@ struct AppGroupCreatorView: View {
                                 .frame(width: 48, height: 48)
 
                             Image(systemName: icon)
-                                .font(.system(size: 20))
+                                .dynamicTypeFont(base: 20)
                                 .foregroundStyle(selectedIcon == icon ? selectedColor.color : .white.opacity(0.6))
                         }
                         .overlay {
@@ -238,7 +238,7 @@ struct AppGroupCreatorView: View {
     private var appsSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             Text("Apps in Group")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
 
             Button {
@@ -246,17 +246,17 @@ struct AppGroupCreatorView: View {
             } label: {
                 HStack {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(selectedColor.color)
 
                     Text(selectedApps.applicationTokens.isEmpty ? "Add Apps" : "\(selectedApps.applicationTokens.count) apps selected")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.3))
                 }
                 .padding(Theme.Spacing.lg)
@@ -274,11 +274,11 @@ struct AppGroupCreatorView: View {
             if selectedApps.applicationTokens.isEmpty {
                 HStack(spacing: Theme.Spacing.sm) {
                     Image(systemName: "lightbulb.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.Colors.aiAmber)
 
                     Text("Tip: Group similar apps together for easier blocking")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .padding(Theme.Spacing.md)
@@ -301,7 +301,7 @@ struct AppGroupCreatorView: View {
                 saveGroup()
             } label: {
                 Text("Create Group")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)

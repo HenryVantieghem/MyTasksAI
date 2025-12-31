@@ -72,7 +72,7 @@ struct BlockingTabBar: View {
                     .font(.system(size: 11, weight: isSelected ? .semibold : .medium))
 
                 Text(tab.title)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .lineLimit(1)
             }
             .foregroundStyle(isSelected ? .white : .white.opacity(0.5))

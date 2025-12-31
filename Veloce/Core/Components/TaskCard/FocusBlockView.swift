@@ -99,7 +99,7 @@ struct FocusBlockView: View {
 
                 // Title
                 Text(task.title)
-                    .font(.system(size: 22, weight: .semibold))
+                    .dynamicTypeFont(base: 22, weight: .semibold)
                     .foregroundColor(Theme.CelestialColors.starWhite)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
@@ -107,7 +107,7 @@ struct FocusBlockView: View {
                 // AI guidance
                 if let advice = task.aiAdvice, !advice.isEmpty {
                     Text(advice)
-                        .font(.system(size: 14, weight: .regular))
+                        .dynamicTypeFont(base: 14, weight: .regular)
                         .foregroundColor(Theme.CelestialColors.starDim)
                         .lineLimit(2)
                         .italic()
@@ -119,9 +119,9 @@ struct FocusBlockView: View {
                     Button(action: onComplete) {
                         HStack(spacing: 6) {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                             Text("Complete")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                         }
                         .foregroundColor(Theme.CelestialColors.starWhite)
                         .padding(.horizontal, 16)
@@ -141,9 +141,9 @@ struct FocusBlockView: View {
                     Button(action: onStartFocus) {
                         HStack(spacing: 6) {
                             Image(systemName: "scope")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                             Text("Start Focus")
-                                .font(.system(size: 14, weight: .bold))
+                                .dynamicTypeFont(base: 14, weight: .bold)
                         }
                         .foregroundColor(Theme.CelestialColors.void)
                         .padding(.horizontal, 20)
@@ -210,9 +210,9 @@ struct FocusBlockView: View {
     private func urgencyBadge(_ text: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
             Text(text)
-                .font(.system(size: 11, weight: .semibold))
+                .dynamicTypeFont(base: 11, weight: .semibold)
         }
         .foregroundColor(urgencyColor)
         .padding(.horizontal, 10)
@@ -226,7 +226,7 @@ struct FocusBlockView: View {
     private var pointsIndicator: some View {
         HStack(spacing: 4) {
             Image(systemName: "bolt.fill")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
             Text("+\(task.pointsEarned > 0 ? task.pointsEarned : 25)")
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
         }

@@ -144,7 +144,7 @@ struct FriendRequestsView: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: segment.icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
 
                 Text(segment.rawValue)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -152,7 +152,7 @@ struct FriendRequestsView: View {
                 // Badge count
                 if segment == .incoming && friendService.pendingCount > 0 {
                     Text("\(friendService.pendingCount)")
-                        .font(.system(size: 10, weight: .bold))
+                        .dynamicTypeFont(base: 10, weight: .bold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -184,7 +184,7 @@ struct FriendRequestsView: View {
                 .scaleEffect(1.5)
 
             Text("Loading requests...")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
             Spacer()
@@ -210,7 +210,7 @@ struct FriendRequestsView: View {
                 }
 
                 Image(systemName: selectedSegment.emptyIcon)
-                    .font(.system(size: 48, weight: .light))
+                    .dynamicTypeFont(base: 48, weight: .light)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
             .frame(height: 160)
@@ -220,7 +220,7 @@ struct FriendRequestsView: View {
                 .foregroundStyle(Theme.CelestialColors.starWhite)
 
             Text(selectedSegment.emptySubtitle)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .multilineTextAlignment(.center)
 
@@ -233,7 +233,7 @@ struct FriendRequestsView: View {
                         Image(systemName: "person.badge.plus")
                         Text("Add a Friend")
                     }
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
@@ -388,7 +388,7 @@ struct IncomingRequestCard: View {
                 ZStack {
                     Theme.CelestialColors.auroraGreen.opacity(0.3)
                     Image(systemName: "checkmark")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundStyle(Theme.CelestialColors.auroraGreen)
                 }
                 .frame(width: 80)
@@ -400,7 +400,7 @@ struct IncomingRequestCard: View {
                 ZStack {
                     Theme.CelestialColors.errorNebula.opacity(0.3)
                     Image(systemName: "xmark")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundStyle(Theme.CelestialColors.errorNebula)
                 }
                 .frame(width: 80)
@@ -440,12 +440,12 @@ struct IncomingRequestCard: View {
                 // Info
                 VStack(alignment: .leading, spacing: 4) {
                     Text(profile.displayName)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     if let username = profile.atUsername {
                         Text(username)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
 
@@ -454,10 +454,10 @@ struct IncomingRequestCard: View {
                         if let streak = profile.currentStreak, streak > 0 {
                             HStack(spacing: 4) {
                                 Image(systemName: "flame.fill")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(Theme.Colors.streakOrange)
                                 Text("\(streak)")
-                                    .font(.system(size: 11, weight: .medium))
+                                    .dynamicTypeFont(base: 11, weight: .medium)
                                     .foregroundStyle(Theme.CelestialColors.starDim)
                             }
                         }
@@ -465,10 +465,10 @@ struct IncomingRequestCard: View {
                         if let level = profile.currentLevel {
                             HStack(spacing: 4) {
                                 Image(systemName: "star.fill")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(Theme.Colors.xp)
                                 Text("Lv \(level)")
-                                    .font(.system(size: 11, weight: .medium))
+                                    .dynamicTypeFont(base: 11, weight: .medium)
                                     .foregroundStyle(Theme.CelestialColors.starDim)
                             }
                         }
@@ -485,7 +485,7 @@ struct IncomingRequestCard: View {
                             respondToRequest(accept: false)
                         } label: {
                             Image(systemName: "xmark")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
                                 .foregroundStyle(Theme.CelestialColors.starDim)
                                 .frame(width: 40, height: 40)
                                 .background(
@@ -503,7 +503,7 @@ struct IncomingRequestCard: View {
                             respondToRequest(accept: true)
                         } label: {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
+                                .dynamicTypeFont(base: 14, weight: .bold)
                                 .foregroundStyle(.white)
                                 .frame(width: 40, height: 40)
                                 .background(
@@ -630,12 +630,12 @@ struct SentRequestCard: View {
             // Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(profile.displayName)
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starWhite.opacity(0.8))
 
                 if let username = profile.atUsername {
                     Text(username)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(Theme.CelestialColors.starGhost)
                 }
 
@@ -645,7 +645,7 @@ struct SentRequestCard: View {
                         .fill(Theme.CelestialColors.warningNebula)
                         .frame(width: 6, height: 6)
                     Text("Pending")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
             }
@@ -658,7 +658,7 @@ struct SentRequestCard: View {
                     cancelRequest()
                 } label: {
                     Text("Cancel")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.errorNebula)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
@@ -738,7 +738,7 @@ struct CelebrationOverlay: View {
                     // Sparkles
                     ForEach(0..<8, id: \.self) { i in
                         Image(systemName: "sparkle")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.auroraGreen)
                             .offset(y: -60 - phase * 20)
                             .rotationEffect(.degrees(Double(i) * 45))
@@ -760,7 +760,7 @@ struct CelebrationOverlay: View {
                         .opacity(showContent ? 1 : 0)
 
                     Image(systemName: "person.2.fill")
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(.white)
                         .scaleEffect(showContent ? 1 : 0.5)
                         .opacity(showContent ? 1 : 0)
@@ -772,7 +772,7 @@ struct CelebrationOverlay: View {
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text("with \(friendName)")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.auroraGreen)
                 }
                 .opacity(showContent ? 1 : 0)
@@ -783,7 +783,7 @@ struct CelebrationOverlay: View {
                     dismiss()
                 } label: {
                     Text("Awesome!")
-                        .font(.system(size: 17, weight: .bold))
+                        .dynamicTypeFont(base: 17, weight: .bold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 40)
                         .padding(.vertical, 14)

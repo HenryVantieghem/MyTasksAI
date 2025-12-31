@@ -133,7 +133,7 @@ struct JournalEditorSheet: View {
                     Button("Done") {
                         saveAndDismiss()
                     }
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(entryColor)
                 }
             }
@@ -209,7 +209,7 @@ struct JournalEditorSheet: View {
     private var entryTypeBadge: some View {
         HStack(spacing: 8) {
             Image(systemName: entryType.icon)
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
 
             Text(entryType.displayName)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -242,7 +242,7 @@ struct JournalEditorSheet: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack(spacing: 6) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text("Today's Prompt")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
             }
@@ -279,7 +279,7 @@ struct JournalEditorSheet: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack(spacing: 6) {
                 Image(systemName: "heart.fill")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text("3 Things You're Grateful For")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
             }
@@ -300,7 +300,7 @@ struct JournalEditorSheet: View {
                             }
                         }
                     ))
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white)
                     .tint(JournalColors.gratitude)
                 }
@@ -330,7 +330,7 @@ struct JournalEditorSheet: View {
             ZStack(alignment: .topLeading) {
                 if content.isEmpty {
                     Text(entryType.placeholder)
-                        .font(.system(size: 17, weight: .regular))
+                        .dynamicTypeFont(base: 17, weight: .regular)
                         .foregroundStyle(.white.opacity(0.3))
                         .padding(.top, 8)
                         .padding(.leading, 4)
@@ -393,7 +393,7 @@ struct JournalEditorSheet: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Image(systemName: "waveform")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text("Voice Notes")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
             }
@@ -418,7 +418,7 @@ struct JournalEditorSheet: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text("AI Insight")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                 Spacer()
@@ -426,7 +426,7 @@ struct JournalEditorSheet: View {
                     aiSuggestion = nil
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 10, weight: .semibold))
+                        .dynamicTypeFont(base: 10, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.4))
                 }
             }
@@ -454,16 +454,16 @@ struct JournalEditorSheet: View {
             HStack(spacing: 6) {
                 if let mood = selectedMood {
                     Text(mood.emoji)
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                     Text(mood.displayName)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.8))
                 } else {
                     Image(systemName: "face.smiling")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(.white.opacity(0.5))
                     Text("Mood")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -682,7 +682,7 @@ struct ToolbarButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .medium))
+                .dynamicTypeFont(base: 18, weight: .medium)
                 .foregroundStyle(color)
                 .frame(width: 44, height: 44)
         }
@@ -718,7 +718,7 @@ struct PhotoThumbnailView: View {
             // Delete button
             Button(action: onDelete) {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(.white)
                     .background {
                         SwiftUI.Circle()
@@ -758,7 +758,7 @@ struct DrawingPreviewView: View {
             // Delete button
             Button(action: onDelete) {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(.white)
                     .background {
                         SwiftUI.Circle()
@@ -786,7 +786,7 @@ struct VoiceRecordingRow: View {
                 isPlaying.toggle()
             } label: {
                 Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                    .font(.system(size: 32))
+                    .dynamicTypeFont(base: 32)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
             .buttonStyle(.plain)
@@ -800,7 +800,7 @@ struct VoiceRecordingRow: View {
                 // Transcription preview
                 if let transcription = recording.transcription {
                     Text(transcription)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
                 }
@@ -811,7 +811,7 @@ struct VoiceRecordingRow: View {
             // Delete button
             Button(action: onDelete) {
                 Image(systemName: "trash")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.4))
             }
             .buttonStyle(.plain)
@@ -882,10 +882,10 @@ struct MoodOption: View {
         Button(action: action) {
             VStack(spacing: 8) {
                 Text(mood.emoji)
-                    .font(.system(size: 36))
+                    .dynamicTypeFont(base: 36)
 
                 Text(mood.displayName)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.5))
             }
             .padding(Theme.Spacing.md)
@@ -998,7 +998,7 @@ struct VoiceRecorderSheet: View {
                         .frame(width: 120, height: 120)
 
                     Image(systemName: isRecording ? "waveform" : "mic.fill")
-                        .font(.system(size: 40))
+                        .dynamicTypeFont(base: 40)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
 
@@ -1032,7 +1032,7 @@ struct VoiceRecorderSheet: View {
                 .buttonStyle(.plain)
 
                 Text(isRecording ? "Tap to stop" : "Tap to record")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.5))
 
                 Spacer()

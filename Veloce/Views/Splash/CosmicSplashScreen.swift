@@ -182,7 +182,7 @@ struct CosmicSplashScreen: View {
 
             // Tagline with cyan accent
             Text("AI-POWERED PRODUCTIVITY")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
                 .tracking(4)
                 .foregroundStyle(
                     LinearGradient(

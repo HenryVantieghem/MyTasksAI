@@ -79,7 +79,7 @@ struct FlowSectionToggle: View {
                     .symbolRenderingMode(.hierarchical)
 
                 Text(section.rawValue)
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
                     .tracking(0.3)
             }
             .foregroundStyle(isSelected ? .white : .white.opacity(0.5))

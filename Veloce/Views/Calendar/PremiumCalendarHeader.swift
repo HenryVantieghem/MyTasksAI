@@ -40,7 +40,7 @@ struct PremiumCalendarHeader: View {
                             .minimumScaleFactor(0.8)
 
                         Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                             .foregroundStyle(.white.opacity(0.4))
                     }
                 }
@@ -74,7 +74,7 @@ struct PremiumCalendarHeader: View {
             HapticsService.shared.selectionFeedback()
         } label: {
             Text("Today")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(Theme.Colors.aiCyan)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
@@ -98,7 +98,7 @@ struct PremiumCalendarHeader: View {
             action()
         } label: {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.7))
                 .frame(width: 32, height: 32)
                 .background {

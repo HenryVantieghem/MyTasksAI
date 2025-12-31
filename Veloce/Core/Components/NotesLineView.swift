@@ -89,7 +89,7 @@ struct NotesLineView: View {
         HStack(spacing: 2) {
             ForEach(0..<line.starRating, id: \.self) { _ in
                 Image(systemName: "star.fill")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(starColor)
             }
         }

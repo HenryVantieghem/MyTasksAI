@@ -49,7 +49,7 @@ struct JoinCircleSheet: View {
                                 .frame(width: 64)
 
                             Image(systemName: "qrcode.viewfinder")
-                                .font(.system(size: 32, weight: .light))
+                                .dynamicTypeFont(base: 32, weight: .light)
                                 .foregroundStyle(Theme.Colors.aiPurple)
                         }
                         .padding(.top, 24)
@@ -61,7 +61,7 @@ struct JoinCircleSheet: View {
                                 .foregroundStyle(Theme.CelestialColors.starWhite)
 
                             Text("Get the code from a circle member")
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(Theme.CelestialColors.starDim)
                         }
 
@@ -74,7 +74,7 @@ struct JoinCircleSheet: View {
                                 Image(systemName: "exclamationmark.circle.fill")
                                 Text(error)
                             }
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(Theme.CelestialColors.errorNebula)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
@@ -189,7 +189,7 @@ struct JoinCircleSheet: View {
                     }
                 }
             }
-            .font(.system(size: 17, weight: .bold))
+            .dynamicTypeFont(base: 17, weight: .bold)
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -362,7 +362,7 @@ struct CirclePreviewCard: View {
 
                 if let description = circle.description, !description.isEmpty {
                     Text(description)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
@@ -372,26 +372,26 @@ struct CirclePreviewCard: View {
                 HStack(spacing: 20) {
                     HStack(spacing: 4) {
                         Image(systemName: "person.2.fill")
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                             .foregroundStyle(Theme.Colors.aiPurple)
                         Text("\(circle.memberCount)")
                             .font(.system(size: 14, weight: .bold, design: .rounded))
                             .foregroundStyle(Theme.CelestialColors.starWhite)
                         Text("members")
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                             .foregroundStyle(Theme.CelestialColors.starGhost)
                     }
 
                     if circle.circleStreak > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                                 .foregroundStyle(Theme.Colors.streakOrange)
                             Text("\(circle.circleStreak)")
                                 .font(.system(size: 14, weight: .bold, design: .rounded))
                                 .foregroundStyle(Theme.CelestialColors.starWhite)
                             Text("streak")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                                 .foregroundStyle(Theme.CelestialColors.starGhost)
                         }
                     }
@@ -445,7 +445,7 @@ struct JoinCircleSuccess: View {
                 // Sparkles
                 ForEach(0..<8, id: \.self) { i in
                     Image(systemName: "sparkle")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.auroraGreen)
                         .offset(y: -50 - phase * 20)
                         .rotationEffect(.degrees(Double(i) * 45))
@@ -467,7 +467,7 @@ struct JoinCircleSuccess: View {
                     .opacity(showContent ? 1 : 0)
 
                 Image(systemName: "checkmark")
-                    .font(.system(size: 36, weight: .bold))
+                    .dynamicTypeFont(base: 36, weight: .bold)
                     .foregroundStyle(.white)
                     .scaleEffect(showContent ? 1 : 0.5)
                     .opacity(showContent ? 1 : 0)
@@ -481,7 +481,7 @@ struct JoinCircleSuccess: View {
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("Welcome to \(circle.name)")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.auroraGreen)
             }
             .opacity(showContent ? 1 : 0)
@@ -493,10 +493,10 @@ struct JoinCircleSuccess: View {
                     // Members
                     VStack(spacing: 4) {
                         Text("\(circle.memberCount)")
-                            .font(.system(size: 24, weight: .bold))
+                            .dynamicTypeFont(base: 24, weight: .bold)
                             .foregroundStyle(Theme.CelestialColors.starWhite)
                         Text("Members")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
 
@@ -507,10 +507,10 @@ struct JoinCircleSuccess: View {
                     // XP
                     VStack(spacing: 4) {
                         Text("\(circle.circleXp)")
-                            .font(.system(size: 24, weight: .bold))
+                            .dynamicTypeFont(base: 24, weight: .bold)
                             .foregroundStyle(Theme.Colors.xp)
                         Text("Circle XP")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
                 }
@@ -529,7 +529,7 @@ struct JoinCircleSuccess: View {
                 onDismiss()
             } label: {
                 Text("Start Collaborating")
-                    .font(.system(size: 17, weight: .bold))
+                    .dynamicTypeFont(base: 17, weight: .bold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)

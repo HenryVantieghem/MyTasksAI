@@ -206,10 +206,10 @@ struct FocusMainView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: section.icon)
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
 
                         Text(section.rawValue)
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                     }
                     .foregroundStyle(selectedSection == section ? .white : .white.opacity(0.5))
                     .frame(maxWidth: .infinity)
@@ -369,9 +369,9 @@ struct FocusMainView: View {
                     // Mode label
                     HStack(spacing: 6) {
                         Image(systemName: selectedMode.icon)
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text(selectedMode.rawValue)
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(selectedMode.accentColor)
 
@@ -383,7 +383,7 @@ struct FocusMainView: View {
                                 resetTimer()
                             } label: {
                                 Image(systemName: "arrow.counterclockwise")
-                                    .font(.system(size: 16, weight: .medium))
+                                    .dynamicTypeFont(base: 16, weight: .medium)
                                     .foregroundStyle(.white.opacity(0.6))
                                     .frame(width: 40, height: 40)
                                     .background(Circle().fill(.white.opacity(0.1)))
@@ -403,7 +403,7 @@ struct FocusMainView: View {
                                     .shadow(color: selectedMode.accentColor.opacity(0.5), radius: 16, y: 4)
 
                                 Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
-                                    .font(.system(size: 20, weight: .semibold))
+                                    .dynamicTypeFont(base: 20, weight: .semibold)
                                     .foregroundStyle(.white)
                                     .offset(x: timerState == .running ? 0 : 2)
                             }
@@ -416,7 +416,7 @@ struct FocusMainView: View {
                                 showActiveSession = true
                             } label: {
                                 Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                    .font(.system(size: 16, weight: .medium))
+                                    .dynamicTypeFont(base: 16, weight: .medium)
                                     .foregroundStyle(.white.opacity(0.6))
                                     .frame(width: 40, height: 40)
                                     .background(Circle().fill(.white.opacity(0.1)))
@@ -438,7 +438,7 @@ struct FocusMainView: View {
     private var modeCardsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Focus Modes")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
@@ -464,7 +464,7 @@ struct FocusMainView: View {
     private var todayFocusStats: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Today's Focus")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             HStack(spacing: 12) {
@@ -507,7 +507,7 @@ struct FocusMainView: View {
             // Main stat card
             VStack(spacing: 8) {
                 Text("Today's Screen Time")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
 
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -516,7 +516,7 @@ struct FocusMainView: View {
                         .foregroundStyle(.white)
 
                     Text("h")
-                        .font(.system(size: 24, weight: .light))
+                        .dynamicTypeFont(base: 24, weight: .light)
                         .foregroundStyle(.white.opacity(0.6))
 
                     Text("23")
@@ -524,18 +524,18 @@ struct FocusMainView: View {
                         .foregroundStyle(.white)
 
                     Text("m")
-                        .font(.system(size: 24, weight: .light))
+                        .dynamicTypeFont(base: 24, weight: .light)
                         .foregroundStyle(.white.opacity(0.6))
                 }
 
                 // Comparison
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.down.right")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Aurora.Colors.prismaticGreen)
 
                     Text("32min less than yesterday")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(Aurora.Colors.prismaticGreen)
                 }
             }
@@ -553,7 +553,7 @@ struct FocusMainView: View {
             // Hourly breakdown chart
             VStack(alignment: .leading, spacing: 12) {
                 Text("Usage by Hour")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
 
                 HStack(alignment: .bottom, spacing: 4) {
@@ -571,7 +571,7 @@ struct FocusMainView: View {
                                 .frame(width: 20, height: height)
 
                             Text("\(hour + 8)")
-                                .font(.system(size: 9))
+                                .dynamicTypeFont(base: 9)
                                 .foregroundStyle(.white.opacity(0.4))
                         }
                     }
@@ -598,7 +598,7 @@ struct FocusMainView: View {
     private var quickBlockActions: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             HStack(spacing: 12) {
@@ -653,7 +653,7 @@ struct FocusMainView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Top Categories")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
 
                 Spacer()
@@ -662,7 +662,7 @@ struct FocusMainView: View {
                     showAppBlocking = true
                 } label: {
                     Text("See All")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(Aurora.Colors.electricCyan)
                 }
                 .buttonStyle(.plain)
@@ -710,7 +710,7 @@ struct FocusMainView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Scheduled Blocks")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
 
                 Spacer()
@@ -719,7 +719,7 @@ struct FocusMainView: View {
                     // Add schedule
                 } label: {
                     Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Aurora.Colors.electricCyan)
                 }
                 .buttonStyle(.plain)
@@ -901,11 +901,11 @@ struct FocusMainView: View {
     private var headerView: some View {
         VStack(spacing: Aurora.Spacing.sm) {
             Text(headerGreeting)
-                .font(.system(size: 28, weight: .thin))
+                .dynamicTypeFont(base: 28, weight: .thin)
                 .foregroundStyle(.white)
 
             Text("Enter your focus sanctuary")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .padding(.vertical, Aurora.Spacing.lg)
@@ -977,7 +977,7 @@ struct FocusMainView: View {
                                     .shadow(color: selectedMode.accentColor.opacity(0.4), radius: 12, y: 4)
 
                                 Image(systemName: timerState == .running ? "pause.fill" : "play.fill")
-                                    .font(.system(size: 18, weight: .semibold))
+                                    .dynamicTypeFont(base: 18, weight: .semibold)
                                     .foregroundStyle(.white)
                                     .offset(x: timerState == .running ? 0 : 2)
                             }
@@ -1172,7 +1172,7 @@ struct FocusMainView: View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(color)
 
                 Text(value)
@@ -1181,7 +1181,7 @@ struct FocusMainView: View {
             }
 
             Text(label)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
         }
     }
@@ -1254,7 +1254,7 @@ struct FocusPortalCard: View {
                             .foregroundStyle(.white)
 
                         Text(subtitle)
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                             .foregroundStyle(.white.opacity(0.6))
                     }
 
@@ -1262,7 +1262,7 @@ struct FocusPortalCard: View {
 
                     // Right: Chevron
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.4))
                 }
                 .padding(Aurora.Spacing.xl)
@@ -1370,7 +1370,7 @@ struct FocusPortalCard: View {
 
             // Icon
             Image(systemName: icon)
-                .font(.system(size: 20, weight: .semibold))
+                .dynamicTypeFont(base: 20, weight: .semibold)
                 .foregroundStyle(.white)
         }
     }
@@ -1388,13 +1388,13 @@ struct QuickModeButton: View {
         Button(action: onTap) {
             VStack(spacing: 6) {
                 Image(systemName: mode.icon)
-                    .font(.system(size: 20, weight: .medium))
+                    .dynamicTypeFont(base: 20, weight: .medium)
 
                 Text(mode.rawValue)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
 
                 Text(mode.label)
-                    .font(.system(size: 10, weight: .regular))
+                    .dynamicTypeFont(base: 10, weight: .regular)
                     .foregroundStyle(.white.opacity(0.5))
             }
             .frame(maxWidth: .infinity)
@@ -1456,7 +1456,7 @@ struct FocusModeCard: View {
                             .frame(width: 40, height: 40)
 
                         Image(systemName: mode.icon)
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(mode.accentColor)
                     }
 
@@ -1473,7 +1473,7 @@ struct FocusModeCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text(mode.rawValue)
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(.white)
 
                         Spacer()
@@ -1484,7 +1484,7 @@ struct FocusModeCard: View {
                     }
 
                     Text(mode.description)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
                 }
@@ -1525,7 +1525,7 @@ struct FocusStatCard: View {
     var body: some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(color)
 
             Text(value)
@@ -1533,7 +1533,7 @@ struct FocusStatCard: View {
                 .foregroundStyle(.white)
 
             Text(label)
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)
@@ -1566,17 +1566,17 @@ struct QuickBlockButton: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: icon)
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(color)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text(subtitle)
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
@@ -1584,7 +1584,7 @@ struct QuickBlockButton: View {
 
                 if isActive {
                     Text("Active")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -1624,7 +1624,7 @@ struct CategoryUsageRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(color)
                 .frame(width: 32, height: 32)
                 .background(Circle().fill(color.opacity(0.15)))
@@ -1632,13 +1632,13 @@ struct CategoryUsageRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(name)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white)
 
                     Spacer()
 
                     Text(time)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
                 }
 
@@ -1676,19 +1676,19 @@ struct ScheduleBlockRow: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(name)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white)
 
                 HStack(spacing: 8) {
                     Text(time)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
 
                     Text("•")
                         .foregroundStyle(.white.opacity(0.3))
 
                     Text(days)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -1729,7 +1729,7 @@ struct CustomTimerPickerSheet: View {
                             .foregroundStyle(.white)
 
                         Text("minutes")
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                     .padding(.top, 32)
@@ -1744,13 +1744,13 @@ struct CustomTimerPickerSheet: View {
 
                         HStack {
                             Text("1 min")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                                 .foregroundStyle(.white.opacity(0.4))
 
                             Spacer()
 
                             Text("3 hours")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                                 .foregroundStyle(.white.opacity(0.4))
                         }
                     }
@@ -1759,7 +1759,7 @@ struct CustomTimerPickerSheet: View {
                     // Presets
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Quick Select")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))], spacing: 10) {
@@ -1769,7 +1769,7 @@ struct CustomTimerPickerSheet: View {
                                     AuroraHaptics.light()
                                 } label: {
                                     Text("\(preset)m")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .dynamicTypeFont(base: 14, weight: .medium)
                                         .foregroundStyle(minutes == preset ? .white : .white.opacity(0.7))
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 10)
@@ -1792,7 +1792,7 @@ struct CustomTimerPickerSheet: View {
                         onStart()
                     } label: {
                         Text("Start Focus")
-                            .font(.system(size: 17, weight: .semibold))
+                            .dynamicTypeFont(base: 17, weight: .semibold)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)

@@ -42,7 +42,7 @@ struct AchievementCard: View {
                         .opacity(glowOpacity)
                 }
                 Image(systemName: achievement.icon)
-                    .font(.system(size: 32))
+                    .dynamicTypeFont(base: 32)
                     .foregroundStyle(achievement.isUnlocked ? LinearGradient(colors: [Theme.Colors.aiGold, .orange], startPoint: .top, endPoint: .bottom) : LinearGradient(colors: [.gray.opacity(0.3), .gray.opacity(0.1)], startPoint: .top, endPoint: .bottom))
             }
             .frame(width: 70, height: 70)
@@ -71,7 +71,7 @@ struct AchievementDetailSheet: View {
     var body: some View {
         VStack(spacing: 24) {
             Image(systemName: achievement.icon)
-                .font(.system(size: 64))
+                .dynamicTypeFont(base: 64)
                 .foregroundStyle(achievement.isUnlocked ? Theme.Colors.aiGold : .gray)
             Text(achievement.title).font(.title2.bold()).foregroundStyle(.white)
             Text(achievement.achievementDescription).font(.body).foregroundStyle(.white.opacity(0.7)).multilineTextAlignment(.center)

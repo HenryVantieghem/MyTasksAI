@@ -220,7 +220,7 @@ struct GoalCardHeroView: View {
                         .frame(width: 60, height: 60)
                     
                     Image(systemName: goal.themeIcon)
-                        .font(.system(size: 32))
+                        .dynamicTypeFont(base: 32)
                         .foregroundStyle(.white)
                 }
                 .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16))

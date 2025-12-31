@@ -548,7 +548,7 @@ struct TaskInputBar: View {
                         .tint(Theme.Colors.aiPurple)
                 } else {
                     Image(systemName: aiModeEnabled ? "sparkles" : "sparkles")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: aiModeEnabled
@@ -694,10 +694,10 @@ struct TaskInputBar: View {
     private var categoryBadgeView: some View {
         HStack(spacing: 6) {
             Image(systemName: "sparkles")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
 
             Text(categoryText)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
         }
         .foregroundStyle(Theme.Colors.aiPurple)
         .padding(.horizontal, 12)

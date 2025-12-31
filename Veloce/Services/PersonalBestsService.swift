@@ -294,7 +294,7 @@ struct PersonalBestCard: View {
         VStack(spacing: 8) {
             // Icon
             Image(systemName: type.icon)
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(type.color)
 
             // Value
@@ -304,7 +304,7 @@ struct PersonalBestCard: View {
 
             // Type label
             Text(type.rawValue)
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -371,7 +371,7 @@ struct NewRecordBanner: View {
                         .frame(width: 100, height: 100)
 
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 48))
+                        .dynamicTypeFont(base: 48)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
@@ -421,14 +421,14 @@ struct NewRecordBanner: View {
                         }
 
                     Text(personalBest.type.rawValue)
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(.secondary)
 
                     HStack(spacing: 8) {
                         // Old value
                         if personalBest.previousValue > 0 {
                             Text("\(personalBest.previousValue)")
-                                .font(.system(size: 18))
+                                .dynamicTypeFont(base: 18)
                                 .foregroundStyle(.secondary)
                                 .strikethrough()
                         }

@@ -46,7 +46,7 @@ struct OfflineBanner: View {
 
                     // Status icon
                     Image(systemName: statusIcon)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(statusColor)
 
                     // Status text
@@ -60,7 +60,7 @@ struct OfflineBanner: View {
                     if syncEngine.pendingCount > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.up.circle")
-                                .font(.system(size: 10))
+                                .dynamicTypeFont(base: 10)
                             Text("\(syncEngine.pendingCount)")
                                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                         }
@@ -75,7 +75,7 @@ struct OfflineBanner: View {
 
                     // Chevron
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starGhost)
                 }
                 .padding(.horizontal, 16)
@@ -117,7 +117,7 @@ struct OfflineBanner: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Image(systemName: "info.circle")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.starGhost)
 
                     Text("Your data is saved locally and will sync when you're back online.")
@@ -139,7 +139,7 @@ struct OfflineBanner: View {
             if syncEngine.pendingCount > 0 {
                 HStack(spacing: 8) {
                     Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.nebulaEdge)
 
                     Text("\(syncEngine.pendingCount) changes will sync automatically")
@@ -307,7 +307,7 @@ struct ConnectionToast: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: iconName)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(iconColor)
 
             Text(message)

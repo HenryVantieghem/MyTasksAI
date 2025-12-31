@@ -422,7 +422,7 @@ struct LiquidGlassAuthView: View {
                 }
 
                 Image(systemName: "envelope.badge.shield.half.filled")
-                    .font(.system(size: 34, weight: .light))
+                    .dynamicTypeFont(base: 34, weight: .light)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Aurora.Colors.electricCyan, Aurora.Colors.borealisViolet],
@@ -521,7 +521,7 @@ struct LiquidGlassAuthView: View {
                         switchScreen(to: .signUp)
                     } label: {
                         Text("Sign Up")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(Aurora.Colors.electricCyan)
                     }
                 }
@@ -536,7 +536,7 @@ struct LiquidGlassAuthView: View {
                         switchScreen(to: .signIn)
                     } label: {
                         Text("Sign In")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(Aurora.Colors.electricCyan)
                     }
                 }
@@ -563,7 +563,7 @@ struct LiquidGlassAuthView: View {
 
             HStack(spacing: 6) {
                 Button("Terms of Service") {}
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.8))
 
                 Text("and")
@@ -571,7 +571,7 @@ struct LiquidGlassAuthView: View {
                     .foregroundStyle(Aurora.Colors.textQuaternary)
 
                 Button("Privacy Policy") {}
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Aurora.Colors.borealisViolet.opacity(0.8))
             }
         }

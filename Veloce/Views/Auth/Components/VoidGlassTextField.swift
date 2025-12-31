@@ -74,7 +74,7 @@ struct VoidGlassTextField: View {
             }
 
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(iconColor)
                 .frame(width: 24, height: 24)
         }
@@ -91,7 +91,7 @@ struct VoidGlassTextField: View {
                 TextField(placeholder, text: $text)
             }
         }
-        .font(.system(size: 16, weight: .regular))
+        .dynamicTypeFont(base: 16, weight: .regular)
         .foregroundStyle(VoidDesign.Colors.textPrimary)
         .focused($isFocused)
         .tint(Theme.Colors.aiPurple)
@@ -109,7 +109,7 @@ struct VoidGlassTextField: View {
                     showSecureText.toggle()
                 } label: {
                     Image(systemName: showSecureText ? "eye.slash.fill" : "eye.fill")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.textTertiary)
                         .frame(width: 24, height: 24)
                 }
@@ -141,7 +141,7 @@ struct VoidGlassTextField: View {
                 EmptyView()
             }
         }
-        .font(.system(size: 16))
+        .dynamicTypeFont(base: 16)
         .transition(.scale.combined(with: .opacity))
     }
 
@@ -245,7 +245,7 @@ struct VoidAuthButton: View {
                             .scaleEffect(0.9)
                     } else {
                         Text(title)
-                            .font(.system(size: 17, weight: .semibold))
+                            .dynamicTypeFont(base: 17, weight: .semibold)
                     }
                 }
                 .foregroundStyle(.white)
@@ -316,7 +316,7 @@ struct VoidPasswordStrengthIndicator: View {
                     .frame(width: 6, height: 6)
 
                 Text(strengthLabel)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(strengthColor)
             }
         }

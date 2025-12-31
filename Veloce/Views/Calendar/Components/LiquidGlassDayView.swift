@@ -84,7 +84,7 @@ struct LiquidGlassDayView: View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Text("all-day")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.secondary)
                     .frame(width: timeGutterWidth, alignment: .trailing)
                     .padding(.trailing, 12)
@@ -111,11 +111,11 @@ struct LiquidGlassDayView: View {
         HStack(spacing: 6) {
             if isTask {
                 Image(systemName: "checkmark.circle")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
             }
 
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .lineLimit(1)
         }
         .foregroundStyle(.white)
@@ -179,7 +179,7 @@ struct LiquidGlassDayView: View {
                 HStack(alignment: .top, spacing: 0) {
                     // Hour label
                     Text(formatHour(hour))
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.secondary)
                         .frame(width: timeGutterWidth, alignment: .trailing)
                         .padding(.trailing, 12)
@@ -289,13 +289,13 @@ struct LiquidGlassDayView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(event.title ?? "Event")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(color)
                     .lineLimit(height > 40 ? 2 : 1)
 
                 if height > 40 {
                     Text(event.startDate.formatted(.dateTime.hour().minute()))
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -328,7 +328,7 @@ struct LiquidGlassDayView: View {
         HStack(spacing: 0) {
             // Time label
             Text(now.formatted(.dateTime.hour().minute()))
-                .font(.system(size: 11, weight: .bold))
+                .dynamicTypeFont(base: 11, weight: .bold)
                 .foregroundStyle(.red)
                 .frame(width: timeGutterWidth, alignment: .trailing)
                 .padding(.trailing, 4)
@@ -447,7 +447,7 @@ struct DayTaskCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(task.title)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.primary)
                         .lineLimit(height > 56 ? 2 : 1)
 
@@ -455,10 +455,10 @@ struct DayTaskCard: View {
                     if height > 48, let minutes = task.estimatedMinutes ?? task.duration {
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
 
                             Text(formatDuration(minutes))
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                         }
                         .foregroundStyle(.secondary)
                     }
@@ -475,7 +475,7 @@ struct DayTaskCard: View {
                         onComplete()
                     } label: {
                         Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 24, weight: .light))
+                            .dynamicTypeFont(base: 24, weight: .light)
                             .foregroundStyle(task.isCompleted ? Color.green : Color.secondary)
                     }
                     .buttonStyle(.plain)

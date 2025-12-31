@@ -308,7 +308,7 @@ struct FloatingAICompanion: View {
             // Header
             HStack {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("Ask me anything...")
@@ -323,7 +323,7 @@ struct FloatingAICompanion: View {
                     }
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
             }
@@ -377,7 +377,7 @@ struct QuickPromptButton: View {
         Button(action: action) {
             HStack(spacing: 10) {
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiBlue)
 
                 Text(text)
@@ -387,7 +387,7 @@ struct QuickPromptButton: View {
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(Theme.Colors.textTertiary)
             }
             .padding(.horizontal, 12)

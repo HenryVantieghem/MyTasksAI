@@ -72,7 +72,7 @@ struct CosmicButton: View {
                         .scaleEffect(0.9)
                 } else {
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                 }
 
                 if iconPosition == .trailing, let icon, !isLoading {
@@ -213,7 +213,7 @@ struct CosmicLinkButton: View {
             action()
         } label: {
             Text(title)
-                .font(.system(size: 15, weight: .medium))
+                .dynamicTypeFont(base: 15, weight: .medium)
                 .foregroundStyle(color)
         }
         .buttonStyle(.plain)

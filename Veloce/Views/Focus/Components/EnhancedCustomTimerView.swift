@@ -87,7 +87,7 @@ struct EnhancedCustomTimerView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.7))
                     }
                 }
@@ -156,7 +156,7 @@ struct EnhancedCustomTimerView: View {
                     .animation(.spring(response: 0.3), value: wheelMinutes)
 
                 Text(durationDescription)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
         }
@@ -272,7 +272,7 @@ struct EnhancedCustomTimerView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Quick Select")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
 
                 Spacer()
@@ -284,9 +284,9 @@ struct EnhancedCustomTimerView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Text(showingFullPresets ? "Less" : "More")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                         Image(systemName: showingFullPresets ? "chevron.up" : "chevron.down")
-                            .font(.system(size: 10, weight: .semibold))
+                            .dynamicTypeFont(base: 10, weight: .semibold)
                     }
                     .foregroundStyle(accentColor)
                 }
@@ -314,7 +314,7 @@ struct EnhancedCustomTimerView: View {
     private var fineTuneSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Fine Tune")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             // Slider with minute markers
@@ -337,13 +337,13 @@ struct EnhancedCustomTimerView: View {
                 // Min/Max labels
                 HStack {
                     Text("5 min")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(.white.opacity(0.4))
 
                     Spacer()
 
                     Text("8 hours")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(.white.opacity(0.4))
                 }
             }
@@ -364,10 +364,10 @@ struct EnhancedCustomTimerView: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "play.fill")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
 
                 Text("Start Focus")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)

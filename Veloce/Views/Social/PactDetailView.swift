@@ -92,7 +92,7 @@ struct PactDetailView: View {
 
                 // Flame icon
                 Image(systemName: pact.currentStreak > 7 ? "flame.fill" : "flame")
-                    .font(.system(size: 60, weight: .medium))
+                    .dynamicTypeFont(base: 60, weight: .medium)
                     .foregroundStyle(streakGradient)
                     .symbolEffect(.bounce, value: pact.bothCompletedToday)
 
@@ -106,12 +106,12 @@ struct PactDetailView: View {
             // Label
             VStack(spacing: 4) {
                 Text("Day Streak")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
 
                 if let next = pact.nextMilestone, let days = pact.daysUntilNextMilestone {
                     Text("\(days) days until \(next)-day milestone")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -120,9 +120,9 @@ struct PactDetailView: View {
             if pact.longestStreak > pact.currentStreak {
                 HStack(spacing: 6) {
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                     Text("Best: \(pact.longestStreak) days")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                 }
                 .foregroundStyle(Theme.Colors.streakGold)
             }
@@ -162,7 +162,7 @@ struct PactDetailView: View {
     private var todayStatus: some View {
         VStack(spacing: 12) {
             Text("Today's Progress")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             HStack(spacing: 20) {
@@ -170,7 +170,7 @@ struct PactDetailView: View {
                 VStack(spacing: 8) {
                     statusCircle(completed: pact.hasCurrentUserCompletedToday(currentUserId: currentUserId))
                     Text("You")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
                 }
 
@@ -187,7 +187,7 @@ struct PactDetailView: View {
                 VStack(spacing: 8) {
                     statusCircle(completed: pact.hasPartnerCompletedToday(currentUserId: currentUserId))
                     Text(partner?.displayName ?? "Partner")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
                         .lineLimit(1)
                 }
@@ -195,7 +195,7 @@ struct PactDetailView: View {
 
             // Status message
             Text(statusMessage)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(statusColor)
                 .padding(.top, 4)
         }
@@ -211,11 +211,11 @@ struct PactDetailView: View {
 
             if completed {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(Theme.Colors.completionMint)
             } else {
                 Image(systemName: "hourglass")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(.white.opacity(0.4))
             }
         }
@@ -259,17 +259,17 @@ struct PactDetailView: View {
                 .frame(width: 50, height: 50)
                 .overlay(
                     Text(partnerInitials)
-                        .font(.system(size: 16, weight: .bold))
+                        .dynamicTypeFont(base: 16, weight: .bold)
                         .foregroundStyle(.white)
                 )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Pact with \(partner?.displayName ?? "Partner")")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text(pact.commitmentDescription)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -278,7 +278,7 @@ struct PactDetailView: View {
             // Shield indicator
             if pact.shieldActive {
                 Image(systemName: "shield.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
         }
@@ -330,7 +330,7 @@ struct PactDetailView: View {
     private var milestonesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Milestones Reached")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             HStack(spacing: 10) {
@@ -356,7 +356,7 @@ struct PactDetailView: View {
                     Image(systemName: "xmark.circle")
                     Text("End Pact")
                 }
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.red.opacity(0.8))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -364,7 +364,7 @@ struct PactDetailView: View {
             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
 
             Text("Ending the pact won't affect your streak history")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(.white.opacity(0.4))
         }
     }
@@ -410,7 +410,7 @@ private struct PactStatCard: View {
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(Theme.Colors.aiPurple)
 
             Text(value)
@@ -418,7 +418,7 @@ private struct PactStatCard: View {
                 .foregroundStyle(.white)
 
             Text(label)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)
@@ -435,10 +435,10 @@ private struct PactMilestoneBadge: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: badgeIcon)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
 
             Text("\(days)")
-                .font(.system(size: 13, weight: .bold))
+                .dynamicTypeFont(base: 13, weight: .bold)
         }
         .foregroundStyle(badgeColor)
         .padding(.horizontal, 10)

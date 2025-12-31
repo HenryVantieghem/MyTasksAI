@@ -42,7 +42,7 @@ struct EditableTaskTitle: View {
     private var displayView: some View {
         HStack(spacing: 8) {
             Text(title)
-                .font(.system(size: 18, weight: .semibold))
+                .dynamicTypeFont(base: 18, weight: .semibold)
                 .foregroundStyle(.white)
                 .strikethrough(isCompleted)
                 .opacity(isCompleted ? 0.6 : 1)
@@ -51,7 +51,7 @@ struct EditableTaskTitle: View {
 
             // Edit hint icon
             Image(systemName: "pencil")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(.white.opacity(0.3))
         }
         .contentShape(Rectangle())
@@ -64,7 +64,7 @@ struct EditableTaskTitle: View {
     private var editingView: some View {
         HStack(spacing: 8) {
             TextField("Task title", text: $editingTitle, axis: .vertical)
-                .font(.system(size: 18, weight: .semibold))
+                .dynamicTypeFont(base: 18, weight: .semibold)
                 .foregroundStyle(.white)
                 .focused($isFocused)
                 .onSubmit {
@@ -78,7 +78,7 @@ struct EditableTaskTitle: View {
                 commitEdit()
             } label: {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(Theme.Colors.success)
             }
 
@@ -87,7 +87,7 @@ struct EditableTaskTitle: View {
                 cancelEdit()
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(.white.opacity(0.4))
             }
         }

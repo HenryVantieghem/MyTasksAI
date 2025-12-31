@@ -15,6 +15,7 @@ struct ProfileSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppViewModel.self) private var appViewModel
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.responsiveLayout) private var layout
     @Bindable var settingsViewModel: SettingsViewModel
 
     // Animation
@@ -76,9 +77,9 @@ struct ProfileSheetView: View {
                         .opacity(sectionsRevealed[5] ? 1 : 0)
                         .offset(y: sectionsRevealed[5] ? 0 : 20)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
-                .padding(.bottom, 48)
+                .padding(.horizontal, layout.screenPadding)
+                .padding(.top, layout.spacing * 1.5)
+                .padding(.bottom, layout.spacing * 3)
             }
             .background {
                 ProfileSheetBackground()
@@ -95,13 +96,13 @@ struct ProfileSheetView: View {
                         ZStack {
                             // Glow behind close button
                             Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 28))
+                                .dynamicTypeFont(base: 28)
                                 .foregroundStyle(Aurora.Colors.borealisViolet)
                                 .blur(radius: 6)
                                 .opacity(0.4)
 
                             Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 28))
+                                .dynamicTypeFont(base: 28)
                                 .foregroundStyle(.white.opacity(0.6))
                                 .symbolRenderingMode(.hierarchical)
                         }
@@ -248,13 +249,13 @@ struct ProfileSheetView: View {
                                 // Glow text
                                 ZStack {
                                     Text(userInitial)
-                                        .font(.system(size: 40, weight: .light, design: .rounded))
+                                        .dynamicTypeFont(base: 40, weight: .light)
                                         .foregroundStyle(Aurora.Colors.electricCyan)
                                         .blur(radius: 6)
                                         .opacity(0.5)
 
                                     Text(userInitial)
-                                        .font(.system(size: 40, weight: .light, design: .rounded))
+                                        .dynamicTypeFont(base: 40, weight: .light)
                                         .foregroundStyle(.white)
                                 }
                             }
@@ -276,7 +277,7 @@ struct ProfileSheetView: View {
                                     .shadow(color: Aurora.Colors.borealisViolet.opacity(0.6), radius: 6)
 
                                 Image(systemName: "pencil")
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .dynamicTypeFont(base: 13, weight: .semibold)
                                     .foregroundStyle(.white)
                             }
                         }
@@ -289,13 +290,13 @@ struct ProfileSheetView: View {
                         HStack {
                             ZStack {
                                 Text("Lv.\(gamification.currentLevel)")
-                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                                    .dynamicTypeFont(base: 11, weight: .bold)
                                     .foregroundStyle(Aurora.Colors.electricCyan)
                                     .blur(radius: 4)
                                     .opacity(0.6)
 
                                 Text("Lv.\(gamification.currentLevel)")
-                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                                    .dynamicTypeFont(base: 11, weight: .bold)
                                     .foregroundStyle(.white)
                             }
                             .padding(.horizontal, 10)
@@ -317,13 +318,13 @@ struct ProfileSheetView: View {
             VStack(spacing: 8) {
                 ZStack {
                     Text(userName)
-                        .font(.system(size: 26, weight: .semibold))
+                        .dynamicTypeFont(base: 26, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.electricCyan)
                         .blur(radius: 8)
                         .opacity(0.4)
 
                     Text(userName)
-                        .font(.system(size: 26, weight: .semibold))
+                        .dynamicTypeFont(base: 26, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.textPrimary)
                 }
 
@@ -408,11 +409,11 @@ struct ProfileSheetView: View {
     private func sectionHeader(_ title: String, icon: String, color: Color) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(color)
             
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
                 .foregroundStyle(.white)
             
             Spacer()
@@ -446,10 +447,10 @@ struct ProfileSheetView: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Email")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.5))
                         Text(settingsViewModel.email.isEmpty ? "Not set" : settingsViewModel.email)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundStyle(.white.opacity(0.8))
                     }
 
@@ -471,10 +472,10 @@ struct ProfileSheetView: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Theme")
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(.white)
                         Text("App appearance")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(.white.opacity(0.5))
                     }
 
@@ -504,17 +505,17 @@ struct ProfileSheetView: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("App Icon")
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(.white)
                         Text("Default")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(.white.opacity(0.5))
                     }
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.3))
                 }
                 .padding(16)
@@ -577,23 +578,23 @@ struct ProfileSheetView: View {
                                 .frame(width: 40, height: 40)
                             
                             Image(systemName: "clock.fill")
-                                .font(.system(size: 18, weight: .semibold))
+                                .dynamicTypeFont(base: 18, weight: .semibold)
                                 .foregroundStyle(Aurora.Colors.prismaticGreen)
                         }
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Default Timer")
-                                .font(.system(size: 16, weight: .semibold))
+                                .dynamicTypeFont(base: 16, weight: .semibold)
                                 .foregroundStyle(.white)
                             Text("Focus session length")
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.6))
                         }
                         
                         Spacer()
                         
                         Text("25 min")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(Aurora.Colors.prismaticGreen)
                     }
                     
@@ -608,23 +609,23 @@ struct ProfileSheetView: View {
                                 .frame(width: 40, height: 40)
                             
                             Image(systemName: "cup.and.saucer.fill")
-                                .font(.system(size: 18, weight: .semibold))
+                                .dynamicTypeFont(base: 18, weight: .semibold)
                                 .foregroundStyle(Aurora.Colors.electricCyan)
                         }
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Break Duration")
-                                .font(.system(size: 16, weight: .semibold))
+                                .dynamicTypeFont(base: 16, weight: .semibold)
                                 .foregroundStyle(.white)
                             Text("Rest between sessions")
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.6))
                         }
                         
                         Spacer()
                         
                         Text("5 min")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(Aurora.Colors.electricCyan)
                     }
                 }
@@ -648,17 +649,17 @@ struct ProfileSheetView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Export Data")
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                                 .foregroundStyle(.white)
                             Text("Download all your data")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.3))
                     }
                     .padding(16)
@@ -677,17 +678,17 @@ struct ProfileSheetView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Clear Completed")
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                                 .foregroundStyle(.white)
                             Text("Remove all completed tasks")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.3))
                     }
                     .padding(16)
@@ -706,10 +707,10 @@ struct ProfileSheetView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Delete Account")
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                                 .foregroundStyle(.red)
                             Text("Permanently remove your account")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
 
@@ -736,9 +737,9 @@ struct ProfileSheetView: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                 Text("Sign Out")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
             }
             .foregroundStyle(.red.opacity(0.9))
             .frame(maxWidth: .infinity)
@@ -860,13 +861,13 @@ private struct AuroraStatCardProfile: View {
             // Icon with glow
             ZStack {
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(color)
                     .blur(radius: 4)
                     .opacity(glowIntensity)
 
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .dynamicTypeFont(base: 20)
                     .foregroundStyle(color)
             }
 
@@ -930,18 +931,18 @@ private struct SettingsSectionCard<Content: View>: View {
             HStack(spacing: 8) {
                 ZStack {
                     Image(systemName: icon)
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(iconColor)
                         .blur(radius: 3)
                         .opacity(0.5)
 
                     Image(systemName: icon)
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(iconColor)
                 }
 
                 Text(title.uppercased())
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Aurora.Colors.textTertiary)
                     .tracking(1.2)
             }
@@ -986,7 +987,7 @@ private struct SettingsIconContainer: View {
                 .frame(width: 36, height: 36)
 
             Image(systemName: icon)
-                .font(.system(size: 15, weight: .medium))
+                .dynamicTypeFont(base: 15, weight: .medium)
                 .foregroundStyle(color)
         }
     }
@@ -1025,10 +1026,10 @@ private struct SettingsToggleRow: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.white)
                 Text(subtitle)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -1058,10 +1059,10 @@ private struct SettingsTextField: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.5))
                 TextField(placeholder, text: $text)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white)
             }
 

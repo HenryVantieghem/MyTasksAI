@@ -223,7 +223,7 @@ struct ImmersiveFocusSessionView: View {
                 }
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(width: 44, height: 44)
                     .background(Circle().fill(.ultraThinMaterial))
@@ -242,7 +242,7 @@ struct ImmersiveFocusSessionView: View {
                     skipBreak()
                 } label: {
                     Text("Skip")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -262,7 +262,7 @@ struct ImmersiveFocusSessionView: View {
                 .frame(width: 8, height: 8)
 
             Text(isBreak ? "Break Time" : "Focus Session")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white.opacity(0.8))
         }
         .padding(.horizontal, 16)
@@ -342,7 +342,7 @@ struct ImmersiveFocusSessionView: View {
                     .monospacedDigit()
 
                 Text(isBreak ? "until next session" : "remaining")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -378,7 +378,7 @@ struct ImmersiveFocusSessionView: View {
                     .foregroundStyle(.white)
 
                 Text("Session")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -392,7 +392,7 @@ struct ImmersiveFocusSessionView: View {
                     .foregroundStyle(Theme.Colors.success)
 
                 Text("Completed")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -403,11 +403,11 @@ struct ImmersiveFocusSessionView: View {
 
                 VStack(spacing: 4) {
                     Image(systemName: task.taskType.icon)
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(taskTypeColor(for: task.taskType))
 
                     Text(task.title.prefix(12) + (task.title.count > 12 ? "..." : ""))
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
                 }
@@ -441,7 +441,7 @@ struct ImmersiveFocusSessionView: View {
                 adjustTime(by: 30)
             } label: {
                 Image(systemName: "gobackward.30")
-                    .font(.system(size: 24, weight: .medium))
+                    .dynamicTypeFont(base: 24, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(width: 60, height: 60)
                     .background(Circle().fill(.ultraThinMaterial))
@@ -452,7 +452,7 @@ struct ImmersiveFocusSessionView: View {
                 togglePause()
             } label: {
                 Image(systemName: isPaused ? "play.fill" : "pause.fill")
-                    .font(.system(size: 32, weight: .medium))
+                    .dynamicTypeFont(base: 32, weight: .medium)
                     .foregroundStyle(.white)
                     .frame(width: 80, height: 80)
                     .background {
@@ -476,7 +476,7 @@ struct ImmersiveFocusSessionView: View {
                 adjustTime(by: -30)
             } label: {
                 Image(systemName: "goforward.30")
-                    .font(.system(size: 24, weight: .medium))
+                    .dynamicTypeFont(base: 24, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(width: 60, height: 60)
                     .background(Circle().fill(.ultraThinMaterial))
@@ -496,15 +496,15 @@ struct ImmersiveFocusSessionView: View {
 
             VStack(spacing: Theme.Spacing.lg) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 48))
+                    .dynamicTypeFont(base: 48)
                     .foregroundStyle(Theme.Colors.aiOrange)
 
                 Text("End Session?")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("You've been focused for \(elapsedTimeString). Ending now won't count as a completed session.")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -514,7 +514,7 @@ struct ImmersiveFocusSessionView: View {
                         showExitConfirmation = false
                     } label: {
                         Text("Keep Going")
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
@@ -528,7 +528,7 @@ struct ImmersiveFocusSessionView: View {
                         endSession(completed: false)
                     } label: {
                         Text("End")
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.7))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
@@ -581,16 +581,16 @@ struct ImmersiveFocusSessionView: View {
                         .frame(width: 120, height: 120)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 48, weight: .bold))
+                        .dynamicTypeFont(base: 48, weight: .bold)
                         .foregroundStyle(.white)
                 }
 
                 Text("Session Complete!")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Great focus! You've completed \(sessionsCompleted + 1) session\(sessionsCompleted == 0 ? "" : "s") today.")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
 
@@ -600,9 +600,9 @@ struct ImmersiveFocusSessionView: View {
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: "cup.and.saucer.fill")
-                                .font(.system(size: 24))
+                                .dynamicTypeFont(base: 24)
                             Text("Take Break")
-                                .font(.system(size: 14, weight: .medium))
+                                .dynamicTypeFont(base: 14, weight: .medium)
                         }
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -618,9 +618,9 @@ struct ImmersiveFocusSessionView: View {
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: "arrow.right.circle.fill")
-                                .font(.system(size: 24))
+                                .dynamicTypeFont(base: 24)
                             Text("Continue")
-                                .font(.system(size: 14, weight: .medium))
+                                .dynamicTypeFont(base: 14, weight: .medium)
                         }
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -637,7 +637,7 @@ struct ImmersiveFocusSessionView: View {
                     endSession(completed: true)
                 } label: {
                     Text("Finish for Now")
-                        .font(.system(size: 15, weight: .medium))
+                        .dynamicTypeFont(base: 15, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .padding(.top, Theme.Spacing.sm)

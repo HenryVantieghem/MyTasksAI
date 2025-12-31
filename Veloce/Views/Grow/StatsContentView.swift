@@ -239,7 +239,7 @@ struct StatsContentView: View {
         VStack(alignment: .leading, spacing: layout.spacing) {
             HStack {
                 Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Aurora.Colors.borealisViolet)
 
                 Text("Weekly Trend")
@@ -300,13 +300,13 @@ struct StatsContentView: View {
                 // Flame icon with glow
                 ZStack {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Aurora.Colors.stellarMagenta)
                         .blur(radius: 4)
                         .opacity(0.6)
 
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Aurora.Colors.cosmicGold, Aurora.Colors.stellarMagenta],
@@ -358,13 +358,13 @@ struct StatsContentView: View {
                 // Trophy icon with glow
                 ZStack {
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Aurora.Colors.cosmicGold)
                         .blur(radius: 4)
                         .opacity(0.6)
 
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Aurora.Colors.cosmicGold)
                 }
 

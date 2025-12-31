@@ -258,7 +258,7 @@ struct TodayPillView: View {
 
                 // Arrow
                 Image(systemName: direction < 0 ? "chevron.left" : "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
             }
         }

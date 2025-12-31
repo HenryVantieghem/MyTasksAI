@@ -209,7 +209,7 @@ struct ProfileAvatarView: View {
                 .frame(width: LivingCosmos.Avatar.editButtonSize, height: LivingCosmos.Avatar.editButtonSize)
 
             Image(systemName: "camera.fill")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starWhite)
         }
     }
@@ -361,12 +361,12 @@ struct ProfileAvatarRow: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(name)
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     if let subtitle {
                         Text(subtitle)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
                 }
@@ -375,7 +375,7 @@ struct ProfileAvatarRow: View {
 
                 if action != nil {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starGhost)
                 }
             }

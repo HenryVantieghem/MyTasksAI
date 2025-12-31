@@ -211,7 +211,7 @@ struct MilestoneOverlay: View {
                     .scaleEffect(1.0 + glowPulse * 0.1)
 
                 Image(systemName: milestoneIcon)
-                    .font(.system(size: 72))
+                    .dynamicTypeFont(base: 72)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [
@@ -228,7 +228,7 @@ struct MilestoneOverlay: View {
             // Title
             VStack(spacing: 8) {
                 Text("MILESTONE")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
                     .foregroundStyle(Theme.Celebration.starGold)
                     .tracking(4)
 
@@ -276,17 +276,17 @@ struct MilestoneOverlay: View {
                     )
 
                 Text("XP")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.secondary)
             }
 
             if event.hasMultiplier {
                 HStack(spacing: 4) {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
 
                     Text("×\(String(format: "%.1f", event.multiplier)) Cosmic Flow Bonus!")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                 }
                 .foregroundStyle(Theme.Celebration.flameInner)
             }
@@ -469,7 +469,7 @@ struct LevelUpOverlay: View {
                     HStack(spacing: 16) {
                         ForEach(0..<5, id: \.self) { i in
                             Image(systemName: "star.fill")
-                                .font(.system(size: 24))
+                                .dynamicTypeFont(base: 24)
                                 .foregroundStyle(Theme.Celebration.starGold)
                                 .rotationEffect(.degrees(starRotations[i]))
                                 .shadow(color: Theme.Celebration.starGold.opacity(0.8), radius: 8)
@@ -577,7 +577,7 @@ struct AchievementBannerOverlay: View {
                             .frame(width: 48, height: 48)
 
                         Image(systemName: icon)
-                            .font(.system(size: 24))
+                            .dynamicTypeFont(base: 24)
                             .foregroundStyle(Theme.Celebration.starGold)
                     }
 

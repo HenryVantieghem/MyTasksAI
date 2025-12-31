@@ -615,7 +615,7 @@ public enum AuroraHaptics {
 
         // Continuous Rotation
         Image(systemName: "sparkle")
-            .font(.system(size: 40))
+            .dynamicTypeFont(base: 40)
             .foregroundStyle(Aurora.Colors.cosmicGold)
             .continuousRotation(duration: 4)
     }

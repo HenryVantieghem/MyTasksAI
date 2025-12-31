@@ -88,10 +88,10 @@ struct TasksViewModeToggle: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: displayMode.icon)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
 
                 Text(displayMode.label)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
             }
             .foregroundStyle(isSelected ? .primary : .secondary)
             .padding(.horizontal, 14)
@@ -168,7 +168,7 @@ struct TasksViewModeToggleCompact: View {
                     }
                 } label: {
                     Image(systemName: displayMode.icon)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(isSelected ? .primary : .tertiary)
                         .frame(width: 36, height: 32)
                         .background {

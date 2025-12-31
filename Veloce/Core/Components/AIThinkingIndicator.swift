@@ -520,7 +520,7 @@ struct ProcessingQueueIndicator: View {
         HStack(spacing: Theme.Spacing.xs) {
             if showWifi {
                 Image(systemName: "antenna.radiowaves.left.and.right")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
 

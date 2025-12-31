@@ -107,7 +107,7 @@ struct SyncStatusIndicator: View {
         switch syncState {
         case .idle:
             Image(systemName: "checkmark.icloud")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
 
         case .syncing(let progress):
@@ -120,23 +120,23 @@ struct SyncStatusIndicator: View {
                     .rotationEffect(.degrees(-90))
             } else {
                 Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.plasmaCore)
             }
 
         case .success:
             Image(systemName: "checkmark")
-                .font(.system(size: 14, weight: .bold))
+                .dynamicTypeFont(base: 14, weight: .bold)
                 .foregroundStyle(Theme.CelestialColors.auroraGreen)
 
         case .error:
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(Theme.CelestialColors.urgencyCritical)
 
         case .offline:
             Image(systemName: "icloud.slash")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         }
     }
@@ -393,23 +393,23 @@ struct SyncPill: View {
         switch syncState {
         case .syncing:
             Image(systemName: "arrow.triangle.2.circlepath")
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.plasmaCore)
         case .success:
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.CelestialColors.auroraGreen)
         case .error:
             Image(systemName: "exclamationmark.circle.fill")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.CelestialColors.urgencyCritical)
         case .offline:
             Image(systemName: "icloud.slash")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         case .idle:
             Image(systemName: "checkmark.icloud.fill")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
     }

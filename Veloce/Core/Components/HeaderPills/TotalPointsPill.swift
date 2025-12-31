@@ -40,7 +40,7 @@ struct TotalPointsPill: View {
             HStack(spacing: Theme.Spacing.xs) {
                 // Gold star icon
                 Image(systemName: "star.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(goldGradient)
                     .rotationEffect(.degrees(starRotation))
                     .symbolEffect(.bounce, value: isGlowing)
@@ -53,7 +53,7 @@ struct TotalPointsPill: View {
 
                 // XP label
                 Text("XP")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, Theme.Spacing.md)
@@ -179,7 +179,7 @@ struct CompactPointsPill: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: "star.fill")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(goldGradient)
 
                 Text(formatPoints(points))

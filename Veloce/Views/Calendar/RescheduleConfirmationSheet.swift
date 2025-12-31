@@ -25,7 +25,7 @@ struct RescheduleConfirmationSheet: View {
             // Header
             VStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "calendar.badge.clock")
-                    .font(.system(size: 48))
+                    .dynamicTypeFont(base: 48)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Colors.aiPurple, Theme.Colors.aiBlue],
@@ -73,7 +73,7 @@ struct RescheduleConfirmationSheet: View {
 
                 // Arrow
                 Image(systemName: "arrow.right")
-                    .font(.system(size: 20, weight: .medium))
+                    .dynamicTypeFont(base: 20, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
 
                 // New time

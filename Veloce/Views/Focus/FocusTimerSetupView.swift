@@ -124,7 +124,7 @@ struct FocusTimerSetupView: View {
                 dismiss()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
                     .frame(width: 40, height: 40)
                     .background {
@@ -136,7 +136,7 @@ struct FocusTimerSetupView: View {
             Spacer()
 
             Text("Focus Timer")
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
                 .foregroundStyle(.white)
 
             Spacer()
@@ -230,7 +230,7 @@ struct FocusTimerSetupView: View {
                 .animation(.spring(response: 0.3), value: selectedMinutes)
 
             Text("minutes")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
                 .textCase(.uppercase)
                 .tracking(2)
@@ -255,7 +255,7 @@ struct FocusTimerSetupView: View {
             action()
         } label: {
             Image(systemName: icon)
-                .font(.system(size: 20, weight: .semibold))
+                .dynamicTypeFont(base: 20, weight: .semibold)
                 .foregroundStyle(.white)
                 .frame(width: 52, height: 52)
                 .background {
@@ -274,7 +274,7 @@ struct FocusTimerSetupView: View {
     private var modeSelector: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("Focus Mode")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
                 .textCase(.uppercase)
                 .tracking(1)
@@ -304,7 +304,7 @@ struct FocusTimerSetupView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Text("Break Time")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
                     .textCase(.uppercase)
                     .tracking(1)
@@ -342,7 +342,7 @@ struct FocusTimerSetupView: View {
             }
         } label: {
             Text("\(minutes)m")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(selectedBreakMinutes == minutes ? .white : .white.opacity(0.6))
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, Theme.Spacing.sm)
@@ -371,7 +371,7 @@ struct FocusTimerSetupView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Text("Focus Tasks")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
                     .textCase(.uppercase)
                     .tracking(1)
@@ -383,9 +383,9 @@ struct FocusTimerSetupView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "plus")
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                         Text("Add")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                     }
                     .foregroundStyle(Theme.Colors.aiAmber)
                 }
@@ -395,16 +395,16 @@ struct FocusTimerSetupView: View {
                 // Empty state
                 HStack {
                     Image(systemName: "checkmark.circle.badge.plus")
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(.white.opacity(0.3))
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("No tasks selected")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(.white.opacity(0.6))
 
                         Text("Focus on anything, or add specific tasks")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(.white.opacity(0.4))
                     }
 
@@ -438,7 +438,7 @@ struct FocusTimerSetupView: View {
                 .frame(width: 8, height: 8)
 
             Text(task.title)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
@@ -449,7 +449,7 @@ struct FocusTimerSetupView: View {
                     selectedTasks.removeAll { $0.id == task.id }
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.4))
                 }
             }
@@ -469,16 +469,16 @@ struct FocusTimerSetupView: View {
             HStack {
                 HStack(spacing: Theme.Spacing.sm) {
                     Image(systemName: "shield.lefthalf.filled")
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(enableAppBlocking ? Theme.Colors.aiCyan : .white.opacity(0.4))
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Block Distracting Apps")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
                             .foregroundStyle(.white)
 
                         Text("Stay focused by blocking apps")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                 }
@@ -518,11 +518,11 @@ struct FocusTimerSetupView: View {
                 if blockingService.hasAppsSelected {
                     HStack {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(Theme.Colors.success)
 
                         Text(blockingService.selectionSummary)
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(.white.opacity(0.7))
 
                         Spacer()
@@ -531,7 +531,7 @@ struct FocusTimerSetupView: View {
                             showAppBlockingPicker = true
                         } label: {
                             Text("Edit")
-                                .font(.system(size: 13, weight: .semibold))
+                                .dynamicTypeFont(base: 13, weight: .semibold)
                                 .foregroundStyle(Theme.Colors.aiCyan)
                         }
                     }
@@ -546,15 +546,15 @@ struct FocusTimerSetupView: View {
                     } label: {
                         HStack {
                             Image(systemName: "plus.app.fill")
-                                .font(.system(size: 16))
+                                .dynamicTypeFont(base: 16)
 
                             Text("Select Apps to Block")
-                                .font(.system(size: 14, weight: .semibold))
+                                .dynamicTypeFont(base: 14, weight: .semibold)
 
                             Spacer()
 
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
+                                .dynamicTypeFont(base: 12, weight: .semibold)
                                 .foregroundStyle(.white.opacity(0.4))
                         }
                         .foregroundStyle(Theme.Colors.aiCyan)
@@ -579,13 +579,13 @@ struct FocusTimerSetupView: View {
                             .foregroundStyle(Theme.Colors.warning)
 
                         Text("Screen Time access required")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.7))
 
                         Spacer()
 
                         Text("Enable")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                             .foregroundStyle(Theme.Colors.aiCyan)
                     }
                     .padding(Theme.Spacing.sm)
@@ -608,10 +608,10 @@ struct FocusTimerSetupView: View {
         } label: {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "play.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
 
                 Text("Start Focus")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -723,10 +723,10 @@ struct FocusModeChip: View {
                     .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
 
                 Text(mode.rawValue)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
 
                 Text(mode.durationLabel)
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(.white.opacity(0.5))
             }
             .foregroundStyle(isSelected ? .white : .white.opacity(0.6))

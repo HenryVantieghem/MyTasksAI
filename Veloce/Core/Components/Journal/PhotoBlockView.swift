@@ -32,7 +32,7 @@ struct PhotoBlockView: View {
                 showDeleteConfirmation = true
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 22))
+                    .dynamicTypeFont(base: 22)
                     .foregroundStyle(.white)
                     .background(SwiftUI.Circle().fill(.black.opacity(0.5)))
             }
@@ -74,7 +74,7 @@ struct PhotoBlockView: View {
                 .frame(height: 200)
                 .overlay {
                     Image(systemName: "photo")
-                        .font(.system(size: 40))
+                        .dynamicTypeFont(base: 40)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
         }
@@ -133,7 +133,7 @@ struct PhotoPickerButton: View {
         ) {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "photo.badge.plus")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                 Text("Add Photos")
                     .font(Theme.Typography.callout)
             }
@@ -198,7 +198,7 @@ struct FullScreenPhotoViewer: View {
                             dismiss()
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 30))
+                                .dynamicTypeFont(base: 30)
                                 .foregroundStyle(.white.opacity(0.8))
                         }
                         .padding(Theme.Spacing.lg)

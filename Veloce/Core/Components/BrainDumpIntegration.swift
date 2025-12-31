@@ -139,7 +139,7 @@ struct BrainDumpFAB: View {
 
                 // Icon
                 Image(systemName: "brain.head.profile")
-                    .font(.system(size: 24, weight: .semibold))
+                    .dynamicTypeFont(base: 24, weight: .semibold)
                     .foregroundStyle(.white)
             }
         }
@@ -173,7 +173,7 @@ struct BrainDumpQuickAccessCard: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: "brain.head.profile")
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(Theme.Colors.accent)
                         .symbolEffect(.pulse.byLayer, options: .repeating.speed(0.5))
                 }
@@ -192,7 +192,7 @@ struct BrainDumpQuickAccessCard: View {
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.tertiaryText)
             }
             .padding(16)

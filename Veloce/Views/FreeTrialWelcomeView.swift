@@ -18,6 +18,7 @@ struct FreeTrialWelcomeView: View {
     @State private var showLogo = false
     @State private var featureAppearance: [Bool] = Array(repeating: false, count: 4)
     @State private var logoScale: CGFloat = 0.9
+    @State private var showHowItWorks = false
 
     private let features: [(icon: String, title: String, subtitle: String, color: Color)] = [
         ("brain.head.profile", "AI-Powered Tasks", "Smart suggestions for every task", Aurora.Colors.violet),
@@ -77,6 +78,9 @@ struct FreeTrialWelcomeView: View {
         .onAppear {
             startAnimations()
         }
+        .sheet(isPresented: $showHowItWorks) {
+            HowItWorksView()
+        }
     }
 
     // MARK: - Layout Calculations
@@ -106,15 +110,15 @@ struct FreeTrialWelcomeView: View {
 
             // Tagline
             Text("AI-Powered Productivity")
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(Aurora.Colors.textSecondary)
 
             // Trial badge with aurora glow
             HStack(spacing: 6) {
                 Image(systemName: "gift.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                 Text("3 Days Free")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
             }
             .foregroundStyle(Aurora.Colors.violet)
             .padding(.horizontal, 18)
@@ -160,7 +164,7 @@ struct FreeTrialWelcomeView: View {
             // Secondary link - Already have an account
             HStack(spacing: Aurora.Layout.spacingTiny) {
                 Text("Already have an account?")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(Aurora.Colors.textSecondary)
 
                 AuroraLinkButton("Sign In") {
@@ -176,8 +180,15 @@ struct FreeTrialWelcomeView: View {
     private var footerSection: some View {
         VStack(spacing: Aurora.Layout.spacingSmall) {
             Text("No credit card required")
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(Aurora.Colors.textTertiary)
+
+            // How It Works link
+            AuroraLinkButton("How It Works", color: Aurora.Colors.cyan) {
+                HapticsService.shared.selectionFeedback()
+                showHowItWorks = true
+            }
+            .padding(.top, Aurora.Layout.spacingTiny)
 
             HStack(spacing: Aurora.Layout.spacingLarge) {
                 AuroraLinkButton("Privacy Policy", color: Aurora.Colors.textTertiary) {
@@ -247,17 +258,17 @@ struct WelcomeFeatureRow: View {
                     .blur(radius: 8)
 
                 Image(systemName: icon)
-                    .font(.system(size: 22, weight: .medium))
+                    .dynamicTypeFont(base: 22, weight: .medium)
                     .foregroundStyle(iconColor)
             }
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text(subtitle)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Aurora.Colors.textSecondary)
             }
 
@@ -265,7 +276,7 @@ struct WelcomeFeatureRow: View {
 
             // Checkmark
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(Aurora.Colors.success.opacity(0.8))
         }
         .opacity(isVisible ? 1 : 0)

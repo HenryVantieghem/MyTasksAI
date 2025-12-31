@@ -184,7 +184,7 @@ struct WeekAtGlanceView: View {
 
                 // Title
                 Text(task.title)
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(.white)
                     .lineLimit(height > 30 ? 2 : 1)
                     .padding(.horizontal, 4)
@@ -271,7 +271,7 @@ struct WeekAtGlanceView: View {
 
         return HStack(spacing: 0) {
             Text(event.title ?? "")
-                .font(.system(size: 9, weight: .medium))
+                .dynamicTypeFont(base: 9, weight: .medium)
                 .foregroundStyle(.white.opacity(0.8))
                 .lineLimit(1)
                 .padding(.horizontal, 4)
@@ -459,7 +459,7 @@ struct WeekDayHeader: View {
             VStack(spacing: 4) {
                 // Day of week
                 Text(date.formatted(.dateTime.weekday(.narrow)))
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(
                         isToday ? Theme.Colors.aiCyan :
                         isSelected ? .white :

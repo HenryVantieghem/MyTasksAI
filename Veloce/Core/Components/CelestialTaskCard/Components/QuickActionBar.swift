@@ -81,7 +81,7 @@ struct SmartActionButton: View {
         }) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
 
                 Text(title)
                     .font(.system(size: 13, weight: isPrimary ? .bold : .semibold))

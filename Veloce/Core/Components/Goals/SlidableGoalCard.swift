@@ -171,7 +171,7 @@ struct SlidableGoalCard: View {
                         .foregroundStyle(.white)
 
                     Text("%")
-                        .font(.system(size: 10, weight: .medium))
+                        .dynamicTypeFont(base: 10, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                 }
             }
@@ -179,7 +179,7 @@ struct SlidableGoalCard: View {
             // AI sparkle indicator
             if goalsVM.hasAIContent(goal) {
                 Image(systemName: "sparkle")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
                     .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple)
                     .offset(x: 24, y: -24)
                     .scaleEffect(1 + aiPulse * 0.2)
@@ -234,9 +234,9 @@ struct SlidableGoalCard: View {
                 HStack {
                     HStack(spacing: 4) {
                         Image(systemName: "flag.checkered")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("\(goal.completedMilestoneCount)/\(goal.milestoneCount) milestones")
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                     }
                     .foregroundStyle(.white.opacity(0.5))
 
@@ -248,7 +248,7 @@ struct SlidableGoalCard: View {
                                 .fill(LiquidGlassDesignSystem.VibrantAccents.solarGold)
                                 .frame(width: 6, height: 6)
                             Text("Check-in due")
-                                .font(.system(size: 11, weight: .medium))
+                                .dynamicTypeFont(base: 11, weight: .medium)
                         }
                         .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.solarGold)
                     }
@@ -273,7 +273,7 @@ struct SlidableGoalCard: View {
                         .scaleEffect(0.8)
                 } else {
                     Image(systemName: aiStatusIcon)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(aiStatusColor)
                 }
             }
@@ -281,11 +281,11 @@ struct SlidableGoalCard: View {
             // Text
             VStack(alignment: .leading, spacing: 2) {
                 Text(aiStatusTitle)
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text(aiStatusSubtitle)
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(.white.opacity(0.6))
                     .lineLimit(1)
             }
@@ -298,7 +298,7 @@ struct SlidableGoalCard: View {
                     onGenerateAI?()
                 } label: {
                     Text(hasError ? "Retry" : "Generate")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
@@ -364,7 +364,7 @@ struct SlidableGoalCard: View {
     private func quickInsightsRow(quote: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "quote.opening")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.plasmaPurple.opacity(0.6))
 
             Text(quote)
@@ -385,9 +385,9 @@ struct SlidableGoalCard: View {
     private func timeframeBadge(_ timeframe: GoalTimeframe) -> some View {
         HStack(spacing: 4) {
             Image(systemName: timeframe.icon)
-                .font(.system(size: 9, weight: .semibold))
+                .dynamicTypeFont(base: 9, weight: .semibold)
             Text(timeframe.displayName)
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
         }
         .foregroundStyle(timeframe.color)
         .padding(.horizontal, 8)
@@ -401,9 +401,9 @@ struct SlidableGoalCard: View {
     private func categoryPill(_ category: GoalCategory) -> some View {
         HStack(spacing: 4) {
             Image(systemName: category.icon)
-                .font(.system(size: 9))
+                .dynamicTypeFont(base: 9)
             Text(category.displayName)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
         }
         .foregroundStyle(category.color.opacity(0.8))
     }
@@ -416,7 +416,7 @@ struct SlidableGoalCard: View {
         return HStack(spacing: 4) {
             if isOverdue {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 9))
+                    .dynamicTypeFont(base: 9)
             }
             Text(isOverdue ? "Overdue" : (days == 0 ? "Today" : "\(days)d left"))
                 .font(.system(size: 11, weight: isUrgent ? .semibold : .medium))
@@ -528,12 +528,12 @@ struct SlidableGoalCard: View {
                         .frame(width: 48, height: 48)
 
                     Image(systemName: icon)
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(color)
                 }
 
                 Text(label)
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(.white.opacity(0.7))
             }
         }

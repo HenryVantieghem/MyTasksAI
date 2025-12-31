@@ -201,9 +201,9 @@ struct TiimoTimerCircle: View {
             // Mode label
             HStack(spacing: 6) {
                 Image(systemName: mode.icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text(mode.rawValue)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
             }
             .foregroundStyle(.white.opacity(0.5))
         }

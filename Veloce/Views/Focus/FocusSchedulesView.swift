@@ -56,10 +56,10 @@ struct FocusSchedulesView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Focus Schedules")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.white)
                 Text("Automate your focus sessions")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -70,7 +70,7 @@ struct FocusSchedulesView: View {
                 showCreateSheet = true
             } label: {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 28))
+                    .dynamicTypeFont(base: 28)
                     .foregroundStyle(Theme.Colors.aiAmber)
             }
         }
@@ -101,17 +101,17 @@ struct FocusSchedulesView: View {
                     .frame(width: 160, height: 160)
 
                 Image(systemName: "calendar.badge.clock")
-                    .font(.system(size: 56, weight: .thin))
+                    .dynamicTypeFont(base: 56, weight: .thin)
                     .foregroundStyle(Theme.Colors.aiAmber)
             }
 
             VStack(spacing: 8) {
                 Text("No Schedules Yet")
-                    .font(.system(size: 20, weight: .semibold))
+                    .dynamicTypeFont(base: 20, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("Create scheduled focus sessions to automatically block apps at specific times")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, Theme.Spacing.xl)
@@ -125,7 +125,7 @@ struct FocusSchedulesView: View {
                     Image(systemName: "plus.circle.fill")
                     Text("Create Schedule")
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 14)
@@ -179,7 +179,7 @@ struct ScheduleCard: View {
                         .foregroundStyle(.white)
 
                     Text(schedule.title)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.8))
                 }
 
@@ -201,9 +201,9 @@ struct ScheduleCard: View {
                 // Duration badge
                 HStack(spacing: 4) {
                     Image(systemName: "timer")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                     Text("\(schedule.durationMinutes) min")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                 }
                 .foregroundStyle(.white.opacity(0.6))
                 .padding(.horizontal, 10)
@@ -217,9 +217,9 @@ struct ScheduleCard: View {
                 if schedule.isRecurring {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.triangle.2.circlepath")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text(schedule.formattedRecurringDays)
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                     }
                     .foregroundStyle(.white.opacity(0.6))
                     .padding(.horizontal, 10)
@@ -234,9 +234,9 @@ struct ScheduleCard: View {
                 if schedule.isDeepFocus {
                     HStack(spacing: 4) {
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("Deep Focus")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                     }
                     .foregroundStyle(Theme.Colors.aiAmber)
                     .padding(.horizontal, 10)
@@ -255,7 +255,7 @@ struct ScheduleCard: View {
                     onEdit()
                 } label: {
                     Image(systemName: "pencil")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.6))
                         .frame(width: 32, height: 32)
                         .background {
@@ -270,7 +270,7 @@ struct ScheduleCard: View {
                     showDeleteConfirmation = true
                 } label: {
                     Image(systemName: "trash")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.error.opacity(0.8))
                         .frame(width: 32, height: 32)
                         .background {
@@ -285,9 +285,9 @@ struct ScheduleCard: View {
             if let nextOccurrence = schedule.nextOccurrence {
                 HStack(spacing: 6) {
                     Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                     Text("Next: \(nextOccurrence, format: .dateTime.weekday().hour().minute())")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                 }
                 .foregroundStyle(Theme.Colors.aiAmber.opacity(0.8))
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -339,11 +339,11 @@ struct ScheduleCreationSheet: View {
                     // Title
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Title")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         TextField("e.g., Morning Focus", text: $title)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .padding(14)
                             .background {
                                 RoundedRectangle(cornerRadius: 12)
@@ -355,7 +355,7 @@ struct ScheduleCreationSheet: View {
                     // Start Time
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Start Time")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         DatePicker("", selection: $startTime, displayedComponents: .hourAndMinute)
@@ -368,7 +368,7 @@ struct ScheduleCreationSheet: View {
                     // Duration
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Duration")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.6))
 
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -391,10 +391,10 @@ struct ScheduleCreationSheet: View {
                         Toggle(isOn: $isRecurring) {
                             HStack(spacing: 10) {
                                 Image(systemName: "arrow.triangle.2.circlepath")
-                                    .font(.system(size: 16))
+                                    .dynamicTypeFont(base: 16)
                                     .foregroundStyle(Theme.Colors.aiAmber)
                                 Text("Repeat")
-                                    .font(.system(size: 16, weight: .medium))
+                                    .dynamicTypeFont(base: 16, weight: .medium)
                             }
                         }
                         .toggleStyle(SwitchToggleStyle(tint: Theme.Colors.aiAmber))
@@ -439,13 +439,13 @@ struct ScheduleCreationSheet: View {
                         Toggle(isOn: $isDeepFocus) {
                             HStack(spacing: 10) {
                                 Image(systemName: "lock.fill")
-                                    .font(.system(size: 16))
+                                    .dynamicTypeFont(base: 16)
                                     .foregroundStyle(Theme.Colors.aiAmber)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("Deep Focus")
-                                        .font(.system(size: 16, weight: .medium))
+                                        .dynamicTypeFont(base: 16, weight: .medium)
                                     Text("Cannot be canceled once started")
-                                        .font(.system(size: 12))
+                                        .dynamicTypeFont(base: 12)
                                         .foregroundStyle(.white.opacity(0.5))
                                 }
                             }
@@ -566,7 +566,7 @@ struct ScheduleQuickDayButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(.white.opacity(0.7))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)

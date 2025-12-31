@@ -94,7 +94,7 @@ struct AddFriendSheet: View {
         VStack(spacing: Theme.Spacing.md) {
             ProgressView()
             Text("Searching...")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -105,15 +105,15 @@ struct AddFriendSheet: View {
     private var emptyResultsView: some View {
         VStack(spacing: Theme.Spacing.md) {
             Image(systemName: "person.slash")
-                .font(.system(size: 40, weight: .light))
+                .dynamicTypeFont(base: 40, weight: .light)
                 .foregroundStyle(Theme.Colors.textTertiary)
 
             Text("No users found")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(Theme.Colors.textSecondary)
 
             Text("Try a different username")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.Colors.textTertiary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -124,15 +124,15 @@ struct AddFriendSheet: View {
     private var searchPromptView: some View {
         VStack(spacing: Theme.Spacing.md) {
             Image(systemName: "at")
-                .font(.system(size: 40, weight: .light))
+                .dynamicTypeFont(base: 40, weight: .light)
                 .foregroundStyle(Theme.Colors.textTertiary)
 
             Text("Search for friends")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(Theme.Colors.textSecondary)
 
             Text("Enter a username to find friends")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(Theme.Colors.textTertiary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -161,18 +161,18 @@ struct AddFriendSheet: View {
                     .frame(width: 50, height: 50)
 
                 Text(user.displayName.prefix(1).uppercased())
-                    .font(.system(size: 20, weight: .semibold))
+                    .dynamicTypeFont(base: 20, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(user.displayName)
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(Theme.Colors.textPrimary)
 
                 if let username = user.atUsername {
                     Text(username)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
             }
@@ -193,7 +193,7 @@ struct AddFriendSheet: View {
     private func addButton(for user: FriendProfile) -> some View {
         if sentRequests.contains(user.id) {
             Text("Sent")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, Theme.Spacing.sm)
@@ -208,7 +208,7 @@ struct AddFriendSheet: View {
                 }
             } label: {
                 Text("Add")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, Theme.Spacing.md)
                     .padding(.vertical, Theme.Spacing.sm)

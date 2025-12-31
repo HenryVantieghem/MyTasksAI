@@ -160,7 +160,7 @@ struct AnimatedStatusPill: View {
 
     var body: some View {
         Text(messages[currentIndex])
-            .font(.system(size: 12, weight: .medium))
+            .dynamicTypeFont(base: 12, weight: .medium)
             .foregroundStyle(.white.opacity(0.9))
             .padding(.horizontal, 12)
             .padding(.vertical, 6)

@@ -51,7 +51,7 @@ struct InteractiveSnippetButton: View {
 
                     // Icon container
                     Image(systemName: icon)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(accentColor)
                         .frame(width: 36, height: 36)
                         .background {
@@ -75,7 +75,7 @@ struct InteractiveSnippetButton: View {
 
                 // Chevron indicator
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starDim.opacity(0.6))
             }
             .padding(.horizontal, Theme.Spacing.lg)
@@ -153,11 +153,11 @@ struct InteractiveSnippetChip: View {
         Button(action: action) {
             HStack(spacing: Theme.Spacing.xs) {
                 Image(systemName: icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(accentColor)
 
                 Text(value)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.white)
             }
             .padding(.horizontal, Theme.Spacing.md)

@@ -76,7 +76,7 @@ struct QuickAddTaskSheet: View {
     private var timeHeader: some View {
         VStack(spacing: 8) {
             Text(adjustedTime.formatted(.dateTime.weekday(.wide).month(.abbreviated).day()))
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.secondary)
 
             DatePicker(
@@ -98,11 +98,11 @@ struct QuickAddTaskSheet: View {
     private var taskTitleInput: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Task")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.secondary)
 
             TextField("What do you need to do?", text: $taskTitle)
-                .font(.system(size: 17))
+                .dynamicTypeFont(base: 17)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
                 .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -121,7 +121,7 @@ struct QuickAddTaskSheet: View {
     private var durationSelector: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Duration")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.secondary)
 
             LazyVGrid(columns: [
@@ -197,14 +197,14 @@ struct CalendarTaskDetailSheet: View {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(task.title)
-                            .font(.system(size: 20, weight: .semibold))
+                            .dynamicTypeFont(base: 20, weight: .semibold)
 
                         if let time = task.scheduledTime {
                             HStack(spacing: 6) {
                                 Image(systemName: "clock")
-                                    .font(.system(size: 13))
+                                    .dynamicTypeFont(base: 13)
                                 Text(time.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day().hour().minute()))
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                             }
                             .foregroundStyle(.secondary)
                         }
@@ -212,9 +212,9 @@ struct CalendarTaskDetailSheet: View {
                         if let duration = task.estimatedMinutes ?? task.duration {
                             HStack(spacing: 6) {
                                 Image(systemName: "hourglass")
-                                    .font(.system(size: 13))
+                                    .dynamicTypeFont(base: 13)
                                 Text("\(duration) minutes")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                             }
                             .foregroundStyle(.secondary)
                         }

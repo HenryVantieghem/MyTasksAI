@@ -317,7 +317,7 @@ struct StatColumn: View {
     var body: some View {
         VStack(spacing: Theme.Spacing.xs) {
             Image(systemName: icon)
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(color)
 
             Text(value)
@@ -345,7 +345,7 @@ struct PointsGainToast: View {
     var body: some View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: isBonus ? "sparkles" : "star.fill")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(isBonus ? Theme.Colors.gold : Theme.Colors.xp)
 
             VStack(alignment: .leading, spacing: 2) {

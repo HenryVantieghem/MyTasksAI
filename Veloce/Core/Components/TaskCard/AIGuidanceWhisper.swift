@@ -59,7 +59,7 @@ struct AIGuidanceWhisper: View {
 
             // Icon
             Image(systemName: "sparkles")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
@@ -77,14 +77,14 @@ struct AIGuidanceWhisper: View {
             if reduceMotion || hasAnimatedIn {
                 // Show full text immediately
                 Text(guidance)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .lineLimit(isExpanded ? nil : 3)
                     .multilineTextAlignment(.leading)
             } else {
                 // Typewriter effect
                 Text(String(guidance.prefix(revealedCharacters)))
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .lineLimit(isExpanded ? nil : 3)
                     .multilineTextAlignment(.leading)
@@ -253,15 +253,15 @@ struct AIGuidanceChip: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: "sparkles")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
 
             if let preview = truncatedPreview {
                 Text(preview)
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .lineLimit(1)
             } else {
                 Text("AI")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
             }
         }
         .foregroundStyle(

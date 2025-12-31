@@ -95,11 +95,11 @@ struct CosmicInfoCard: View {
     var body: some View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(iconColor)
 
             Text(message)
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(Theme.CelestialColors.starDim)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -159,7 +159,7 @@ struct CosmicStatCard: View {
                     .blur(radius: 8)
 
                 Image(systemName: icon)
-                    .font(.system(size: 20, weight: .medium))
+                    .dynamicTypeFont(base: 20, weight: .medium)
                     .foregroundStyle(iconColor)
             }
 
@@ -176,7 +176,7 @@ struct CosmicStatCard: View {
 
             // Label
             Text(label)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
         .frame(maxWidth: .infinity)
@@ -189,15 +189,15 @@ struct CosmicStatCard: View {
         switch trend {
         case .up:
             Image(systemName: "arrow.up")
-                .font(.system(size: 12, weight: .bold))
+                .dynamicTypeFont(base: 12, weight: .bold)
                 .foregroundStyle(Theme.CelestialColors.auroraGreen)
         case .down:
             Image(systemName: "arrow.down")
-                .font(.system(size: 12, weight: .bold))
+                .dynamicTypeFont(base: 12, weight: .bold)
                 .foregroundStyle(Theme.CelestialColors.errorNebula)
         case .neutral:
             Image(systemName: "minus")
-                .font(.system(size: 12, weight: .bold))
+                .dynamicTypeFont(base: 12, weight: .bold)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
     }
@@ -240,18 +240,18 @@ struct CosmicEmptyState: View {
                     .blur(radius: 12)
 
                 Image(systemName: icon)
-                    .font(.system(size: 32, weight: .light))
+                    .dynamicTypeFont(base: 32, weight: .light)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
 
             // Text
             VStack(spacing: Theme.Spacing.xs) {
                 Text(title)
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text(message)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .multilineTextAlignment(.center)
             }

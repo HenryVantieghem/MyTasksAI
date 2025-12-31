@@ -108,7 +108,7 @@ struct VelocityScoreOrb: View {
             // Rotating sparkle
             if !reduceMotion {
                 Image(systemName: "sparkle")
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(score.color)
                     .offset(y: -80)
                     .rotationEffect(.degrees(rotationAngle))
@@ -130,9 +130,9 @@ struct VelocityScoreOrb: View {
             // Tier label
             HStack(spacing: 4) {
                 Image(systemName: score.tier.icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                 Text(score.tierLabel)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
             }
             .foregroundStyle(score.color)
             .padding(.horizontal, 12)
@@ -144,7 +144,7 @@ struct VelocityScoreOrb: View {
 
             // Message
             Text(score.message)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 120)
@@ -159,13 +159,13 @@ struct VelocityScoreOrb: View {
                 HStack(spacing: Theme.Spacing.md) {
                     // Icon
                     Image(systemName: breakdown.icon)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(breakdown.color)
                         .frame(width: 24)
 
                     // Label
                     Text(breakdown.category)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.primary)
 
                     Spacer()
@@ -266,14 +266,14 @@ struct VelocityScoreCompact: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Velocity Score")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 4) {
                     Image(systemName: score.tier.icon)
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text(score.tierLabel)
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                 }
                 .foregroundStyle(score.color)
             }
@@ -281,7 +281,7 @@ struct VelocityScoreCompact: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(.tertiary)
         }
         .padding(Theme.Spacing.md)
@@ -305,16 +305,16 @@ struct ShareableVelocityCard: View {
             // Header
             HStack {
                 Image(systemName: "bolt.circle.fill")
-                    .font(.system(size: 24))
+                    .dynamicTypeFont(base: 24)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Veloce")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
 
                 Spacer()
 
                 Text(weekLabel)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.secondary)
             }
 
@@ -328,13 +328,13 @@ struct ShareableVelocityCard: View {
                     Image(systemName: score.tier.icon)
                     Text(score.tierLabel)
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(score.color)
             }
 
             // User name
             Text(userName)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.secondary)
 
             Divider()
@@ -362,7 +362,7 @@ struct ShareableVelocityCard: View {
     private func scoreItem(icon: String, value: Int, color: Color) -> some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(color)
 
             Text("\(value)")
@@ -393,14 +393,14 @@ struct VelocityScoreDetailSheet: View {
                         // Message card
                         HStack(spacing: Theme.Spacing.md) {
                             Image(systemName: score.tier.icon)
-                                .font(.system(size: 24))
+                                .dynamicTypeFont(base: 24)
                                 .foregroundStyle(score.color)
 
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(score.tierLabel)
-                                    .font(.system(size: 16, weight: .bold))
+                                    .dynamicTypeFont(base: 16, weight: .bold)
                                 Text(score.message)
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.secondary)
                             }
 
@@ -419,17 +419,17 @@ struct VelocityScoreDetailSheet: View {
                         // Score Breakdown
                         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
                             Text("Score Breakdown")
-                                .font(.system(size: 17, weight: .semibold))
+                                .dynamicTypeFont(base: 17, weight: .semibold)
 
                             ForEach(ScoreBreakdown.from(score)) { breakdown in
                                 HStack(spacing: Theme.Spacing.md) {
                                     Image(systemName: breakdown.icon)
-                                        .font(.system(size: 18))
+                                        .dynamicTypeFont(base: 18)
                                         .foregroundStyle(breakdown.color)
                                         .frame(width: 28)
 
                                     Text(breakdown.category)
-                                        .font(.system(size: 15, weight: .medium))
+                                        .dynamicTypeFont(base: 15, weight: .medium)
 
                                     Spacer()
 
@@ -467,7 +467,7 @@ struct VelocityScoreDetailSheet: View {
                                 Image(systemName: "lightbulb.fill")
                                     .foregroundStyle(.yellow)
                                 Text("Tips to Improve")
-                                    .font(.system(size: 15, weight: .semibold))
+                                    .dynamicTypeFont(base: 15, weight: .semibold)
                             }
 
                             improvementTips
@@ -505,10 +505,10 @@ struct VelocityScoreDetailSheet: View {
             ForEach(tips, id: \.self) { tip in
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "arrow.right.circle.fill")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.yellow)
                     Text(tip)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.primary)
                 }
             }

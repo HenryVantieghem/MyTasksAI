@@ -257,7 +257,7 @@ struct CosmicLevelProgress: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Level \(level)")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text("\(currentXP) / \(requiredXP) XP")
@@ -268,7 +268,7 @@ struct CosmicLevelProgress: View {
                 Spacer()
 
                 Text("Level \(level + 1)")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
 

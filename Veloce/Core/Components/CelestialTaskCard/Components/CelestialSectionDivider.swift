@@ -31,7 +31,7 @@ struct CelestialSectionDivider: View {
             // Section label with icon
             HStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
 
                 Text(title.uppercased())
                     .font(.system(size: 10, weight: .bold, design: .rounded))

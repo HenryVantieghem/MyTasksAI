@@ -122,7 +122,7 @@ struct FriendPickerSheet: View {
             // Title Section
             VStack(spacing: 8) {
                 Image(systemName: "person.2.badge.plus")
-                    .font(.system(size: 32, weight: .light))
+                    .dynamicTypeFont(base: 32, weight: .light)
                     .foregroundStyle(Theme.CelestialColors.nebulaGradient)
 
                 Text("Invite Friends")
@@ -204,7 +204,7 @@ struct FriendPickerSheet: View {
         VStack(spacing: 20) {
             Spacer()
             Image(systemName: "person.2.slash")
-                .font(.system(size: 60, weight: .ultraLight))
+                .dynamicTypeFont(base: 60, weight: .ultraLight)
                 .foregroundStyle(Theme.CelestialColors.nebulaGradient)
 
             VStack(spacing: 8) {
@@ -505,7 +505,7 @@ private struct InviteSentOverlay: View {
                         .frame(width: 80, height: 80)
                         .overlay(
                             Image(systemName: "paperplane.fill")
-                                .font(.system(size: 32, weight: .medium))
+                                .dynamicTypeFont(base: 32, weight: .medium)
                                 .foregroundColor(.black)
                         )
                         .scaleEffect(showContent ? 1.0 : 0.5)

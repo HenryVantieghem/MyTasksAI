@@ -270,15 +270,14 @@ struct SupernovaParticleView: View {
             }
     }
 
-    @ViewBuilder
-    private var particleShape: some Shape {
+    private var particleShape: AnyShape {
         switch particle.shape {
         case .circle:
-            Circle()
+            AnyShape(Circle())
         case .star:
-            Star(points: 4, innerRatio: 0.5)
+            AnyShape(Star(points: 4, innerRatio: 0.5))
         case .sparkle:
-            Star(points: 6, innerRatio: 0.3)
+            AnyShape(Star(points: 6, innerRatio: 0.3))
         }
     }
 
@@ -320,8 +319,8 @@ struct Star: Shape {
             let angle = (Double(i) * .pi / Double(points)) - .pi / 2
             let radius = i.isMultiple(of: 2) ? outerRadius : innerRadius
             let point = CGPoint(
-                x: center.x + cos(angle) * radius,
-                y: center.y + sin(angle) * radius
+                x: center.x + CGFloat(cos(angle)) * radius,
+                y: center.y + CGFloat(sin(angle)) * radius
             )
 
             if i == 0 {

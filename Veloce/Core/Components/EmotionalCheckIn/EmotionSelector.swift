@@ -70,7 +70,7 @@ struct EmotionSelector: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("How are you feeling?")
-                .font(.system(size: 20, weight: .semibold))
+                .dynamicTypeFont(base: 20, weight: .semibold)
                 .foregroundStyle(.white)
 
             LazyVGrid(columns: [
@@ -144,7 +144,7 @@ struct EmotionButton: View {
 
                     // Icon
                     Image(systemName: emotion.icon)
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
                 }
 
@@ -185,18 +185,18 @@ struct EmotionResponseCard: View {
                         .frame(width: 32, height: 32)
 
                     Image(systemName: "sparkles")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white)
                 }
 
                 Text("MyTasksAI")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.8))
             }
 
             if showResponse {
                 Text(emotion.aiResponse)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.9))
                     .lineSpacing(4)
                     .transition(.opacity.combined(with: .move(edge: .top)))
@@ -234,7 +234,7 @@ struct BlockerIdentifier: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("What's making this hard?")
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
                 .foregroundStyle(.white)
 
             VStack(spacing: 8) {
@@ -302,19 +302,19 @@ struct BlockerOption: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: blocker.icon)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
                     .frame(width: 24)
 
                 Text(blocker.rawValue)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.8))
 
                 Spacer()
 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(Color(hex: "8B5CF6"))
                 }
             }

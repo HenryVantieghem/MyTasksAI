@@ -54,7 +54,7 @@ struct StatsBottomSheet: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
+                            .dynamicTypeFont(base: 24)
                             .foregroundStyle(Theme.Colors.textTertiary)
                     }
                 }
@@ -252,13 +252,13 @@ struct StatsBottomSheet: View {
                             .overlay {
                                 if dayCompleted(day) {
                                     Image(systemName: "checkmark")
-                                        .font(.system(size: 14, weight: .bold))
+                                        .dynamicTypeFont(base: 14, weight: .bold)
                                         .foregroundStyle(.white)
                                 }
                             }
 
                         Text(dayLabel(day))
-                            .font(.system(size: 10, weight: .medium))
+                            .dynamicTypeFont(base: 10, weight: .medium)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
                 }
@@ -310,7 +310,7 @@ struct StatCard: View {
     var body: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: icon)
-                .font(.system(size: 24, weight: .semibold))
+                .dynamicTypeFont(base: 24, weight: .semibold)
                 .foregroundStyle(iconColor)
 
             Text(value)

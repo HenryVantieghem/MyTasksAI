@@ -24,7 +24,7 @@ struct ModuleCard<Content: View>: View {
             // Header
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
                     .foregroundStyle(accentColor)
 
                 Text(title)
@@ -36,7 +36,7 @@ struct ModuleCard<Content: View>: View {
 
                 if let trailing = trailingText {
                     Text(trailing)
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -65,7 +65,7 @@ struct ModuleHeader: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 11, weight: .semibold))
+                .dynamicTypeFont(base: 11, weight: .semibold)
                 .foregroundStyle(accentColor)
 
             Text(title)
@@ -77,7 +77,7 @@ struct ModuleHeader: View {
 
             if let trailing = trailingText {
                 Text(trailing)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
         }
@@ -97,7 +97,7 @@ struct ModuleHeader: View {
                 accentColor: Theme.TaskCardColors.strategy
             ) {
                 Text("This is the module content area where the main functionality lives.")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.8))
             }
 
@@ -108,7 +108,7 @@ struct ModuleHeader: View {
                 trailingText: "30 seconds"
             ) {
                 Text("First step content goes here.")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.8))
             }
         }

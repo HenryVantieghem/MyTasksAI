@@ -84,16 +84,16 @@ struct BrainDumpResultsView: View {
                     .frame(width: 60, height: 60)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 28, weight: .medium))
+                    .dynamicTypeFont(base: 28, weight: .medium)
                     .foregroundStyle(Theme.Colors.success)
             }
 
             Text("Found \(viewModel.extractedTasks.count) tasks")
-                .font(.system(size: 24, weight: .bold))
+                .dynamicTypeFont(base: 24, weight: .bold)
                 .foregroundStyle(Color.white)
 
             Text("~\(viewModel.formattedEstimatedTime) total")
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(Color.white.opacity(0.6))
         }
     }
@@ -109,19 +109,19 @@ struct BrainDumpResultsView: View {
                     .frame(width: 36, height: 36)
 
                 Image(systemName: "brain.head.profile")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.white)
             }
 
             VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
                 Text("Insight")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .textCase(.uppercase)
                     .tracking(1)
 
                 Text(observation)
-                    .font(.system(size: 15, weight: .regular))
+                    .dynamicTypeFont(base: 15, weight: .regular)
                     .foregroundStyle(Color.white.opacity(0.9))
                     .lineSpacing(4)
             }
@@ -158,9 +158,9 @@ struct BrainDumpResultsView: View {
     private func moodPill(_ mood: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "heart.fill")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
             Text(mood)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
         }
         .foregroundStyle(Theme.Colors.aiPink)
         .padding(.horizontal, 10)
@@ -173,7 +173,7 @@ struct BrainDumpResultsView: View {
 
     private func themePill(_ theme: String) -> some View {
         Text(theme)
-            .font(.system(size: 12, weight: .medium))
+            .dynamicTypeFont(base: 12, weight: .medium)
             .foregroundStyle(Color.white.opacity(0.7))
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
@@ -190,7 +190,7 @@ struct BrainDumpResultsView: View {
             // Section header
             HStack {
                 Text("Tasks")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(Color.white.opacity(0.5))
                     .textCase(.uppercase)
                     .tracking(1)
@@ -205,7 +205,7 @@ struct BrainDumpResultsView: View {
                     }
                 } label: {
                     Text(viewModel.selectedCount == viewModel.extractedTasks.count ? "Deselect All" : "Select All")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(Theme.Colors.accent)
                 }
             }
@@ -248,7 +248,7 @@ struct BrainDumpResultsView: View {
                     viewModel.goBackToInput()
                 } label: {
                     Image(systemName: "arrow.left")
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(Color.white.opacity(0.7))
                         .frame(width: 50, height: 50)
                         .background(
@@ -270,10 +270,10 @@ struct BrainDumpResultsView: View {
                 } label: {
                     HStack(spacing: Theme.Spacing.sm) {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 18, weight: .semibold))
+                            .dynamicTypeFont(base: 18, weight: .semibold)
 
                         Text("Add \(viewModel.selectedCount) Tasks")
-                            .font(.system(size: 17, weight: .semibold))
+                            .dynamicTypeFont(base: 17, weight: .semibold)
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -371,7 +371,7 @@ struct ExtractedTaskCard: View {
                             .frame(width: 24, height: 24)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
@@ -380,7 +380,7 @@ struct ExtractedTaskCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title
                     Text(task.title)
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Color.white)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
@@ -391,7 +391,7 @@ struct ExtractedTaskCard: View {
                         HStack(spacing: 2) {
                             ForEach(0..<task.priority.starRating, id: \.self) { _ in
                                 Image(systemName: "star.fill")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                     .foregroundStyle(priorityColor)
                             }
                         }
@@ -399,9 +399,9 @@ struct ExtractedTaskCard: View {
                         // Time estimate
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
-                                .font(.system(size: 10))
+                                .dynamicTypeFont(base: 10)
                             Text(formatMinutes(task.estimatedMinutes))
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                         }
                         .foregroundStyle(Color.white.opacity(0.5))
 
@@ -409,9 +409,9 @@ struct ExtractedTaskCard: View {
                         if let due = task.dueContext {
                             HStack(spacing: 4) {
                                 Image(systemName: "calendar")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                 Text(due)
-                                    .font(.system(size: 12, weight: .medium))
+                                    .dynamicTypeFont(base: 12, weight: .medium)
                             }
                             .foregroundStyle(Theme.Colors.aiBlue.opacity(0.8))
                         }
@@ -420,9 +420,9 @@ struct ExtractedTaskCard: View {
                         if let person = task.relatedPerson {
                             HStack(spacing: 4) {
                                 Image(systemName: "person")
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                 Text(person)
-                                    .font(.system(size: 12, weight: .medium))
+                                    .dynamicTypeFont(base: 12, weight: .medium)
                             }
                             .foregroundStyle(Theme.Colors.aiPink.opacity(0.8))
                         }
@@ -432,9 +432,9 @@ struct ExtractedTaskCard: View {
                     if let suggestion = task.suggestion {
                         HStack(spacing: 4) {
                             Image(systemName: "lightbulb.fill")
-                                .font(.system(size: 10))
+                                .dynamicTypeFont(base: 10)
                             Text(suggestion)
-                                .font(.system(size: 12, weight: .regular))
+                                .dynamicTypeFont(base: 12, weight: .regular)
                         }
                         .foregroundStyle(Theme.Colors.xp.opacity(0.8))
                         .padding(.top, 2)

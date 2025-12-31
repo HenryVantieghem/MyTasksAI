@@ -502,13 +502,13 @@ struct LiquidGlassTabBarMinimal: View {
                         ZStack {
                             // Glow behind icon
                             Image(systemName: selectedTab.selectedIcon)
-                                .font(.system(size: 56, weight: .light))
+                                .dynamicTypeFont(base: 56, weight: .light)
                                 .foregroundStyle(Aurora.Colors.electricCyan)
                                 .blur(radius: 12)
                                 .opacity(0.5)
 
                             Image(systemName: selectedTab.selectedIcon)
-                                .font(.system(size: 56, weight: .light))
+                                .dynamicTypeFont(base: 56, weight: .light)
                                 .foregroundStyle(Aurora.Gradients.aiGradient)
                                 .symbolEffect(.bounce, value: selectedTab)
                         }

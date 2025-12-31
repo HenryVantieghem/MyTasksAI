@@ -56,12 +56,12 @@ struct CosmicStepperRow: View {
             // Text content
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
             }
@@ -97,7 +97,7 @@ struct CosmicStepperRow: View {
 
                 if let unit {
                     Text(unit)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
             }
@@ -139,7 +139,7 @@ private struct CosmicStepperButton: View {
                 }
 
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(isEnabled ? Theme.Colors.aiPurple : Theme.CelestialColors.starGhost)
             }
         }
@@ -196,7 +196,7 @@ struct CosmicSliderRow: View {
                 }
 
                 Text(title)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Spacer()

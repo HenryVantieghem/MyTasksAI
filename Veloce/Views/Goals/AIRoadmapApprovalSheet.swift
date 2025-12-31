@@ -81,17 +81,17 @@ struct AIRoadmapApprovalSheet: View {
                 }
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 32))
+                    .dynamicTypeFont(base: 32)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
 
             VStack(spacing: 8) {
                 Text("Generating Your Roadmap")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("AI is analyzing your goal and creating a personalized plan...")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
             }
@@ -107,23 +107,23 @@ struct AIRoadmapApprovalSheet: View {
     private var emptyState: some View {
         VStack(spacing: 24) {
             Image(systemName: "map")
-                .font(.system(size: 48))
+                .dynamicTypeFont(base: 48)
                 .foregroundStyle(.white.opacity(0.3))
 
             VStack(spacing: 8) {
                 Text("No Roadmap Yet")
-                    .font(.system(size: 20, weight: .semibold))
+                    .dynamicTypeFont(base: 20, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("Generate an AI-powered roadmap to get personalized milestones and task suggestions")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
             }
 
             if let error = error {
                 Text(error)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.Colors.error)
                     .padding()
                     .background(
@@ -139,7 +139,7 @@ struct AIRoadmapApprovalSheet: View {
                     Image(systemName: "sparkles")
                     Text("Generate Roadmap")
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 28)
                 .padding(.vertical, 16)
@@ -222,7 +222,7 @@ struct AIRoadmapApprovalSheet: View {
                         .foregroundStyle(.white)
 
                     Text("Success")
-                        .font(.system(size: 10, weight: .medium))
+                        .dynamicTypeFont(base: 10, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -271,16 +271,16 @@ struct AIRoadmapApprovalSheet: View {
     private func coachingNotesCard(_ notes: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "lightbulb.fill")
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
                 .foregroundStyle(Color(hex: "FFD700"))
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("Coach's Notes")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.7))
 
                 Text(notes)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.8))
                     .lineSpacing(4)
             }
@@ -302,7 +302,7 @@ struct AIRoadmapApprovalSheet: View {
         VStack(spacing: 16) {
             HStack {
                 Text("\(selectedCount) of \(allSuggestions.count) tasks selected")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(.white.opacity(0.6))
 
                 Spacer()
@@ -315,7 +315,7 @@ struct AIRoadmapApprovalSheet: View {
                     }
                 } label: {
                     Text(selectedCount == allSuggestions.count ? "Deselect All" : "Select All")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
                 .buttonStyle(.plain)
@@ -334,7 +334,7 @@ struct AIRoadmapApprovalSheet: View {
 
                     Text(isApproving ? "Creating Tasks..." : "Create \(selectedCount) Tasks")
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .dynamicTypeFont(base: 16, weight: .semibold)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -401,14 +401,14 @@ private struct StatPill: View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                 Text(value)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
             }
             .foregroundStyle(.white)
 
             Text(label)
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(.white.opacity(0.5))
         }
     }
@@ -446,11 +446,11 @@ private struct PhaseCard: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(phase.name)
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(.white)
 
                         Text("Weeks \(phase.startWeek ?? 1)-\(phase.endWeek ?? 1)")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(.white.opacity(0.6))
                             .lineLimit(1)
                     }
@@ -458,7 +458,7 @@ private struct PhaseCard: View {
                     Spacer()
 
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.4))
                         .rotationEffect(.degrees(isExpanded ? 0 : -90))
                 }
@@ -470,17 +470,17 @@ private struct PhaseCard: View {
                 if !phase.milestones.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Milestones", systemImage: "flag.checkered")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
 
                         ForEach(phase.milestones, id: \.title) { milestone in
                             HStack(spacing: 10) {
                                 Image(systemName: "circle")
-                                    .font(.system(size: 8))
+                                    .dynamicTypeFont(base: 8)
                                     .foregroundStyle(Theme.Colors.aiCyan)
 
                                 Text(milestone.title)
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.8))
                             }
                         }
@@ -491,7 +491,7 @@ private struct PhaseCard: View {
                 if let habits = phase.dailyHabits, !habits.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Daily Habits", systemImage: "repeat")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
 
                         ForEach(habits, id: \.title) { habit in
@@ -510,7 +510,7 @@ private struct PhaseCard: View {
                 if let tasks = phase.oneTimeTasks, !tasks.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Tasks", systemImage: "checklist")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
 
                         ForEach(tasks, id: \.title) { task in
@@ -581,19 +581,19 @@ private struct TaskSuggestionRow: View {
                             .frame(width: 22, height: 22)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .dynamicTypeFont(base: 11, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.white.opacity(isSelected ? 1 : 0.7))
                         .strikethrough(!isSelected, color: .white.opacity(0.3))
 
                     Text(duration)
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(.white.opacity(0.4))
                 }
 

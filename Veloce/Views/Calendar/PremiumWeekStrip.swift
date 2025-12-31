@@ -92,7 +92,7 @@ struct PremiumWeekStrip: View {
             VStack(spacing: 6) {
                 // Day of week
                 Text(date.formatted(.dateTime.weekday(.narrow)))
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(
                         isToday ? Theme.Colors.aiCyan :
                             isSelected ? .white :
@@ -146,7 +146,7 @@ struct PremiumWeekStrip: View {
 
                         if totalCount > 3 {
                             Text("+")
-                                .font(.system(size: 8, weight: .bold))
+                                .dynamicTypeFont(base: 8, weight: .bold)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
                     } else {

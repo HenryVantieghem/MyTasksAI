@@ -48,15 +48,15 @@ struct SmartScheduleModule: View {
     private var peakHoursView: some View {
         HStack(spacing: 6) {
             Image(systemName: "sparkles")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(accentColor)
 
             Text("Your best \(task.taskType.displayName.uppercased()) time: ")
-                .font(.system(size: 13, weight: .regular))
+                .dynamicTypeFont(base: 13, weight: .regular)
                 .foregroundStyle(.white.opacity(0.8))
 
             Text(viewModel.userPeakHours)
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(accentColor)
         }
     }
@@ -90,21 +90,21 @@ struct SmartScheduleModule: View {
             HStack(spacing: Theme.Spacing.sm) {
                 // Quality indicator
                 Text(suggestion.rank.emoji)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(suggestion.rank.label)
-                            .font(.system(size: 11, weight: .bold))
+                            .dynamicTypeFont(base: 11, weight: .bold)
                             .foregroundStyle(suggestion.rank.color)
 
                         Text(suggestion.formattedTime)
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                             .foregroundStyle(.white)
                     }
 
                     Text(suggestion.reason)
-                        .font(.system(size: 11, weight: .regular))
+                        .dynamicTypeFont(base: 11, weight: .regular)
                         .foregroundStyle(.white.opacity(0.6))
                         .lineLimit(1)
                 }
@@ -112,7 +112,7 @@ struct SmartScheduleModule: View {
                 Spacer()
 
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(accentColor.opacity(0.6))
             }
             .padding(Theme.Spacing.sm)
@@ -140,7 +140,7 @@ struct SmartScheduleModule: View {
                 Image(systemName: "calendar.badge.plus")
                 Text("Add to Calendar")
             }
-            .font(.system(size: 13, weight: .semibold))
+            .dynamicTypeFont(base: 13, weight: .semibold)
             .foregroundStyle(accentColor)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)

@@ -121,7 +121,7 @@ struct DrawingToolPalette: View {
                     onUndo()
                 } label: {
                     Image(systemName: "arrow.uturn.backward")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Theme.Colors.textSecondary)
                         .frame(width: 36, height: 36)
                 }
@@ -132,7 +132,7 @@ struct DrawingToolPalette: View {
                     onRedo()
                 } label: {
                     Image(systemName: "arrow.uturn.forward")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Theme.Colors.textSecondary)
                         .frame(width: 36, height: 36)
                 }
@@ -146,7 +146,7 @@ struct DrawingToolPalette: View {
                     onClear()
                 } label: {
                     Image(systemName: "trash")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Theme.Colors.error)
                         .frame(width: 36, height: 36)
                 }
@@ -158,7 +158,7 @@ struct DrawingToolPalette: View {
                     onDismiss()
                 } label: {
                     Image(systemName: "keyboard.chevron.compact.down")
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(Theme.Colors.accent)
                         .frame(width: 44, height: 44)
                 }

@@ -128,15 +128,15 @@ struct InlineBlockingSection: View {
                         .foregroundStyle(.white)
 
                     Text("Today's Screen Time")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
 
                     // Comparison
                     HStack(spacing: 4) {
                         Image(systemName: todayScreenTime < weeklyAverage ? "arrow.down" : "arrow.up")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                         Text(formatTimeDiff(todayScreenTime - weeklyAverage) + " vs avg")
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                     }
                     .foregroundStyle(todayScreenTime < weeklyAverage ? Theme.Colors.success : Theme.Colors.aiOrange)
                 }
@@ -175,7 +175,7 @@ struct InlineBlockingSection: View {
     private func statCard(value: String, label: String, icon: String, color: Color) -> some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(color)
 
             Text(value)
@@ -183,7 +183,7 @@ struct InlineBlockingSection: View {
                 .foregroundStyle(.white)
 
             Text(label)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .frame(maxWidth: .infinity)
@@ -199,7 +199,7 @@ struct InlineBlockingSection: View {
     private var quickBlockActions: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Quick Actions")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
 
             HStack(spacing: 10) {
@@ -226,10 +226,10 @@ struct InlineBlockingSection: View {
         Button(action: action) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
 
                 Text(title)
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -262,17 +262,17 @@ struct InlineBlockingSection: View {
                     .frame(width: 36, height: 36)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("AI Insight")
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("Usage spikes after 9 PM. Consider blocking social apps then.")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.white.opacity(0.8))
                     .lineLimit(2)
             }
@@ -301,13 +301,13 @@ struct InlineBlockingSection: View {
                         .frame(width: 8, height: 8)
 
                     Text(blockingService.isBlocking ? "Blocking Active" : "No Active Blocks")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
                 }
 
                 if blockingService.isBlocking {
                     Text("12 apps blocked")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -319,7 +319,7 @@ struct InlineBlockingSection: View {
                     Task { await blockingService.endSession() }
                 } label: {
                     Text("End")
-                        .font(.system(size: 13, weight: .semibold))
+                        .dynamicTypeFont(base: 13, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 7)
@@ -349,15 +349,15 @@ struct InlineBlockingSection: View {
                 } label: {
                     HStack {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 18))
+                            .dynamicTypeFont(base: 18)
 
                         Text("Create Schedule")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                     .foregroundStyle(.white)
@@ -391,12 +391,12 @@ struct InlineBlockingSection: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Text(name)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
 
                     if isActive {
                         Text("ACTIVE")
-                            .font(.system(size: 9, weight: .bold))
+                            .dynamicTypeFont(base: 9, weight: .bold)
                             .foregroundStyle(Theme.Colors.success)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 2)
@@ -409,10 +409,10 @@ struct InlineBlockingSection: View {
 
                 HStack(spacing: 6) {
                     Text(time)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                     Text("•")
                     Text(days)
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                 }
                 .foregroundStyle(.white.opacity(0.5))
             }
@@ -442,15 +442,15 @@ struct InlineBlockingSection: View {
                 } label: {
                     HStack {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 18))
+                            .dynamicTypeFont(base: 18)
 
                         Text("Create App Group")
-                            .font(.system(size: 15, weight: .semibold))
+                            .dynamicTypeFont(base: 15, weight: .semibold)
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                     .foregroundStyle(.white)
@@ -488,24 +488,24 @@ struct InlineBlockingSection: View {
                     .frame(width: 40, height: 40)
 
                 Image(systemName: icon)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(color)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text("\(appCount) apps")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.3))
         }
         .padding(14)

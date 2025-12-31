@@ -57,7 +57,7 @@ struct SmartScheduleCard: View {
         HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "calendar.badge.clock")
                 .foregroundStyle(Theme.Colors.accent)
-                .font(.system(size: 18))
+                .dynamicTypeFont(base: 18)
 
             Text("Smart Schedule")
                 .font(Theme.Typography.headline)
@@ -103,7 +103,7 @@ struct SmartScheduleCard: View {
     private var emptyStateView: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "calendar.badge.exclamationmark")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(Theme.Colors.tertiaryText)
 
             Text("No schedule suggestion yet")
@@ -198,12 +198,12 @@ struct SmartScheduleCard: View {
                     .rotationEffect(.degrees(-90))
 
                 Text("\(Int(confidence * 100))%")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Theme.Colors.primaryText)
             }
 
             Text(confidenceLabel(for: confidence))
-                .font(.system(size: 9))
+                .dynamicTypeFont(base: 9)
                 .foregroundStyle(Theme.Colors.tertiaryText)
         }
     }
@@ -233,7 +233,7 @@ struct SmartScheduleCard: View {
 
                 ForEach(conflicts, id: \.self) { conflict in
                     Text("• \(conflict)")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(Theme.Colors.secondaryText)
                 }
             }

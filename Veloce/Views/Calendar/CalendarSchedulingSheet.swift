@@ -92,15 +92,15 @@ struct CalendarSchedulingSheet: View {
     private var permissionRequestView: some View {
         VStack(spacing: 24) {
             Image(systemName: "calendar.badge.plus")
-                .font(.system(size: 56))
+                .dynamicTypeFont(base: 56)
                 .foregroundStyle(Theme.Colors.aiPurple)
 
             Text("Calendar Access Required")
-                .font(.system(size: 22, weight: .bold))
+                .dynamicTypeFont(base: 22, weight: .bold)
                 .foregroundStyle(.white)
 
             Text("Allow access to add this task to your calendar and see your availability.")
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(.white.opacity(0.6))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
@@ -111,7 +111,7 @@ struct CalendarSchedulingSheet: View {
                 }
             } label: {
                 Text("Allow Calendar Access")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 32)
                     .padding(.vertical, 14)
@@ -159,16 +159,16 @@ struct CalendarSchedulingSheet: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.title)
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(.white)
                     .lineLimit(2)
 
                 if let estimate = task.estimatedMinutes {
                     HStack(spacing: 4) {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("AI suggests \(estimate) min")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                     }
                     .foregroundStyle(Theme.Colors.aiPurple)
                 }
@@ -187,7 +187,7 @@ struct CalendarSchedulingSheet: View {
     private var dateSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Label("Date", systemImage: "calendar")
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.8))
 
             DatePicker(
@@ -211,7 +211,7 @@ struct CalendarSchedulingSheet: View {
     private var timeSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Label("Time", systemImage: "clock")
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.8))
 
             DatePicker(
@@ -235,7 +235,7 @@ struct CalendarSchedulingSheet: View {
     private var durationSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Label("Duration", systemImage: "hourglass")
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.8))
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 10) {
@@ -257,11 +257,11 @@ struct CalendarSchedulingSheet: View {
             VStack(spacing: 4) {
                 if isAIRecommended {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(Theme.Colors.aiPurple)
                 }
                 Text(formatDuration(minutes))
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
             }
             .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
             .frame(maxWidth: .infinity)
@@ -297,7 +297,7 @@ struct CalendarSchedulingSheet: View {
     private var timelinePreview: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Label("Preview", systemImage: "eye")
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.8))
 
             MiniTimelinePreview(
@@ -330,7 +330,7 @@ struct CalendarSchedulingSheet: View {
                     Text("Add to Calendar")
                 }
             }
-            .font(.system(size: 16, weight: .semibold))
+            .dynamicTypeFont(base: 16, weight: .semibold)
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -392,16 +392,16 @@ struct CalendarSchedulingSheet: View {
                         .frame(width: 70, height: 70)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 32, weight: .bold))
+                        .dynamicTypeFont(base: 32, weight: .bold)
                         .foregroundStyle(.white)
                 }
 
                 Text("Added to Calendar")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text(combinedDateTime.formatted(date: .abbreviated, time: .shortened))
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.7))
             }
             .transition(.scale.combined(with: .opacity))
@@ -468,7 +468,7 @@ struct MiniTimelinePreview: View {
                     ForEach(0..<4, id: \.self) { hour in
                         HStack(spacing: 8) {
                             Text(hourLabel(for: hour))
-                                .font(.system(size: 10, weight: .medium))
+                                .dynamicTypeFont(base: 10, weight: .medium)
                                 .foregroundStyle(.white.opacity(0.4))
                                 .frame(width: 40, alignment: .trailing)
 

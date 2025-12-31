@@ -71,7 +71,7 @@ struct XPFloatView: View {
             if data.hasMultiplier {
                 HStack(spacing: 2) {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
 
                     Text("×\(String(format: "%.1f", data.multiplier))")
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
@@ -169,7 +169,7 @@ struct XPCounterView: View {
         HStack(spacing: 4) {
             Image(systemName: "star.fill")
                 .foregroundStyle(Theme.Celebration.starGold)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
 
             Text("\(displayedXP)")
                 .font(.system(size: 16, weight: .bold, design: .rounded))
@@ -177,7 +177,7 @@ struct XPCounterView: View {
                 .contentTransition(.numericText())
 
             Text("XP")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(.secondary)
         }
         .padding(.horizontal, 10)
@@ -258,7 +258,7 @@ struct XPEarnedBanner: View {
                         .frame(width: 60, height: 60)
 
                     Image(systemName: "star.fill")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(Theme.Celebration.starGold)
                         .shadow(color: Theme.Celebration.starGold.opacity(0.8), radius: 10)
                 }
@@ -280,9 +280,9 @@ struct XPEarnedBanner: View {
                     if multiplier > 1.0 {
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                             Text("×\(String(format: "%.1f", multiplier)) Cosmic Flow bonus!")
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                         }
                         .foregroundStyle(Theme.Celebration.flameInner)
                     }
@@ -344,7 +344,7 @@ struct XPSparkle: View {
         ZStack {
             ForEach(particles, id: \.id) { particle in
                 Image(systemName: "sparkle")
-                    .font(.system(size: 8))
+                    .dynamicTypeFont(base: 8)
                     .foregroundStyle(Theme.Celebration.starGold)
                     .offset(particle.offset)
                     .opacity(particle.opacity)

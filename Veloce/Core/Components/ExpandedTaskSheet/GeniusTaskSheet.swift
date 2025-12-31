@@ -165,9 +165,9 @@ struct GeniusTaskSheet: View {
                 // Task type badge
                 HStack(spacing: 4) {
                     Image(systemName: task.taskType.icon)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                     Text(task.taskType.displayName)
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                 }
                 .foregroundStyle(taskTypeColor)
                 .padding(.horizontal, 10)
@@ -184,14 +184,14 @@ struct GeniusTaskSheet: View {
                     onEditTapped()
                 } label: {
                     Text("Edit")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiBlue)
                 }
             }
 
             // Task title
             Text(task.title)
-                .font(.system(size: 22, weight: .bold))
+                .dynamicTypeFont(base: 22, weight: .bold)
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -201,15 +201,15 @@ struct GeniusTaskSheet: View {
                 if let estimate = task.estimatedTimeFormatted {
                     HStack(spacing: 4) {
                         Image(systemName: "clock")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text(estimate)
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(.white.opacity(0.7))
                 }
 
                 Text(task.priorityStars)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(task.priority.color)
 
                 if task.hasAIProcessing {
@@ -258,7 +258,7 @@ struct GeniusTaskSheet: View {
                 Image(systemName: "square.and.pencil")
                 Text("Full Details")
             }
-            .font(.system(size: 15, weight: .semibold))
+            .dynamicTypeFont(base: 15, weight: .semibold)
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)

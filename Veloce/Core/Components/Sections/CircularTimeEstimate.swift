@@ -34,7 +34,7 @@ struct CircularTimeEstimate: View {
                     .font(.system(size: 18, weight: .bold, design: .default))
                     .foregroundStyle(.white)
                 Text("min")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(.white.opacity(0.6))
             }
         }

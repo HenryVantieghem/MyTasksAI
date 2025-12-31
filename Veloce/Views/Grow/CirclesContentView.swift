@@ -147,7 +147,7 @@ struct CirclesContentView: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: "person.2.fill")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.stellarMagenta)
                 }
 
@@ -176,7 +176,7 @@ struct CirclesContentView: View {
                     )
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(Aurora.Colors.textTertiary)
             }
             .padding(16)
@@ -224,7 +224,7 @@ struct CirclesContentView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "plus")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                         Text("Create")
                             .font(Aurora.Typography.subheadline)
                             .fontWeight(.semibold)
@@ -300,7 +300,7 @@ struct CirclesContentView: View {
                             .frame(width: 56, height: 56)
 
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 26))
+                            .dynamicTypeFont(base: 26)
                             .foregroundStyle(Aurora.Colors.stellarMagenta)
                     }
 
@@ -352,7 +352,7 @@ struct CirclesContentView: View {
                             .frame(width: 56, height: 56)
 
                         Image(systemName: "person.badge.plus")
-                            .font(.system(size: 24))
+                            .dynamicTypeFont(base: 24)
                             .foregroundStyle(Aurora.Colors.electricCyan)
                     }
 
@@ -408,7 +408,7 @@ struct CirclesContentView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "person.badge.plus")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                         Text("Add")
                             .font(Aurora.Typography.subheadline)
                             .fontWeight(.semibold)
@@ -463,7 +463,7 @@ struct CirclesContentView: View {
                 }
 
                 Image(systemName: "person.2")
-                    .font(.system(size: 28, weight: .light))
+                    .dynamicTypeFont(base: 28, weight: .light)
                     .foregroundStyle(Aurora.Colors.textSecondary)
             }
             .frame(height: 100)
@@ -520,13 +520,13 @@ struct CirclesContentView: View {
             // Section Header
             HStack {
                 Text("Recent Activity")
-                    .font(.system(size: 20, weight: .bold))
+                    .dynamicTypeFont(base: 20, weight: .bold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Spacer()
 
                 Text("From your circles")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Aurora.Colors.textTertiary)
             }
             .padding(.horizontal, layout.screenPadding)
@@ -602,7 +602,7 @@ struct CirclesContentView: View {
                         .shadow(color: Aurora.Colors.borealisViolet.opacity(0.5), radius: 20)
 
                     Image(systemName: "person.3.fill")
-                        .font(.system(size: 32, weight: .medium))
+                        .dynamicTypeFont(base: 32, weight: .medium)
                         .foregroundStyle(.white)
                 }
             }
@@ -610,11 +610,11 @@ struct CirclesContentView: View {
 
             VStack(spacing: 12) {
                 Text("Build Your Circle")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text("Connect with friends, join circles, and\nachieve your goals together")
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(Aurora.Colors.textSecondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
@@ -630,7 +630,7 @@ struct CirclesContentView: View {
                         Image(systemName: "plus.circle.fill")
                         Text("Create a Circle")
                     }
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -650,7 +650,7 @@ struct CirclesContentView: View {
                         Image(systemName: "person.badge.plus")
                         Text("Add Friends")
                     }
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -766,22 +766,22 @@ struct PremiumCircleCard: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(circle.name)
-                            .font(.system(size: 17, weight: .semibold))
+                            .dynamicTypeFont(base: 17, weight: .semibold)
                             .foregroundStyle(Aurora.Colors.textPrimary)
                             .lineLimit(1)
 
                         HStack(spacing: 8) {
                             Label("\(circle.memberCount)", systemImage: "person.2.fill")
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                                 .foregroundStyle(Aurora.Colors.textSecondary)
 
                             if circle.circleStreak > 0 {
                                 HStack(spacing: 3) {
                                     Image(systemName: "flame.fill")
-                                        .font(.system(size: 10))
+                                        .dynamicTypeFont(base: 10)
                                         .foregroundStyle(.orange)
                                     Text("\(circle.circleStreak)")
-                                        .font(.system(size: 12, weight: .medium))
+                                        .dynamicTypeFont(base: 12, weight: .medium)
                                         .foregroundStyle(Aurora.Colors.textSecondary)
                                 }
                             }
@@ -802,7 +802,7 @@ struct PremiumCircleCard: View {
 
                         if members.count > 4 {
                             Text("+\(members.count - 4)")
-                                .font(.system(size: 10, weight: .bold))
+                                .dynamicTypeFont(base: 10, weight: .bold)
                                 .foregroundStyle(Aurora.Colors.textSecondary)
                                 .frame(width: 28, height: 28)
                                 .background {
@@ -818,7 +818,7 @@ struct PremiumCircleCard: View {
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                             .foregroundStyle(Aurora.Colors.textTertiary)
                     }
                 }
@@ -870,7 +870,7 @@ struct MiniAvatarView: View {
 
     var body: some View {
         Text(String(name.prefix(1)).uppercased())
-            .font(.system(size: 11, weight: .bold))
+            .dynamicTypeFont(base: 11, weight: .bold)
             .foregroundStyle(.white)
             .frame(width: 28, height: 28)
             .background {
@@ -912,7 +912,7 @@ struct PremiumFriendCard: View {
                         .frame(width: 48, height: 48)
 
                     Text(String(friend.displayName.prefix(1)).uppercased())
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white)
 
                     // Online indicator
@@ -929,12 +929,12 @@ struct PremiumFriendCard: View {
                 // Info
                 VStack(alignment: .leading, spacing: 4) {
                     Text(friend.displayName)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.textPrimary)
 
                     if let username = friend.username {
                         Text("@\(username)")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                             .foregroundStyle(Aurora.Colors.textSecondary)
                     }
                 }
@@ -947,7 +947,7 @@ struct PremiumFriendCard: View {
                     if let streak = friend.currentStreak, streak > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(.orange)
                             Text("\(streak)")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -959,10 +959,10 @@ struct PremiumFriendCard: View {
                     if let level = friend.currentLevel {
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                                 .foregroundStyle(Aurora.Colors.cosmicGold)
                             Text("Lv\(level)")
-                                .font(.system(size: 13, weight: .medium))
+                                .dynamicTypeFont(base: 13, weight: .medium)
                                 .foregroundStyle(Aurora.Colors.textSecondary)
                         }
                     }
@@ -1014,7 +1014,7 @@ struct ActivityFeedItem: View {
                     .frame(width: 40, height: 40)
 
                 Image(systemName: activity.activityType.icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(activity.activityType.color)
             }
 
@@ -1022,17 +1022,17 @@ struct ActivityFeedItem: View {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Text(activity.user?.displayName ?? "Someone")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.textPrimary)
 
                     Text(activity.activityType.displayName.lowercased())
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Aurora.Colors.textSecondary)
                 }
 
                 if let message = activity.message {
                     Text(message)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(Aurora.Colors.textTertiary)
                         .lineLimit(1)
                 }
@@ -1043,7 +1043,7 @@ struct ActivityFeedItem: View {
             // Time and points
             VStack(alignment: .trailing, spacing: 3) {
                 Text(activity.formattedTime)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(Aurora.Colors.textTertiary)
 
                 if activity.pointsEarned > 0 {

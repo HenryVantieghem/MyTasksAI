@@ -161,11 +161,11 @@ struct TimePeriodDivider: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: period.icon)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundColor(period.color)
 
             Text(period.rawValue)
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundColor(Theme.CelestialColors.starDim)
 
             Rectangle()

@@ -84,7 +84,7 @@ struct LiquidGlassCalendarHeader: View {
                 }
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.secondary)
                     .frame(width: 36, height: 36)
                     .contentShape(Rectangle())
@@ -101,7 +101,7 @@ struct LiquidGlassCalendarHeader: View {
                         .minimumScaleFactor(0.8)
 
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 10, weight: .semibold))
+                        .dynamicTypeFont(base: 10, weight: .semibold)
                         .foregroundStyle(.tertiary)
                 }
                 .frame(height: 36)
@@ -117,7 +117,7 @@ struct LiquidGlassCalendarHeader: View {
                 }
             } label: {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.secondary)
                     .frame(width: 36, height: 36)
                     .contentShape(Rectangle())
@@ -147,12 +147,12 @@ struct LiquidGlassCalendarHeader: View {
         case .day:
             HStack {
                 Text(selectedDate.formatted(.dateTime.weekday(.wide)))
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.secondary)
 
                 if calendar.isDateInToday(selectedDate) {
                     Text("Today")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Color.accentColor)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
@@ -167,13 +167,13 @@ struct LiquidGlassCalendarHeader: View {
                 if let weekStart = calendar.dateInterval(of: .weekOfYear, for: selectedDate)?.start,
                    let weekEnd = calendar.date(byAdding: .day, value: 6, to: weekStart) {
                     Text("\(weekStart.formatted(.dateTime.month(.abbreviated).day())) - \(weekEnd.formatted(.dateTime.month(.abbreviated).day()))")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.secondary)
                 }
 
                 if isCurrentWeek {
                     Text("This Week")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Color.accentColor)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
@@ -188,13 +188,13 @@ struct LiquidGlassCalendarHeader: View {
                 if let monthInterval = calendar.dateInterval(of: .month, for: selectedDate) {
                     let daysInMonth = calendar.dateComponents([.day], from: monthInterval.start, to: monthInterval.end).day ?? 30
                     Text("\(daysInMonth) days")
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.secondary)
                 }
 
                 if isCurrentMonth {
                     Text("This Month")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(Color.accentColor)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
@@ -228,7 +228,7 @@ struct LiquidGlassCalendarHeader: View {
             }
         } label: {
             Text("Today")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(Color.accentColor)
                 .padding(.horizontal, 10)
                 .frame(height: 30)

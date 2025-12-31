@@ -78,7 +78,7 @@ struct TaskCardV2: View {
         return AIGuidanceGenerator.generateFallback(for: task.title, taskType: task.taskType)
     }
 
-    private var urgencyLevel: UrgencyGlowModifier.UrgencyLevel {
+    private var urgencyLevel: UrgencyGlowModifier.GlassUrgencyLevel {
         guard let scheduledTime = task.scheduledTime else { return .calm }
         let now = Date()
 
@@ -344,7 +344,7 @@ struct TaskCardV2: View {
                 metadataChip(
                     icon: "calendar",
                     text: formatScheduledTime(scheduledTime),
-                    color: urgencyLevel == .overdue ? Theme.CelestialColors.urgencyCritical : .secondary
+                    color: (urgencyLevel == .critical || urgencyLevel == .overdue) ? Theme.CelestialColors.urgencyCritical : .secondary
                 )
             }
         }
@@ -354,7 +354,7 @@ struct TaskCardV2: View {
     private func metadataChip(icon: String, text: String, color: Color) -> some View {
         HStack(spacing: 3) {
             Image(systemName: icon)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
             Text(text)
                 .font(Theme.Typography.cosmosMeta)
         }
@@ -588,7 +588,7 @@ struct PlayTimerButton: View {
 
                 // Play icon
                 Image(systemName: "play.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(Theme.Colors.aiAmber)
                     .offset(x: 1)  // Optical centering for play icon
             }
@@ -741,7 +741,7 @@ struct PlasmaEnergyCore: View {
             // Tap hint (only for incomplete tasks)
             if !isCompleted {
                 Text("tap")
-                    .font(.system(size: 9, weight: .medium))
+                    .dynamicTypeFont(base: 9, weight: .medium)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
                     .opacity(reduceMotion ? 0.6 : 0.4 + Double(attentionRingPhase) * 0.2)
             }
@@ -843,7 +843,7 @@ struct CosmicPointsBadge: View {
                 .foregroundStyle(badgeColor)
 
             Image(systemName: isEarned ? "bolt.fill" : "bolt")
-                .font(.system(size: 10, weight: .bold))
+                .dynamicTypeFont(base: 10, weight: .bold)
                 .foregroundStyle(badgeColor)
         }
         .padding(.horizontal, 8)

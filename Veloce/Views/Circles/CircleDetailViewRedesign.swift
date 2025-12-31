@@ -78,7 +78,7 @@ struct CircleDetailViewRedesign: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
-                            .font(.system(size: 18))
+                            .dynamicTypeFont(base: 18)
                             .foregroundStyle(Theme.Colors.aiPurple)
                     }
                 }
@@ -143,7 +143,7 @@ struct CircleDetailViewRedesign: View {
 
                 if let description = circle.description, !description.isEmpty {
                     Text(description)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .multilineTextAlignment(.center)
                 }
@@ -160,10 +160,10 @@ struct CircleDetailViewRedesign: View {
             if hasActiveChallenge {
                 HStack(spacing: 6) {
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
 
                     Text("Active Challenge")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                 }
                 .foregroundStyle(Theme.CelestialColors.solarFlare)
                 .padding(.horizontal, 14)
@@ -187,7 +187,7 @@ struct CircleDetailViewRedesign: View {
         VStack(spacing: 6) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(color)
 
                 Text(value)
@@ -196,7 +196,7 @@ struct CircleDetailViewRedesign: View {
             }
 
             Text(label)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         }
     }
@@ -213,7 +213,7 @@ struct CircleDetailViewRedesign: View {
                 } label: {
                     VStack(spacing: 6) {
                         Image(systemName: tab.icon)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
 
                         Text(tab.rawValue)
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -267,9 +267,9 @@ struct CircleDetailViewRedesign: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "plus")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                         Text("Invite")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                     }
                     .foregroundStyle(Theme.Colors.aiPurple)
                 }
@@ -326,11 +326,11 @@ struct CircleDetailViewRedesign: View {
             } else if activity.isEmpty {
                 VStack(spacing: 12) {
                     Image(systemName: "bubble.left.and.bubble.right")
-                        .font(.system(size: 32, weight: .light))
+                        .dynamicTypeFont(base: 32, weight: .light)
                         .foregroundStyle(Theme.CelestialColors.starGhost)
 
                     Text("No activity yet")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .frame(maxWidth: .infinity)
@@ -361,9 +361,9 @@ struct CircleDetailViewRedesign: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "bolt.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("New")
-                            .font(.system(size: 13, weight: .semibold))
+                            .dynamicTypeFont(base: 13, weight: .semibold)
                     }
                     .foregroundStyle(Theme.CelestialColors.solarFlare)
                 }
@@ -372,18 +372,18 @@ struct CircleDetailViewRedesign: View {
             // Placeholder for circle challenges
             VStack(spacing: 12) {
                 Image(systemName: "trophy")
-                    .font(.system(size: 32, weight: .light))
+                    .dynamicTypeFont(base: 32, weight: .light)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
 
                 Text("No circle challenges yet")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starDim)
 
                 Button {
                     // Create challenge
                 } label: {
                     Text("Start a Circle Challenge")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
@@ -486,7 +486,7 @@ struct CircleMemberRow: View {
                     // Role badge
                     if member.role != .member {
                         Text(member.role.displayName)
-                            .font(.system(size: 9, weight: .bold))
+                            .dynamicTypeFont(base: 9, weight: .bold)
                             .foregroundStyle(member.role == .owner ? Theme.Colors.xp : Theme.Colors.aiPurple)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -500,9 +500,9 @@ struct CircleMemberRow: View {
                 if let streak = user.currentStreak, streak > 0 {
                     HStack(spacing: 3) {
                         Image(systemName: "flame.fill")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("\(streak) day streak")
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                     }
                     .foregroundStyle(Theme.Colors.streakOrange)
                 }
@@ -517,7 +517,7 @@ struct CircleMemberRow: View {
                     .foregroundStyle(Theme.Colors.xp)
 
                 Text("XP")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
         }
@@ -569,7 +569,7 @@ struct CircleLeaderboardRow: View {
             // XP
             HStack(spacing: 4) {
                 Image(systemName: "star.fill")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.Colors.xp)
 
                 Text("\(user.totalPoints ?? 0)")
@@ -621,7 +621,7 @@ struct CircleActivityRow: View {
                     .frame(width: 36, height: 36)
 
                 Image(systemName: activity.activityType.icon)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(activity.activityType.color)
             }
 
@@ -629,11 +629,11 @@ struct CircleActivityRow: View {
                 // User and action
                 HStack(spacing: 4) {
                     Text(activity.user?.displayName ?? "User")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text(activity.message ?? activity.activityType.defaultMessage)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
 
@@ -641,16 +641,16 @@ struct CircleActivityRow: View {
                 if activity.pointsEarned > 0 {
                     HStack(spacing: 3) {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("+\(activity.pointsEarned) XP")
-                            .font(.system(size: 11, weight: .semibold))
+                            .dynamicTypeFont(base: 11, weight: .semibold)
                     }
                     .foregroundStyle(Theme.Colors.xp)
                 }
 
                 // Time
                 Text(activity.formattedTime)
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.CelestialColors.starGhost)
             }
 
@@ -675,7 +675,7 @@ struct CircleInviteSheet: View {
                 // Invite code display
                 VStack(spacing: 12) {
                     Text("Invite Code")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     Text(circle.formattedInviteCode)
@@ -695,7 +695,7 @@ struct CircleInviteSheet: View {
                             Image(systemName: copied ? "checkmark" : "doc.on.doc")
                             Text(copied ? "Copied!" : "Copy Code")
                         }
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
@@ -712,7 +712,7 @@ struct CircleInviteSheet: View {
                 // Share options
                 VStack(spacing: 12) {
                     Text("Or share directly")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
 
                     ShareLink(
@@ -724,7 +724,7 @@ struct CircleInviteSheet: View {
                             Image(systemName: "square.and.arrow.up")
                             Text("Share Invite")
                         }
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starWhite)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)

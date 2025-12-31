@@ -26,11 +26,11 @@ struct AppBlockingModule: View {
                 // Icon and title
                 HStack(spacing: Theme.Spacing.sm) {
                     Image(systemName: "shield.fill")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.TaskCardColors.workMode)
 
                     Text("App Blocking")
-                        .font(.system(size: 13, weight: .bold))
+                        .dynamicTypeFont(base: 13, weight: .bold)
                         .foregroundStyle(Theme.TaskCardColors.workMode)
                 }
 
@@ -61,7 +61,7 @@ struct AppBlockingModule: View {
                                 Image(systemName: "plus.app")
                                 Text(hasSelection ? "Edit Blocked Apps" : "Select Apps to Block")
                             }
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -75,7 +75,7 @@ struct AppBlockingModule: View {
 
                     // Info text
                     Text("Apps will be blocked when you start a focus session for this task")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))
@@ -110,11 +110,11 @@ struct AppBlockingModule: View {
         VStack(spacing: Theme.Spacing.sm) {
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.warning)
 
                 Text("Screen Time access required")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.9))
             }
 
@@ -124,7 +124,7 @@ struct AppBlockingModule: View {
                 }
             } label: {
                 Text("Enable in Settings")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(Theme.TaskCardColors.workMode)
             }
             .buttonStyle(.plain)
@@ -143,19 +143,19 @@ struct AppBlockingModule: View {
             if hasSelection {
                 // Show count of blocked apps
                 Image(systemName: "app.badge.checkmark.fill")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.success)
 
                 Text(selectionSummary)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.9))
             } else {
                 Image(systemName: "app.dashed")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starDim)
 
                 Text("No apps selected")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
 

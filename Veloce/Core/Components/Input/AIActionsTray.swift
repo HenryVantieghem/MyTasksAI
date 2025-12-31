@@ -133,7 +133,7 @@ struct AIEnhanceSheet: View {
                                 Spacer()
 
                                 Image(systemName: "chevron.down")
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .dynamicTypeFont(base: 12, weight: .semibold)
                                     .foregroundStyle(.secondary)
                                     .rotationEffect(.degrees(showExpandedActions ? 180 : 0))
                             }
@@ -185,10 +185,10 @@ struct AIEnhanceSheet: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 Image(systemName: "text.quote")
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
 
                 Text("Your Task")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
             }
             .foregroundStyle(.secondary)
 
@@ -233,7 +233,7 @@ struct AIEnhanceSheet: View {
     private func sectionHeader(title: String, icon: String) -> some View {
         HStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
@@ -243,7 +243,7 @@ struct AIEnhanceSheet: View {
                 )
 
             Text(title)
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.primary)
         }
     }
@@ -300,7 +300,7 @@ struct AIActionButton: View {
                             .tint(action.color)
                     } else {
                         Image(systemName: action.icon)
-                            .font(.system(size: 16, weight: .semibold))
+                            .dynamicTypeFont(base: 16, weight: .semibold)
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [action.color, action.color.opacity(0.7)],
@@ -315,11 +315,11 @@ struct AIActionButton: View {
                 // Labels
                 VStack(spacing: 2) {
                     Text(action.rawValue)
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundStyle(.primary)
 
                     Text(action.description)
-                        .font(.system(size: 10, weight: .regular))
+                        .dynamicTypeFont(base: 10, weight: .regular)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
@@ -439,10 +439,10 @@ struct CompactAIActionChip: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: action.icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
 
                 Text(action.rawValue)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
             }
             .foregroundStyle(
                 isSelected

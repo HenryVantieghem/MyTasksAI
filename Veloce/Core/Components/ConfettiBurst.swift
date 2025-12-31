@@ -259,7 +259,7 @@ struct StreakCelebration: View {
                 VStack(spacing: 24) {
                     // Emoji (decorative - fixed size is OK for emoji)
                     Text(streakEmoji)
-                        .font(.system(size: 72))
+                        .dynamicTypeFont(base: 72)
                         .scaleEffect(numberScale)
                         .accessibilityHidden(true)
 

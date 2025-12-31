@@ -173,7 +173,7 @@ struct SettingsBottomSheet: View {
             // Name and email
             VStack(spacing: Theme.Spacing.xs) {
                 Text(viewModel.fullName.isEmpty ? "Your Name" : viewModel.fullName)
-                    .font(.system(size: 20, weight: .semibold))
+                    .dynamicTypeFont(base: 20, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 if !viewModel.username.isEmpty {
@@ -183,7 +183,7 @@ struct SettingsBottomSheet: View {
                 }
 
                 Text(viewModel.email)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             }
 
@@ -208,7 +208,7 @@ struct SettingsBottomSheet: View {
         VStack(spacing: Theme.Spacing.xs) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(color)
 
                 Text(value)
@@ -217,7 +217,7 @@ struct SettingsBottomSheet: View {
             }
 
             Text(label)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(Theme.CelestialColors.starDim)
         }
     }
@@ -271,11 +271,11 @@ struct SettingsBottomSheet: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Theme")
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(Theme.CelestialColors.starWhite)
 
                         Text("App appearance")
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
 
@@ -369,13 +369,13 @@ struct SettingsBottomSheet: View {
                         }
 
                         Text("Delete Account")
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(Theme.CelestialColors.errorNebula)
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                             .foregroundStyle(Theme.CelestialColors.starGhost)
                     }
                     .padding(.horizontal, LivingCosmos.Controls.rowPadding)
@@ -394,11 +394,11 @@ struct SettingsBottomSheet: View {
             // App logo mini
             HStack(spacing: Theme.Spacing.sm) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("Veloce")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("v1.0.0")
@@ -420,7 +420,7 @@ struct SettingsBottomSheet: View {
             }
 
             Text("Made with AI in San Francisco")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
                 .padding(.top, Theme.Spacing.xs)
         }
@@ -466,7 +466,7 @@ struct ProfileEditSheet: View {
                             .tracking(1.5)
 
                         TextField("", text: $editedName)
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                             .foregroundStyle(Theme.CelestialColors.starWhite)
                             .padding()
                             .background {
@@ -488,11 +488,11 @@ struct ProfileEditSheet: View {
 
                         HStack {
                             Text("@")
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                                 .foregroundStyle(Theme.Colors.aiPurple)
 
                             TextField("", text: $editedUsername)
-                                .font(.system(size: 16))
+                                .dynamicTypeFont(base: 16)
                                 .foregroundStyle(Theme.CelestialColors.starWhite)
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled()

@@ -34,10 +34,10 @@ struct CelestialQuickActions: View {
         Button(action: onComplete) {
             HStack(spacing: 10) {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
 
                 Text("Mark Complete")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -67,10 +67,10 @@ struct CelestialQuickActions: View {
         Button(action: onDuplicate) {
             VStack(spacing: 6) {
                 Image(systemName: "doc.on.doc")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
 
                 Text("Duplicate")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -93,10 +93,10 @@ struct CelestialQuickActions: View {
         Button(action: onSnooze) {
             VStack(spacing: 6) {
                 Image(systemName: "moon.zzz")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
 
                 Text("Snooze")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
             }
             .foregroundStyle(Theme.TaskCardColors.schedule)
             .frame(maxWidth: .infinity)
@@ -119,10 +119,10 @@ struct CelestialQuickActions: View {
         Button(action: onDelete) {
             VStack(spacing: 6) {
                 Image(systemName: "trash")
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
 
                 Text("Delete")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
             }
             .foregroundStyle(Theme.Colors.destructive)
             .frame(maxWidth: .infinity)

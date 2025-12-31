@@ -41,7 +41,7 @@ struct MilestoneCelebrationView: View {
                 // Celebration header
                 if showContent {
                     Text(milestone.celebrationTitle)
-                        .font(.system(size: 14, weight: .bold))
+                        .dynamicTypeFont(base: 14, weight: .bold)
                         .tracking(3)
                         .foregroundStyle(milestone.accentColor)
                         .textCase(.uppercase)
@@ -80,7 +80,7 @@ struct MilestoneCelebrationView: View {
                             .foregroundStyle(.white)
 
                         Text(milestone.description)
-                            .font(.system(size: 16, weight: .medium))
+                            .dynamicTypeFont(base: 16, weight: .medium)
                             .foregroundStyle(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)
@@ -92,7 +92,7 @@ struct MilestoneCelebrationView: View {
                 if showContent {
                     HStack(spacing: 8) {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 24))
+                            .dynamicTypeFont(base: 24)
                             .foregroundStyle(Theme.Colors.aiAmber)
 
                         Text("+\(xpCounterValue)")
@@ -107,7 +107,7 @@ struct MilestoneCelebrationView: View {
                             .contentTransition(.numericText())
 
                         Text("XP")
-                            .font(.system(size: 20, weight: .bold))
+                            .dynamicTypeFont(base: 20, weight: .bold)
                             .foregroundStyle(.white.opacity(0.6))
                     }
                     .transition(.scale.combined(with: .opacity))
@@ -120,7 +120,7 @@ struct MilestoneCelebrationView: View {
                     onDismiss()
                 } label: {
                     Text("Continue")
-                        .font(.system(size: 17, weight: .semibold))
+                        .dynamicTypeFont(base: 17, weight: .semibold)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)

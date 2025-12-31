@@ -73,7 +73,7 @@ struct LiquidGlassSignInView: View {
                                 Spacer()
                                 Button(action: onForgotPassword) {
                                     Text("Forgot Password?")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .dynamicTypeFont(base: 14, weight: .medium)
                                         .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
                                 }
                             }
@@ -93,9 +93,9 @@ struct LiquidGlassSignInView: View {
                             if showError {
                                 HStack {
                                     Image(systemName: "exclamationmark.triangle.fill")
-                                        .font(.system(size: 14))
+                                        .dynamicTypeFont(base: 14)
                                     Text(errorMessage)
-                                        .font(.system(size: 14))
+                                        .dynamicTypeFont(base: 14)
                                 }
                                 .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.nebulaPink)
                                 .padding(12)
@@ -109,7 +109,7 @@ struct LiquidGlassSignInView: View {
                                     .fill(.white.opacity(0.1))
                                     .frame(height: 1)
                                 Text("or")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.5))
                                 Rectangle()
                                     .fill(.white.opacity(0.1))
@@ -164,11 +164,11 @@ struct LiquidGlassSignInView: View {
             // Title
             VStack(spacing: 8) {
                 Text("Welcome Back")
-                    .font(.system(size: 36, weight: .thin))
+                    .dynamicTypeFont(base: 36, weight: .thin)
                     .foregroundStyle(.white)
                 
                 Text("Sign in to continue your journey")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.6))
             }
         }
@@ -359,9 +359,9 @@ struct LiquidGlassSignUpView: View {
                             if showError {
                                 HStack {
                                     Image(systemName: "exclamationmark.triangle.fill")
-                                        .font(.system(size: 14))
+                                        .dynamicTypeFont(base: 14)
                                     Text(errorMessage)
-                                        .font(.system(size: 14))
+                                        .dynamicTypeFont(base: 14)
                                 }
                                 .foregroundStyle(LiquidGlassDesignSystem.VibrantAccents.nebulaPink)
                                 .padding(12)
@@ -375,7 +375,7 @@ struct LiquidGlassSignUpView: View {
                                     .fill(.white.opacity(0.1))
                                     .frame(height: 1)
                                 Text("or")
-                                    .font(.system(size: 14))
+                                    .dynamicTypeFont(base: 14)
                                     .foregroundStyle(.white.opacity(0.5))
                                 Rectangle()
                                     .fill(.white.opacity(0.1))
@@ -430,11 +430,11 @@ struct LiquidGlassSignUpView: View {
             // Title
             VStack(spacing: 8) {
                 Text("Begin Your Journey")
-                    .font(.system(size: 36, weight: .thin))
+                    .dynamicTypeFont(base: 36, weight: .thin)
                     .foregroundStyle(.white)
                 
                 Text("Create your account to unlock peak productivity")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
             }
@@ -562,7 +562,7 @@ struct LiquidGlassSecureField: View {
                         .textContentType(.password)
                 }
             }
-            .font(.system(size: 17))
+            .dynamicTypeFont(base: 17)
             .foregroundStyle(.white)
             .tint(LiquidGlassDesignSystem.VibrantAccents.electricCyan)
             .submitLabel(.done)
@@ -575,7 +575,7 @@ struct LiquidGlassSecureField: View {
                 HapticsService.shared.lightImpact()
             } label: {
                 Image(systemName: isVisible ? "eye.slash.fill" : "eye.fill")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white.opacity(0.5))
                     .frame(width: 24, height: 24)
             }

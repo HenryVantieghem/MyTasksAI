@@ -258,11 +258,10 @@ struct TaskCardV5: View {
                 )
                 .position(x: geo.size.width / 2, y: geo.size.height / 2)
             }
-            .frame(width: 44, height: 44)
+            .frame(width: layout.minTouchTarget, height: layout.minTouchTarget)
 
             // Title - SF Pro Rounded for premium feel
             Text(task.title)
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
                 .dynamicTypeFont(base: 17, weight: .semibold, design: .rounded)
                 .foregroundStyle(.primary)
                 .lineLimit(2)
@@ -297,9 +296,8 @@ struct TaskCardV5: View {
 
     private var aiWhisperSection: some View {
         Text(aiInsight)
-            .font(.system(size: 14, weight: .regular, design: .serif))
-            .italic()
             .dynamicTypeFont(base: 14, weight: .regular, design: .serif)
+            .italic()
             .foregroundStyle(
                 LinearGradient(
                     colors: [
@@ -422,10 +420,10 @@ struct TaskCardV5: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "play.fill")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
 
                 Text("Focus")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
             }
             .foregroundStyle(.white)
             .padding(.horizontal, 16)
@@ -468,7 +466,7 @@ struct TaskCardV5: View {
             }
         } label: {
             Image(systemName: "ellipsis")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.secondary)
                 .frame(width: 36, height: 36)
                 .background(Color(.tertiarySystemFill))
@@ -487,7 +485,7 @@ struct TaskCardV5: View {
                     Theme.AdaptiveColors.success.opacity(0.2)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundStyle(Theme.AdaptiveColors.success)
                         .opacity(swipeOffset > swipeCompleteThreshold * 0.5 ? 1 : 0)
                 }
@@ -505,7 +503,7 @@ struct TaskCardV5: View {
                     (isDelete ? Theme.AdaptiveColors.destructive : Theme.AdaptiveColors.warning).opacity(0.2)
 
                     Image(systemName: isDelete ? "trash.fill" : "moon.fill")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundStyle(isDelete ? Theme.AdaptiveColors.destructive : Theme.AdaptiveColors.warning)
                         .opacity(-swipeOffset > swipeSnoozeThreshold * 0.5 ? 1 : 0)
                 }
@@ -672,7 +670,7 @@ struct GlassMetadataChip: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 9, weight: .medium))
+                .dynamicTypeFont(base: 9, weight: .medium)
 
             Text(text)
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
@@ -802,7 +800,7 @@ struct EpicCelebrationOverlay: View {
                     // Main XP badge
                     HStack(spacing: 6) {
                         Image(systemName: "bolt.fill")
-                            .font(.system(size: 18, weight: .bold))
+                            .dynamicTypeFont(base: 18, weight: .bold)
 
                         Text("+\(pointsEarned)")
                             .font(.system(size: 26, weight: .bold, design: .rounded))
@@ -835,7 +833,7 @@ struct EpicCelebrationOverlay: View {
                         .mask {
                             HStack(spacing: 6) {
                                 Image(systemName: "bolt.fill")
-                                    .font(.system(size: 18, weight: .bold))
+                                    .dynamicTypeFont(base: 18, weight: .bold)
                                 Text("+\(pointsEarned)")
                                     .font(.system(size: 26, weight: .bold, design: .rounded))
                             }

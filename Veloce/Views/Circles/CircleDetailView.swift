@@ -78,13 +78,13 @@ struct CircleDetailView: View {
                     ))
                     .frame(width: 80, height: 80)
                 Text(circle.name.prefix(2).uppercased())
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
             }
 
             if let description = circle.description {
                 Text(description)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
             }
@@ -102,9 +102,9 @@ struct CircleDetailView: View {
     private func statItem(value: String, label: String) -> some View {
         VStack(spacing: 2) {
             Text(value)
-                .font(.system(size: 20, weight: .bold))
+                .dynamicTypeFont(base: 20, weight: .bold)
             Text(label)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
     }
@@ -112,7 +112,7 @@ struct CircleDetailView: View {
     private var membersSection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("Members")
-                .font(.system(size: 18, weight: .bold))
+                .dynamicTypeFont(base: 18, weight: .bold)
 
             if let members = circle.members {
                 ForEach(members) { member in
@@ -123,22 +123,22 @@ struct CircleDetailView: View {
                                     .fill(Theme.Colors.backgroundSecondary)
                                     .frame(width: 40, height: 40)
                                 Text(user.displayName.prefix(1).uppercased())
-                                    .font(.system(size: 16, weight: .semibold))
+                                    .dynamicTypeFont(base: 16, weight: .semibold)
                             }
                             VStack(alignment: .leading) {
                                 Text(user.displayName)
-                                    .font(.system(size: 15, weight: .medium))
+                                    .dynamicTypeFont(base: 15, weight: .medium)
                                 Text(member.role.displayName)
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                                     .foregroundStyle(Theme.Colors.textTertiary)
                             }
                             Spacer()
                             if let streak = user.currentStreak, streak > 0 {
                                 HStack(spacing: 2) {
                                     Image(systemName: "flame.fill")
-                                        .font(.system(size: 12))
+                                        .dynamicTypeFont(base: 12)
                                     Text("\(streak)")
-                                        .font(.system(size: 13, weight: .semibold))
+                                        .dynamicTypeFont(base: 13, weight: .semibold)
                                 }
                                 .foregroundStyle(.orange)
                             }
@@ -153,14 +153,14 @@ struct CircleDetailView: View {
     private var activitySection: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Text("Activity")
-                .font(.system(size: 18, weight: .bold))
+                .dynamicTypeFont(base: 18, weight: .bold)
 
             if isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity)
             } else if activity.isEmpty {
                 Text("No activity yet")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.textTertiary)
                     .frame(maxWidth: .infinity)
             } else {
@@ -180,10 +180,10 @@ struct CircleDetailView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.user?.displayName ?? "User")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                 if let message = item.message {
                     Text(message)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(Theme.Colors.textSecondary)
                 }
             }
@@ -191,7 +191,7 @@ struct CircleDetailView: View {
             Spacer()
 
             Text(item.formattedTime)
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.textTertiary)
         }
         .padding(.vertical, 4)

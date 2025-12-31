@@ -48,7 +48,7 @@ struct CirclesPill: View {
             // Icon with online indicator
             ZStack {
                 Image(systemName: "person.2.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 // Online indicator dot
@@ -167,7 +167,7 @@ struct CirclesPillCompact: View {
         } label: {
             ZStack {
                 Image(systemName: "person.2.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 // Notification dot

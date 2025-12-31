@@ -205,14 +205,14 @@ struct MomentumDataArtView: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: realm.icon)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(realm.rawValue)
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
 
                     Text(realm.subtitle)
-                        .font(.system(size: 10, weight: .medium))
+                        .dynamicTypeFont(base: 10, weight: .medium)
                         .opacity(isSelected ? 0.7 : 0.5)
                 }
             }
@@ -439,7 +439,7 @@ struct OrganicStatCell: View {
 
             // Label
             Text(label)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(LivingDataColors.textSecondary)
 
             // Organic progress bar
@@ -607,9 +607,9 @@ struct VelocityBlobVisualization: View {
                 if streak > 0 {
                     HStack(spacing: 4) {
                         Image(systemName: "flame.fill")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text("\(streak) day streak")
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                     }
                     .foregroundStyle(LivingDataColors.biolumOrange)
                     .padding(.top, 4)
@@ -702,7 +702,7 @@ struct StreakOrganismCard: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Image(systemName: "flame.fill")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(LivingDataColors.biolumOrange)
 
                 Text("Streak Organism")
@@ -712,7 +712,7 @@ struct StreakOrganismCard: View {
                 Spacer()
 
                 Text("Best: \(longestStreak)")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(LivingDataColors.textSecondary)
             }
 
@@ -730,7 +730,7 @@ struct StreakOrganismCard: View {
                         .font(.system(size: 32, weight: .light, design: .rounded))
                         .foregroundStyle(LivingDataColors.biolumOrange)
                     Text("days")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(LivingDataColors.textSecondary)
                 }
 
@@ -740,7 +740,7 @@ struct StreakOrganismCard: View {
                     let progress = Double(currentStreak) / Double(nextMilestone)
 
                     Text("\(nextMilestone - currentStreak) days to \(nextMilestone)-day milestone")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(LivingDataColors.textSecondary)
 
                     GeometryReader { geo in
@@ -871,7 +871,7 @@ struct TaskFlowFieldCard: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Image(systemName: "waveform.path")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(LivingDataColors.biolumCyan)
 
                 Text("Weekly Flow")
@@ -881,7 +881,7 @@ struct TaskFlowFieldCard: View {
                 Spacer()
 
                 Text("\(weeklyData.reduce(0, +)) tasks")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(LivingDataColors.textSecondary)
             }
 
@@ -1020,7 +1020,7 @@ struct LevelProgressCard: View {
                         .foregroundStyle(LivingDataColors.textPrimary)
 
                     Text("\(totalPoints) XP total")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(LivingDataColors.textSecondary)
                 }
 
@@ -1199,7 +1199,7 @@ struct GrowRealmView: View {
                         .blur(radius: 2)
 
                     Image(systemName: "sparkles")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(.white)
                 }
 
@@ -1209,14 +1209,14 @@ struct GrowRealmView: View {
                         .foregroundStyle(LivingDataColors.textPrimary)
 
                     Text("Let's cultivate your next goal together")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(LivingDataColors.textSecondary)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(LivingDataColors.textTertiary)
             }
             .padding(16)
@@ -1247,7 +1247,7 @@ struct GrowRealmView: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: "plus")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
 
                 Text("Plant a New Goal")
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -1422,7 +1422,7 @@ struct MyceliumNetworkVisualization: View {
                         .foregroundStyle(LivingDataColors.textSecondary)
 
                     Text("Watch your garden grow")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(LivingDataColors.textTertiary)
                 }
                 .position(x: geometry.size.width / 2, y: geometry.size.height / 2 + 50)
@@ -1497,13 +1497,13 @@ struct OrganicGoalCard: View {
                 HStack(spacing: 8) {
                     // Category
                     Text(goal.category ?? "Other")
-                        .font(.system(size: 11, weight: .medium))
+                        .dynamicTypeFont(base: 11, weight: .medium)
                         .foregroundStyle(categoryColor)
 
                     // Days remaining
                     if let days = goal.daysRemaining {
                         Text("\(days)d left")
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
                             .foregroundStyle(LivingDataColors.textSecondary)
                     }
                 }
@@ -1512,7 +1512,7 @@ struct OrganicGoalCard: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(LivingDataColors.textTertiary)
         }
         .padding(16)
@@ -1535,7 +1535,7 @@ struct CompletedGoalPill: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(LivingDataColors.biolumGreen)
 
             Text(goal.title)
@@ -1547,7 +1547,7 @@ struct CompletedGoalPill: View {
 
             if let completedAt = goal.completedAt {
                 Text(completedAt.formatted(.dateTime.month(.abbreviated).day()))
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(LivingDataColors.textTertiary)
             }
         }
@@ -1621,7 +1621,7 @@ struct AIGoalAssistantSheet: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(LivingDataColors.textSecondary)
                             .padding(8)
                             .background(Circle().fill(LivingDataColors.humus))
@@ -1659,7 +1659,7 @@ struct AIGoalAssistantSheet: View {
                     .scaleEffect(1 + pulsePhase * 0.1)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 32, weight: .light))
+                    .dynamicTypeFont(base: 32, weight: .light)
                     .foregroundStyle(LivingDataColors.textPrimary)
             }
 
@@ -1669,7 +1669,7 @@ struct AIGoalAssistantSheet: View {
                     .foregroundStyle(LivingDataColors.textPrimary)
 
                 Text("Tell me what you want to achieve, and I'll help you create a roadmap to get there.")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(LivingDataColors.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
@@ -1720,14 +1720,14 @@ struct AIGoalAssistantSheet: View {
                     .frame(width: 28, height: 28)
                     .overlay(
                         Image(systemName: "sparkles")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white)
                     )
             }
 
             VStack(alignment: message.isAI ? .leading : .trailing, spacing: 8) {
                 Text(message.content)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(LivingDataColors.textPrimary)
                     .padding(12)
                     .background(
@@ -1743,7 +1743,7 @@ struct AIGoalAssistantSheet: View {
                     .frame(width: 28, height: 28)
                     .overlay(
                         Image(systemName: "person.fill")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white)
                     )
             }
@@ -1763,7 +1763,7 @@ struct AIGoalAssistantSheet: View {
                 .frame(width: 28, height: 28)
                 .overlay(
                     Image(systemName: "sparkles")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white)
                 )
 
@@ -1788,7 +1788,7 @@ struct AIGoalAssistantSheet: View {
     private var inputBar: some View {
         HStack(spacing: 12) {
             TextField("Describe your goal...", text: $userInput)
-                .font(.system(size: 15, weight: .medium))
+                .dynamicTypeFont(base: 15, weight: .medium)
                 .foregroundStyle(LivingDataColors.textPrimary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
@@ -1805,7 +1805,7 @@ struct AIGoalAssistantSheet: View {
                 sendMessage()
             } label: {
                 Image(systemName: "arrow.up")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
                     .background(

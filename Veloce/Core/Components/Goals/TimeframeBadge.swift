@@ -119,14 +119,14 @@ struct DaysRemainingPill: View {
         HStack(spacing: 4) {
             if days < 0 || isOverdue {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
             } else if days <= 3 {
                 Image(systemName: "clock.fill")
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
             }
 
             Text(displayText)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
         }
         .foregroundStyle(pillColor)
         .padding(.horizontal, 8)
@@ -153,7 +153,7 @@ struct MilestoneProgressBar: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text("Milestones")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(Theme.Colors.textTertiary)
 
                 Spacer()
@@ -214,17 +214,17 @@ struct LinkedTasksSummary: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "checklist")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.textTertiary)
 
             Text("\(count) linked tasks")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.textSecondary)
 
             Spacer()
 
             Text("\(Int(progress * 100))% done")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(progress >= 1.0 ? Theme.Colors.success : Theme.Colors.textSecondary)
         }
         .padding(.horizontal, 12)

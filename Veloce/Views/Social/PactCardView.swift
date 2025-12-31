@@ -26,7 +26,7 @@ struct PactCardView: View {
                 // Partner name and commitment
                 HStack {
                     Text(partnerName)
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Spacer()
@@ -37,7 +37,7 @@ struct PactCardView: View {
 
                 // Commitment description
                 Text(pact.commitmentDescription)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(.white.opacity(0.6))
                     .lineLimit(1)
 
@@ -114,7 +114,7 @@ struct PactCardView: View {
         HStack(spacing: 4) {
             // Flame icon with intensity
             Image(systemName: pact.currentStreak > 7 ? "flame.fill" : "flame")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(streakColor)
                 .symbolEffect(.pulse, options: .repeating, value: pact.bothCompletedToday)
 
@@ -143,12 +143,12 @@ struct PactCardView: View {
         HStack(spacing: 6) {
             // Status icon
             Image(systemName: userStatus.icon)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
                 .foregroundStyle(statusColor)
 
             // Status text
             Text(userStatus.displayText)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(statusColor)
 
             Spacer()
@@ -161,7 +161,7 @@ struct PactCardView: View {
             // Shield indicator if active
             if pact.shieldActive {
                 Image(systemName: "shield.fill")
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.Colors.aiPurple)
             }
         }
@@ -244,11 +244,11 @@ struct PactInvitationBanner: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("\(initiatorName) wants to start a Pact!")
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text(pact.commitmentDescription)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.6))
                 }
 
@@ -262,7 +262,7 @@ struct PactInvitationBanner: View {
                     onDecline()
                 } label: {
                     Text("Decline")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -275,7 +275,7 @@ struct PactInvitationBanner: View {
                     onAccept()
                 } label: {
                     Text("Accept Pact")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -337,10 +337,10 @@ struct PactStatusIndicator: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: statusIcon)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
 
             Text(statusText)
-                .font(.system(size: 11, weight: .medium))
+                .dynamicTypeFont(base: 11, weight: .medium)
         }
         .foregroundStyle(statusColor)
         .padding(.horizontal, 6)
@@ -390,7 +390,7 @@ struct PactStreakFlame: View {
         HStack(spacing: 6) {
             // Flame with gradient based on streak
             Image(systemName: streak > 7 ? "flame.fill" : "flame")
-                .font(.system(size: 24, weight: .semibold))
+                .dynamicTypeFont(base: 24, weight: .semibold)
                 .foregroundStyle(flameGradient)
                 .symbolEffect(.bounce, value: isAnimated)
 
@@ -400,7 +400,7 @@ struct PactStreakFlame: View {
                     .foregroundStyle(.white)
 
                 Text("day streak")
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.white.opacity(0.6))
             }
         }

@@ -87,13 +87,13 @@ struct ShareableWinCard: View {
                     .frame(width: 100, height: 100)
 
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 56))
+                    .dynamicTypeFont(base: 56)
                     .foregroundStyle(Theme.Celebration.successGlow)
             }
 
             VStack(spacing: 8) {
                 Text("Daily Wins")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(.secondary)
 
                 Text("\(tasks)")
@@ -101,7 +101,7 @@ struct ShareableWinCard: View {
                     .foregroundStyle(.white)
 
                 Text("tasks completed")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(.secondary)
             }
 
@@ -141,7 +141,7 @@ struct ShareableWinCard: View {
                     .frame(width: 100, height: 100)
 
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 56))
+                    .dynamicTypeFont(base: 56)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Celebration.starGold, Theme.Celebration.solarFlare],
@@ -153,7 +153,7 @@ struct ShareableWinCard: View {
 
             VStack(spacing: 8) {
                 Text("MILESTONE")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
                     .foregroundStyle(Theme.Celebration.starGold)
                     .tracking(2)
 
@@ -173,7 +173,7 @@ struct ShareableWinCard: View {
                     )
 
                 Text(description)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.secondary)
             }
 
@@ -197,13 +197,13 @@ struct ShareableWinCard: View {
                     .frame(width: 100, height: 100)
 
                 Image(systemName: type.icon)
-                    .font(.system(size: 48))
+                    .dynamicTypeFont(base: 48)
                     .foregroundStyle(type.color)
             }
 
             VStack(spacing: 12) {
                 Text("NEW RECORD")
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
                     .foregroundStyle(Theme.Celebration.starGold)
                     .tracking(2)
 
@@ -221,7 +221,7 @@ struct ShareableWinCard: View {
                     }
 
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 24))
+                        .dynamicTypeFont(base: 24)
                         .foregroundStyle(Theme.Celebration.auroraGreen)
 
                     Text("\(value)")
@@ -250,7 +250,7 @@ struct ShareableWinCard: View {
                     .frame(width: 120, height: 120)
 
                 Image(systemName: "flame.fill")
-                    .font(.system(size: 64))
+                    .dynamicTypeFont(base: 64)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [
@@ -280,13 +280,13 @@ struct ShareableWinCard: View {
                     )
 
                 Text("day streak")
-                    .font(.system(size: 24, weight: .semibold))
+                    .dynamicTypeFont(base: 24, weight: .semibold)
                     .foregroundStyle(.secondary)
             }
 
             // Motivation text
             Text(streakMotivation(days: days))
-                .font(.system(size: 16, weight: .medium))
+                .dynamicTypeFont(base: 16, weight: .medium)
                 .foregroundStyle(.white.opacity(0.8))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
@@ -349,7 +349,7 @@ struct ShareableWinCard: View {
                     )
 
                 Text("Total: \(totalXP) XP")
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.secondary)
             }
 
@@ -381,13 +381,13 @@ struct ShareableWinCard: View {
                     .frame(width: 100, height: 100)
 
                 Image(systemName: "medal.fill")
-                    .font(.system(size: 56))
+                    .dynamicTypeFont(base: 56)
                     .foregroundStyle(Theme.Celebration.starGold)
             }
 
             VStack(spacing: 12) {
                 Text("ACHIEVEMENT UNLOCKED")
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(Theme.Celebration.starGold)
                     .tracking(2)
 
@@ -397,7 +397,7 @@ struct ShareableWinCard: View {
                     .multilineTextAlignment(.center)
 
                 Text(description)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }

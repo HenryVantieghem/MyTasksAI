@@ -385,7 +385,7 @@ extension ButtonStyle where Self == PremiumGlowButtonStyle {
         VStack(spacing: 32) {
             // Input bar style
             Text("What's on your mind?")
-                .font(.system(size: 16, weight: .light))
+                .dynamicTypeFont(base: 16, weight: .light)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
@@ -406,7 +406,7 @@ extension ButtonStyle where Self == PremiumGlowButtonStyle {
                 Button("Focus Mode") {
                     print("Tapped")
                 }
-                .font(.system(size: 15, weight: .medium))
+                .dynamicTypeFont(base: 15, weight: .medium)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
@@ -419,7 +419,7 @@ extension ButtonStyle where Self == PremiumGlowButtonStyle {
                 Button("Success Action") {
                     print("Tapped")
                 }
-                .font(.system(size: 15, weight: .medium))
+                .dynamicTypeFont(base: 15, weight: .medium)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
@@ -458,7 +458,7 @@ extension ButtonStyle where Self == PremiumGlowButtonStyle {
                     ("Strong", PremiumGlowIntensity.strong)
                 ], id: \.0) { name, intensity in
                     Text(name)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.primary)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)

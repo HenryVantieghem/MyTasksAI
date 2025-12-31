@@ -10,6 +10,8 @@ import Foundation
 import SwiftData
 import Supabase
 import Auth
+import Combine
+import UIKit
 
 // MARK: - App State
 
@@ -54,12 +56,63 @@ final class AppViewModel {
     private let offlineManager = OfflineManager.shared
     private let ai = AIService.shared
     private let haptics = HapticsService.shared
+    private let subscription = SubscriptionService.shared
 
     // MARK: Context
     private var modelContext: ModelContext?
 
+    // MARK: Scene Phase Tracking
+    private var cancellables = Set<AnyCancellable>()
+
     // MARK: Initialization
-    init() {}
+    init() {
+        setupTrialExpirationHandler()
+        setupScenePhaseObserver()
+    }
+
+    /// Setup handler for when trial expires while app is in use
+    private func setupTrialExpirationHandler() {
+        subscription.onTrialExpired = { [weak self] in
+            Task { @MainActor in
+                guard let self = self else { return }
+
+                // Only show paywall if user was authenticated and not subscribed
+                if self.appState == .authenticated && !self.subscription.isSubscribed {
+                    #if DEBUG
+                    print("🔵 [AppViewModel] Trial expired while in app → .paywall")
+                    #endif
+                    self.haptics.warning()
+                    self.appState = .paywall
+                }
+            }
+        }
+    }
+
+    /// Setup observer for app going to foreground
+    private func setupScenePhaseObserver() {
+        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    await self?.handleAppForeground()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    /// Called when app comes to foreground
+    private func handleAppForeground() async {
+        // Re-check subscription/trial status when app becomes active
+        await subscription.checkSubscriptionStatus()
+
+        // If trial expired and not subscribed, show paywall
+        if appState == .authenticated && subscription.shouldShowPaywall {
+            #if DEBUG
+            print("🔵 [AppViewModel] App foreground - trial expired → .paywall")
+            #endif
+            haptics.warning()
+            appState = .paywall
+        }
+    }
 
     // MARK: - Setup
 
@@ -111,6 +164,9 @@ final class AppViewModel {
             print("🔵 [AppViewModel] No user ID found")
             #endif
 
+            // Stop trial timer when not authenticated
+            subscription.stopTrialExpirationTimer()
+
             // Check if user has seen the welcome screen
             if !hasSeenWelcome {
                 #if DEBUG
@@ -143,6 +199,10 @@ final class AppViewModel {
                 #if DEBUG
                 print("🔵 [AppViewModel] No daily goal set → .onboarding")
                 #endif
+
+                // Start trial when user first authenticates (even before completing onboarding)
+                await startTrialIfNeeded()
+
                 appState = .onboarding
                 return
             }
@@ -150,12 +210,21 @@ final class AppViewModel {
             // Load or create local user
             await loadOrCreateLocalUser(from: supabaseUser)
 
+            // Load trial info from server (handles reinstall scenarios)
+            await subscription.loadTrialFromSupabase()
+
+            // Start trial if this is user's first time (trial not yet started)
+            await startTrialIfNeeded()
+
             // Check subscription status
-            let subscription = SubscriptionService.shared
             await subscription.checkSubscriptionStatus()
 
             #if DEBUG
-            print("🔵 [AppViewModel] Subscription check complete - shouldShowPaywall: \(subscription.shouldShowPaywall)")
+            print("🔵 [AppViewModel] Subscription check complete")
+            print("🔵 [AppViewModel] - isSubscribed: \(subscription.isSubscribed)")
+            print("🔵 [AppViewModel] - isInTrial: \(subscription.isInTrial)")
+            print("🔵 [AppViewModel] - trialExpired: \(subscription.trialExpired)")
+            print("🔵 [AppViewModel] - shouldShowPaywall: \(subscription.shouldShowPaywall)")
             #endif
 
             // If trial expired and not subscribed, show paywall
@@ -172,6 +241,9 @@ final class AppViewModel {
             #endif
             appState = .authenticated
 
+            // Start trial expiration timer
+            subscription.startTrialExpirationTimer()
+
             // Start background sync with new sync engine
             Task {
                 await syncEngine.performFullSync()
@@ -180,8 +252,29 @@ final class AppViewModel {
             #if DEBUG
             print("🔵 [AppViewModel] Error fetching profile: \(error) → .onboarding")
             #endif
+
+            // Start trial even if profile fetch failed
+            await startTrialIfNeeded()
+
             // User authenticated but no profile - needs onboarding
             appState = .onboarding
+        }
+    }
+
+    /// Start the free trial if user hasn't started one yet
+    private func startTrialIfNeeded() async {
+        // Only start trial if it hasn't been started yet
+        if subscription.canStartFreeTrial {
+            #if DEBUG
+            print("🔵 [AppViewModel] Starting free trial for new user")
+            #endif
+            subscription.startFreeTrial()
+        } else {
+            #if DEBUG
+            print("🔵 [AppViewModel] Trial already started or expired")
+            #endif
+            // Just refresh the trial status
+            await subscription.checkSubscriptionStatus()
         }
     }
 
@@ -191,6 +284,10 @@ final class AppViewModel {
         print("🔵 [AppViewModel] handleSubscriptionCompleted() → .authenticated")
         #endif
         haptics.success()
+
+        // Stop trial timer since user is now subscribed
+        subscription.stopTrialExpirationTimer()
+
         appState = .authenticated
     }
 
@@ -200,7 +297,6 @@ final class AppViewModel {
         // Only check if user is authenticated
         guard appState == .authenticated else { return }
 
-        let subscription = SubscriptionService.shared
         await subscription.checkSubscriptionStatus()
 
         if subscription.shouldShowPaywall {
@@ -215,6 +311,33 @@ final class AppViewModel {
     /// Check if user can access the app (not locked out by paywall)
     var canAccessApp: Bool {
         appState == .authenticated || appState == .onboarding
+    }
+
+    // MARK: - Trial Status (for UI display)
+
+    /// Get trial days remaining (for UI display)
+    var trialDaysRemaining: Int {
+        subscription.trialDaysRemaining
+    }
+
+    /// Get trial hours remaining (for UI display)
+    var trialHoursRemaining: Int {
+        subscription.trialHoursRemaining
+    }
+
+    /// Check if user is currently in trial
+    var isInTrial: Bool {
+        subscription.isInTrial
+    }
+
+    /// Check if trial has expired
+    var trialExpired: Bool {
+        subscription.trialExpired
+    }
+
+    /// Get trial end date
+    var trialEndDate: Date? {
+        subscription.trialEndDate
     }
 
     /// Handle user continuing from Free Trial welcome screen
@@ -283,6 +406,9 @@ final class AppViewModel {
 
     /// Sign out
     func signOut() async {
+        // Stop trial timer
+        subscription.stopTrialExpirationTimer()
+
         guard supabase.isConfigured else {
             currentUser = nil
             appState = .unauthenticated

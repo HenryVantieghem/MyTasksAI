@@ -43,17 +43,17 @@ struct StreakFlameView: View {
                         .foregroundStyle(.white)
 
                     Text("day streak")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(.white.opacity(0.7))
                 }
 
                 HStack(spacing: 4) {
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(Theme.Colors.aiAmber.opacity(0.7))
 
                     Text("Best: \(bestStreak) days")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -114,7 +114,7 @@ struct StreakFlameView: View {
             ZStack {
                 // Outer flame (orange)
                 Image(systemName: flameIntensity.icon)
-                    .font(.system(size: 36, weight: .semibold))
+                    .dynamicTypeFont(base: 36, weight: .semibold)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Colors.aiOrange, Theme.Colors.aiAmber],
@@ -127,7 +127,7 @@ struct StreakFlameView: View {
                 // Inner flame (yellow/white)
                 if flameIntensity.hasInnerFlame {
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 20, weight: .semibold))
+                        .dynamicTypeFont(base: 20, weight: .semibold)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Theme.Colors.aiAmber, .white],
@@ -153,12 +153,12 @@ struct StreakFlameView: View {
                     .frame(width: 36, height: 36)
 
                 Image(systemName: "shield.checkered")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
                     .foregroundStyle(Theme.Colors.success)
             }
 
             Text("Protected")
-                .font(.system(size: 9, weight: .semibold))
+                .dynamicTypeFont(base: 9, weight: .semibold)
                 .foregroundStyle(Theme.Colors.success)
         }
     }
@@ -270,7 +270,7 @@ struct CompactStreakBadge: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: streak > 0 ? "flame.fill" : "flame")
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .foregroundStyle(
                     streak > 0
                         ? LinearGradient(colors: [Theme.Colors.aiOrange, Theme.Colors.aiAmber], startPoint: .bottom, endPoint: .top)

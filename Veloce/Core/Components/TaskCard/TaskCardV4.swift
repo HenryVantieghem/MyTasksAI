@@ -351,7 +351,7 @@ struct TaskCardV4: View {
             }
         } label: {
             Image(systemName: "ellipsis")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(CosmicWidget.Text.tertiary)
                 .frame(width: 36, height: 36)
                 .background(CosmicWidget.Void.interactive)
@@ -407,7 +407,7 @@ struct TaskCardV4: View {
                     Theme.AdaptiveColors.success.opacity(0.2)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundStyle(Theme.AdaptiveColors.success)
                         .opacity(swipeOffset > swipeCompleteThreshold * 0.5 ? 1 : 0)
                 }
@@ -425,7 +425,7 @@ struct TaskCardV4: View {
                     (isDelete ? Theme.AdaptiveColors.destructive : Theme.AdaptiveColors.warning).opacity(0.2)
 
                     Image(systemName: isDelete ? "trash.fill" : "moon.fill")
-                        .font(.system(size: 24, weight: .bold))
+                        .dynamicTypeFont(base: 24, weight: .bold)
                         .foregroundStyle(isDelete ? Theme.AdaptiveColors.destructive : Theme.AdaptiveColors.warning)
                         .opacity(-swipeOffset > swipeSnoozeThreshold * 0.5 ? 1 : 0)
                 }
@@ -515,7 +515,7 @@ struct MetadataChip: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 9, weight: .medium))
+                .dynamicTypeFont(base: 9, weight: .medium)
 
             Text(text)
                 .font(.caption.weight(.medium))

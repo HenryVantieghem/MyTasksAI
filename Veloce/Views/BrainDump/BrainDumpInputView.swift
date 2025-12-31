@@ -78,10 +78,10 @@ struct BrainDumpInputView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: mode.icon)
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
 
                         Text(mode.rawValue)
-                            .font(.system(size: 12, weight: .semibold))
+                            .dynamicTypeFont(base: 12, weight: .semibold)
                     }
                     .foregroundStyle(selectedMode == mode ? .primary : .secondary)
                     .padding(.horizontal, 14)
@@ -119,7 +119,7 @@ struct BrainDumpInputView: View {
                         // Sample suggestions
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Try asking:")
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                                 .foregroundStyle(.secondary)
 
                             ForEach([
@@ -149,7 +149,7 @@ struct BrainDumpInputView: View {
     private var chatInputBar: some View {
         HStack(spacing: 12) {
             TextField("Ask anything...", text: $chatInput)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .focused($isFocused)
                 .submitLabel(.send)
                 .onSubmit { sendMessage() }
@@ -171,7 +171,7 @@ struct BrainDumpInputView: View {
                     }
 
                     Image(systemName: "arrow.up")
-                        .font(.system(size: 16, weight: .bold))
+                        .dynamicTypeFont(base: 16, weight: .bold)
                         .foregroundStyle(.white)
                 }
                 .frame(width: 40, height: 40)
@@ -248,12 +248,12 @@ struct BrainDumpInputView: View {
                     if viewModel.inputText.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("What's on your mind?")
-                                .font(.system(size: 24, weight: .thin))
+                                .dynamicTypeFont(base: 24, weight: .thin)
                                 .italic()
                                 .foregroundStyle(.secondary.opacity(0.6))
 
                             Text("Just let it all out...")
-                                .font(.system(size: 16, weight: .light))
+                                .dynamicTypeFont(base: 16, weight: .light)
                                 .foregroundStyle(.tertiary)
                         }
                         .padding(.horizontal, 24)
@@ -262,7 +262,7 @@ struct BrainDumpInputView: View {
 
                     TextEditor(text: $viewModel.inputText)
                         .focused($isFocused)
-                        .font(.system(size: 20, weight: .regular))
+                        .dynamicTypeFont(base: 20, weight: .regular)
                         .foregroundStyle(.primary)
                         .scrollContentBackground(.hidden)
                         .background(Color.clear)
@@ -276,7 +276,7 @@ struct BrainDumpInputView: View {
                 // Hint
                 if !viewModel.inputText.isEmpty {
                     Text("AI will organize your thoughts into actionable tasks")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.tertiary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
@@ -310,10 +310,10 @@ struct BrainDumpInputView: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
 
                 Text("Process Thoughts")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
             }
             .foregroundStyle(.white)
             .padding(.horizontal, 28)
@@ -370,13 +370,13 @@ struct AIChatBubble: View {
                             .frame(width: 32, height: 32)
 
                         Image(systemName: "sparkles")
-                            .font(.system(size: 14, weight: .bold))
+                            .dynamicTypeFont(base: 14, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
 
                 Text(message)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.primary)
                     .padding(16)
                     .background {
@@ -400,7 +400,7 @@ struct SuggestionChip: View {
     var body: some View {
         Button(action: action) {
             Text(text)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(Color(hex: "8B5CF6"))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
@@ -451,35 +451,35 @@ struct ContentFeedCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Image(systemName: type.icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(type.color)
 
                 Text(source)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(type.color)
 
                 Spacer()
 
                 if let duration = duration {
                     Text(duration)
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(.secondary)
                 }
             }
 
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
+                .dynamicTypeFont(base: 17, weight: .semibold)
                 .foregroundStyle(.primary)
 
             Text(description)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
 
             if let actionLabel = actionLabel {
                 Button { } label: {
                     Text(actionLabel)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)

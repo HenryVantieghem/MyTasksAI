@@ -6,11 +6,27 @@
 //  Handles Pro ($9.99/mo) and Creator ($19.99/mo) subscriptions
 //  Includes local 3-day free trial (no payment required)
 //
+//  Trial Flow:
+//  1. First-time users see FreeTrialWelcomeView
+//  2. Upon sign up/sign in, trial starts (3 days)
+//  3. During trial, full app access (no paywall)
+//  4. After 3 days, paywall appears - must subscribe to continue
+//
 
 import Foundation
 import SwiftUI
 import RevenueCat
 import Supabase
+
+// MARK: - Trial Constants
+
+private enum TrialConstants {
+    static let trialDurationDays: Int = 3
+    static let trialStartDateKey = "mytasksai_trial_start_date"
+    static let trialStartedKey = "mytasksai_trial_started"
+    static let lastKnownDateKey = "mytasksai_last_known_date"
+    static let installDateKey = "mytasksai_install_date"
+}
 
 // MARK: - Subscription Service
 
@@ -24,10 +40,12 @@ final class SubscriptionService {
     private(set) var isSubscribed: Bool = false
     private(set) var isInTrial: Bool = false
     private(set) var trialDaysRemaining: Int = 0
+    private(set) var trialHoursRemaining: Int = 0
     private(set) var isLoading: Bool = false
     private(set) var error: String?
     private(set) var currentTier: SubscriptionTier = .free
     private(set) var subscription: Subscription?
+    private(set) var trialExpired: Bool = false
 
     // RevenueCat state
     private(set) var offerings: Offerings?
@@ -35,7 +53,12 @@ final class SubscriptionService {
     private(set) var isConfigured: Bool = false
 
     // Trial tracking
+    private(set) var trialStartDate: Date?
+    private(set) var trialEndDate: Date?
     private(set) var installDate: Date
+
+    // Callback for trial expiration (used by AppViewModel)
+    var onTrialExpired: (() -> Void)?
 
     // RevenueCat Entitlement IDs (configure these in RevenueCat dashboard)
     static let proEntitlementId = "pro"
@@ -50,16 +73,28 @@ final class SubscriptionService {
     // Dependencies
     private let supabase = SupabaseService.shared
 
+    // Timer for checking trial expiration
+    private var trialCheckTimer: Timer?
+
     // MARK: Initialization
     private init() {
-        // Get or set install date for local trial
-        if let savedDate = UserDefaults.standard.object(forKey: "veloce_install_date") as? Date {
+        // Get install date
+        if let savedDate = UserDefaults.standard.object(forKey: TrialConstants.installDateKey) as? Date {
             self.installDate = savedDate
         } else {
             let now = Date()
-            UserDefaults.standard.set(now, forKey: "veloce_install_date")
+            UserDefaults.standard.set(now, forKey: TrialConstants.installDateKey)
             self.installDate = now
         }
+
+        // Load trial start date if exists
+        if let savedTrialStart = UserDefaults.standard.object(forKey: TrialConstants.trialStartDateKey) as? Date {
+            self.trialStartDate = savedTrialStart
+            self.trialEndDate = Calendar.current.date(byAdding: .day, value: TrialConstants.trialDurationDays, to: savedTrialStart)
+        }
+
+        // Save current date for tampering detection
+        UserDefaults.standard.set(Date(), forKey: TrialConstants.lastKnownDateKey)
     }
 
     // MARK: - Secret Loading
@@ -240,25 +275,132 @@ final class SubscriptionService {
 
     // MARK: - Local Free Trial Check
 
-    /// Local 3-day trial that doesn't require payment info
+    /// Check if trial has been started and if it's still active
+    /// Trial only starts when user signs up/signs in, not on install
     private func checkLocalFreeTrial() {
-        let daysSinceInstall = Calendar.current.dateComponents(
-            [.day],
-            from: installDate,
-            to: Date()
-        ).day ?? 0
-
-        if daysSinceInstall <= 3 {
-            isInTrial = true
-            trialDaysRemaining = max(0, 3 - daysSinceInstall)
-        } else {
-            isInTrial = false
-            trialDaysRemaining = 0
+        // First check for date tampering
+        if detectDateTampering() {
+            #if DEBUG
+            print("[SubscriptionService] Date tampering detected - expiring trial")
+            #endif
+            expireTrialImmediately()
+            return
         }
 
-        #if DEBUG
-        print("[SubscriptionService] Local trial check - days since install: \(daysSinceInstall), in trial: \(isInTrial)")
-        #endif
+        // Update last known date
+        UserDefaults.standard.set(Date(), forKey: TrialConstants.lastKnownDateKey)
+
+        // If trial hasn't started yet, user is NOT in trial (they need to sign up first)
+        guard let startDate = trialStartDate else {
+            isInTrial = false
+            trialDaysRemaining = 0
+            trialHoursRemaining = 0
+            trialExpired = false
+            #if DEBUG
+            print("[SubscriptionService] Trial not started yet - awaiting sign up")
+            #endif
+            return
+        }
+
+        let now = Date()
+
+        // Calculate end date
+        guard let endDate = Calendar.current.date(byAdding: .day, value: TrialConstants.trialDurationDays, to: startDate) else {
+            isInTrial = false
+            trialExpired = true
+            return
+        }
+
+        trialEndDate = endDate
+
+        // Check if trial is still active
+        if now < endDate {
+            isInTrial = true
+            trialExpired = false
+
+            // Calculate remaining time
+            let components = Calendar.current.dateComponents([.day, .hour], from: now, to: endDate)
+            trialDaysRemaining = max(0, components.day ?? 0)
+            trialHoursRemaining = max(0, components.hour ?? 0)
+
+            #if DEBUG
+            print("[SubscriptionService] Trial active - \(trialDaysRemaining) days, \(trialHoursRemaining) hours remaining")
+            #endif
+        } else {
+            // Trial has expired
+            isInTrial = false
+            trialDaysRemaining = 0
+            trialHoursRemaining = 0
+            trialExpired = true
+
+            #if DEBUG
+            print("[SubscriptionService] Trial expired")
+            #endif
+
+            // Notify listeners
+            onTrialExpired?()
+        }
+    }
+
+    /// Detect if user has tampered with device date to extend trial
+    private func detectDateTampering() -> Bool {
+        guard let lastKnownDate = UserDefaults.standard.object(forKey: TrialConstants.lastKnownDateKey) as? Date else {
+            return false
+        }
+
+        let now = Date()
+
+        // If current date is significantly before last known date, user may have changed date
+        // Allow 1 hour tolerance for minor clock adjustments
+        let oneHourAgo = Calendar.current.date(byAdding: .hour, value: -1, to: lastKnownDate) ?? lastKnownDate
+
+        if now < oneHourAgo {
+            #if DEBUG
+            print("[SubscriptionService] Date tampering detected: current \(now) is before last known \(lastKnownDate)")
+            #endif
+            return true
+        }
+
+        return false
+    }
+
+    /// Immediately expire the trial (used for tampering detection)
+    private func expireTrialImmediately() {
+        isInTrial = false
+        trialDaysRemaining = 0
+        trialHoursRemaining = 0
+        trialExpired = true
+
+        // Set trial end date to past
+        if let startDate = trialStartDate {
+            trialEndDate = Calendar.current.date(byAdding: .day, value: -1, to: startDate)
+        }
+
+        onTrialExpired?()
+    }
+
+    // MARK: - Trial Timer
+
+    /// Start a timer to periodically check trial status
+    func startTrialExpirationTimer() {
+        stopTrialExpirationTimer()
+
+        // Check every minute
+        trialCheckTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.checkLocalFreeTrial()
+
+                // If trial just expired while user was in app, trigger callback
+                if self?.trialExpired == true && self?.isSubscribed == false {
+                    self?.onTrialExpired?()
+                }
+            }
+        }
+    }
+
+    func stopTrialExpirationTimer() {
+        trialCheckTimer?.invalidate()
+        trialCheckTimer = nil
     }
 
     // MARK: - Access Checks
@@ -305,37 +447,140 @@ final class SubscriptionService {
 
     // MARK: - Start Free Trial
 
+    /// Start the free trial when user signs up or signs in for the first time
+    /// This should be called after successful authentication
     @discardableResult
     func startFreeTrial() -> Bool {
-        let hasUsedTrial = UserDefaults.standard.bool(forKey: "veloce_trial_used")
-
-        if hasUsedTrial {
+        // Check if trial was already started
+        if trialStartDate != nil {
             #if DEBUG
-            print("[SubscriptionService] Trial already used")
+            print("[SubscriptionService] Trial already started on \(trialStartDate!)")
             #endif
-            return false
+            // Refresh trial status
+            checkLocalFreeTrial()
+            return isInTrial
         }
 
         let now = Date()
-        UserDefaults.standard.set(now, forKey: "veloce_install_date")
-        UserDefaults.standard.set(true, forKey: "veloce_trial_started")
-        UserDefaults.standard.set(true, forKey: "veloce_trial_used")
-        installDate = now
+
+        // Save trial start date
+        trialStartDate = now
+        trialEndDate = Calendar.current.date(byAdding: .day, value: TrialConstants.trialDurationDays, to: now)
+
+        UserDefaults.standard.set(now, forKey: TrialConstants.trialStartDateKey)
+        UserDefaults.standard.set(true, forKey: TrialConstants.trialStartedKey)
+        UserDefaults.standard.set(now, forKey: TrialConstants.lastKnownDateKey)
 
         isInTrial = true
-        trialDaysRemaining = 3
+        trialDaysRemaining = TrialConstants.trialDurationDays
+        trialHoursRemaining = 0
+        trialExpired = false
         isSubscribed = false
         error = nil
 
+        // Start expiration timer
+        startTrialExpirationTimer()
+
         #if DEBUG
-        print("[SubscriptionService] Free trial started")
+        print("[SubscriptionService] Free trial started - ends on \(trialEndDate!)")
         #endif
+
+        // Sync trial start to Supabase
+        Task {
+            await syncTrialToSupabase()
+        }
 
         return true
     }
 
+    /// Check if user has ever started a trial (to prevent re-starting)
+    var hasTrialBeenStarted: Bool {
+        UserDefaults.standard.bool(forKey: TrialConstants.trialStartedKey) || trialStartDate != nil
+    }
+
+    /// Check if user can start a free trial (hasn't used it before)
     var canStartFreeTrial: Bool {
-        !UserDefaults.standard.bool(forKey: "veloce_trial_used")
+        !hasTrialBeenStarted
+    }
+
+    /// Sync trial status to Supabase for server-side tracking
+    private func syncTrialToSupabase() async {
+        guard supabase.isConfigured else { return }
+
+        do {
+            let client = try supabase.getClient()
+            guard let userId = try await client.auth.session.user.id as UUID? else { return }
+
+            // Update user's trial info in Supabase
+            let trialData: [String: AnyEncodable] = [
+                "trial_started_at": AnyEncodable(trialStartDate),
+                "trial_ends_at": AnyEncodable(trialEndDate),
+                "updated_at": AnyEncodable(Date())
+            ]
+
+            try await client
+                .from("users")
+                .update(trialData)
+                .eq("id", value: userId)
+                .execute()
+
+            #if DEBUG
+            print("[SubscriptionService] Trial synced to Supabase")
+            #endif
+        } catch {
+            #if DEBUG
+            print("[SubscriptionService] Failed to sync trial to Supabase: \(error)")
+            #endif
+        }
+    }
+
+    /// Load trial info from Supabase (for reinstall/new device scenarios)
+    func loadTrialFromSupabase() async {
+        guard supabase.isConfigured else { return }
+
+        do {
+            let client = try supabase.getClient()
+            guard let userId = try await client.auth.session.user.id as UUID? else { return }
+
+            struct UserTrialInfo: Decodable {
+                let trial_started_at: Date?
+                let trial_ends_at: Date?
+            }
+
+            let response: [UserTrialInfo] = try await client
+                .from("users")
+                .select("trial_started_at, trial_ends_at")
+                .eq("id", value: userId)
+                .execute()
+                .value
+
+            if let userInfo = response.first,
+               let serverTrialStart = userInfo.trial_started_at {
+                // Server has trial info - use it (prevents trial reset on reinstall)
+                let localTrialStart = trialStartDate
+
+                // Use whichever trial started earlier (prevents extending trial)
+                if localTrialStart == nil || serverTrialStart < localTrialStart! {
+                    trialStartDate = serverTrialStart
+                    trialEndDate = userInfo.trial_ends_at ?? Calendar.current.date(byAdding: .day, value: TrialConstants.trialDurationDays, to: serverTrialStart)
+
+                    // Save to local
+                    UserDefaults.standard.set(serverTrialStart, forKey: TrialConstants.trialStartDateKey)
+                    UserDefaults.standard.set(true, forKey: TrialConstants.trialStartedKey)
+
+                    #if DEBUG
+                    print("[SubscriptionService] Loaded trial from Supabase - started: \(serverTrialStart)")
+                    #endif
+                }
+
+                // Re-check trial status with server data
+                checkLocalFreeTrial()
+            }
+        } catch {
+            #if DEBUG
+            print("[SubscriptionService] Failed to load trial from Supabase: \(error)")
+            #endif
+        }
     }
 
     // MARK: - Purchase with RevenueCat

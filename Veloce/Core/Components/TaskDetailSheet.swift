@@ -275,7 +275,7 @@ struct TaskDetailContentView: View {
                                 .frame(width: 28, height: 28)
 
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
+                                .dynamicTypeFont(base: 14, weight: .bold)
                                 .foregroundStyle(.white)
                         }
                     }
@@ -322,7 +322,7 @@ struct TaskDetailContentView: View {
                     HapticsService.shared.selectionFeedback()
                 } label: {
                     Text(String(repeating: "★", count: stars))
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(task.starRating == stars ? Theme.Colors.warning : Theme.Colors.textTertiary)
                 }
                 .buttonStyle(.plain)
@@ -356,7 +356,7 @@ struct TaskDetailContentView: View {
             // Header
             HStack {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .symbolEffect(.pulse.byLayer, options: .repeating.speed(0.3))
 
@@ -371,7 +371,7 @@ struct TaskDetailContentView: View {
                     refreshAI()
                 } label: {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiBlue)
                         .rotationEffect(.degrees(refreshRotation))
                 }
@@ -448,7 +448,7 @@ struct TaskDetailContentView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "brain")
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
 
                             Text("How AI arrived at this advice")
                                 .font(Theme.Typography.caption1)
@@ -456,7 +456,7 @@ struct TaskDetailContentView: View {
                             Spacer()
 
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 10, weight: .medium))
+                                .dynamicTypeFont(base: 10, weight: .medium)
                         }
                         .foregroundStyle(Theme.Colors.textTertiary)
                         .padding(.top, 4)
@@ -475,7 +475,7 @@ struct TaskDetailContentView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "calendar")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Schedule")
@@ -515,7 +515,7 @@ struct TaskDetailContentView: View {
                 } label: {
                     HStack {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
 
                         Text("Add to Calendar")
                             .font(Theme.Typography.subheadline)
@@ -541,7 +541,7 @@ struct TaskDetailContentView: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: "bolt.fill")
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(.white)
                 }
 
@@ -581,7 +581,7 @@ struct TaskDetailContentView: View {
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "play.fill")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
 
                     Text("Start \(focusDuration) min Focus")
                         .font(.headline)
@@ -1176,7 +1176,7 @@ struct MetadataPill: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
 
             Text(text)
                 .font(Theme.Typography.caption1Medium)
@@ -1203,7 +1203,7 @@ struct ActionButton: View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
 
                 Text(title)
                     .font(Theme.Typography.caption1)

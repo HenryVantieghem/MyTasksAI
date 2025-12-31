@@ -130,7 +130,7 @@ struct HolographicButton: View {
     @ViewBuilder
     private func iconView(_ systemName: String) -> some View {
         Image(systemName: systemName)
-            .font(.system(size: 16, weight: .semibold))
+            .dynamicTypeFont(base: 16, weight: .semibold)
     }
 
     // MARK: - Loading Indicator
@@ -472,7 +472,7 @@ struct HolographicLinkButton: View {
             action()
         } label: {
             Text(title)
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [

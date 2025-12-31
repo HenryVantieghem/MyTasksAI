@@ -152,7 +152,7 @@ struct EmptyStateView: View {
 
     private var iconView: some View {
         Image(systemName: config.icon)
-            .font(.system(size: 56, weight: .ultraLight))
+            .dynamicTypeFont(base: 56, weight: .ultraLight)
             .foregroundStyle(Theme.Colors.textTertiary.opacity(0.6))
             .scaleEffect(iconPulse ? 1.04 : 1.0)
             .opacity(showContent ? 1 : 0)
@@ -166,7 +166,7 @@ struct EmptyStateView: View {
                 .foregroundStyle(Theme.Colors.textPrimary)
 
             Text(config.subtext)
-                .font(.system(size: 15, weight: .regular))
+                .dynamicTypeFont(base: 15, weight: .regular)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)

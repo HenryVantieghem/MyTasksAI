@@ -316,7 +316,7 @@ struct GemDiamondShape: Shape {
                         FocusGemView(gemType: gem, isEarned: true, size: 60)
 
                         Text(gem.rawValue)
-                            .font(.system(size: 10, weight: .medium))
+                            .dynamicTypeFont(base: 10, weight: .medium)
                             .foregroundStyle(.white.opacity(0.7))
                     }
                 }
@@ -332,7 +332,7 @@ struct GemDiamondShape: Shape {
                         FocusGemView(gemType: gem, isEarned: false, size: 60)
 
                         Text("Locked")
-                            .font(.system(size: 10, weight: .medium))
+                            .dynamicTypeFont(base: 10, weight: .medium)
                             .foregroundStyle(.white.opacity(0.4))
                     }
                 }

@@ -85,7 +85,7 @@ struct GoalCreationSheet: View {
                         } else {
                             HStack(spacing: 4) {
                                 Image(systemName: "chevron.left")
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .dynamicTypeFont(base: 12, weight: .semibold)
                                 Text("Back")
                             }
                             .foregroundStyle(.white.opacity(0.7))
@@ -161,11 +161,11 @@ struct GoalCreationSheet: View {
                 headerOrb(icon: "target", color: Theme.Colors.aiPurple)
 
                 Text("What's your goal?")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Describe what you want to achieve")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -179,7 +179,7 @@ struct GoalCreationSheet: View {
                 .focused($titleFocused)
 
                 Text("Be specific about what success looks like")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.white.opacity(0.4))
             }
             .padding(.horizontal, 20)
@@ -202,11 +202,11 @@ struct GoalCreationSheet: View {
                 headerOrb(icon: "folder.fill", color: selectedCategory.color)
 
                 Text("What area of life?")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Choose a category for your goal")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -242,11 +242,11 @@ struct GoalCreationSheet: View {
                 headerOrb(icon: selectedTimeframe.icon, color: selectedTimeframe.color)
 
                 Text("How long will it take?")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Choose your goal horizon")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -282,11 +282,11 @@ struct GoalCreationSheet: View {
                 headerOrb(icon: "calendar", color: selectedTimeframe.color)
 
                 Text("Set your target date")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("When do you want to achieve this?")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
@@ -301,11 +301,11 @@ struct GoalCreationSheet: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(targetDate.formatted(.dateTime.weekday(.wide)))
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.6))
 
                             Text(targetDate.formatted(.dateTime.month(.wide).day().year()))
-                                .font(.system(size: 20, weight: .semibold))
+                                .dynamicTypeFont(base: 20, weight: .semibold)
                                 .foregroundStyle(.white)
                         }
 
@@ -318,7 +318,7 @@ struct GoalCreationSheet: View {
                                     .foregroundStyle(selectedTimeframe.color)
 
                                 Text("days")
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                                     .foregroundStyle(.white.opacity(0.5))
                             }
                         }
@@ -375,18 +375,18 @@ struct GoalCreationSheet: View {
                 headerOrb(icon: "text.alignleft", color: Theme.Colors.aiPurple)
 
                 Text("Add more details")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text("Optional: Help AI understand your goal better")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
             }
 
             // Description input
             VStack(alignment: .leading, spacing: 8) {
                 TextEditor(text: $description)
-                    .font(.system(size: 16))
+                    .dynamicTypeFont(base: 16)
                     .foregroundStyle(.white)
                     .scrollContentBackground(.hidden)
                     .frame(minHeight: 120, maxHeight: 180)
@@ -403,11 +403,11 @@ struct GoalCreationSheet: View {
 
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                     Text("AI will refine your goal into SMART format")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -424,7 +424,7 @@ struct GoalCreationSheet: View {
                     goToNext()
                 } label: {
                     Text("Skip for now")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white.opacity(0.5))
                 }
                 .buttonStyle(.plain)
@@ -444,11 +444,11 @@ struct GoalCreationSheet: View {
                     headerOrb(icon: "checkmark.seal", color: Theme.Colors.success)
 
                     Text("Review Your Goal")
-                        .font(.system(size: 28, weight: .bold))
+                        .dynamicTypeFont(base: 28, weight: .bold)
                         .foregroundStyle(.white)
 
                     Text("Make sure everything looks right")
-                        .font(.system(size: 15))
+                        .dynamicTypeFont(base: 15)
                         .foregroundStyle(.white.opacity(0.6))
                 }
 
@@ -457,11 +457,11 @@ struct GoalCreationSheet: View {
                     // Title
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Goal")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                             .foregroundStyle(.white.opacity(0.5))
 
                         Text(title)
-                            .font(.system(size: 18, weight: .semibold))
+                            .dynamicTypeFont(base: 18, weight: .semibold)
                             .foregroundStyle(.white)
                     }
 
@@ -508,11 +508,11 @@ struct GoalCreationSheet: View {
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Description")
-                                .font(.system(size: 12, weight: .medium))
+                                .dynamicTypeFont(base: 12, weight: .medium)
                                 .foregroundStyle(.white.opacity(0.5))
 
                             Text(description)
-                                .font(.system(size: 14))
+                                .dynamicTypeFont(base: 14)
                                 .foregroundStyle(.white.opacity(0.8))
                         }
                     }
@@ -531,11 +531,11 @@ struct GoalCreationSheet: View {
                 // AI note
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.Colors.aiPurple)
 
                     Text("AI will analyze your goal and create a personalized roadmap")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .padding(16)
@@ -555,10 +555,10 @@ struct GoalCreationSheet: View {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 18))
+                            .dynamicTypeFont(base: 18)
 
                         Text("Create Goal")
-                            .font(.system(size: 17, weight: .semibold))
+                            .dynamicTypeFont(base: 17, weight: .semibold)
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -628,11 +628,11 @@ struct GoalCreationSheet: View {
             // Text
             VStack(spacing: 12) {
                 Text("Creating Your Goal")
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundStyle(.white)
 
                 Text(creationStatusText)
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
             }
@@ -707,7 +707,7 @@ struct GoalCreationSheet: View {
                         .shadow(color: Theme.Colors.success.opacity(0.5), radius: 20)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 48, weight: .bold))
+                        .dynamicTypeFont(base: 48, weight: .bold)
                         .foregroundStyle(.white)
                 }
                 .scaleEffect(showSuccess ? 1 : 0)
@@ -717,12 +717,12 @@ struct GoalCreationSheet: View {
             // Text
             VStack(spacing: 12) {
                 Text("Goal Created!")
-                    .font(.system(size: 28, weight: .bold))
+                    .dynamicTypeFont(base: 28, weight: .bold)
                     .foregroundStyle(.white)
 
                 if let goal = createdGoal {
                     Text(goal.displayTitle)
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundStyle(.white.opacity(0.7))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
@@ -731,9 +731,9 @@ struct GoalCreationSheet: View {
                 if createdGoal?.hasRoadmap == true {
                     HStack(spacing: 6) {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("AI roadmap generated")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                     }
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .padding(.top, 8)
@@ -747,7 +747,7 @@ struct GoalCreationSheet: View {
                 dismiss()
             } label: {
                 Text("View Goal")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 18)
@@ -808,7 +808,7 @@ struct GoalCreationSheet: View {
 
             // Icon
             Image(systemName: icon)
-                .font(.system(size: 28))
+                .dynamicTypeFont(base: 28)
                 .foregroundStyle(color)
         }
     }
@@ -819,10 +819,10 @@ struct GoalCreationSheet: View {
         } label: {
             HStack(spacing: 8) {
                 Text("Continue")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
 
                 Image(systemName: "arrow.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -1032,7 +1032,7 @@ private struct CategoryCard: View {
                         .frame(width: 48, height: 48)
 
                     Image(systemName: category.icon)
-                        .font(.system(size: 20))
+                        .dynamicTypeFont(base: 20)
                         .foregroundStyle(isSelected ? .white : category.color)
                 }
 
@@ -1082,7 +1082,7 @@ private struct TimeframeCard: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: timeframe.icon)
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(isSelected ? .white : timeframe.color)
                 }
 
@@ -1093,7 +1093,7 @@ private struct TimeframeCard: View {
                         .foregroundStyle(isSelected ? .white : .white.opacity(0.9))
 
                     Text(timeframe.subtitle)
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.5))
                 }
 
@@ -1102,16 +1102,16 @@ private struct TimeframeCard: View {
                 // Points multiplier
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text("\(timeframe.pointsMultiplier, specifier: "%.1f")x")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                 }
                 .foregroundStyle(Color(hex: "FFD700").opacity(0.8))
 
                 // Checkmark
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 22))
+                        .dynamicTypeFont(base: 22)
                         .foregroundStyle(timeframe.color)
                 }
             }
@@ -1150,16 +1150,16 @@ private struct ReviewItem: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(.white.opacity(0.5))
 
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(color)
 
                 Text(value)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.white)
             }
         }

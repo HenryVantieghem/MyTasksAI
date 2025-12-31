@@ -84,7 +84,7 @@ struct RecurringPickerSheet: View {
         VStack(spacing: Theme.Spacing.sm) {
             HStack {
                 Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(Theme.Colors.aiAmber)
 
                 Text("Repeat Task")
@@ -97,7 +97,7 @@ struct RecurringPickerSheet: View {
                     dismiss()
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .frame(width: 32, height: 32)
                 }
@@ -119,12 +119,12 @@ struct RecurringPickerSheet: View {
     private var infoCard: some View {
         HStack(spacing: Theme.Spacing.md) {
             Image(systemName: "info.circle.fill")
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .foregroundStyle(Theme.Colors.aiBlue)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Recurring Task")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Text(recurringDescription)
@@ -187,7 +187,7 @@ struct RecurringPickerSheet: View {
                     HapticsService.shared.selectionFeedback()
                 } label: {
                     Text("Clear")
-                        .font(.system(size: 15, weight: .medium))
+                        .dynamicTypeFont(base: 15, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .padding(.horizontal, Theme.Spacing.xl)
                         .padding(.vertical, Theme.Spacing.lg)
@@ -201,10 +201,10 @@ struct RecurringPickerSheet: View {
             } label: {
                 HStack(spacing: Theme.Spacing.sm) {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .bold))
+                        .dynamicTypeFont(base: 14, weight: .bold)
 
                     Text("Save")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                 }
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)

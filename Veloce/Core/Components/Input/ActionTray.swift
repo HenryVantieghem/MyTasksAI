@@ -100,7 +100,7 @@ struct ActionTrayButton: View {
 
                     // Icon
                     Image(systemName: item.icon)
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [item.color, item.color.opacity(0.7)],
@@ -112,7 +112,7 @@ struct ActionTrayButton: View {
 
                 // Label
                 Text(item.rawValue)
-                    .font(.system(size: 11, weight: .medium))
+                    .dynamicTypeFont(base: 11, weight: .medium)
                     .foregroundStyle(.secondary)
             }
             .scaleEffect(isPressed ? 0.92 : 1.0)
@@ -251,7 +251,7 @@ struct QuickAddSheet: View {
                         showAddTemplate = true
                     } label: {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 20))
+                            .dynamicTypeFont(base: 20)
                             .foregroundStyle(Theme.Colors.aiPurple)
                     }
                 }
@@ -267,11 +267,11 @@ struct QuickAddSheet: View {
     private var searchBar: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(.secondary)
 
             TextField("Search templates...", text: $searchText)
-                .font(.system(size: 15))
+                .dynamicTypeFont(base: 15)
                 .foregroundStyle(.primary)
 
             if !searchText.isEmpty {
@@ -279,7 +279,7 @@ struct QuickAddSheet: View {
                     searchText = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -302,11 +302,11 @@ struct QuickAddSheet: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Image(systemName: "clock.fill")
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
                     .foregroundStyle(.secondary)
 
                 Text("Recent")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.secondary)
             }
 
@@ -329,11 +329,11 @@ struct QuickAddSheet: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Image(systemName: "bolt.fill")
-                    .font(.system(size: 11, weight: .semibold))
+                    .dynamicTypeFont(base: 11, weight: .semibold)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("All Templates")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.primary)
             }
 
@@ -366,11 +366,11 @@ struct RecentTemplateChip: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: template.icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(template.color)
 
                 Text(template.title)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.primary)
             }
             .padding(.horizontal, 14)
@@ -426,12 +426,12 @@ struct TemplateGridItem: View {
                         }
 
                     Image(systemName: template.icon)
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(template.color)
                 }
 
                 Text(template.title)
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.primary)
                     .lineLimit(1)
             }
@@ -480,12 +480,12 @@ struct AddCustomTemplateButton: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .medium))
+                        .dynamicTypeFont(base: 18, weight: .medium)
                         .foregroundStyle(.secondary)
                 }
 
                 Text("Custom")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
@@ -588,12 +588,12 @@ struct AddTemplateSheet: View {
                     }
 
                 Image(systemName: selectedIcon)
-                    .font(.system(size: 24, weight: .semibold))
+                    .dynamicTypeFont(base: 24, weight: .semibold)
                     .foregroundStyle(selectedColor)
             }
 
             Text(title.isEmpty ? "Template Name" : title)
-                .font(.system(size: 14, weight: .medium))
+                .dynamicTypeFont(base: 14, weight: .medium)
                 .foregroundStyle(title.isEmpty ? .secondary : .primary)
         }
         .frame(maxWidth: .infinity)
@@ -611,11 +611,11 @@ struct AddTemplateSheet: View {
     private var titleInput: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Name")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.secondary)
 
             TextField("Enter template name", text: $title)
-                .font(.system(size: 16))
+                .dynamicTypeFont(base: 16)
                 .padding(14)
                 .background {
                     RoundedRectangle(cornerRadius: 12)
@@ -631,7 +631,7 @@ struct AddTemplateSheet: View {
     private var iconPicker: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Icon")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.secondary)
 
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
@@ -653,7 +653,7 @@ struct AddTemplateSheet: View {
                                 }
 
                             Image(systemName: icon)
-                                .font(.system(size: 16, weight: .medium))
+                                .dynamicTypeFont(base: 16, weight: .medium)
                                 .foregroundStyle(selectedIcon == icon ? selectedColor : .secondary)
                         }
                     }
@@ -666,7 +666,7 @@ struct AddTemplateSheet: View {
     private var colorPicker: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Color")
-                .font(.system(size: 13, weight: .semibold))
+                .dynamicTypeFont(base: 13, weight: .semibold)
                 .foregroundStyle(.secondary)
 
             HStack(spacing: 12) {
@@ -686,7 +686,7 @@ struct AddTemplateSheet: View {
                                     .frame(width: 36, height: 36)
 
                                 Image(systemName: "checkmark")
-                                    .font(.system(size: 14, weight: .bold))
+                                    .dynamicTypeFont(base: 14, weight: .bold)
                                     .foregroundStyle(.white)
                             }
                         }

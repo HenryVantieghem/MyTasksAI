@@ -31,14 +31,14 @@ struct GoalSpotlightCard: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(goal.displayTitle)
-                            .font(.system(size: 17, weight: .semibold))
+                            .dynamicTypeFont(base: 17, weight: .semibold)
                             .foregroundStyle(.white)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
 
                         if let aiTitle = goal.aiRefinedTitle, aiTitle != goal.title {
                             Text(goal.title)
-                                .font(.system(size: 13))
+                                .dynamicTypeFont(base: 13)
                                 .foregroundStyle(.white.opacity(0.5))
                                 .lineLimit(1)
                         }
@@ -47,9 +47,9 @@ struct GoalSpotlightCard: View {
                         if let category = goal.categoryEnum {
                             HStack(spacing: 4) {
                                 Image(systemName: category.icon)
-                                    .font(.system(size: 10))
+                                    .dynamicTypeFont(base: 10)
                                 Text(category.displayName)
-                                    .font(.system(size: 11))
+                                    .dynamicTypeFont(base: 11)
                             }
                             .foregroundStyle(category.color.opacity(0.8))
                         }
@@ -127,21 +127,21 @@ struct GoalSpotlightCard: View {
     private var checkInPrompt: some View {
         HStack(spacing: 8) {
             Image(systemName: "bell.badge.fill")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.warning)
 
             Text("Weekly check-in due")
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
                 .foregroundStyle(Theme.Colors.warning)
 
             Spacer()
 
             Text("Tap to complete")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(.white.opacity(0.5))
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 10, weight: .semibold))
+                .dynamicTypeFont(base: 10, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.5))
         }
         .padding(.horizontal, 12)
@@ -159,7 +159,7 @@ struct GoalSpotlightCard: View {
     private func aiQuote(_ quote: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "sparkles")
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.Colors.aiPurple.opacity(0.6))
 
             Text(quote)
@@ -242,7 +242,7 @@ struct GoalSpotlightSection: View {
             // Section header
             HStack {
                 Label("Goals", systemImage: "target")
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.6))
 
                 Spacer()
@@ -250,9 +250,9 @@ struct GoalSpotlightSection: View {
                 Button(action: onAddGoal) {
                     HStack(spacing: 4) {
                         Image(systemName: "plus")
-                            .font(.system(size: 11, weight: .semibold))
+                            .dynamicTypeFont(base: 11, weight: .semibold)
                         Text("Add")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                     }
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .padding(.horizontal, 10)
@@ -288,26 +288,26 @@ struct GoalSpotlightSection: View {
                         .frame(width: 64, height: 64)
 
                     Image(systemName: "target")
-                        .font(.system(size: 28))
+                        .dynamicTypeFont(base: 28)
                         .foregroundStyle(Theme.Colors.aiPurple.opacity(0.6))
                 }
 
                 VStack(spacing: 4) {
                     Text("Set Your First Goal")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(.white)
 
                     Text("Turn your aspirations into achievements with AI-powered planning")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(.white.opacity(0.5))
                         .multilineTextAlignment(.center)
                 }
 
                 HStack(spacing: 6) {
                     Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                     Text("Create Goal")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                 }
                 .foregroundStyle(Theme.Colors.aiPurple)
                 .padding(.horizontal, 16)
@@ -353,7 +353,7 @@ struct GoalCardCompact: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(goal.displayTitle)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white)
                         .lineLimit(1)
 
@@ -364,7 +364,7 @@ struct GoalCardCompact: View {
 
                         if let days = goal.daysRemaining {
                             Text(days == 0 ? "Today" : "\(days)d")
-                                .font(.system(size: 11))
+                                .dynamicTypeFont(base: 11)
                                 .foregroundStyle(
                                     days <= 3 ? Theme.Colors.warning : Theme.Colors.textTertiary
                                 )
@@ -375,7 +375,7 @@ struct GoalCardCompact: View {
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.3))
             }
             .padding(12)

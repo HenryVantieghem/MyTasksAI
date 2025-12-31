@@ -423,7 +423,7 @@ struct MiniStatBadge: View {
             .widgetAccentable()
             
             Text(label)
-                .font(.system(size: 9))
+                .dynamicTypeFont(base: 9)
                 .foregroundStyle(.white.opacity(0.7))
         }
         .frame(maxWidth: .infinity)

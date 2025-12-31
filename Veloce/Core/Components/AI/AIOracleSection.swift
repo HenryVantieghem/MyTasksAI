@@ -88,7 +88,7 @@ struct AIOracleSection: View {
                     .frame(width: 36, height: 36)
 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 16, weight: .medium))
+                    .dynamicTypeFont(base: 16, weight: .medium)
                     .foregroundStyle(Theme.AdaptiveColors.aiPrimary)
                     .symbolEffect(.pulse.byLayer, options: .repeating.speed(0.3))
             }
@@ -123,7 +123,7 @@ struct AIOracleSection: View {
                 refreshAI()
             } label: {
                 Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.AdaptiveColors.aiSecondary)
                     .rotationEffect(.degrees(refreshRotation))
                     .frame(width: 32, height: 32)
@@ -212,7 +212,7 @@ struct AIOracleSection: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "brain")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.AdaptiveColors.aiTertiary)
 
                     Text("Thought Process")
@@ -222,7 +222,7 @@ struct AIOracleSection: View {
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 10, weight: .semibold))
+                        .dynamicTypeFont(base: 10, weight: .semibold)
                         .foregroundStyle(.tertiary)
                         .rotationEffect(.degrees(isThoughtProcessExpanded ? 90 : 0))
                 }
@@ -267,7 +267,7 @@ struct AIOracleSection: View {
             // Header
             HStack(spacing: 8) {
                 Image(systemName: "book.fill")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.AdaptiveColors.aiSecondary)
 
                 Text("Helpful Resources")
@@ -322,7 +322,7 @@ struct AIOracleSection: View {
             // Header
             HStack(spacing: 8) {
                 Image(systemName: "message.fill")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(Theme.AdaptiveColors.aiPrimary)
 
                 Text("AI Prompt")
@@ -337,7 +337,7 @@ struct AIOracleSection: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: copiedPrompt ? "checkmark" : "doc.on.doc")
-                            .font(.system(size: 11, weight: .medium))
+                            .dynamicTypeFont(base: 11, weight: .medium)
 
                         Text(copiedPrompt ? "Copied!" : "Copy")
                             .font(.caption.weight(.medium))
@@ -473,7 +473,7 @@ struct OracleMetadataPill: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 10, weight: .medium))
+                .dynamicTypeFont(base: 10, weight: .medium)
 
             Text(text)
                 .font(.caption2.weight(.medium))
@@ -500,7 +500,7 @@ struct ResourceLinkRow: View {
             HStack(spacing: 12) {
                 // Icon
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(color)
                     .frame(width: 28, height: 28)
                     .background(color.opacity(0.12))
@@ -522,7 +522,7 @@ struct ResourceLinkRow: View {
 
                 // Arrow
                 Image(systemName: "arrow.up.right")
-                    .font(.system(size: 10, weight: .medium))
+                    .dynamicTypeFont(base: 10, weight: .medium)
                     .foregroundStyle(.tertiary)
             }
             .padding(8)

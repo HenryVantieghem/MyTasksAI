@@ -389,7 +389,7 @@ struct ChallengesTabContent: View {
                 }
 
                 Image(systemName: "trophy.fill")
-                    .font(.system(size: 28, weight: .light))
+                    .dynamicTypeFont(base: 28, weight: .light)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.CelestialColors.solarFlare, Theme.Colors.xp],
@@ -405,7 +405,7 @@ struct ChallengesTabContent: View {
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text("Challenge a friend to stay accountable and earn bonus XP")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
@@ -416,7 +416,7 @@ struct ChallengesTabContent: View {
                     Image(systemName: "bolt.fill")
                     Text("Send a Challenge")
                 }
-                .font(.system(size: 15, weight: .semibold))
+                .dynamicTypeFont(base: 15, weight: .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
@@ -480,7 +480,7 @@ struct IncomingChallengeCard: View {
                         .frame(width: 40, height: 40)
 
                     Image(systemName: challenge.challengeType.icon)
-                        .font(.system(size: 18, weight: .semibold))
+                        .dynamicTypeFont(base: 18, weight: .semibold)
                         .foregroundStyle(challenge.challengeType.color)
                 }
 
@@ -490,7 +490,7 @@ struct IncomingChallengeCard: View {
                         .foregroundStyle(Theme.CelestialColors.starWhite)
 
                     Text("from \(challenge.creatorName)")
-                        .font(.system(size: 12))
+                        .dynamicTypeFont(base: 12)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
 
@@ -508,9 +508,9 @@ struct IncomingChallengeCard: View {
             if let stakes = challenge.stakes, !stakes.isEmpty {
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                     Text("Stakes: \(stakes)")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                 }
                 .foregroundStyle(Theme.CelestialColors.solarFlare)
             }
@@ -519,7 +519,7 @@ struct IncomingChallengeCard: View {
             HStack(spacing: 12) {
                 Button(action: onDecline) {
                     Text("Decline")
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -529,10 +529,10 @@ struct IncomingChallengeCard: View {
                 Button(action: onAccept) {
                     HStack(spacing: 6) {
                         Image(systemName: "bolt.fill")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("Accept")
                     }
-                    .font(.system(size: 14, weight: .bold))
+                    .dynamicTypeFont(base: 14, weight: .bold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
@@ -563,14 +563,14 @@ struct IncomingChallengeCard: View {
         VStack(spacing: 2) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 10))
+                    .dynamicTypeFont(base: 10)
                 Text(value)
                     .font(.system(size: 13, weight: .bold, design: .rounded))
             }
             .foregroundStyle(color)
 
             Text(label)
-                .font(.system(size: 10))
+                .dynamicTypeFont(base: 10)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         }
     }
@@ -591,7 +591,7 @@ struct ActiveChallengeCard: View {
                 // Type badge
                 HStack(spacing: 6) {
                     Image(systemName: challenge.challengeType.icon)
-                        .font(.system(size: 12, weight: .bold))
+                        .dynamicTypeFont(base: 12, weight: .bold)
 
                     Text(challenge.challengeType.displayName)
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -606,7 +606,7 @@ struct ActiveChallengeCard: View {
                 // Time remaining
                 HStack(spacing: 4) {
                     Image(systemName: "clock")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
 
                     Text(challenge.formattedTimeRemaining)
                         .font(.system(size: 12, weight: .semibold, design: .monospaced))
@@ -637,9 +637,9 @@ struct ActiveChallengeCard: View {
 
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                     Text("Winner gets +\(challenge.xpReward) XP")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                 }
                 .foregroundStyle(Theme.Colors.xp)
             }
@@ -692,7 +692,7 @@ struct ParticipantProgressRow: View {
                 // Leader crown
                 if participant.currentProgress > 0 && isLeading {
                     Image(systemName: "crown.fill")
-                        .font(.system(size: 10))
+                        .dynamicTypeFont(base: 10)
                         .foregroundStyle(Theme.Colors.xp)
                         .offset(y: -20)
                 }
@@ -763,7 +763,7 @@ struct CompletedChallengeRow: View {
                     .frame(width: 44, height: 44)
 
                 Image(systemName: challenge.challengeType.icon)
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(challenge.challengeType.color)
             }
 
@@ -775,9 +775,9 @@ struct CompletedChallengeRow: View {
                 if let winner = challenge.participants.first(where: { $0.isWinner }) {
                     HStack(spacing: 4) {
                         Image(systemName: "trophy.fill")
-                            .font(.system(size: 10))
+                            .dynamicTypeFont(base: 10)
                         Text(winner.userName)
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                     }
                     .foregroundStyle(Theme.Colors.xp)
                 }
@@ -829,7 +829,7 @@ struct ChallengeTypeCard: View {
                         .frame(width: 44, height: 44)
 
                     Image(systemName: type.icon)
-                        .font(.system(size: 20, weight: .semibold))
+                        .dynamicTypeFont(base: 20, weight: .semibold)
                         .foregroundStyle(type.color)
                 }
 
@@ -838,7 +838,7 @@ struct ChallengeTypeCard: View {
                     .foregroundStyle(Theme.CelestialColors.starWhite)
 
                 Text(type.description)
-                    .font(.system(size: 11))
+                    .dynamicTypeFont(base: 11)
                     .foregroundStyle(Theme.CelestialColors.starDim)
                     .lineLimit(2)
             }
@@ -892,7 +892,7 @@ struct ChallengeCelebrationOverlay: View {
                     }
 
                     Image(systemName: "trophy.fill")
-                        .font(.system(size: 60))
+                        .dynamicTypeFont(base: 60)
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color(red: 0.98, green: 0.75, blue: 0.25), Color(red: 0.85, green: 0.55, blue: 0.15)],
@@ -920,7 +920,7 @@ struct ChallengeCelebrationOverlay: View {
                 Button("Awesome!") {
                     onDismiss()
                 }
-                .font(.system(size: 16, weight: .bold))
+                .dynamicTypeFont(base: 16, weight: .bold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 40)
                 .padding(.vertical, 14)
@@ -978,7 +978,7 @@ struct ChallengeDetailSheet: View {
                     .frame(width: 80, height: 80)
 
                 Image(systemName: challenge.challengeType.icon)
-                    .font(.system(size: 36, weight: .semibold))
+                    .dynamicTypeFont(base: 36, weight: .semibold)
                     .foregroundStyle(challenge.challengeType.color)
             }
 
@@ -990,7 +990,7 @@ struct ChallengeDetailSheet: View {
 
                 if let description = challenge.description {
                     Text(description)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .multilineTextAlignment(.center)
                 }
@@ -1040,14 +1040,14 @@ struct ChallengeDetailSheet: View {
         VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text(value)
                     .font(.system(size: 16, weight: .bold, design: .rounded))
             }
             .foregroundStyle(Theme.CelestialColors.starWhite)
 
             Text(label)
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
                 .foregroundStyle(Theme.CelestialColors.starGhost)
         }
     }

@@ -29,11 +29,11 @@ struct CelestialScheduleSection: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.TaskCardColors.schedule)
 
                 Text("Smart Suggestions")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -47,7 +47,7 @@ struct CelestialScheduleSection: View {
 
             if viewModel.scheduleSuggestions.isEmpty {
                 Text("Loading suggestions...")
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Theme.CelestialColors.starDim)
             } else {
                 VStack(spacing: Theme.Spacing.sm) {
@@ -75,11 +75,11 @@ struct CelestialScheduleSection: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(formatSuggestionDate(suggestion.date))
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white)
 
                     Text(suggestion.reason)
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                         .lineLimit(2)
                 }
@@ -88,7 +88,7 @@ struct CelestialScheduleSection: View {
 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 18))
+                        .dynamicTypeFont(base: 18)
                         .foregroundStyle(Theme.TaskCardColors.schedule)
                 }
             }
@@ -122,7 +122,7 @@ struct CelestialScheduleSection: View {
         }()
 
         return Image(systemName: icon)
-            .font(.system(size: 14, weight: .medium))
+            .dynamicTypeFont(base: 14, weight: .medium)
             .foregroundStyle(color)
             .frame(width: 28, height: 28)
             .background(
@@ -137,11 +137,11 @@ struct CelestialScheduleSection: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             HStack {
                 Image(systemName: "calendar.badge.clock")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.TaskCardColors.schedule)
 
                 Text("Pick Your Own Time")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -155,23 +155,23 @@ struct CelestialScheduleSection: View {
                     if let scheduled = viewModel.editedScheduledTime {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(formatFullDate(scheduled))
-                                .font(.system(size: 14, weight: .medium))
+                                .dynamicTypeFont(base: 14, weight: .medium)
                                 .foregroundStyle(.white)
 
                             Text(formatTime(scheduled))
-                                .font(.system(size: 12))
+                                .dynamicTypeFont(base: 12)
                                 .foregroundStyle(Theme.TaskCardColors.schedule)
                         }
                     } else {
                         Text("Not scheduled")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                             .foregroundStyle(Theme.CelestialColors.starDim)
                     }
 
                     Spacer()
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .medium))
+                        .dynamicTypeFont(base: 12, weight: .medium)
                         .foregroundStyle(Theme.CelestialColors.starDim)
                 }
                 .padding(Theme.Spacing.sm)
@@ -193,9 +193,9 @@ struct CelestialScheduleSection: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "xmark.circle")
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                         Text("Clear schedule")
-                            .font(.system(size: 12, weight: .medium))
+                            .dynamicTypeFont(base: 12, weight: .medium)
                     }
                     .foregroundStyle(Theme.CelestialColors.starDim)
                 }

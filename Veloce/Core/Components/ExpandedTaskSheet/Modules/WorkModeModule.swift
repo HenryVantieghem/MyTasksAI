@@ -62,24 +62,24 @@ struct WorkModeModule: View {
             VStack(spacing: 8) {
                 // Icon
                 Image(systemName: mode.icon)
-                    .font(.system(size: 24, weight: .medium))
+                    .dynamicTypeFont(base: 24, weight: .medium)
 
                 // Mode name
                 Text(mode.rawValue)
-                    .font(.system(size: 13, weight: .semibold))
+                    .dynamicTypeFont(base: 13, weight: .semibold)
 
                 // Duration
                 Text(mode.duration)
-                    .font(.system(size: 11, weight: .regular))
+                    .dynamicTypeFont(base: 11, weight: .regular)
                     .foregroundStyle(.white.opacity(0.7))
 
                 // AI recommended badge
                 if isRecommended {
                     HStack(spacing: 3) {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 8))
+                            .dynamicTypeFont(base: 8)
                         Text("AI Pick")
-                            .font(.system(size: 9, weight: .medium))
+                            .dynamicTypeFont(base: 9, weight: .medium)
                     }
                     .foregroundStyle(accentColor)
                     .padding(.horizontal, 6)
@@ -113,12 +113,12 @@ struct WorkModeModule: View {
     private var aiExplanation: some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "sparkles")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(accentColor)
                 .padding(.top, 2)
 
             Text(viewModel.workModeReason)
-                .font(.system(size: 13, weight: .regular))
+                .dynamicTypeFont(base: 13, weight: .regular)
                 .foregroundStyle(.white.opacity(0.8))
                 .lineSpacing(3)
         }
@@ -137,9 +137,9 @@ struct WorkModeModule: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: buttonIcon)
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                 Text(buttonLabel)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
             }
             .foregroundStyle(.black)
             .frame(maxWidth: .infinity)

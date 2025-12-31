@@ -47,11 +47,11 @@ struct ExecutionStepsModule: View {
         HStack {
             HStack(spacing: 8) {
                 Image(systemName: "list.bullet.rectangle")
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(accentColor)
 
                 Text("EXECUTION STEPS")
-                    .font(.system(size: 12, weight: .bold))
+                    .dynamicTypeFont(base: 12, weight: .bold)
                     .foregroundStyle(.white.opacity(0.8))
             }
 
@@ -60,7 +60,7 @@ struct ExecutionStepsModule: View {
             // Progress indicator
             if !steps.isEmpty {
                 Text(progressText)
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(accentColor)
             }
 
@@ -70,7 +70,7 @@ struct ExecutionStepsModule: View {
                 HapticsService.shared.selectionFeedback()
             } label: {
                 Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 12, weight: .semibold))
+                    .dynamicTypeFont(base: 12, weight: .semibold)
                     .foregroundStyle(accentColor.opacity(0.7))
                     .rotationEffect(.degrees(isLoading ? 360 : 0))
                     .animation(isLoading ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: isLoading)
@@ -113,18 +113,18 @@ struct ExecutionStepsModule: View {
     private var emptyStateView: some View {
         VStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "sparkles")
-                .font(.system(size: 24))
+                .dynamicTypeFont(base: 24)
                 .foregroundStyle(accentColor.opacity(0.5))
 
             Text("No steps generated yet")
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.5))
 
             Button {
                 onRefresh()
             } label: {
                 Text("Generate Steps")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(accentColor)
             }
         }
@@ -181,7 +181,7 @@ struct ExecutionStepRow: View {
                 VStack(alignment: .leading, spacing: 6) {
                     // Description
                     Text(step.description)
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(.white)
                         .strikethrough(step.isCompleted)
                         .opacity(step.isCompleted ? 0.6 : 1)
@@ -191,9 +191,9 @@ struct ExecutionStepRow: View {
                         // Time estimate
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
-                                .font(.system(size: 10))
+                                .dynamicTypeFont(base: 10)
                             Text("\(step.estimatedMinutes) min")
-                                .font(.system(size: 11, weight: .medium))
+                                .dynamicTypeFont(base: 11, weight: .medium)
                         }
                         .foregroundStyle(.white.opacity(0.5))
 
@@ -207,11 +207,11 @@ struct ExecutionStepRow: View {
                             } label: {
                                 HStack(spacing: 4) {
                                     Image(systemName: "sparkles")
-                                        .font(.system(size: 9))
+                                        .dynamicTypeFont(base: 9)
                                     Text("Why")
-                                        .font(.system(size: 10, weight: .medium))
+                                        .dynamicTypeFont(base: 10, weight: .medium)
                                     Image(systemName: showReasoning ? "chevron.up" : "chevron.down")
-                                        .font(.system(size: 8, weight: .bold))
+                                        .dynamicTypeFont(base: 8, weight: .bold)
                                 }
                                 .foregroundStyle(Theme.Colors.aiPurple)
                             }
@@ -221,7 +221,7 @@ struct ExecutionStepRow: View {
                     // Reasoning (expandable)
                     if showReasoning, let reasoning = step.reasoning {
                         Text(reasoning)
-                            .font(.system(size: 12))
+                            .dynamicTypeFont(base: 12)
                             .foregroundStyle(Theme.Colors.aiPurple.opacity(0.8))
                             .padding(.top, 4)
                             .transition(.move(edge: .top).combined(with: .opacity))
@@ -253,7 +253,7 @@ struct ExecutionStepRow: View {
                         .frame(width: 24, height: 24)
 
                     Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
+                        .dynamicTypeFont(base: 12, weight: .bold)
                         .foregroundStyle(.white)
                 }
             }

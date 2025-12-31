@@ -110,7 +110,7 @@ struct CrystallineTextField: View {
             }
 
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .medium))
+                .dynamicTypeFont(base: 18, weight: .medium)
                 .foregroundStyle(iconColor)
                 .frame(width: 24, height: 24)
         }
@@ -139,7 +139,7 @@ struct CrystallineTextField: View {
                 TextField("", text: $text)
             }
         }
-        .font(.system(size: 16, weight: .regular))
+        .dynamicTypeFont(base: 16, weight: .regular)
         .foregroundStyle(Aurora.Colors.textPrimary)
         .focused($isFocused)
         .keyboardType(keyboardType)
@@ -164,7 +164,7 @@ struct CrystallineTextField: View {
                     showSecureText.toggle()
                 } label: {
                     Image(systemName: showSecureText ? "eye.slash.fill" : "eye.fill")
-                        .font(.system(size: 16, weight: .medium))
+                        .dynamicTypeFont(base: 16, weight: .medium)
                         .foregroundStyle(Aurora.Colors.textTertiary)
                         .frame(width: 28, height: 28)
                 }
@@ -191,13 +191,13 @@ struct CrystallineTextField: View {
 
         case .valid:
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(Aurora.Colors.success)
                 .transition(.scale.combined(with: .opacity))
 
         case .invalid:
             Image(systemName: "exclamationmark.circle.fill")
-                .font(.system(size: 20))
+                .dynamicTypeFont(base: 20)
                 .foregroundStyle(Aurora.Colors.error)
                 .transition(.scale.combined(with: .opacity))
         }
@@ -268,10 +268,10 @@ struct CrystallineTextField: View {
     private func errorMessage(_ message: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 11))
+                .dynamicTypeFont(base: 11)
 
             Text(message)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
         }
         .foregroundStyle(Aurora.Colors.error)
         .padding(.leading, 44) // Align with text field content

@@ -60,7 +60,7 @@ struct JournalDetailSheet: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
+                            .dynamicTypeFont(base: 24)
                             .foregroundStyle(.white.opacity(0.4))
                     }
                 }
@@ -109,10 +109,10 @@ struct JournalDetailSheet: View {
     private var entryTypeBadge: some View {
         HStack(spacing: 6) {
             Image(systemName: entry.entryType.icon)
-                .font(.system(size: 12, weight: .medium))
+                .dynamicTypeFont(base: 12, weight: .medium)
 
             Text(entry.entryType.displayName)
-                .font(.system(size: 12, weight: .semibold))
+                .dynamicTypeFont(base: 12, weight: .semibold)
                 .textCase(.uppercase)
                 .tracking(0.5)
         }
@@ -152,22 +152,22 @@ struct JournalDetailSheet: View {
             // Created date
             HStack(spacing: 6) {
                 Image(systemName: "calendar")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.white.opacity(0.4))
 
                 Text(entry.createdAt.formatted(date: .complete, time: .shortened))
-                    .font(.system(size: 13, weight: .regular))
+                    .dynamicTypeFont(base: 13, weight: .regular)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
             // Word count
             HStack(spacing: 6) {
                 Image(systemName: "text.word.spacing")
-                    .font(.system(size: 12))
+                    .dynamicTypeFont(base: 12)
                     .foregroundStyle(.white.opacity(0.4))
 
                 Text("\(entry.wordCount) words")
-                    .font(.system(size: 13, weight: .regular))
+                    .dynamicTypeFont(base: 13, weight: .regular)
                     .foregroundStyle(.white.opacity(0.5))
             }
 
@@ -175,10 +175,10 @@ struct JournalDetailSheet: View {
             if let mood = entry.mood {
                 HStack(spacing: 6) {
                     Text(mood.emoji)
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
 
                     Text(mood.displayName)
-                        .font(.system(size: 13, weight: .regular))
+                        .dynamicTypeFont(base: 13, weight: .regular)
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
@@ -196,7 +196,7 @@ struct JournalDetailSheet: View {
                 dismiss()
             } label: {
                 Label("Convert to Task", systemImage: "arrow.right.circle")
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(14)
@@ -224,7 +224,7 @@ struct JournalDetailSheet: View {
                     copiedToClipboard ? "Copied!" : "Copy Text",
                     systemImage: copiedToClipboard ? "checkmark" : "doc.on.doc"
                 )
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(copiedToClipboard ? Theme.Colors.success : .white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(14)
@@ -241,7 +241,7 @@ struct JournalDetailSheet: View {
                 showDeleteConfirmation = true
             } label: {
                 Label("Delete Entry", systemImage: "trash")
-                    .font(.system(size: 15, weight: .medium))
+                    .dynamicTypeFont(base: 15, weight: .medium)
                     .foregroundStyle(.red.opacity(0.9))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(14)
@@ -259,11 +259,11 @@ struct JournalDetailSheet: View {
     private var reminderSuggestionCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("May contain a task", systemImage: "sparkles")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(Theme.Colors.aiAmber)
 
             Text("This entry looks actionable. Would you like to add it as a task?")
-                .font(.system(size: 14, weight: .regular))
+                .dynamicTypeFont(base: 14, weight: .regular)
                 .foregroundStyle(.white.opacity(0.6))
 
             Button {
@@ -272,7 +272,7 @@ struct JournalDetailSheet: View {
                 dismiss()
             } label: {
                 Text("Add to Tasks")
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)

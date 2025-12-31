@@ -209,12 +209,12 @@ struct CrystallineSelectionCard: View {
                 // Text content
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                         .foregroundStyle(Aurora.Colors.textPrimary)
 
                     if let subtitle {
                         Text(subtitle)
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(Aurora.Colors.textTertiary)
                     }
                 }
@@ -224,7 +224,7 @@ struct CrystallineSelectionCard: View {
                 // Selection indicator
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 22))
+                        .dynamicTypeFont(base: 22)
                         .foregroundStyle(accentColor)
                         .transition(.scale.combined(with: .opacity))
                 }
@@ -258,7 +258,7 @@ struct CrystallineSelectionCard: View {
             }
 
             Image(systemName: icon)
-                .font(.system(size: 20, weight: .medium))
+                .dynamicTypeFont(base: 20, weight: .medium)
                 .foregroundStyle(isSelected ? accentColor : Aurora.Colors.textSecondary)
         }
     }
@@ -299,17 +299,17 @@ struct CrystallineFeatureCard: View {
                     .frame(width: 44, height: 44)
 
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .medium))
+                    .dynamicTypeFont(base: 18, weight: .medium)
                     .foregroundStyle(accentColor)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(Aurora.Colors.textPrimary)
 
                 Text(description)
-                    .font(.system(size: 13))
+                    .dynamicTypeFont(base: 13)
                     .foregroundStyle(Aurora.Colors.textTertiary)
                     .lineLimit(2)
             }

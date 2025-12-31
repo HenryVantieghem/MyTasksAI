@@ -701,7 +701,7 @@ struct ChatTasksView: View {
             HStack(spacing: CosmicWidget.Spacing.sm) {
                 // Constellation icon
                 Image(systemName: "sparkles")
-                    .font(.system(size: 12, weight: .medium))
+                    .dynamicTypeFont(base: 12, weight: .medium)
                     .foregroundStyle(CosmicWidget.Widget.mint)
 
                 Text("Completed")
@@ -973,7 +973,7 @@ struct ConstellationTaskRow: View {
 
                 // Core star with gradient
                 Image(systemName: "star.fill")
-                    .font(.system(size: 10, weight: .semibold))
+                    .dynamicTypeFont(base: 10, weight: .semibold)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Aurora.Colors.cosmicGold, Aurora.Colors.prismaticGreen],
@@ -1205,7 +1205,7 @@ struct KanbanColumn: View {
                     .blur(radius: 10)
 
                 Image(systemName: section.icon)
-                    .font(.system(size: 28, weight: .light))
+                    .dynamicTypeFont(base: 28, weight: .light)
                     .foregroundStyle(Aurora.Colors.textTertiary)
             }
 
@@ -1290,12 +1290,12 @@ struct PriorityPickerSheet: View {
                             HStack(spacing: 4) {
                                 ForEach(0..<priority, id: \.self) { _ in
                                     Image(systemName: "star.fill")
-                                        .font(.system(size: 18))
+                                        .dynamicTypeFont(base: 18)
                                         .foregroundStyle(CosmicWidget.Widget.gold)
                                 }
                                 ForEach(0..<(3 - priority), id: \.self) { _ in
                                     Image(systemName: "star")
-                                        .font(.system(size: 18))
+                                        .dynamicTypeFont(base: 18)
                                         .foregroundStyle(CosmicWidget.Text.tertiary)
                                 }
                             }
@@ -1398,7 +1398,7 @@ struct ChatTaskDetailSheet: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
+                            .dynamicTypeFont(base: 24)
                             .foregroundStyle(CosmicWidget.Text.tertiary)
                     }
                 }

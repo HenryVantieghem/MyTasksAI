@@ -144,7 +144,7 @@ struct GoalsContentView: View {
                             .shadow(color: Aurora.Colors.prismaticGreen.opacity(0.5), radius: 16, y: 6)
 
                         Image(systemName: "plus")
-                            .font(.system(size: 20, weight: .bold))
+                            .dynamicTypeFont(base: 20, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
@@ -357,7 +357,7 @@ struct GoalsContentView: View {
                         .frame(width: 120, height: 120)
 
                     Image(systemName: selectedFilter == .completed ? "checkmark.seal" : "leaf.fill")
-                        .font(.system(size: 40))
+                        .dynamicTypeFont(base: 40)
                         .foregroundStyle(Aurora.Colors.prismaticGreen.opacity(0.7))
                 }
             }
@@ -381,7 +381,7 @@ struct GoalsContentView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 16))
+                            .dynamicTypeFont(base: 16)
                         Text("Create Your First Goal")
                             .font(Aurora.Typography.subheadline)
                             .fontWeight(.semibold)
@@ -532,7 +532,7 @@ struct AuroraGoalStatCard: View {
                     .frame(width: 36, height: 36)
 
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundStyle(iconColor)
             }
 

@@ -26,20 +26,20 @@ struct SmartStackSection<Content: View>: View {
                 HStack(spacing: 10) {
                     // Icon
                     Image(systemName: icon)
-                        .font(.system(size: 14, weight: .semibold))
+                        .dynamicTypeFont(base: 14, weight: .semibold)
                         .foregroundColor(iconColor)
                         .frame(width: 20)
 
                     // Title
                     Text(title)
-                        .font(.system(size: 15, weight: .semibold))
+                        .dynamicTypeFont(base: 15, weight: .semibold)
                         .foregroundColor(Theme.CelestialColors.starWhite)
 
                     Spacer()
 
                     // Chevron
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
+                        .dynamicTypeFont(base: 12, weight: .semibold)
                         .foregroundColor(Theme.CelestialColors.starDim)
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
                 }
@@ -96,12 +96,12 @@ struct SmartSectionFixed<Content: View>: View {
             // Header
             HStack(spacing: 10) {
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .dynamicTypeFont(base: 14, weight: .semibold)
                     .foregroundColor(iconColor)
                     .frame(width: 20)
 
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundColor(Theme.CelestialColors.starWhite)
 
                 Spacer()
@@ -139,9 +139,9 @@ struct DangerZoneSection: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "doc.on.doc")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                     Text("Duplicate Task")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                 }
                 .foregroundColor(Theme.CelestialColors.starDim)
                 .frame(maxWidth: .infinity)
@@ -159,9 +159,9 @@ struct DangerZoneSection: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "trash")
-                        .font(.system(size: 14))
+                        .dynamicTypeFont(base: 14)
                     Text("Delete Task")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                 }
                 .foregroundColor(Theme.CelestialColors.errorNebula)
                 .frame(maxWidth: .infinity)
@@ -233,7 +233,7 @@ struct CompactHeaderSection: View {
             // Title (inline editable)
             if isEditing {
                 TextField("Task title", text: $editedTitle)
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundColor(Theme.CelestialColors.starWhite)
                     .focused($isTitleFocused)
                     .onAppear {
@@ -247,7 +247,7 @@ struct CompactHeaderSection: View {
                     }
             } else {
                 Text(title)
-                    .font(.system(size: 24, weight: .bold))
+                    .dynamicTypeFont(base: 24, weight: .bold)
                     .foregroundColor(Theme.CelestialColors.starWhite)
                     .lineLimit(3)
             }
@@ -275,7 +275,7 @@ struct InlineStarRating: View {
                     onChange(star)
                 }) {
                     Image(systemName: star <= rating ? "star.fill" : "star")
-                        .font(.system(size: 16))
+                        .dynamicTypeFont(base: 16)
                         .foregroundColor(star <= rating ? Theme.TaskCardColors.pointsGlow : Theme.CelestialColors.starGhost)
                 }
                 .buttonStyle(PlainButtonStyle())

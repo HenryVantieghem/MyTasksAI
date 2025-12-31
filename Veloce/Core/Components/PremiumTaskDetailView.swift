@@ -198,7 +198,7 @@ struct PremiumTaskDetailView: View {
                 dismiss()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.9))
                     .frame(width: 36, height: 36)
                     .background(
@@ -246,7 +246,7 @@ struct PremiumTaskDetailView: View {
                 }
             } label: {
                 Image(systemName: "ellipsis")
-                    .font(.system(size: 16, weight: .semibold))
+                    .dynamicTypeFont(base: 16, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.9))
                     .frame(width: 36, height: 36)
                     .background(
@@ -288,13 +288,13 @@ struct PremiumTaskDetailView: View {
                             .frame(width: 24, height: 24)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 12, weight: .bold))
+                            .dynamicTypeFont(base: 12, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
 
                 Text(task.isCompleted ? "Completed" : "Mark Complete")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(task.isCompleted ? Theme.Colors.success : .white.opacity(0.7))
             }
             .padding(.horizontal, 16)
@@ -341,7 +341,7 @@ struct PremiumTaskDetailView: View {
                                 .frame(width: 28, height: 28)
 
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
+                                .dynamicTypeFont(base: 14, weight: .bold)
                                 .foregroundStyle(.white)
                         }
                     }
@@ -372,7 +372,7 @@ struct PremiumTaskDetailView: View {
     private var priorityPicker: some View {
         HStack(spacing: 12) {
             Text("Priority")
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(Theme.Colors.textSecondary)
 
             HStack(spacing: 8) {
@@ -385,7 +385,7 @@ struct PremiumTaskDetailView: View {
                         HStack(spacing: 2) {
                             ForEach(0..<stars, id: \.self) { _ in
                                 Image(systemName: "star.fill")
-                                    .font(.system(size: 12))
+                                    .dynamicTypeFont(base: 12)
                             }
                         }
                         .foregroundStyle(task.starRating == stars ? Theme.Colors.warning : Theme.Colors.textTertiary)
@@ -418,11 +418,11 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "clock.fill")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiBlue)
 
                 Text("Duration")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -458,9 +458,9 @@ struct PremiumTaskDetailView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "plus")
-                                .font(.system(size: 12, weight: .semibold))
+                                .dynamicTypeFont(base: 12, weight: .semibold)
                             Text("Custom")
-                                .font(.system(size: 13, weight: .medium))
+                                .dynamicTypeFont(base: 13, weight: .medium)
                         }
                         .foregroundStyle(Theme.Colors.textSecondary)
                         .padding(.horizontal, 14)
@@ -485,11 +485,11 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "text.alignleft")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Context")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -503,7 +503,7 @@ struct PremiumTaskDetailView: View {
 
             // Context text editor
             TextEditor(text: $contextNotes)
-                .font(.system(size: 14))
+                .dynamicTypeFont(base: 14)
                 .foregroundStyle(.white.opacity(0.9))
                 .scrollContentBackground(.hidden)
                 .frame(minHeight: 80, maxHeight: 150)
@@ -524,7 +524,7 @@ struct PremiumTaskDetailView: View {
 
             // Helper text
             Text("Add details to get better AI suggestions")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.textTertiary)
         }
         .padding(20)
@@ -538,11 +538,11 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "timer")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.destructive)
 
                 Text("Focus Timer")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -567,7 +567,7 @@ struct PremiumTaskDetailView: View {
                         HapticsService.shared.impact()
                     } label: {
                         Text("\(mins)m")
-                            .font(.system(size: 14, weight: .semibold))
+                            .dynamicTypeFont(base: 14, weight: .semibold)
                             .foregroundStyle(pomodoroService.isRunning ? Theme.Colors.textTertiary : .white)
                             .frame(width: 50, height: 40)
                             .background(
@@ -587,9 +587,9 @@ struct PremiumTaskDetailView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "scope")
-                            .font(.system(size: 14))
+                            .dynamicTypeFont(base: 14)
                         Text("Focus Mode")
-                            .font(.system(size: 13, weight: .medium))
+                            .dynamicTypeFont(base: 13, weight: .medium)
                     }
                     .foregroundStyle(Theme.Colors.destructive)
                     .padding(.horizontal, 14)
@@ -613,12 +613,12 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .symbolEffect(.pulse.byLayer, options: .repeating.speed(0.3))
 
                 Text("AI Insight")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -628,7 +628,7 @@ struct PremiumTaskDetailView: View {
                     Task { await loadAIContent() }
                 } label: {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.aiBlue)
                         .rotationEffect(.degrees(isLoadingAI ? 360 : 0))
                         .animation(isLoadingAI ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: isLoadingAI)
@@ -644,7 +644,7 @@ struct PremiumTaskDetailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             } else if let advice = task.aiAdvice {
                 Text(advice)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -672,7 +672,7 @@ struct PremiumTaskDetailView: View {
                     Image(systemName: "wand.and.stars")
                         .foregroundStyle(Theme.Colors.textTertiary)
                     Text("Tap refresh to generate AI insights")
-                        .font(.system(size: 13))
+                        .dynamicTypeFont(base: 13)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
                 .padding(.vertical, 8)
@@ -689,11 +689,11 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "bubble.left.and.bubble.right.fill")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.aiPurple)
 
                 Text("Ask AI")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -734,11 +734,11 @@ struct PremiumTaskDetailView: View {
             // Header with progress
             HStack {
                 Image(systemName: "checklist")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.success)
 
                 Text("Sub-Tasks")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -760,7 +760,7 @@ struct PremiumTaskDetailView: View {
                     HStack {
                         Image(systemName: "sparkles")
                         Text("Generate sub-tasks with AI")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                     }
                     .foregroundStyle(Theme.Colors.aiPurple)
                     .frame(maxWidth: .infinity)
@@ -799,11 +799,11 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "play.rectangle.fill")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(.red)
 
                 Text("Learning Resources")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -812,7 +812,7 @@ struct PremiumTaskDetailView: View {
                     loadYouTubeResources()
                 } label: {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 14, weight: .medium))
+                        .dynamicTypeFont(base: 14, weight: .medium)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
                 .buttonStyle(.plain)
@@ -826,7 +826,7 @@ struct PremiumTaskDetailView: View {
                     HStack {
                         Image(systemName: "magnifyingglass")
                         Text("Find learning resources")
-                            .font(.system(size: 14, weight: .medium))
+                            .dynamicTypeFont(base: 14, weight: .medium)
                     }
                     .foregroundStyle(.red.opacity(0.9))
                     .frame(maxWidth: .infinity)
@@ -856,11 +856,11 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "calendar")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Schedule")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -871,11 +871,11 @@ struct PremiumTaskDetailView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(scheduledTime.formatted(date: .abbreviated, time: .omitted))
-                            .font(.system(size: 15, weight: .medium))
+                            .dynamicTypeFont(base: 15, weight: .medium)
                             .foregroundStyle(.white)
 
                         Text(scheduledTime.formatted(date: .omitted, time: .shortened))
-                            .font(.system(size: 13))
+                            .dynamicTypeFont(base: 13)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
 
@@ -885,7 +885,7 @@ struct PremiumTaskDetailView: View {
                         selectedScheduleDate = scheduledTime
                         showSchedulePicker = true
                     }
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
                 }
             } else {
@@ -907,7 +907,7 @@ struct PremiumTaskDetailView: View {
                         showSchedulePicker = true
                     } label: {
                         Image(systemName: "calendar.badge.plus")
-                            .font(.system(size: 18))
+                            .dynamicTypeFont(base: 18)
                             .foregroundStyle(Theme.Colors.accent)
                     }
                     .buttonStyle(.plain)
@@ -925,11 +925,11 @@ struct PremiumTaskDetailView: View {
             // Header
             HStack {
                 Image(systemName: "repeat")
-                    .font(.system(size: 14, weight: .medium))
+                    .dynamicTypeFont(base: 14, weight: .medium)
                     .foregroundStyle(Theme.Colors.accent)
 
                 Text("Repeat")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -1008,7 +1008,7 @@ struct PremiumTaskDetailView: View {
                 Spacer()
 
                 Text("Schedule Task")
-                    .font(.system(size: 17, weight: .semibold))
+                    .dynamicTypeFont(base: 17, weight: .semibold)
 
                 Spacer()
 
@@ -1041,7 +1041,7 @@ struct PremiumTaskDetailView: View {
     private var customDurationSheet: some View {
         VStack(spacing: 24) {
             Text("Set Duration")
-                .font(.system(size: 20, weight: .semibold))
+                .dynamicTypeFont(base: 20, weight: .semibold)
 
             HStack(spacing: 16) {
                 TextField("Minutes", text: $customDurationText)
@@ -1056,7 +1056,7 @@ struct PremiumTaskDetailView: View {
                     )
 
                 Text("minutes")
-                    .font(.system(size: 18))
+                    .dynamicTypeFont(base: 18)
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
 
@@ -1069,7 +1069,7 @@ struct PremiumTaskDetailView: View {
                 }
                 showCustomDuration = false
             }
-            .font(.system(size: 17, weight: .semibold))
+            .dynamicTypeFont(base: 17, weight: .semibold)
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
@@ -1241,7 +1241,7 @@ struct DurationPresetButton: View {
     var body: some View {
         Button(action: onSelect) {
             Text(label)
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(isSelected ? .white : Theme.Colors.textSecondary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
@@ -1266,7 +1266,7 @@ struct QuickSuggestionChip: View {
     var body: some View {
         Button(action: action) {
             Text(text)
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(Theme.Colors.aiPurple)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
@@ -1287,7 +1287,7 @@ struct PremiumChatMessageBubble: View {
             if message.role == .user { Spacer() }
 
             Text(message.content)
-                .font(.system(size: 13))
+                .dynamicTypeFont(base: 13)
                 .foregroundStyle(message.role == .user ? .white : Theme.Colors.textSecondary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
@@ -1323,14 +1323,14 @@ struct PremiumSubTaskRow: View {
                             .frame(width: 20, height: 20)
 
                         Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
+                            .dynamicTypeFont(base: 10, weight: .bold)
                             .foregroundStyle(.white)
                     }
                 }
 
                 // Title
                 Text(subtask.title)
-                    .font(.system(size: 14))
+                    .dynamicTypeFont(base: 14)
                     .foregroundStyle(subtask.status == .completed ? Theme.Colors.textTertiary : .white)
                     .strikethrough(subtask.status == .completed, color: Theme.Colors.textTertiary)
 
@@ -1377,13 +1377,13 @@ struct PremiumYouTubeResourceRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(resource.title)
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.white)
                     .lineLimit(2)
 
                 if let channelName = resource.channelName {
                     Text(channelName)
-                        .font(.system(size: 11))
+                        .dynamicTypeFont(base: 11)
                         .foregroundStyle(Theme.Colors.textTertiary)
                 }
             }
@@ -1391,7 +1391,7 @@ struct PremiumYouTubeResourceRow: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 12))
+                .dynamicTypeFont(base: 12)
                 .foregroundStyle(Theme.Colors.textTertiary)
         }
         .padding(10)
@@ -1412,7 +1412,7 @@ struct QuickScheduleButton: View {
             onSelect(date)
         } label: {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
@@ -1433,7 +1433,7 @@ struct RecurringTypeButton: View {
     var body: some View {
         Button(action: onSelect) {
             Text(type.displayName)
-                .font(.system(size: 13, weight: .medium))
+                .dynamicTypeFont(base: 13, weight: .medium)
                 .foregroundStyle(isSelected ? .white : Theme.Colors.textSecondary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)

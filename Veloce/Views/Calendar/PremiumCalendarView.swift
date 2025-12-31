@@ -344,7 +344,7 @@ struct PremiumCalendarView: View {
     private var upcomingTasksList: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Upcoming")
-                .font(.system(size: 14, weight: .semibold))
+                .dynamicTypeFont(base: 14, weight: .semibold)
                 .foregroundStyle(.white.opacity(0.6))
                 .padding(.horizontal, 20)
 
@@ -373,13 +373,13 @@ struct PremiumCalendarView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(task.title)
-                        .font(.system(size: 13, weight: .medium))
+                        .dynamicTypeFont(base: 13, weight: .medium)
                         .foregroundStyle(.white)
                         .lineLimit(1)
 
                     if let time = task.scheduledTime {
                         Text(time.formatted(.dateTime.weekday(.abbreviated).hour().minute()))
-                            .font(.system(size: 11))
+                            .dynamicTypeFont(base: 11)
                             .foregroundStyle(.white.opacity(0.5))
                     }
                 }
@@ -414,7 +414,7 @@ struct PremiumCalendarView: View {
             let dayTaskCount = viewModel.tasks(for: viewModel.selectedDate).count
             if dayTaskCount > 0 {
                 Text("\(dayTaskCount) task\(dayTaskCount == 1 ? "" : "s")")
-                    .font(.system(size: 13, weight: .medium))
+                    .dynamicTypeFont(base: 13, weight: .medium)
                     .foregroundStyle(.white.opacity(0.5))
             }
         }
@@ -430,10 +430,10 @@ struct PremiumCalendarView: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 18, weight: .semibold))
+                    .dynamicTypeFont(base: 18, weight: .semibold)
 
                 Text("Add task to \(viewModel.selectedDate.formatted(.dateTime.month(.abbreviated).day()))")
-                    .font(.system(size: 15, weight: .semibold))
+                    .dynamicTypeFont(base: 15, weight: .semibold)
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -571,7 +571,7 @@ struct CalendarPermissionView: View {
                     .frame(width: 120, height: 120)
 
                 Image(systemName: "calendar.badge.checkmark")
-                    .font(.system(size: 48, weight: .light))
+                    .dynamicTypeFont(base: 48, weight: .light)
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Theme.Colors.aiPurple, Theme.Colors.aiCyan],
@@ -587,7 +587,7 @@ struct CalendarPermissionView: View {
                     .foregroundStyle(.white)
 
                 Text("See your Apple Calendar events alongside\nyour tasks for a complete view of your day")
-                    .font(.system(size: 15))
+                    .dynamicTypeFont(base: 15)
                     .foregroundStyle(.white.opacity(0.6))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
@@ -596,10 +596,10 @@ struct CalendarPermissionView: View {
             Button(action: onRequest) {
                 HStack(spacing: 10) {
                     Image(systemName: "calendar.badge.plus")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
 
                     Text("Connect Calendar")
-                        .font(.system(size: 16, weight: .semibold))
+                        .dynamicTypeFont(base: 16, weight: .semibold)
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, 32)
