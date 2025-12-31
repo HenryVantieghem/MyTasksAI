@@ -765,7 +765,7 @@ struct ChatTasksView: View {
     private func completeTask(_ task: TaskItem) {
         // Utopian completion feedback
         AuroraSoundEngine.shared.taskComplete()
-        AuroraHaptics.dopamineBurst()
+        HapticsService.shared.dopamineBurst()
 
         // Get position for points animation
         let screenCenter = CGPoint(x: 200, y: 400)
