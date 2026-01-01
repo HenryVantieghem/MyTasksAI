@@ -365,7 +365,7 @@ struct GoalStreakBadge: View {
                     )
                 )
         }
-        .glassEffect(.regular.tint(.orange).interactive(), in: .rect(cornerRadius: 16))
+        .glassEffect(.regular.tint(.orange).interactive(), in: RoundedRectangle(cornerRadius: 16))
         .onAppear {
             withAnimation(
                 .easeInOut(duration: 0.6)
