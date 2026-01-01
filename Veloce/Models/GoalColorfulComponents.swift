@@ -230,7 +230,7 @@ struct FloatingActionButton: View {
                     .foregroundStyle(.white)
             }
             .scaleEffect(isPressed ? 0.85 : 1.0)
-            .glassEffect(.regular.tint(color).interactive(), in: .circle)
+            .glassEffect(.regular.tint(color).interactive(), in: Circle())
         }
     }
 }
