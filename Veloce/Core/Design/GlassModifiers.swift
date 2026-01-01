@@ -82,15 +82,5 @@ extension View {
 }
 
 // MARK: - Theme Shadow Extension (For Compatibility)
-
-extension View {
-    /// Apply theme shadow from Theme.Shadow tokens
-    func themeShadow(_ shadow: Theme.Shadow) -> some View {
-        self.shadow(
-            color: shadow.color,
-            radius: shadow.radius,
-            x: shadow.x,
-            y: shadow.y
-        )
-    }
-}
+// NOTE: themeShadow(_ style: ShadowStyle) is defined in Theme.swift
+// Use Theme.Shadow.sm, Theme.Shadow.md, Theme.Shadow.lg etc. with that function
