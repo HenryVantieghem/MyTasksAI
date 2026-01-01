@@ -47,11 +47,6 @@ extension View {
     func nativeGlass<S: Shape>(in shape: S) -> some View {
         self.glassEffect(.regular, in: shape)
     }
-
-    /// Interactive glass with custom shape
-    func nativeGlassInteractive<S: Shape>(in shape: S) -> some View {
-        self.glassEffect(.regular.interactive(), in: shape)
-    }
 }
 
 // MARK: - Content Layer Modifiers (NO Glass - Solid Backgrounds)
@@ -118,15 +113,9 @@ extension View {
 }
 
 // MARK: - Morphing Support
-
-@available(iOS 26.0, *)
-extension View {
-    /// Apply glass effect ID for fluid morphing transitions between glass shapes
-    /// System automatically creates smooth morphing animations when IDs match
-    func glassMorphID<ID: Hashable>(_ id: ID) -> some View {
-        self.glassEffectID(id)
-    }
-}
+// NOTE: For iOS 26+ glass morphing, use the native SwiftUI.View.glassEffectID(_:) modifier directly
+// Example: someView.glassEffectID("myID")
+// The system automatically creates smooth morphing animations when IDs match across GlassEffectContainers
 
 // MARK: - Container Relative Shape
 
