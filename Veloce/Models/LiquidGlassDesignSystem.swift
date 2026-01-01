@@ -18,6 +18,21 @@ import SwiftUI
 
 enum LiquidGlassDesignSystem {
 
+    // MARK: - Glass Tints (for liquidGlassTinted)
+
+    enum GlassTints {
+        /// Neutral tint for general purpose glass
+        static let neutral = Color.white.opacity(0.08)
+        /// Purple tint for AI/premium elements
+        static let purple = Color(red: 0.58, green: 0.25, blue: 0.98).opacity(0.15)
+        /// Cyan tint for interactive elements
+        static let cyan = Color(red: 0.0, green: 0.95, blue: 1.0).opacity(0.12)
+        /// Green tint for success states
+        static let green = Color(red: 0.15, green: 1.0, blue: 0.65).opacity(0.12)
+        /// Gold tint for achievements
+        static let gold = Color(red: 1.0, green: 0.85, blue: 0.25).opacity(0.12)
+    }
+
     // MARK: - Vibrant Accents
 
     enum VibrantAccents {
