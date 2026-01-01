@@ -127,7 +127,7 @@ struct GradientProgressBar: View {
             }
         }
         .frame(height: height)
-        .glassEffect(.regular, in: .rect(cornerRadius: cornerRadius))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius))
         .onAppear {
             animatedProgress = progress
         }
