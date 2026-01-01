@@ -291,7 +291,7 @@ struct MilestoneBadge: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(color.opacity(0.1))
         }
-        .glassEffect(.regular.tint(color), in: .rect(cornerRadius: 12))
+        .glassEffect(.regular.tint(color), in: RoundedRectangle(cornerRadius: 12))
         .onAppear {
             withAnimation(.spring(duration: 0.8, bounce: 0.3)) {
                 animatedCompleted = completed
