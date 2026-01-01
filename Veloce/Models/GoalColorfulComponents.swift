@@ -173,7 +173,7 @@ struct PulsingBadge: View {
                     )
                 )
                 .frame(width: size, height: size)
-                .glassEffect(.regular.tint(color).interactive(), in: .circle)
+                .glassEffect(.regular.tint(color).interactive(), in: Circle())
             
             // Icon
             Image(systemName: icon)
