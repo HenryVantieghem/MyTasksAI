@@ -257,7 +257,7 @@ struct MilestoneBadge: View {
                     .dynamicTypeFont(base: 14)
                     .foregroundStyle(color)
             }
-            .glassEffect(.regular, in: .circle)
+            .glassEffect(.regular, in: Circle())
             
             // Progress text
             VStack(alignment: .leading, spacing: 2) {
