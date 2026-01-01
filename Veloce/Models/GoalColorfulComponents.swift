@@ -406,7 +406,7 @@ struct CategoryTag: View {
                     )
                 )
         }
-        .glassEffect(.regular.tint(category.color), in: .capsule)
+        .glassEffect(.regular.tint(category.color), in: Capsule())
     }
 }
 
